@@ -1,0 +1,11 @@
+"workshopitem"
+{
+  "appid"           "4170200"
+  "publishedfileid" "0"
+  "contentfolder"   "./build"
+  "previewfile"     "./preview.png"
+  "visibility"      "0"
+  "title"           "{{MOD_TITLE}}"
+  "description"     "{{MOD_DESCRIPTION}}"
+  "changenote"      "{{CHANGE_NOTES}}"
+}

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "modId": "YOUR_MOD_ID",
+  "hooks": [
+    {
+      "name": "FMF.GAMEPLAY.JobCompleted",
+      "role": "subscribe"
+    }
+  ]
+}

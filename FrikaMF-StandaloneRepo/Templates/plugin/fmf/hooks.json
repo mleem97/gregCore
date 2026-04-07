@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "pluginId": "FFM.Plugin.YourName",
+  "hooks": []
+}

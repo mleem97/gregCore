@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "description": "Map legacy Game2Framework identifiers to FMF hook names.",
+  "map": {
+    "Game2Framework.OnJobDone": "FMF.GAMEPLAY.JobCompleted",
+    "Game2Framework.OnRackTempHigh": "FMF.SERVER.RackOverheated"
+  }
+}

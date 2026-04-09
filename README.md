@@ -9,7 +9,9 @@
 ![Greg Framework API Banner](https://github.com/user-attachments/assets/3e78050a-67e8-4eaa-981e-7fa5cfbc466c)
 
 **FrikaMF** (Frika Mod Framework) is a MelonLoader-based modding stack for **Data Center**.
-It provides Harmony hooks, event handling, a Rust/native bridge, plugin extensions, and optional tooling.
+It is the **framework core** (`gregCore`): translations, Harmony hooks, event handling, a Rust/native bridge, plugin extensions, and optional tooling.
+
+**Mod / plugin / extension logic** shipped by authors must be implemented in **C#** — see [Modding language (C# only)](https://github.com/mleem97/gregWiki/blob/main/docs/reference/modding-language-requirement.md) in **gregWiki**.
 
 ---
 

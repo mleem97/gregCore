@@ -184,6 +184,9 @@ public class Core : MelonMod
             CrashLog.Log("step: loading all mods");
             _ffiBridge.LoadAllMods();
 
+            CrashLog.Log("step: registering built-in UI extension handlers (core)");
+            UiExtensionBootstrap.RegisterBuiltInHandlers();
+
             // ModigApi is now fully integrated into FrikaMF.
             // All game API surfaces (Player, Network, Time, Localisation, UI, World)
             // are accessible via the consolidated ModigApi class.
@@ -367,6 +370,7 @@ public class Core : MelonMod
         {
             LoggerInstance.Msg("Shutting down modloader...");
             CrashLog.Log("step: OnApplicationQuit starting");
+            UiExtensionBootstrap.UnregisterBuiltInHandlers();
             UninstallGlobalExceptionHooks();
             _ffiBridge?.Shutdown();
             _ffiBridge?.Dispose();

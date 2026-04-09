@@ -5,7 +5,10 @@ using UnityEngine;
 namespace DataCenterModLoader;
 
 /// <summary>
-/// Optional extension bridge for UI/sysadmin features provided by standalone plugins.
+/// Bridge for **UI** features (web replacement, modernizer, mod settings menu). Not related to
+/// <see cref="MultiplayerBridge"/> — multiplayer is a separate plugin concern. Built-in handlers are registered by
+/// <see cref="UiExtensionBootstrap"/> from <see cref="Core"/>; optional FFM.Plugin.* assemblies may still
+/// replace registrations via <c>OnFrameworkReady</c> if loaded after the core.
 /// </summary>
 public static class UiExtensionBridge
 {

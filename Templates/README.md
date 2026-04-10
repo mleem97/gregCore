@@ -16,7 +16,7 @@ gregCore is loaded as a MelonLoader Plugin. This means it initializes early and 
 To consume the framework in your mod:
 1. Add a **`<ProjectReference>`** to **`../framework/gregCore.csproj`** (from a template under `Templates/`) — output assembly **`gregCore.dll`**.
 2. Use **`gregFramework.Core`**: `GregEventDispatcher`, `GregHookName`, `GregNativeEventHooks`, etc. Subscribe to canonical **`greg.*`** strings (see **`greg_hooks.json`** and [greg hooks catalog](https://github.com/mleem97/gregWiki/blob/main/docs/reference/greg-hooks-catalog.md)).
-3. (Optional) Rust/native mods use the FFI bridge in the **`framework/src/ModLoader/`** layer.
+3. (Optional) Rust/native mods use the FFI bridge in the **`framework/ModLoader/`** layer.
 
 For a ready-to-run Sysadmin sample in C#/Lua/TS/Rust, use `Templates/mod/sysadmin/`.
 

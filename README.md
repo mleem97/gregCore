@@ -25,7 +25,7 @@
 
 ### Quick install
 
-1. Build or download `gregCore.Framework.dll`.
+1. Build or download `gregCore.dll`.
 2. Copy it to: `Data Center/Mods/`.
 3. (Optional) Add companion mods or plugins.
 4. Launch the game and verify load order in `MelonLoader/Latest.log`.

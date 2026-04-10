@@ -100,19 +100,19 @@
     <Compile Include="..\..\framework\Main.cs" Link="Main.cs" />
     <Compile Include="..\..\framework\Main.CI.cs" Link="Main.CI.cs" />
 
-    <Compile Include="..\..\framework\src\ModLoader\GameSignalSnapshotService.cs" Link="Services\GameSignalSnapshotService.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Il2CppEventCatalogService.cs" Link="Services\Il2CppEventCatalogService.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Il2CppGameplayIndexService.cs" Link="Services\Il2CppGameplayIndexService.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\ModEventFramework.cs" Link="Framework\ModEventFramework.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\RuntimeHookService.cs" Link="Services\RuntimeHookService.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\TestMods\FrameworkDependencyTest.cs" Link="TestMods\FrameworkDependencyTest.cs" />
+    <Compile Include="..\..\framework\ModLoader\GameSignalSnapshotService.cs" Link="Services\GameSignalSnapshotService.cs" />
+    <Compile Include="..\..\framework\ModLoader\Il2CppEventCatalogService.cs" Link="Services\Il2CppEventCatalogService.cs" />
+    <Compile Include="..\..\framework\ModLoader\Il2CppGameplayIndexService.cs" Link="Services\Il2CppGameplayIndexService.cs" />
+    <Compile Include="..\..\framework\ModLoader\ModEventFramework.cs" Link="Framework\ModEventFramework.cs" />
+    <Compile Include="..\..\framework\ModLoader\RuntimeHookService.cs" Link="Services\RuntimeHookService.cs" />
+    <Compile Include="..\..\framework\ModLoader\TestMods\FrameworkDependencyTest.cs" Link="TestMods\FrameworkDependencyTest.cs" />
 
-    <Compile Include="..\..\framework\src\ModLoader\Events\ErrorEvents.cs" Link="Events\ErrorEvents.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\ExportEvents.cs" Link="Events\ExportEvents.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\HookEvents.cs" Link="Events\HookEvents.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\Il2CppCatalogEvents.cs" Link="Events\Il2CppCatalogEvents.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\IModEvent.cs" Link="Events\IModEvent.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\ModLifecycleEvents.cs" Link="Events\ModLifecycleEvents.cs" />
-    <Compile Include="..\..\framework\src\ModLoader\Events\ToggleEvents.cs" Link="Events\ToggleEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\ErrorEvents.cs" Link="Events\ErrorEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\ExportEvents.cs" Link="Events\ExportEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\HookEvents.cs" Link="Events\HookEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\Il2CppCatalogEvents.cs" Link="Events\Il2CppCatalogEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\IModEvent.cs" Link="Events\IModEvent.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\ModLifecycleEvents.cs" Link="Events\ModLifecycleEvents.cs" />
+    <Compile Include="..\..\framework\ModLoader\Events\ToggleEvents.cs" Link="Events\ToggleEvents.cs" />
   </ItemGroup>
 </Project>

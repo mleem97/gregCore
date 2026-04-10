@@ -29,7 +29,7 @@ internal static class Patch_Player_UpdateCoin
                 newBalance = tentativeNew,
                 accepted = true
             };
-            if (!GregEventDispatcher.InvokeCancelable(GregHookName.Create(GregDomain.Player, "MoneyChanged"), payload))
+            if (!GregEventDispatcher.InvokeCancelable(GregNativeEventHooks.PlayerCoinChanged, payload))
                 return false;
         }
         catch (Exception ex) { EventDispatcher.LogError($"UpdateCoin cancelable prefix: {ex.Message}"); }

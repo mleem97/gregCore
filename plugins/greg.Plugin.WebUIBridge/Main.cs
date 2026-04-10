@@ -17,7 +17,7 @@ namespace greg.Plugin.WebUIBridge;
 public sealed class Main : GregPluginBase
 {
     public override string PluginId => "greg.Plugin.WebUIBridge";
-    public override string DisplayName => "FrikaMF WebUI Bridge (framework UI addon example)";
+    public override string DisplayName => "gregCore WebUI Bridge (framework UI addon example)";
     public override Version RequiredFrameworkVersion => ParseFrameworkVersion(ReleaseVersion.Current);
 
     public override void OnInitializeMelon()
@@ -35,7 +35,7 @@ public sealed class Main : GregPluginBase
         UiExtensionBridge.AfterSettingsOpened += OnAfterSettingsOpened;
 
         MelonLogger.Msg(
-            "[greg.Plugin.WebUIBridge] Subscribed to UiExtensionBridge hooks; web replacement remains in FrikaMF core.");
+            "[greg.Plugin.WebUIBridge] Subscribed to UiExtensionBridge hooks; web replacement remains in gregCore.");
     }
 
     public override void OnApplicationQuit()

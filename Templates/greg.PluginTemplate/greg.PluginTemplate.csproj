@@ -78,6 +78,10 @@
   </Target>
 
   <ItemGroup>
+    <Compile Remove="greg.PluginTemplate.Tests\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\framework\FrikaMF.csproj" />
   </ItemGroup>
 

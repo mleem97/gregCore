@@ -1,80 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using gregFramework.Core;
 
 namespace DataCenterModLoader;
 
 /// <summary>
-/// Emits canonical greg.* events alongside the existing FFI / legacy hook pipeline.
-/// Mapping is keyed by <see cref="DataCenterModLoader.EventIds"/>; names align with greg_hooks.json where listed.
+/// Emits canonical greg.* events for the native FFI pipeline. Hook names come from
+/// <see cref="GregNativeEventHooks"/> (aligned with greg_hooks.json where listed).
 /// </summary>
 internal static class GregHookIntegration
 {
-    private static readonly Dictionary<uint, string> GregByEventId = BuildGregMap();
-
-    private static Dictionary<uint, string> BuildGregMap()
-    {
-        var d = new Dictionary<uint, string>
-        {
-            [EventIds.MoneyChanged] = "greg.PLAYER.MoneyChanged",
-            [EventIds.XPChanged] = "greg.PLAYER.XpChanged",
-            [EventIds.ReputationChanged] = "greg.PLAYER.ReputationChanged",
-
-            [EventIds.ServerPowered] = "greg.SERVER.PowerToggled",
-            [EventIds.ServerBroken] = "greg.SERVER.Degraded",
-            [EventIds.ServerRepaired] = "greg.SERVER.Repaired",
-            [EventIds.ServerInstalled] = "greg.RACK.DevicePlaced",
-
-            [EventIds.CableConnected] = "greg.NETWORK.CableConnected",
-            [EventIds.CableDisconnected] = "greg.NETWORK.CableDisconnected",
-            [EventIds.ServerCustomerChanged] = "greg.SERVER.ClientAssigned",
-            [EventIds.ServerAppChanged] = "greg.SERVER.AppChanged",
-            [EventIds.RackUnmounted] = "greg.RACK.Removed",
-            [EventIds.SwitchBroken] = "greg.NETWORK.LinkDown",
-            [EventIds.SwitchRepaired] = "greg.NETWORK.LinkUp",
-            [EventIds.CableCreated] = "greg.NETWORK.CableConnected",
-            [EventIds.CableRemoved] = "greg.NETWORK.CableDisconnected",
-            [EventIds.CableCleared] = "greg.NETWORK.CableDisconnected",
-            [EventIds.CableSpeedChanged] = "greg.NETWORK.TrafficThreshold",
-            [EventIds.CableSfpInserted] = "greg.NETWORK.CableConnected",
-            [EventIds.CableSfpRemoved] = "greg.NETWORK.CableDisconnected",
-
-            [EventIds.DayEnded] = "greg.SYSTEM.DayChanged",
-            [EventIds.MonthEnded] = "greg.SYSTEM.MonthChanged",
-
-            [EventIds.CustomerAccepted] = "greg.CUSTOMER.ContractSigned",
-            [EventIds.CustomerSatisfied] = "greg.CUSTOMER.SlaRestored",
-            [EventIds.CustomerUnsatisfied] = "greg.CUSTOMER.SlaBreached",
-
-            [EventIds.ShopCheckout] = "greg.UI.StoreCartCheckedOut",
-            [EventIds.ShopItemAdded] = "greg.UI.StoreItemAdded",
-            [EventIds.ShopCartCleared] = "greg.UI.StoreCartCheckedOut",
-            [EventIds.ShopItemRemoved] = "greg.UI.StoreItemRemoved",
-
-            [EventIds.EmployeeHired] = "greg.EMPLOYEE.Hired",
-            [EventIds.EmployeeFired] = "greg.EMPLOYEE.Terminated",
-
-            [EventIds.GameSaved] = "greg.SYSTEM.SaveCompleted",
-            [EventIds.GameLoaded] = "greg.SYSTEM.LoadCompleted",
-            [EventIds.GameAutoSaved] = "greg.SYSTEM.AutoSaveRequested",
-
-            [EventIds.WallPurchased] = "greg.GAMEPLAY.RoomExpanded",
-            [EventIds.NetWatchDispatched] = "greg.NETWORK.TrafficThreshold",
-
-            [EventIds.CustomEmployeeHired] = "greg.EMPLOYEE.Hired",
-            [EventIds.CustomEmployeeFired] = "greg.EMPLOYEE.Terminated",
-
-            [FrikaMF.EventIds.HookBridgeInstalled] = "greg.SYSTEM.HookBridgeInstalled",
-            [FrikaMF.EventIds.HookBridgeTriggered] = "greg.SYSTEM.HookBridgeTriggered",
-        };
-
-        return d;
-    }
-
     internal static void EmitForSimple(uint eventId)
     {
-        if (!GregByEventId.TryGetValue(eventId, out var greg))
+        if (!GregNativeEventHooks.TryGetHookForEvent(eventId, out var greg))
             return;
 
         GregEventDispatcher.Emit(greg, new GregSimplePayload(eventId));
@@ -82,7 +20,7 @@ internal static class GregHookIntegration
 
     internal static void EmitForStruct<T>(uint eventId, T data) where T : struct
     {
-        if (!GregByEventId.TryGetValue(eventId, out var greg))
+        if (!GregNativeEventHooks.TryGetHookForEvent(eventId, out var greg))
             return;
 
         object payload = BuildPayload(eventId, data);

@@ -1,13 +1,13 @@
-# Generates greg_hooks.json + gregCore/framework/src/harmony/*.cs from Il2CppInterop C# sources
+# Generates greg_hooks.json + gregCore/framework/harmony/*.cs from Il2CppInterop C# sources
 # (stand-in when repo root MergedCode.md is absent). Re-run after game / interop updates.
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $il2cppDir = Join-Path $repoRoot 'gregReferences\il2cpp-unpack\Assembly-CSharp\Il2Cpp'
-$harmonyPatches = Join-Path $repoRoot 'gregCore\framework\src\ModLoader\HarmonyPatches.cs'
+$harmonyPatches = Join-Path $repoRoot 'gregCore\framework\ModLoader\HarmonyPatches.cs'
 $outJsonRoot = Join-Path $repoRoot 'greg_hooks.json'
 $outJsonFramework = Join-Path $repoRoot 'gregCore\framework\greg_hooks.json'
-$outHooksDir = Join-Path $repoRoot 'gregCore\framework\src\harmony'
+$outHooksDir = Join-Path $repoRoot 'gregCore\framework\harmony'
 
 if (-not (Test-Path $il2cppDir)) { throw "Missing Il2Cpp sources: $il2cppDir" }
 New-Item -ItemType Directory -Force -Path $outHooksDir | Out-Null

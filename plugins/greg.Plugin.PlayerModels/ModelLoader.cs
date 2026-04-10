@@ -15,10 +15,22 @@ public static class ModelLoader
         MelonEnvironment.GameRootDirectory,
         "DataCenter_Data",
         "StreamingAssets",
+        "gregCore",
+        "PlayerModels");
+
+    private static readonly string LegacyStreamingModelsRoot = Path.Combine(
+        MelonEnvironment.GameRootDirectory,
+        "DataCenter_Data",
+        "StreamingAssets",
         "FrikaMF",
         "PlayerModels");
 
     private static readonly string ModsModelsRoot = Path.Combine(
+        MelonEnvironment.ModsDirectory,
+        "gregCore",
+        "PlayerModels");
+
+    private static readonly string LegacyModsModelsRoot = Path.Combine(
         MelonEnvironment.ModsDirectory,
         "FrikaMF",
         "PlayerModels");
@@ -29,7 +41,12 @@ public static class ModelLoader
     public static LoadedPlayerModel LoadFromStreamingAssets(string modelName)
     {
         string bundlePath = Path.Combine(StreamingModelsRoot, modelName + ".bundle");
-        return LoadFromPath(modelName, bundlePath, "StreamingAssets");
+        LoadedPlayerModel model = LoadFromPath(modelName, bundlePath, "StreamingAssets/gregCore");
+        if (model != null)
+            return model;
+
+        string legacyBundlePath = Path.Combine(LegacyStreamingModelsRoot, modelName + ".bundle");
+        return LoadFromPath(modelName, legacyBundlePath, "StreamingAssets/FrikaMF (legacy)");
     }
 
     /// <summary>
@@ -38,7 +55,12 @@ public static class ModelLoader
     public static LoadedPlayerModel LoadFromModsPath(string modelName)
     {
         string bundlePath = Path.Combine(ModsModelsRoot, modelName + ".bundle");
-        return LoadFromPath(modelName, bundlePath, "ModsPath");
+        LoadedPlayerModel model = LoadFromPath(modelName, bundlePath, "Mods/gregCore");
+        if (model != null)
+            return model;
+
+        string legacyBundlePath = Path.Combine(LegacyModsModelsRoot, modelName + ".bundle");
+        return LoadFromPath(modelName, legacyBundlePath, "Mods/FrikaMF (legacy)");
     }
 
     /// <summary>

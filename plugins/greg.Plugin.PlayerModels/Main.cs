@@ -26,7 +26,7 @@ public sealed class Main : GregPluginBase
     public override string PluginId => "greg.Plugin.PlayerModels";
 
     /// <inheritdoc />
-    public override string DisplayName => "FrikaMF Player Models Plugin";
+    public override string DisplayName => "gregCore Player Models Plugin";
 
     /// <inheritdoc />
     public override Version RequiredFrameworkVersion => ParseFrameworkVersion(ReleaseVersion.Current);

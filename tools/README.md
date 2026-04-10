@@ -2,10 +2,10 @@
 
 ## `Generate-GregHookCatalog.ps1`
 
-Generates the Docusaurus page [`wiki/docs/reference/greg-hooks-catalog.md`](../wiki/docs/reference/greg-hooks-catalog.md) from:
+Generates the Docusaurus page [`gregWiki/docs/reference/greg-hooks-catalog.md`](../../gregWiki/docs/reference/greg-hooks-catalog.md) from:
 
-- `framework/FrikaMF/HookNames.cs` — string literals and `EventId` → hook mappings
-- `framework/FrikaMF/EventIds.cs` — numeric event id constants
+- `framework/Sdk/GregNativeEventHooks.cs` — canonical `greg.*` strings for the native / FFI pipeline
+- `framework/ModLoader/EventDispatcher.cs` — `EventIds` numeric constants
 
 Run from repo root:
 

@@ -1,6 +1,6 @@
 # gregCore
 
-**Frika Mod Framework (FrikaMF)** — MelonLoader-based modding stack for **Data Center**: translations, Harmony hooks, event handling, a Rust/native bridge, plugin extensions, and optional tooling.
+**gregCore** — MelonLoader-based modding stack for **Data Center**: translations, Harmony hooks, event handling, a Rust/native bridge, plugin extensions, and optional tooling.
 
 [![Last commit](https://img.shields.io/github/last-commit/mleem97/gregCore/main?label=last%20commit)](https://github.com/mleem97/gregCore/commits/main)
 
@@ -44,7 +44,7 @@
 
 | Component | Path | Description |
 | :--- | :--- | :--- |
-| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/FrikaMF.csproj`](framework/FrikaMF.csproj) or [`FrikaMF.sln`](FrikaMF.sln). Quellen: [`framework/STRUCTURE.md`](framework/STRUCTURE.md) (`src/Sdk`, `src/ModLoader`, …). |
+| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/FrikaMF.csproj`](framework/FrikaMF.csproj) or [`FrikaMF.sln`](FrikaMF.sln). Quellen: [`framework/STRUCTURE.md`](framework/STRUCTURE.md) (`Sdk`, `ModLoader`, `harmony`). |
 | **greg plugins** | [`plugins/`](plugins/) | Runtime plugin layer projects (`greg.Plugin.*`). |
 | **Templates** | [`Templates/`](Templates/) | Mod and plugin template projects and scaffolds. |
 | **MCP server** | [`mcp-server/`](mcp-server/) | Model Context Protocol server implementation and tooling docs. |

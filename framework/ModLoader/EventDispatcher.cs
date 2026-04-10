@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using gregFramework.Core;
 using MelonLoader;
 
 namespace DataCenterModLoader;
@@ -55,6 +56,10 @@ public static class EventIds
     // mod systems (10xx)
     public const uint CustomEmployeeHired = 1000;
     public const uint CustomEmployeeFired = 1001;
+
+    // hook bridge introspection (11xx) — keep in sync with dc_api / FrikaMF.EventIds history
+    public const uint HookBridgeInstalled = 1100;
+    public const uint HookBridgeTriggered = 1101;
 }
 
 // must match rust repr(C) layouts
@@ -195,7 +200,7 @@ public static class EventDispatcher
         try
         {
             Marshal.StructureToPtr(data, ptr, false);
-            string hookName = HookNames.Resolve(eventId);
+            string hookName = GregNativeEventHooks.Resolve(eventId);
             CrashLog.Log($"DispatchWithData: hook={hookName}, eventId={eventId}, dataType={typeof(T).Name}, size={size}");
             _bridge.DispatchEvent(eventId, ptr, (uint)size);
         }
@@ -219,7 +224,7 @@ public static class EventDispatcher
 
         try
         {
-            string hookName = HookNames.Resolve(eventId);
+            string hookName = GregNativeEventHooks.Resolve(eventId);
             CrashLog.Log($"FireSimple: hook={hookName}, eventId={eventId}");
             _bridge.DispatchEvent(eventId, IntPtr.Zero, 0);
         }
@@ -387,12 +392,12 @@ public static class EventDispatcher
     public static void FireHookBridgeInstalled(int installed, int failed)
     {
         CrashLog.Log($"FireHookBridgeInstalled: installed={installed}, failed={failed}");
-        FireSimple(FrikaMF.EventIds.HookBridgeInstalled);
+        FireSimple(EventIds.HookBridgeInstalled);
     }
 
     public static void FireHookBridgeTriggered(string methodKey)
     {
         CrashLog.Log($"FireHookBridgeTriggered: method={methodKey}");
-        FireSimple(FrikaMF.EventIds.HookBridgeTriggered);
+        FireSimple(EventIds.HookBridgeTriggered);
     }
 }

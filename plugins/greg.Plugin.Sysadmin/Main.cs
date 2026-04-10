@@ -17,7 +17,7 @@ namespace greg.Plugin.Sysadmin;
 public sealed class Main : GregPluginBase
 {
     public override string PluginId => "greg.Plugin.Sysadmin";
-    public override string DisplayName => "FrikaMF Sysadmin (framework UI addon example)";
+    public override string DisplayName => "gregCore Sysadmin (framework UI addon example)";
     public override Version RequiredFrameworkVersion => ParseFrameworkVersion(ReleaseVersion.Current);
 
     public override void OnInitializeMelon()
@@ -35,7 +35,7 @@ public sealed class Main : GregPluginBase
         UiExtensionBridge.AfterSettingsOpened += OnAfterSettingsOpened;
 
         MelonLogger.Msg(
-            "[greg.Plugin.Sysadmin] Subscribed to UiExtensionBridge additive hooks (see gregCore/framework/src/ModLoader/UiExtensionBridge.cs).");
+            "[greg.Plugin.Sysadmin] Subscribed to UiExtensionBridge additive hooks (see gregCore/framework/ModLoader/UiExtensionBridge.cs).");
     }
 
     public override void OnApplicationQuit()

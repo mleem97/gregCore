@@ -23,7 +23,7 @@ public sealed class Main : GregPluginBase
     public override string PluginId => "greg.Plugin.Multiplayer";
 
     /// <inheritdoc />
-    public override string DisplayName => "FrikaMF Multiplayer Plugin";
+    public override string DisplayName => "gregCore Multiplayer Plugin";
 
     /// <inheritdoc />
     public override Version RequiredFrameworkVersion => ParseFrameworkVersion(ReleaseVersion.Current);

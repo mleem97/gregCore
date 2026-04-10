@@ -50,7 +50,7 @@ Write-Host "[workshop] WorkshopRoot = $WorkshopRoot"
 
 #region Build all projects
 $AllProjects = @(
-    'framework\FrikaMF.csproj',
+    'framework\gregCore.csproj',
     'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
     'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
     'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
@@ -109,20 +109,20 @@ function New-WorkshopProject {
 }
 
 #region Package framework
-$fwDll = Join-Path $RepoRoot "framework\bin\$Configuration\$tfm\FrikaModdingFramework.dll"
+$fwDll = Join-Path $RepoRoot "framework\bin\$Configuration\$tfm\gregCore.dll"
 if (-not (Test-Path -LiteralPath $fwDll)) { throw "Missing: $fwDll" }
 New-WorkshopProject `
-    -Name 'FrikaModFramework' `
+    -Name 'gregCore' `
     -DllSource $fwDll `
     -ContentSubPath 'Mods' `
-    -Title 'FrikaModFramework' `
+    -Title 'gregCore' `
     -Description 'Core modding framework for Data Center. Required by all greg-based mods and plugins.' `
     -Tags @('modded', 'melonloader', 'framework', 'greg')
 #endregion
 
 #region Package plugins
 $plugins = @(
-    @{ Id = 'greg.Plugin.Multiplayer';    Folder = 'plugins\greg.Plugin.Multiplayer';    Desc = 'Multiplayer support plugin for FrikaModFramework.' },
+    @{ Id = 'greg.Plugin.Multiplayer';    Folder = 'plugins\greg.Plugin.Multiplayer';    Desc = 'Multiplayer support plugin for gregCore.' },
     @{ Id = 'greg.Plugin.Sysadmin';       Folder = 'plugins\greg.Plugin.Sysadmin';       Desc = 'Sysadmin tools and server management plugin.' },
     @{ Id = 'greg.Plugin.AssetExporter';  Folder = 'plugins\greg.Plugin.AssetExporter';  Desc = 'Asset export utilities for Data Center modding.' },
     @{ Id = 'greg.Plugin.WebUIBridge';    Folder = 'plugins\greg.Plugin.WebUIBridge';    Desc = 'Web UI bridge plugin for in-game browser-based interfaces.' },
@@ -248,7 +248,7 @@ Write-Host "[workshop] WorkshopUploader -> $mmContent"
 $mmMeta = @{
     publishedFileId = 0
     title = 'Gregtools Modmanager'
-    description = 'All-in-one Mod Manager and Workshop Uploader for Data Center. Browse, install, and publish Steam Workshop content. Manage mod dependencies (MelonLoader, FrikaModFramework, plugins) in one place.'
+    description = 'All-in-one Mod Manager and Workshop Uploader for Data Center. Browse, install, and publish Steam Workshop content. Manage mod dependencies (MelonLoader, gregCore, plugins) in one place.'
     visibility = 'Private'
     previewImageRelativePath = 'preview.png'
     tags = @('tool', 'modmanager', 'workshop', 'greg')

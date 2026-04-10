@@ -8,7 +8,7 @@ namespace DataCenterModLoader;
 
 /// <summary>
 /// Consolidated Modig API layer providing safe, documented access to core game systems.
-/// Previously split across ModigAPIs, now unified within FrikaMF runtime.
+/// Previously split across ModigAPIs, now unified within gregCore runtime.
 /// </summary>
 public static class ModigApi
 {

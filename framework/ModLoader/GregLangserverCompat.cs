@@ -28,7 +28,7 @@ public sealed class GregLangserverCompatRuntime
     {
         _logger = logger;
         _modsDirectory = MelonEnvironment.ModsDirectory;
-        _frameworkDirectory = Path.Combine(MelonEnvironment.GameRootDirectory, "FrikaFM");
+        _frameworkDirectory = Path.Combine(MelonEnvironment.GameRootDirectory, "gregCore");
         _compatDirectory = Path.Combine(_modsDirectory, CompatFolderName);
     }
 
@@ -291,7 +291,7 @@ public sealed class GregLangserverCompatRuntime
         {
             var knownSafeNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                "FrikaModdingFramework.dll",
+                "gregCore.dll",
                 "greg.UIReplacementMod.dll",
                 "greg.HexLabelMod.dll",
                 "greg.JoniMLCompatMod.dll"

@@ -1,7 +1,7 @@
 using System;
-using FrikaMF;
-using FrikaMF.Hooks;
-using FrikaMF.Plugins;
+using gregCore;
+using gregCore.Hooks;
+using gregCore.Plugins;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(greg.Plugin.PlayerModels.Main), "greg.Plugin.PlayerModels", ReleaseVersion.Current, "mleem97")]

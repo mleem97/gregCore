@@ -11,7 +11,7 @@ Use this template to create a standalone **greg Plugin** based on `GregPluginBas
 
 - MelonLoader installed in the game.
 - Generated IL2CPP assemblies (`MelonLoader/Il2CppAssemblies`).
-- `FrikaModdingFramework.dll` installed in the game `Mods` folder.
+- `gregCore.dll` installed in the game `Mods` folder.
 
 ## Quick usage
 

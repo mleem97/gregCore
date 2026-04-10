@@ -34,7 +34,7 @@ public static class UiExtensionBootstrap
             drawGui: ModSettingsMenuBridge.DrawGUI,
             onSettingsOpened: mainMenu => ModSettingsMenuBridge.OnSettingsOpened(mainMenu));
 
-        MelonLogger.Msg("FrikaMF: built-in UI extension handlers registered (Web UI + settings/modernizer UI; not multiplayer).");
+        MelonLogger.Msg("gregCore: built-in UI extension handlers registered (full main menu replace + settings/modernizer UI).");
     }
 
     /// <summary>

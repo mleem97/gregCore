@@ -8,7 +8,7 @@ const html = `
 <div class='greg-shell'>
   <div class='greg-shell__glow'></div>
   <div class='greg-shell__copy'>
-    <p class='eyebrow'>Frika Mod Framework</p>
+    <p class='eyebrow'>greg Mod Framework</p>
     <h1>Modern React UI with C# bridge support</h1>
     <p>greg can resolve the action labels below directly, letting the wrapper route main menu commands without extra glue.</p>
   </div>

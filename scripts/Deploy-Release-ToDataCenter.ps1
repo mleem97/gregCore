@@ -4,7 +4,7 @@
   Builds the in-game stack and copies outputs into the Data Center install for local testing.
 
 .DESCRIPTION
-  - FrikaModdingFramework.dll -> {GameRoot}/Mods
+  - gregCore.dll -> {GameRoot}/Mods
   - greg.Plugin.*.dll           -> {GameRoot}/greg/Plugins
   - greg.ModPathRedirector.dll  -> {GameRoot}/Plugins (MelonLoader Plugins folder)
 
@@ -42,7 +42,7 @@ if ([string]::IsNullOrWhiteSpace($GameDir) -or -not (Test-Path -LiteralPath $Gam
 }
 
 $GameProjects = @(
-    'framework\FrikaMF.csproj',
+    'framework\gregCore.csproj',
     'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
     'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
     'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
@@ -77,10 +77,10 @@ if ($IncludeWorkshopUploader) {
 New-Item -ItemType Directory -Path $dirs -Force | Out-Null
 
 $tfm = 'net6.0'
-$FwDll = Join-Path $RepoRoot "framework\bin\$Configuration\$tfm\FrikaModdingFramework.dll"
+$FwDll = Join-Path $RepoRoot "framework\bin\$Configuration\$tfm\gregCore.dll"
 if (-not (Test-Path -LiteralPath $FwDll)) { throw "Missing: $FwDll" }
-Copy-Item -LiteralPath $FwDll -Destination (Join-Path $Mods 'FrikaModdingFramework.dll') -Force
-Write-Host "[deploy] -> $Mods\FrikaModdingFramework.dll"
+Copy-Item -LiteralPath $FwDll -Destination (Join-Path $Mods 'gregCore.dll') -Force
+Write-Host "[deploy] -> $Mods\gregCore.dll"
 
 $RedirectorDll = Join-Path $RepoRoot "mods\greg.ModPathRedirector\bin\$Configuration\$tfm\greg.ModPathRedirector.dll"
 if (-not (Test-Path -LiteralPath $RedirectorDll)) { throw "Missing: $RedirectorDll" }

@@ -5,7 +5,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <PlatformTarget>x64</PlatformTarget>
-    <!-- Linked framework sources overlap types from FrikaMF.csproj; compiler prefers the linked definitions. -->
+    <!-- Linked framework sources overlap types from gregCore.csproj; compiler prefers the linked definitions. -->
     <NoWarn>$(NoWarn);CS0436</NoWarn>
     <AssemblyName>greg.Plugin.AssetExporter</AssemblyName>
     <RootNamespace>AssetExporter</RootNamespace>
@@ -95,7 +95,7 @@
   </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\framework\FrikaMF.csproj" />
+    <ProjectReference Include="..\..\framework\gregCore.csproj" />
 
     <Compile Include="..\..\framework\Main.cs" Link="Main.cs" />
     <Compile Include="..\..\framework\Main.CI.cs" Link="Main.CI.cs" />

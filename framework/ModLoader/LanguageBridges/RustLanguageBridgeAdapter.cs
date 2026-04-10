@@ -36,6 +36,25 @@ public sealed class RustLanguageBridgeAdapter : IGregLanguageBridge
         return 0;
     }
 
+    public IReadOnlyList<GregRuntimeUnit> GetRuntimeUnits()
+    {
+        return _ffiBridge.GetLoadedRuntimeUnits();
+    }
+
+    public bool SetUnitEnabled(string unitId, bool enabled)
+    {
+        if (string.IsNullOrWhiteSpace(unitId) || !unitId.StartsWith("native:", System.StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        _ffiBridge.SetModEnabled(unitId, enabled);
+        return true;
+    }
+
+    public int ReloadEnabledUnits()
+    {
+        return _ffiBridge.ReloadAllMods();
+    }
+
     public void OnSceneLoaded(string sceneName)
     {
     }

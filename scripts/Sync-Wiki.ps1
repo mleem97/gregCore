@@ -54,7 +54,7 @@ if (-not [string]::IsNullOrWhiteSpace($GitHubToken)) {
     $cloneUrl = $WikiRepoUrl -replace '^https://', ("https://${tokenUser}:${encodedToken}@")
 }
 
-$tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('FrikaWikiSync_' + [guid]::NewGuid().ToString('N'))
+$tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('gregWikiSync_' + [guid]::NewGuid().ToString('N'))
 $targetPath = Join-Path $tempRoot 'wiki'
 
 try {

@@ -1,5 +1,5 @@
 param(
-    [string]$OutputPath = "FrikaMF\JoniMF\Hooker.cs"
+    [string]$OutputPath = "gregCore\JoniMF\Hooker.cs"
 )
 
 Set-StrictMode -Version Latest
@@ -18,7 +18,7 @@ $stub = @"
 using System;
 using System.Collections.Generic;
 
-namespace FrikaMF;
+namespace gregCore;
 
 public static class Hooker
 {

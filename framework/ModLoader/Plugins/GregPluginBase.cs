@@ -1,10 +1,10 @@
 using System;
 using MelonLoader;
 
-namespace FrikaMF.Plugins;
+namespace gregCore.Plugins;
 
 /// <summary>
-/// Base class for FrikaModFramework standalone plugins.
+/// Base class for gregCore standalone plugins.
 /// </summary>
 public abstract class GregPluginBase : MelonMod
 {

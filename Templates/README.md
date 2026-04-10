@@ -4,18 +4,21 @@ This directory contains starter templates to help you build mods and plugins on 
 
 ## Available Templates
 
-- `StandaloneModTemplate/`: A basic C# class library project pre-configured to build a standalone mod that depends on gregCore.
-- `greg.PluginTemplate/`: A starter template for creating plugins that extend the core framework's capabilities globally before mods are loaded.
-- `UiTemplate/`: A React/Vite-based starter for building custom HTML/CSS/JS user interfaces that bridge with the game's UI through gregCore.
+- `greg.BasedModTemplate/`: Recommended MelonLoader mod with **`ProjectReference`** to **`framework/gregCore.csproj`** and **`gregFramework.Core`** API surface.
+- `StandaloneModTemplate/`: Minimal class library; add a framework reference as needed.
+- `greg.PluginTemplate/`: **`MelonPlugin`** template for code that runs before mods.
+- `UiTemplate/`: React/Vite UI bridged to the game via gregCore web bridge patterns.
 
 ## How to use the Framework
 
 gregCore is loaded as a MelonLoader Plugin. This means it initializes early and provides foundational event hooks and routing for your mods.
 
 To consume the framework in your mod:
-1. Reference `FrikaModdingFramework.dll` in your `.csproj`.
-2. Access the event dispatcher and hooks using the canonical `greg.*` namespace (e.g., `greg.Store.Cart.OnCheckedOut`).
-3. (Optional) For native Rust mods, interface via the FFI bridge provided by the core layer.
+1. Add a **`<ProjectReference>`** to **`../framework/gregCore.csproj`** (from a template under `Templates/`) — output assembly **`gregCore.dll`**.
+2. Use **`gregFramework.Core`**: `GregEventDispatcher`, `GregHookName`, `GregNativeEventHooks`, etc. Subscribe to canonical **`greg.*`** strings (see **`greg_hooks.json`** and [greg hooks catalog](https://github.com/mleem97/gregWiki/blob/main/docs/reference/greg-hooks-catalog.md)).
+3. (Optional) Rust/native mods use the FFI bridge in the **`framework/src/ModLoader/`** layer.
+
+For a ready-to-run Sysadmin sample in C#/Lua/TS/Rust, use `Templates/mod/sysadmin/`.
 
 ## Creating a Plugin to Extend Framework Functions
 

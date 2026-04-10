@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using DataCenterModLoader;
-using FrikaMF.Hooks;
+using gregCore.Hooks;
 
-namespace FrikaMF;
+namespace gregCore;
 
 public static class Hooker
 {

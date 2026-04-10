@@ -1,7 +1,7 @@
 using System;
 using DataCenterModLoader;
-using FrikaMF;
-using FrikaMF.Plugins;
+using gregCore;
+using gregCore.Plugins;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(greg.PluginTemplate.Main), "greg.PluginTemplate", "00.01.0001", "your-name")]

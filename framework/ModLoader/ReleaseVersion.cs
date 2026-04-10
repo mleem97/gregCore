@@ -1,4 +1,4 @@
-namespace FrikaMF;
+namespace gregCore;
 
 public static class ReleaseVersion
 {

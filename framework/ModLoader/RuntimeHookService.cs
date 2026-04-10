@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using FrikaMF.Hooks;
+using gregCore.Hooks;
 
 namespace AssetExporter
 {
@@ -29,7 +29,7 @@ namespace AssetExporter
         private static readonly ConcurrentDictionary<string, int> TriggerCounts = new ConcurrentDictionary<string, int>();
         private static readonly ConcurrentDictionary<string, byte> PatchedMethods = new ConcurrentDictionary<string, byte>();
 
-        private readonly string harmonyId = "frikadelle.framework.runtimehooks";
+        private readonly string harmonyId = "greg.framework.runtimehooks";
         private static readonly Regex CatalogLineRegex = new Regex(
             "^runtime_trigger \\| asm=Assembly-CSharp \\| type=(?<type>[^|]+) \\| method=(?<method>.+)$",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);

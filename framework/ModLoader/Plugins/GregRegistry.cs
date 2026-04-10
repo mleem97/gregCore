@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using MelonLoader;
 
-namespace FrikaMF.Plugins;
+namespace gregCore.Plugins;
 
 /// <summary>
-/// Central runtime registry for standalone FrikaMF plugins.
+/// Central runtime registry for standalone gregCore plugins.
 /// </summary>
 public static class GregRegistry
 {

@@ -1,5 +1,5 @@
 using System;
-using FrikaMF.Plugins;
+using gregCore.Plugins;
 using Il2Cpp;
 using UnityEngine;
 

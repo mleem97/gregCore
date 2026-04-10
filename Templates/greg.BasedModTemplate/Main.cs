@@ -1,6 +1,5 @@
 using System;
 using DataCenterModLoader;
-using FrikaMF;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(greg.BasedModTemplate.Main), "greg.BasedModTemplate", "00.01.0001", "your-name")]
@@ -16,7 +15,7 @@ public sealed class Main : MelonMod
     {
         if (Core.Instance == null)
         {
-            LoggerInstance.Warning("FrikaModdingFramework core not available yet. Waiting for game update loop.");
+            LoggerInstance.Warning("gregCore runtime not available yet. Waiting for game update loop.");
             return;
         }
 

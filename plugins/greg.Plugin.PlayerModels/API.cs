@@ -54,7 +54,7 @@ public static class API
         string localId = "local-player";
         AssignModelToPlayer(localId, modelName);
 
-        string path = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "FrikaFM", "local-player-model.txt");
+        string path = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "gregCore", "local-player-model.txt");
         System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path) ?? MelonEnvironment.UserDataDirectory);
         System.IO.File.WriteAllText(path, modelName ?? string.Empty);
     }

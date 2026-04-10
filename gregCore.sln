@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrikaMF", "framework\FrikaMF.csproj", "{73B346A1-72BC-4F8C-BDAF-C2E88AB9CF69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore", "framework\gregCore.csproj", "{73B346A1-72BC-4F8C-BDAF-C2E88AB9CF69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.Multiplayer", "plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj", "{E6D8D7AD-8D3F-4B1B-97A4-5D6F8F2E0D21}"
 EndProject
@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.PlayerModels", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{9A0CCAB9-4303-13B4-2371-F1B97FF5B728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrikaMF.Tests", "framework\FrikaMF.Tests\FrikaMF.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "framework\gregCore.Tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{808186BE-9BD0-DD1D-D574-36EEAD1E7F8F}"
 EndProject

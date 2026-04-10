@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using MelonLoader;
 
-namespace FrikaMF.References;
+namespace gregCore.References;
 
 /// <summary>
 /// Recursively scans a references folder and loads all valid managed assemblies.

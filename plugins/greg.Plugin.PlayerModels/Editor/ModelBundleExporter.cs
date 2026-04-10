@@ -9,7 +9,7 @@ namespace greg.Plugin.PlayerModels.Editor;
 /// </summary>
 public static class ModelBundleExporter
 {
-    [MenuItem("FrikaMF/PlayerModels/Build Selected PlayerModel Bundle")]
+    [MenuItem("gregCore/PlayerModels/Build Selected PlayerModel Bundle")]
     public static void BuildSelectedBundle()
     {
         GameObject selected = Selection.activeObject as GameObject;

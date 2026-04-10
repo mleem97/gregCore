@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using MelonLoader;
+using DataCenterModLoader.LanguageBridges;
 
 namespace DataCenterModLoader;
 
@@ -134,7 +135,7 @@ public class FFIBridge : IDisposable
         if (string.Equals(extension, ".dll", StringComparison.OrdinalIgnoreCase))
             return modPath;
 
-        string cacheDir = Path.Combine(Path.GetTempPath(), "FrikaMF", "NativeModShadow");
+        string cacheDir = Path.Combine(Path.GetTempPath(), "gregCore", "NativeModShadow");
         Directory.CreateDirectory(cacheDir);
 
         string fileName = Path.GetFileNameWithoutExtension(modPath);
@@ -189,12 +190,22 @@ public class FFIBridge : IDisposable
             mod.Author = Marshal.PtrToStringAnsi(info.Author) ?? "Unknown";
             var description = Marshal.PtrToStringAnsi(info.Description) ?? "";
 
+            mod.Id = NormalizeModId(mod.Id, modPath);
+
             _logger.Msg($"  Mod: {mod.Name} v{mod.Version} by {mod.Author}");
             _logger.Msg($"  Description: {description}");
         }
         else
         {
             _logger.Warning($"  '{fileName}' has no mod_info() export.");
+            mod.Id = NormalizeModId(mod.Id, modPath);
+        }
+
+        if (!IsModEnabled(mod))
+        {
+            _logger.Msg($"  Skipped (disabled): {mod.Name} [{mod.Id}]");
+            FreeLibrary(handle);
+            return;
         }
 
         // mod_init
@@ -256,6 +267,9 @@ public class FFIBridge : IDisposable
         {
             foreach (var mod in _loadedMods)
             {
+                if (!IsModEnabled(mod))
+                    continue;
+
                 try { mod.Update?.Invoke(deltaTime); }
                 catch (Exception ex)
                 {
@@ -276,6 +290,9 @@ public class FFIBridge : IDisposable
         {
             foreach (var mod in _loadedMods)
             {
+                if (!IsModEnabled(mod))
+                    continue;
+
                 try { mod.FixedUpdate?.Invoke(deltaTime); }
                 catch (Exception ex)
                 {
@@ -297,6 +314,9 @@ public class FFIBridge : IDisposable
         {
             foreach (var mod in _loadedMods)
             {
+                if (!IsModEnabled(mod))
+                    continue;
+
                 try { mod.OnSceneLoaded?.Invoke(ptr); }
                 catch (Exception ex) { _logger.Error($"[{mod.Name}] mod_on_scene_loaded crashed: {ex.Message}"); }
             }
@@ -308,6 +328,9 @@ public class FFIBridge : IDisposable
     {
         foreach (var mod in _loadedMods)
         {
+            if (!IsModEnabled(mod))
+                continue;
+
             if (mod.OnEvent == null) continue;
             CrashLog.Log($"DispatchEvent: calling mod_on_event(id={eventId}, dataSize={dataSize}) on '{mod.Name}'");
             try { mod.OnEvent.Invoke(eventId, eventData, dataSize); }
@@ -319,6 +342,9 @@ public class FFIBridge : IDisposable
     {
         foreach (var mod in _loadedMods)
         {
+            if (!IsModEnabled(mod))
+                continue;
+
             try
             {
                 _logger.Msg($"Shutting down: {mod.Name}");
@@ -330,10 +356,55 @@ public class FFIBridge : IDisposable
 
     public int ReloadAllMods()
     {
-        _logger.Msg("Reloading Rust mods (hotload)...");
+        _logger.Msg("Reloading native mods (hotload)...");
         UnloadLoadedMods(callShutdown: true);
         LoadAllMods();
         return _loadedMods.Count;
+    }
+
+    public IReadOnlyList<GregRuntimeUnit> GetLoadedRuntimeUnits()
+    {
+        var units = new List<GregRuntimeUnit>(_loadedMods.Count);
+        for (int index = 0; index < _loadedMods.Count; index++)
+        {
+            var mod = _loadedMods[index];
+            units.Add(new GregRuntimeUnit
+            {
+                Id = mod.Id,
+                DisplayName = $"{mod.Name} ({Path.GetFileName(mod.FilePath)})",
+                Language = "rust/native",
+                Enabled = IsModEnabled(mod),
+                SupportsHotReload = !string.Equals(Path.GetExtension(mod.FilePath), ".dll", StringComparison.OrdinalIgnoreCase),
+                IsNativeModule = true
+            });
+        }
+
+        return units;
+    }
+
+    public void SetModEnabled(string modId, bool enabled)
+    {
+        if (string.IsNullOrWhiteSpace(modId))
+            return;
+
+        ModActivationService.SetEnabled(modId, enabled);
+    }
+
+    private static string NormalizeModId(string modId, string modPath)
+    {
+        string suffix = string.IsNullOrWhiteSpace(modId)
+            ? Path.GetFileNameWithoutExtension(modPath)
+            : modId.Trim();
+
+        if (suffix.StartsWith("native:", StringComparison.OrdinalIgnoreCase))
+            return suffix;
+
+        return $"native:{suffix}";
+    }
+
+    private static bool IsModEnabled(RustMod mod)
+    {
+        return ModActivationService.IsEnabled(mod.Id, true);
     }
 
     private void UnloadLoadedMods(bool callShutdown)

@@ -8,3 +8,5 @@ Suggested layout:
 - `rust/` for native Rust mods (compiled library for `Mods/RustMods`)
 
 Example stubs are included in each folder.
+
+For a complete cross-language example, see `Templates/mod/sysadmin/`.

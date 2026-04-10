@@ -11,7 +11,7 @@ Use this template to create an greg-based standalone mod for **Data Center**.
 
 - MelonLoader installed in the game.
 - Generated IL2CPP assemblies (`MelonLoader/Il2CppAssemblies`).
-- `FrikaModdingFramework.dll` available at runtime in `Data Center/Mods`.
+- `gregCore.dll` available at runtime in `Data Center/Mods`.
 
 ## Quick usage
 

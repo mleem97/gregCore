@@ -28,7 +28,7 @@ const REPO_OVERVIEW = `## gregCore / gregFramework (split-repo layout)
 
 | Path (under gregCore repo) | Role |
 |----------------------------|------|
-| framework/ | MelonLoader runtime (FrikaMF.csproj, Core, HookBinder, …) |
+| framework/ | MelonLoader runtime (gregCore.csproj, Core, HookBinder, …) |
 | framework/gregFramework/ | greg.* hook registry (greg_hooks.json), Core helpers |
 | plugins/ | greg.Plugin.* extensions |
 | mods/ | Gameplay mods |
@@ -109,7 +109,7 @@ async function resolveGregHooksJsonPath(dataRoot) {
 async function resolveLegacygregHooksJsonPath(dataRoot) {
   const candidates = [
     path.join(dataRoot, 'greg_hooks.json'),
-    path.join(dataRoot, 'FrikaModFramework', 'greg_hooks.json')
+    path.join(dataRoot, 'gregCore', 'greg_hooks.json')
   ];
   return tryAccess(candidates);
 }
@@ -330,7 +330,7 @@ function registerTools(mcpServer, dataRoot) {
     {
       title: 'greg_hooks.json (Legacy-Katalog)',
       description:
-        'Liefert **greg_hooks.json** falls im `dataRoot` vorhanden (flach oder unter `FrikaModFramework/`). ' +
+        'Liefert **greg_hooks.json** falls im `dataRoot` vorhanden (flach oder unter `gregCore/`). ' +
         'Ältere deklarative greg/greg-Hook-Liste; für neue Arbeit **greg_hook_registry** / **greg_hook_search** bevorzugen.',
       inputSchema: z.object({})
     },

@@ -57,7 +57,7 @@ public static class EventIds
     public const uint CustomEmployeeHired = 1000;
     public const uint CustomEmployeeFired = 1001;
 
-    // hook bridge introspection (11xx) — keep in sync with dc_api / FrikaMF.EventIds history
+    // hook bridge introspection (11xx) — keep in sync with dc_api / gregCore.EventIds history
     public const uint HookBridgeInstalled = 1100;
     public const uint HookBridgeTriggered = 1101;
 }

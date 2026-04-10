@@ -11,7 +11,7 @@ else {
 }
 
 $script:RepoRoot = Split-Path -Parent $script:ScriptRoot
-$script:ReleaseVersionFile = Join-Path $script:RepoRoot 'FrikaMF\JoniMF\ReleaseVersion.cs'
+$script:ReleaseVersionFile = Join-Path $script:RepoRoot 'gregCore\JoniMF\ReleaseVersion.cs'
 
 function Get-CurrentReleaseVersion {
     if (-not (Test-Path -LiteralPath $script:ReleaseVersionFile)) {
@@ -37,7 +37,7 @@ function Get-GitHubHeaders {
         Authorization          = "Bearer $Token"
         Accept                 = 'application/vnd.github+json'
         'X-GitHub-Api-Version' = '2022-11-28'
-        'User-Agent'           = 'FrikaModFramework-local-release-uploader'
+        'User-Agent'           = 'gregCore-local-release-uploader'
     }
 }
 
@@ -152,7 +152,7 @@ function Publish-LocalRelease {
         [string]$Owner = 'mleem97',
 
         [Parameter()]
-        [string]$Repo = 'FrikaModFramework',
+        [string]$Repo = 'gregCore',
 
         [Parameter()]
         [string]$Configuration = 'Release',
@@ -170,7 +170,7 @@ function Publish-LocalRelease {
         [string]$ReleaseBody = 'Local build upload (contains game-dependent DLL outputs).',
 
         [Parameter()]
-        [string]$FrameworkAssetPrefix = 'FrikaModdingFramework-v'
+        [string]$FrameworkAssetPrefix = 'gregCore-v'
     )
 
     if ([string]::IsNullOrWhiteSpace($Token)) {
@@ -186,17 +186,17 @@ function Publish-LocalRelease {
         }
 
         if ([string]::IsNullOrWhiteSpace($ReleaseName)) {
-            $ReleaseName = "FrikaModdingFramework v$version"
+            $ReleaseName = "gregCore v$version"
         }
 
         if (-not $SkipBuild) {
-            dotnet build .\framework\FrikaMF.csproj -c $Configuration -p:TreatWarningsAsErrors=true -nologo
+            dotnet build .\framework\gregCore.csproj -c $Configuration -p:TreatWarningsAsErrors=true -nologo
             if ($LASTEXITCODE -ne 0) {
-                throw "FrikaMF build failed with exit code $LASTEXITCODE"
+                throw "gregCore build failed with exit code $LASTEXITCODE"
             }
         }
 
-        $frameworkDll = Join-Path $script:RepoRoot ("framework\bin\$Configuration\net6.0\FrikaModdingFramework.dll")
+        $frameworkDll = Join-Path $script:RepoRoot ("framework\bin\$Configuration\net6.0\gregCore.dll")
 
         if (-not (Test-Path -LiteralPath $frameworkDll)) {
             throw "Missing framework DLL: $frameworkDll"

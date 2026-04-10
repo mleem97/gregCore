@@ -1,10 +1,10 @@
 using System.Xml.Linq;
 
-namespace FrikaMF.Tests;
+namespace gregCore.Tests;
 
 public class ProjectSanityTests
 {
-    private static readonly string ProjectFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "FrikaMF.csproj"));
+    private static readonly string ProjectFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "gregCore.csproj"));
 
     [Fact]
     public void ProjectFile_Exists()

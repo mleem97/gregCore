@@ -4,7 +4,7 @@ Use this template to create a new greg-compatible standalone mod.
 
 ## Requirements
 
-- `FrikaModdingFramework.dll` must be installed in game `Mods` folder.
+- `gregCore.dll` must be installed in game `Mods` folder.
 - MelonLoader + generated IL2CPP assemblies.
 
 ## Files

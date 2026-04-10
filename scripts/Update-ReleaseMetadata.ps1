@@ -26,8 +26,8 @@ else {
 }
 
 $script:RepoRoot = Split-Path -Parent $script:MetadataScriptRoot
-$legacyReleaseVersionFile = Join-Path $script:RepoRoot 'FrikaMF\JoniMF\ReleaseVersion.cs'
-$newReleaseVersionFile = Join-Path $script:RepoRoot 'FrikaMF\ReleaseVersion.cs'
+$legacyReleaseVersionFile = Join-Path $script:RepoRoot 'gregCore\JoniMF\ReleaseVersion.cs'
+$newReleaseVersionFile = Join-Path $script:RepoRoot 'gregCore\ReleaseVersion.cs'
 $script:ReleaseVersionFile = if (Test-Path -LiteralPath $newReleaseVersionFile) {
     $newReleaseVersionFile
 }

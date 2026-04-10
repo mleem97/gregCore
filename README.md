@@ -11,7 +11,7 @@
 | **Im Workspace** | Pfad `gregFramework/gregCore/`. Überblick: [gregFramework README](../README.md). |
 | **Remote** | [`mleem97/gregCore`](https://github.com/mleem97/gregCore) |
 
-**Mod-, Plugin- und Extension-Logik**: C# (voll), Rust/native (voll), Lua und TypeScript/JavaScript (Bridge-Host vorbereitet, Runtime-Host im Ausbau).
+**Mod-, Plugin- und Extension-Logik**: C# (voll), Rust/native (voll), Lua und TypeScript/JavaScript (Bridge-Host vorbereitet, Runtime-Host im Ausbau). Core enthält ein vollständiges MainMenu-UI-Replace mit separaten Bereichen für Settings, Multiplayer und Mods.
 
 ---
 
@@ -25,7 +25,7 @@
 
 ### Quick install
 
-1. Build or download `FrikaModdingFramework.dll`.
+1. Build or download `gregCore.Framework.dll`.
 2. Copy it to: `Data Center/Mods/`.
 3. (Optional) Add companion mods or plugins.
 4. Launch the game and verify load order in `MelonLoader/Latest.log`.
@@ -44,7 +44,7 @@
 
 | Component | Path | Description |
 | :--- | :--- | :--- |
-| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/FrikaMF.csproj`](framework/FrikaMF.csproj) or [`FrikaMF.sln`](FrikaMF.sln). Quellen: [`framework/STRUCTURE.md`](framework/STRUCTURE.md) (`Sdk`, `ModLoader`, `harmony`). |
+| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/gregCore.csproj`](framework/gregCore.csproj) or [`gregCore.sln`](gregCore.sln). Quellen: [`framework/STRUCTURE.md`](framework/STRUCTURE.md) (`Sdk`, `ModLoader`, `harmony`). |
 | **greg plugins** | [`plugins/`](plugins/) | Runtime plugin layer projects (`greg.Plugin.*`). |
 | **Templates** | [`Templates/`](Templates/) | Mod and plugin template projects and scaffolds. |
 | **MCP server** | [`mcp-server/`](mcp-server/) | Model Context Protocol server implementation and tooling docs. |
@@ -56,6 +56,7 @@
 
 ## Documentation
 
+- **Native hook map (`EventIds` → `greg.*`):** [`framework/Sdk/GregNativeEventHooks.cs`](framework/Sdk/GregNativeEventHooks.cs) — wiki table via [`tools/Generate-GregHookCatalog.ps1`](tools/Generate-GregHookCatalog.ps1)
 - **Reference assemblies workflow:** [`lib/references/README.md`](lib/references/README.md)
 - **MCP server details:** [`mcp-server/README.md`](mcp-server/README.md)
 - **Template usage:** [`Templates/README.md`](Templates/README.md)

@@ -1,7 +1,7 @@
 using System;
 using DataCenterModLoader;
-using FrikaMF;
-using FrikaMF.Plugins;
+using gregCore;
+using gregCore.Plugins;
 using Il2Cpp;
 using MelonLoader;
 using UnityEngine;

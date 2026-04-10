@@ -95,6 +95,69 @@ public sealed class GregLanguageBridgeHost
         }
     }
 
+    public IReadOnlyList<GregRuntimeUnit> GetRuntimeUnits()
+    {
+        var units = new List<GregRuntimeUnit>();
+        for (int index = 0; index < _bridges.Count; index++)
+        {
+            IGregLanguageBridge bridge = _bridges[index];
+            try
+            {
+                var bridgeUnits = bridge.GetRuntimeUnits();
+                for (int unitIndex = 0; unitIndex < bridgeUnits.Count; unitIndex++)
+                {
+                    units.Add(bridgeUnits[unitIndex]);
+                }
+            }
+            catch (Exception exception)
+            {
+                CrashLog.LogException($"GregLanguageBridgeHost.GetRuntimeUnits.{bridge.LanguageName}", exception);
+            }
+        }
+
+        return units;
+    }
+
+    public bool SetUnitEnabled(string unitId, bool enabled)
+    {
+        for (int index = 0; index < _bridges.Count; index++)
+        {
+            IGregLanguageBridge bridge = _bridges[index];
+            try
+            {
+                if (bridge.SetUnitEnabled(unitId, enabled))
+                {
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                CrashLog.LogException($"GregLanguageBridgeHost.SetUnitEnabled.{bridge.LanguageName}", exception);
+            }
+        }
+
+        return false;
+    }
+
+    public int ReloadHotloadableUnits()
+    {
+        int total = 0;
+        for (int index = 0; index < _bridges.Count; index++)
+        {
+            IGregLanguageBridge bridge = _bridges[index];
+            try
+            {
+                total += bridge.ReloadEnabledUnits();
+            }
+            catch (Exception exception)
+            {
+                CrashLog.LogException($"GregLanguageBridgeHost.ReloadEnabledUnits.{bridge.LanguageName}", exception);
+            }
+        }
+
+        return total;
+    }
+
     public void Shutdown()
     {
         for (int index = 0; index < _bridges.Count; index++)

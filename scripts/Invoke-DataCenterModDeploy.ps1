@@ -60,7 +60,7 @@ function Invoke-DataCenterModDeploy {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [Parameter()]
-        [string]$ProjectPath = (Join-Path $script:DeployScriptRoot "..\framework\FrikaMF.csproj"),
+        [string]$ProjectPath = (Join-Path $script:DeployScriptRoot "..\framework\gregCore.csproj"),
 
         [Parameter()]
         [ValidateSet('Debug', 'Release')]
@@ -186,7 +186,7 @@ function Invoke-Deploy {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [Parameter(Position = 0)]
-        [ValidateSet('--1', '--all', '1', 'all', 'Frika')]
+        [ValidateSet('--1', '--all', '1', 'all', 'greg')]
         [string]$Target = '--1',
 
         [Parameter()]
@@ -210,13 +210,13 @@ function Invoke-Deploy {
     )
 
     $isAll = $Target -in @('--all', 'all')
-    $useFrika = $Target -in @('--1', '1', 'Frika')
+    $usegreg = $Target -in @('--1', '1', 'greg')
 
-    $projectPaths = @((Join-Path $script:DeployScriptRoot '..\framework\FrikaMF.csproj'))
+    $projectPaths = @((Join-Path $script:DeployScriptRoot '..\framework\gregCore.csproj'))
 
     $projectPaths = @($projectPaths)
 
-    Write-Host "[Deploy] Target selected: $(if ($isAll) { 'All (--all => FrikaMF)' } else { 'Frika (--1)' })"
+    Write-Host "[Deploy] Target selected: $(if ($isAll) { 'All (--all => gregCore)' } else { 'greg (--1)' })"
 
     $failedTargets = @()
 

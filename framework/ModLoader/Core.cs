@@ -4,14 +4,14 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using HarmonyLib;
-using FrikaMF.Plugins;
+using gregCore.Plugins;
 using AssetExporter;
 using DataCenterModLoader.LanguageBridges;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-[assembly: MelonInfo(typeof(DataCenterModLoader.Core), "RustBridge", FrikaMF.ReleaseVersion.Current, "Joniii")]
+[assembly: MelonInfo(typeof(DataCenterModLoader.Core), "gregCore", gregCore.ReleaseVersion.Current, "Joniii")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace DataCenterModLoader;
@@ -28,14 +28,14 @@ public static class CrashLog
     {
         try
         {
-            _frameworkDirectory = Path.Combine(gameRoot, "FrikaFM");
+            _frameworkDirectory = Path.Combine(gameRoot, "gregCore");
             Directory.CreateDirectory(_frameworkDirectory);
 
-            _logPath = Path.Combine(_frameworkDirectory, "frikafm-debug.log");
-            _errorLogPath = Path.Combine(_frameworkDirectory, "frikafm-errors.log");
+            _logPath = Path.Combine(_frameworkDirectory, "gregcore-debug.log");
+            _errorLogPath = Path.Combine(_frameworkDirectory, "gregcore-errors.log");
 
             var header =
-                $"===== FrikaMF Debug Log ====={Environment.NewLine}" +
+                $"===== gregCore Debug Log ====={Environment.NewLine}" +
                 $"Started: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}{Environment.NewLine}" +
                 $"========================================={Environment.NewLine}";
 
@@ -141,14 +141,16 @@ public class Core : MelonMod
 
             CrashLog.Init(MelonEnvironment.GameRootDirectory);
             CrashLog.Log("step: CrashLog initialized");
+            ModActivationService.Initialize(LoggerInstance);
+            CrashLog.Log("step: ModActivationService initialized");
 
             ModSaveCompatibilityService.Initialize();
 
             _modsPath = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "RustMods");
 
             LoggerInstance.Msg("╔══════════════════════════════════════════╗");
-            LoggerInstance.Msg("║   Rust Bridge v0.1.0                     ║");
-            LoggerInstance.Msg("║   Rust FFI Bridge Active                 ║");
+            LoggerInstance.Msg("║   gregCore Runtime                       ║");
+            LoggerInstance.Msg("║   Native + Script Bridges Active         ║");
             LoggerInstance.Msg("╚══════════════════════════════════════════╝");
 
             if (!Directory.Exists(_modsPath))
@@ -194,7 +196,7 @@ public class Core : MelonMod
             CrashLog.Log("step: registering built-in UI extension handlers (core)");
             UiExtensionBootstrap.RegisterBuiltInHandlers();
 
-            // ModigApi is now fully integrated into FrikaMF.
+            // ModigApi is now fully integrated into gregCore.
             // All game API surfaces (Player, Network, Time, Localisation, UI, World)
             // are accessible via the consolidated ModigApi class.
             CrashLog.Log("step: ModigApi integrated");
@@ -203,24 +205,24 @@ public class Core : MelonMod
             GregRegistry.NotifyFrameworkReady();
 
             LoggerInstance.Msg("Modloader initialization complete.");
-            LoggerInstance.Msg("Hotkeys: Ctrl+Shift+R reload Rust mods (Main Menu only)");
+            LoggerInstance.Msg("Hotkeys: Ctrl+Shift+R reload enabled mods (Main Menu only)");
             LoggerInstance.Msg("API: Access game systems via ModigApi (Player, Network, Time, Localisation, UI, World)");
-            ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, FrikaMF.ReleaseVersion.Current));
+            ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, gregCore.ReleaseVersion.Current));
 
 #if DEBUG
             try
             {
-                string diagnosticsDir = Path.Combine(MelonEnvironment.GameRootDirectory, "FrikaFM", "Diagnostics");
+                string diagnosticsDir = Path.Combine(MelonEnvironment.GameRootDirectory, "gregCore", "Diagnostics");
                 string snapshotPath = _gameSignalSnapshot.ExportAll(
                     diagnosticsDir,
                     _il2CppEventCatalog,
                     _il2CppGameplayIndex,
                     _runtimeHookService);
-                LoggerInstance.Msg($"FrikaMF: IL2CPP diagnostics snapshot written to {snapshotPath}");
+                LoggerInstance.Msg($"gregCore: IL2CPP diagnostics snapshot written to {snapshotPath}");
             }
             catch (Exception ex)
             {
-                LoggerInstance.Warning($"FrikaMF: IL2CPP diagnostics snapshot failed: {ex.Message}");
+                LoggerInstance.Warning($"gregCore: IL2CPP diagnostics snapshot failed: {ex.Message}");
                 CrashLog.LogException("Il2CppDiagnostics", ex);
             }
 #endif
@@ -311,8 +313,8 @@ public class Core : MelonMod
 
         try
         {
-            int loaded = _ffiBridge?.ReloadAllMods() ?? 0;
-            LoggerInstance.Msg($"Hotload complete. Loaded Rust mods: {loaded}");
+            int loaded = _languageBridgeHost?.ReloadHotloadableUnits() ?? 0;
+            LoggerInstance.Msg($"Hotload complete. Reloaded runtime units: {loaded}");
         }
         catch (Exception ex)
         {
@@ -442,5 +444,20 @@ public class Core : MelonMod
     {
         if (ReferenceEquals(Multiplayer, bridge))
             Multiplayer = null;
+    }
+
+    public System.Collections.Generic.IReadOnlyList<GregRuntimeUnit> GetRuntimeUnits()
+    {
+        return _languageBridgeHost?.GetRuntimeUnits() ?? Array.Empty<GregRuntimeUnit>();
+    }
+
+    public bool SetRuntimeUnitEnabled(string unitId, bool enabled)
+    {
+        return _languageBridgeHost?.SetUnitEnabled(unitId, enabled) ?? false;
+    }
+
+    public int ReloadRuntimeUnits()
+    {
+        return _languageBridgeHost?.ReloadHotloadableUnits() ?? 0;
     }
 }

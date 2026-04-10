@@ -76,7 +76,7 @@ public static class HireRosterService
     {
         try
         {
-            string frameworkDir = Path.Combine(MelonEnvironment.GameRootDirectory, "FrikaFM");
+            string frameworkDir = Path.Combine(MelonEnvironment.GameRootDirectory, "gregCore");
             Directory.CreateDirectory(frameworkDir);
             string outputPath = Path.Combine(frameworkDir, "available-hires.json");
 

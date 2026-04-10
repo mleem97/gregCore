@@ -170,7 +170,7 @@ function App() {
       <section className="hero-card">
         <header className="hero-header">
           <div>
-            <p className="eyebrow">Frika Mod Framework</p>
+            <p className="eyebrow">greg Mod Framework</p>
             <h1>Modern React UI with C# bridge support</h1>
             <p className="subtitle">
               This template is wired for greg-controlled UI replacement and keeps the action labels that the C# wrapper

@@ -18,7 +18,7 @@ public delegate bool LocalisationResolverDelegate(int textId, string currentText
 /// Allows mods to register resolver chains that intercept and override game localisation
 /// without modifying the core i18n system.
 /// 
-/// Previously part of ModigAPIs, now consolidated within FrikaMF core.
+/// Previously part of ModigAPIs, now consolidated within gregCore core.
 /// 
 /// Use via ModigApi.RegisterLocalisationResolver() / UnregisterLocalisationResolver().
 /// </summary>

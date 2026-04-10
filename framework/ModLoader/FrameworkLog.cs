@@ -2,7 +2,7 @@ using MelonLoader;
 using System;
 using DataCenterModLoader;
 
-namespace FrikaMF;
+namespace gregCore;
 
 public static class FrameworkLog
 {

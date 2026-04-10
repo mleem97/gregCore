@@ -22,7 +22,7 @@ public static class ModelLoader
         MelonEnvironment.GameRootDirectory,
         "DataCenter_Data",
         "StreamingAssets",
-        "FrikaMF",
+        "gregCore",
         "PlayerModels");
 
     private static readonly string ModsModelsRoot = Path.Combine(
@@ -32,7 +32,7 @@ public static class ModelLoader
 
     private static readonly string LegacyModsModelsRoot = Path.Combine(
         MelonEnvironment.ModsDirectory,
-        "FrikaMF",
+        "gregCore",
         "PlayerModels");
 
     /// <summary>
@@ -46,7 +46,7 @@ public static class ModelLoader
             return model;
 
         string legacyBundlePath = Path.Combine(LegacyStreamingModelsRoot, modelName + ".bundle");
-        return LoadFromPath(modelName, legacyBundlePath, "StreamingAssets/FrikaMF (legacy)");
+        return LoadFromPath(modelName, legacyBundlePath, "StreamingAssets/gregCore (legacy)");
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public static class ModelLoader
             return model;
 
         string legacyBundlePath = Path.Combine(LegacyModsModelsRoot, modelName + ".bundle");
-        return LoadFromPath(modelName, legacyBundlePath, "Mods/FrikaMF (legacy)");
+        return LoadFromPath(modelName, legacyBundlePath, "Mods/gregCore (legacy)");
     }
 
     /// <summary>

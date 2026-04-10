@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace FrikaMF.Hooks;
+namespace gregCore.Hooks;
 
 /// <summary>
 /// Runtime context for an greg hook invocation.

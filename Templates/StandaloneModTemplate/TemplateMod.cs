@@ -20,13 +20,13 @@ public sealed class TemplateMod : MelonMod
                 || string.Equals(name, "gregFramework", StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            return string.Equals(name, "FrikaModdingFramework", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "FrikaMF", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(name, "gregCore", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "gregCore", StringComparison.OrdinalIgnoreCase);
         });
 
         if (!_frameworkAvailable)
         {
-            LoggerInstance.Error("greg Template Mod requires gregCore (legacy FrikaModdingFramework also supported).");
+            LoggerInstance.Error("greg Template Mod requires gregCore (legacy gregCore also supported).");
             return;
         }
 

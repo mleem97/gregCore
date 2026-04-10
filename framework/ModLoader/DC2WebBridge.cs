@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Il2Cpp;
 using Il2CppTMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -133,6 +134,17 @@ public static class DC2WebBridge
             {
                 new Dc2WebSource { Type = Dc2WebSourceType.Html, Content = "<div><h1>Mod Settings</h1><p>Switch between game settings and mod framework settings.</p></div>" },
                 new Dc2WebSource { Type = Dc2WebSourceType.TailwindCss, Content = "bg-slate-900 text-slate-100 text-base text-sky-400" },
+            }
+        });
+
+        RegisterBundle("MainMenu", new Dc2WebBundle
+        {
+            BundleId = "default-mainmenu-replace",
+            ReplaceExistingUi = true,
+            Sources =
+            {
+                new Dc2WebSource { Type = Dc2WebSourceType.Html, Content = "<div><h1>gregCore Main Menu</h1><p>Unified dashboard for gameplay settings, multiplayer and mods.</p></div>" },
+                new Dc2WebSource { Type = Dc2WebSourceType.Css, Content = ":root{--panel-color:#0b1220ee;--text-color:#f8fafc;--secondary-text-color:#9fb3c8;--btn-normal:#162236;--btn-highlight:#1f3250;--btn-pressed:#111c2e;--accent:#38bdf8;}" },
             }
         });
 
@@ -505,9 +517,35 @@ public static class DC2WebBridge
 
         EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Continue", "Continue", profile, () => TryInvokeMainMenuAction(root, "continue"));
         EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_New", "New Game", profile, () => TryInvokeMainMenuAction(root, "new"));
-        EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Multiplayer", "Multiplayer", profile, () => TryInvokeMainMenuAction(root, "multiplayer"));
-        EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Settings", "Settings", profile, () => TryInvokeMainMenuAction(root, "settings"));
+        EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Settings", "Settings", profile, () => TryOpenCoreHubSection(root, "settings"));
+        EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Multiplayer", "Multiplayer", profile, () => TryOpenCoreHubSection(root, "multiplayer"));
+        EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Mods", "Mods", profile, () => TryOpenCoreHubSection(root, "mods"));
         EnsureMainMenuButton(actionsRow.transform, "DC2WEB_Action_Exit", "Exit", profile, () => TryInvokeMainMenuAction(root, "exit"));
+    }
+
+    private static bool TryOpenCoreHubSection(GameObject root, string section)
+    {
+        if (root == null)
+            return false;
+
+        MainMenu mainMenu = root.GetComponent<MainMenu>();
+        if (mainMenu == null)
+            mainMenu = root.GetComponentInChildren<MainMenu>(true);
+
+        if (mainMenu == null)
+            return TryInvokeMainMenuAction(root, "settings");
+
+        try
+        {
+            ModSettingsMenuBridge.OpenMainMenuSection(mainMenu.gameObject, section);
+            CrashLog.Log($"DC2WebBridge: opened gregCore hub section '{section}'.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException($"DC2WebBridge.TryOpenCoreHubSection.{section}", ex);
+            return false;
+        }
     }
 
     private static GameObject EnsureActionRow(Transform parent)

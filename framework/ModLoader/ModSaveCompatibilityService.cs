@@ -11,7 +11,7 @@ namespace DataCenterModLoader;
 /// </summary>
 public static class ModSaveCompatibilityService
 {
-    private static readonly string CompatibilityDirectory = Path.Combine(MelonEnvironment.UserDataDirectory, "FrikaFM");
+    private static readonly string CompatibilityDirectory = Path.Combine(MelonEnvironment.UserDataDirectory, "gregCore");
     private static readonly string StampPath = Path.Combine(CompatibilityDirectory, "save-compatibility.json");
 
     public static void Initialize()

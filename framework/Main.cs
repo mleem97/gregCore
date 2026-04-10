@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 // Namespace AssetExporter muss zu deiner AssemblyInfo passen
-[assembly: MelonInfo(typeof(AssetExporter.Main), "Frikadelle Modding Framework", FrikaMF.ReleaseVersion.Current, "mleem97")]
+[assembly: MelonInfo(typeof(AssetExporter.Main), "gregCore Framework", gregCore.ReleaseVersion.Current, "mleem97")]
 [assembly: MelonGame(null, null)]
 
 namespace AssetExporter
@@ -38,14 +38,14 @@ namespace AssetExporter
             exportPath = Path.Combine(MelonEnvironment.ModsDirectory, "ExportedAssets");
             if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
-            MelonLogger.Msg("Frikadelle Modding Framework geladen.");
+            MelonLogger.Msg("gregCore Framework geladen.");
 #if DEBUG
             MelonLogger.Msg("Debug-Modus aktiv: F6 Healthcheck | F7 Testmutation | F8 Export | F9 UI-Pfad | F10 NotUsed | F11 Katalog+Index | F12 Hooks installieren.");
 #else
             MelonLogger.Msg("Release-Modus aktiv: nur Game-Kommunikation/Framework-Basis, keine Dev-Exports/Hooks.");
 #endif
             MelonLogger.Msg("Projekt: https://github.com/mleem97/gregFramework");
-            ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, FrikaMF.ReleaseVersion.Current));
+            ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, gregCore.ReleaseVersion.Current));
 
             RunAutoHookCommandIfRequested();
 
@@ -115,7 +115,7 @@ namespace AssetExporter
                 $"Hooks Available: {debugHooksAvailable:D6}\n" +
                 $"HookEvents Available: {debugHookEventsAvailable:D6}\n" +
                 $"Not yet Implemented Hook/Events: {debugNotYetImplemented:D6}\n" +
-                $"FRIKAMF v{FrikaMF.ReleaseVersion.Current}\n" +
+                $"GREGCORE v{gregCore.ReleaseVersion.Current}\n" +
                 "F6: Healthcheck   F7: +1 Money   F8: Export   F9: UI Path   " +
                 $"F10: NotUsed [{notUsedState}]   F11: Catalog/Index   F12: Hooks";
 

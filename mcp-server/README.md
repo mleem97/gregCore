@@ -41,7 +41,7 @@ Der Server erwartet unter **`dataRoot`** (oder per `--data-root` / Env):
 
 Optional (Legacy):
 
-- **`greg_hooks.json`** oder **`FrikaModFramework/greg_hooks.json`**
+- **`greg_hooks.json`** oder **`gregCore/greg_hooks.json`**
 
 **Beispiel** (stdio, aus `gregCore/mcp-server/`):
 

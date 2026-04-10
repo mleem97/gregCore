@@ -15,6 +15,12 @@ public interface IGregLanguageBridge
 
     int LoadScripts();
 
+    IReadOnlyList<GregRuntimeUnit> GetRuntimeUnits();
+
+    bool SetUnitEnabled(string unitId, bool enabled);
+
+    int ReloadEnabledUnits();
+
     void OnSceneLoaded(string sceneName);
 
     void OnUpdate(float deltaTime);

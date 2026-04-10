@@ -1,6 +1,6 @@
 # Standalone Mod Template
 
-Use this template to create a new FMF-compatible standalone mod.
+Use this template to create a new greg-compatible standalone mod.
 
 ## Requirements
 

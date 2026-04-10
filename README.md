@@ -44,8 +44,8 @@
 
 | Component | Path | Description |
 | :--- | :--- | :--- |
-| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/FrikaMF.csproj`](framework/FrikaMF.csproj) or [`FrikaMF.sln`](FrikaMF.sln). |
-| **FFM plugins** | [`plugins/`](plugins/) | Runtime plugin layer projects (`FFM.Plugin.*`). |
+| **Framework (runtime)** | [`framework/`](framework/) | Build with [`framework/FrikaMF.csproj`](framework/FrikaMF.csproj) or [`FrikaMF.sln`](FrikaMF.sln). Quellen: [`framework/STRUCTURE.md`](framework/STRUCTURE.md) (`src/Sdk`, `src/ModLoader`, …). |
+| **greg plugins** | [`plugins/`](plugins/) | Runtime plugin layer projects (`greg.Plugin.*`). |
 | **Templates** | [`Templates/`](Templates/) | Mod and plugin template projects and scaffolds. |
 | **MCP server** | [`mcp-server/`](mcp-server/) | Model Context Protocol server implementation and tooling docs. |
 | **Scripts** | [`scripts/`](scripts/) | Build, deploy, and version scripts. |
@@ -80,7 +80,7 @@
 - **Regenerate hook catalog:**
 
   ```powershell
-  ./tools/Generate-FmfHookCatalog.ps1
+  ./tools/Generate-GregHookCatalog.ps1
   ```
 
 ---

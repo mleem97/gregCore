@@ -3,7 +3,7 @@
   "modId": "YOUR_MOD_ID",
   "hooks": [
     {
-      "name": "FMF.GAMEPLAY.JobCompleted",
+      "name": "greg.GAMEPLAY.JobCompleted",
       "role": "subscribe"
     }
   ]

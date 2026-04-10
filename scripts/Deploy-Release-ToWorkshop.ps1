@@ -11,7 +11,7 @@
 
   The content/ folder mirrors the game directory structure:
     - Framework DLL:     content/Mods/
-    - Plugin DLLs:       content/FMF/Plugins/
+    - Plugin DLLs:       content/greg/Plugins/
     - Standalone mods:   content/Mods/
 
   After running, use the WorkshopUploader UI or CLI to publish each folder.
@@ -51,15 +51,15 @@ Write-Host "[workshop] WorkshopRoot = $WorkshopRoot"
 #region Build all projects
 $AllProjects = @(
     'framework\FrikaMF.csproj',
-    'plugins\FFM.Plugin.Multiplayer\FFM.Plugin.Multiplayer.csproj',
-    'plugins\FFM.Plugin.Sysadmin\FFM.Plugin.Sysadmin.csproj',
-    'plugins\FFM.Plugin.AssetExporter\FFM.Plugin.AssetExporter.csproj',
-    'plugins\FFM.Plugin.WebUIBridge\FFM.Plugin.WebUIBridge.csproj',
-    'plugins\FFM.Plugin.PlayerModels\FFM.Plugin.PlayerModels.csproj',
-    'mods\FMF.ConsoleInputGuard\FMF.ConsoleInputGuard.csproj',
-    'mods\FMF.Mod.GregifyEmployees\FMF.GregifyEmployees.csproj',
-    'mods\FMF.Mod.HexLabelMod\FMF.HexLabelMod.csproj',
-    'mods\FMF.Plugin.LangCompatBridge\FMF.JoniMLCompatMod.csproj'
+    'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
+    'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
+    'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
+    'plugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj',
+    'plugins\greg.Plugin.PlayerModels\greg.Plugin.PlayerModels.csproj',
+    'mods\greg.ConsoleInputGuard\greg.ConsoleInputGuard.csproj',
+    'mods\greg.Mod.GregifyEmployees\greg.GregifyEmployees.csproj',
+    'mods\greg.Mod.HexLabelMod\greg.HexLabelMod.csproj',
+    'mods\greg.Plugin.LangCompatBridge\greg.JoniMLCompatMod.csproj'
 )
 
 foreach ($rel in $AllProjects) {
@@ -116,17 +116,17 @@ New-WorkshopProject `
     -DllSource $fwDll `
     -ContentSubPath 'Mods' `
     -Title 'FrikaModFramework' `
-    -Description 'Core modding framework for Data Center. Required by all FMF-based mods and plugins.' `
-    -Tags @('modded', 'melonloader', 'framework', 'fmf')
+    -Description 'Core modding framework for Data Center. Required by all greg-based mods and plugins.' `
+    -Tags @('modded', 'melonloader', 'framework', 'greg')
 #endregion
 
 #region Package plugins
 $plugins = @(
-    @{ Id = 'FFM.Plugin.Multiplayer';    Folder = 'plugins\FFM.Plugin.Multiplayer';    Desc = 'Multiplayer support plugin for FrikaModFramework.' },
-    @{ Id = 'FFM.Plugin.Sysadmin';       Folder = 'plugins\FFM.Plugin.Sysadmin';       Desc = 'Sysadmin tools and server management plugin.' },
-    @{ Id = 'FFM.Plugin.AssetExporter';  Folder = 'plugins\FFM.Plugin.AssetExporter';  Desc = 'Asset export utilities for Data Center modding.' },
-    @{ Id = 'FFM.Plugin.WebUIBridge';    Folder = 'plugins\FFM.Plugin.WebUIBridge';    Desc = 'Web UI bridge plugin for in-game browser-based interfaces.' },
-    @{ Id = 'FFM.Plugin.PlayerModels';   Folder = 'plugins\FFM.Plugin.PlayerModels';   Desc = 'Custom player models plugin for Data Center.' }
+    @{ Id = 'greg.Plugin.Multiplayer';    Folder = 'plugins\greg.Plugin.Multiplayer';    Desc = 'Multiplayer support plugin for FrikaModFramework.' },
+    @{ Id = 'greg.Plugin.Sysadmin';       Folder = 'plugins\greg.Plugin.Sysadmin';       Desc = 'Sysadmin tools and server management plugin.' },
+    @{ Id = 'greg.Plugin.AssetExporter';  Folder = 'plugins\greg.Plugin.AssetExporter';  Desc = 'Asset export utilities for Data Center modding.' },
+    @{ Id = 'greg.Plugin.WebUIBridge';    Folder = 'plugins\greg.Plugin.WebUIBridge';    Desc = 'Web UI bridge plugin for in-game browser-based interfaces.' },
+    @{ Id = 'greg.Plugin.PlayerModels';   Folder = 'plugins\greg.Plugin.PlayerModels';   Desc = 'Custom player models plugin for Data Center.' }
 )
 
 foreach ($p in $plugins) {
@@ -135,19 +135,19 @@ foreach ($p in $plugins) {
     New-WorkshopProject `
         -Name $p.Id `
         -DllSource $dll `
-        -ContentSubPath 'FMF\Plugins' `
+        -ContentSubPath 'greg\Plugins' `
         -Title $p.Id `
         -Description $p.Desc `
-        -Tags @('modded', 'fmf', 'plugin')
+        -Tags @('modded', 'greg', 'plugin')
 }
 #endregion
 
 #region Package mods
 $mods = @(
-    @{ Name = 'FMF.ConsoleInputGuard';  Folder = 'mods\FMF.ConsoleInputGuard';           Assembly = 'FMF.ConsoleInputGuard';  Desc = 'Console input guard mod for Data Center.' },
-    @{ Name = 'FMF.GregifyEmployees';   Folder = 'mods\FMF.Mod.GregifyEmployees';        Assembly = 'FMF.GregifyEmployees';   Desc = 'Gregify Employees gameplay mod.' },
-    @{ Name = 'FMF.HexLabelMod';        Folder = 'mods\FMF.Mod.HexLabelMod';             Assembly = 'FMF.HexLabelMod';        Desc = 'Hex label display mod for Data Center.' },
-    @{ Name = 'FMF.JoniMLCompatMod';    Folder = 'mods\FMF.Plugin.LangCompatBridge';      Assembly = 'FMF.JoniMLCompatMod';    Desc = 'Language compatibility bridge mod.' }
+    @{ Name = 'greg.ConsoleInputGuard';  Folder = 'mods\greg.ConsoleInputGuard';           Assembly = 'greg.ConsoleInputGuard';  Desc = 'Console input guard mod for Data Center.' },
+    @{ Name = 'greg.GregifyEmployees';   Folder = 'mods\greg.Mod.GregifyEmployees';        Assembly = 'greg.GregifyEmployees';   Desc = 'Gregify Employees gameplay mod.' },
+    @{ Name = 'greg.HexLabelMod';        Folder = 'mods\greg.Mod.HexLabelMod';             Assembly = 'greg.HexLabelMod';        Desc = 'Hex label display mod for Data Center.' },
+    @{ Name = 'greg.JoniMLCompatMod';    Folder = 'mods\greg.Plugin.LangCompatBridge';      Assembly = 'greg.JoniMLCompatMod';    Desc = 'Language compatibility bridge mod.' }
 )
 
 foreach ($m in $mods) {
@@ -251,7 +251,7 @@ $mmMeta = @{
     description = 'All-in-one Mod Manager and Workshop Uploader for Data Center. Browse, install, and publish Steam Workshop content. Manage mod dependencies (MelonLoader, FrikaModFramework, plugins) in one place.'
     visibility = 'Private'
     previewImageRelativePath = 'preview.png'
-    tags = @('tool', 'modmanager', 'workshop', 'fmf')
+    tags = @('tool', 'modmanager', 'workshop', 'greg')
 } | ConvertTo-Json -Depth 3
 
 $mmMetaPath = Join-Path $mmProject 'metadata.json'

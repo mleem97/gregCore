@@ -1,5 +1,8 @@
 /**
- * FrikaMF modding MCP server — stdio (local) or HTTP Streamable MCP + static Docusaurus (Docker).
+ * gregFramework / gregCore — MCP server (Model Context Protocol).
+ * Stdio (IDE) or HTTP Streamable MCP + optional static Docusaurus (Docker).
+ *
+ * Tools: docs search/read, hook registries (greg + legacy greg), CONTRIBUTING, repo overview.
  */
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
@@ -16,32 +19,41 @@ import * as z from 'zod/v4';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const FMF_INSTRUCTIONS = `You help with FrikaMF (Freaky Modding Framework) modding for the community game stack in this monorepo.
-Use the tools to read official docs, hook naming, and the hook registry before inventing APIs.
-Conventions: Harmony patches, event hooks named FMF.<Domain>.<Event> (see CONTRIBUTING / fmf-hook-naming).
-Prefer small, reviewable changes; respect MelonLoader / IL2CPP constraints.`;
+const GREG_INSTRUCTIONS = `You assist with **gregFramework** modding for Data Center (MelonLoader / IL2CPP).
+Use the MCP tools before inventing APIs: read docs, search hooks, load registries.
+Hook catalog: canonical ids use **greg.<DOMAIN>.<Class>.<Method>.<Signature>** (see greg_hooks.json). Legacy greg/greg names may still appear in older docs — prefer greg.* in new work.
+Prefer small, reviewable changes; respect MelonLoader and IL2CPP constraints.`;
 
-const REPO_OVERVIEW = `## FrikaMF monorepo (high level)
+const REPO_OVERVIEW = `## gregCore / gregFramework (split-repo layout)
 
-| Path | Role |
-|------|------|
-| framework/ | MelonLoader runtime (FrikaMF.csproj, Main.cs, hooks) |
-| mods/ | Gameplay mods (FMF.Mod.*) |
-| plugins/ | FFM.Plugin.* |
-| templates/ | Scaffolds for new mods/plugins |
-| docs/ | Docusaurus markdown (source of truth for this MCP) |
-| wiki/ | Docusaurus app (build output served in Docker) |
-| tools/ | Hook catalog, scripts |
-| FrikaModFramework/fmf_hooks.json | Declarative hook registry |`;
+| Path (under gregCore repo) | Role |
+|----------------------------|------|
+| framework/ | MelonLoader runtime (FrikaMF.csproj, Core, HookBinder, …) |
+| framework/gregFramework/ | greg.* hook registry (greg_hooks.json), Core helpers |
+| plugins/ | greg.Plugin.* extensions |
+| mods/ | Gameplay mods |
+| Templates/ | Scaffolds |
+| docs/ | Markdown consumed by this MCP (often mirrored in gregWiki) |
+| mcp-server/ | This Node MCP server |
+| scripts/ | Hook generation (parse_merged_code.py), build helpers |
+
+Multi-repo workspace: sibling folders \`gregWiki/\`, \`gregMod.*\`, \`gregExt.*\` live next to \`gregCore/\` under \`gregFramework/\`.`;
+
+function envStr(...keys) {
+  for (const k of keys) {
+    if (process.env[k]) return process.env[k];
+  }
+  return null;
+}
 
 function parseArgs(argv) {
   const out = {
     http: false,
     stdio: false,
-    host: process.env.FMF_MCP_HOST ?? '0.0.0.0',
-    port: Number(process.env.FMF_MCP_PORT ?? 3000),
-    staticDir: process.env.FMF_MCP_STATIC ?? null,
-    dataRoot: process.env.FMF_MCP_DATA_ROOT ?? null
+    host: envStr('GREG_MCP_HOST', 'GREG_MCP_HOST') ?? '0.0.0.0',
+    port: Number(envStr('GREG_MCP_PORT', 'GREG_MCP_PORT') ?? 3000),
+    staticDir: envStr('GREG_MCP_STATIC', 'GREG_MCP_STATIC') ?? null,
+    dataRoot: envStr('GREG_MCP_DATA_ROOT', 'GREG_MCP_DATA_ROOT') ?? null
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -57,9 +69,9 @@ function parseArgs(argv) {
 }
 
 function defaultDataRoot() {
-  if (process.env.FMF_MCP_DATA_ROOT) return path.resolve(process.env.FMF_MCP_DATA_ROOT);
-  const repoRoot = path.resolve(__dirname, '..', '..');
-  return repoRoot;
+  const fromEnv = envStr('GREG_MCP_DATA_ROOT', 'GREG_MCP_DATA_ROOT');
+  if (fromEnv) return path.resolve(fromEnv);
+  return path.resolve(__dirname, '..', '..');
 }
 
 function docsDir(dataRoot) {
@@ -70,16 +82,36 @@ function contributingPath(dataRoot) {
   return path.join(dataRoot, 'CONTRIBUTING.md');
 }
 
-async function resolveHooksJsonPath(dataRoot) {
-  const flat = path.join(dataRoot, 'fmf_hooks.json');
-  try {
-    await fs.access(flat);
-    return flat;
-  } catch {
-    const nested = path.join(dataRoot, 'FrikaModFramework', 'fmf_hooks.json');
-    await fs.access(nested);
-    return nested;
+/** Try paths in order; return first existing file. */
+async function tryAccess(paths) {
+  for (const p of paths) {
+    try {
+      await fs.access(p);
+      return p;
+    } catch {
+      /* continue */
+    }
   }
+  return null;
+}
+
+/** Canonical greg hook list (generated from MergedCode.md). */
+async function resolveGregHooksJsonPath(dataRoot) {
+  const candidates = [
+    path.join(dataRoot, 'framework', 'gregFramework', 'greg_hooks.json'),
+    path.join(dataRoot, 'gregFramework', 'greg_hooks.json'),
+    path.join(dataRoot, 'greg_hooks.json')
+  ];
+  return tryAccess(candidates);
+}
+
+/** Legacy declarative list (greg_hooks.json) if still present. */
+async function resolveLegacygregHooksJsonPath(dataRoot) {
+  const candidates = [
+    path.join(dataRoot, 'greg_hooks.json'),
+    path.join(dataRoot, 'FrikaModFramework', 'greg_hooks.json')
+  ];
+  return tryAccess(candidates);
 }
 
 function safeDocPath(dataRoot, rel) {
@@ -92,16 +124,18 @@ function safeDocPath(dataRoot, rel) {
   return full;
 }
 
-function registerFmfTools(mcpServer, dataRoot) {
+function registerTools(mcpServer, dataRoot) {
   mcpServer.registerTool(
-    'fmf_search_docs',
+    'greg_search_docs',
     {
-      title: 'Search docs',
+      title: 'Search documentation (Markdown)',
       description:
-        'Search Markdown under docs/ by substring (case-insensitive). Returns paths and short snippets.',
+        'Volltext-Suche (Teilstring, case-insensitive) in allen **docs/**/*.md**-Dateien unter `dataRoot`. ' +
+        'Liefert Pfade relativ zu `docs/` plus kurze Snippets (~280 Zeichen) um den Treffer. ' +
+        'Nutzen: Themen finden, bevor du eine ganze Datei mit `greg_read_doc` lädst.',
       inputSchema: {
-        query: z.string().min(1).max(256).describe('Search string'),
-        limit: z.number().int().min(1).max(25).optional().describe('Max results (default 8)')
+        query: z.string().min(1).max(256).describe('Suchbegriff (z. B. HookBinder, MelonLoader, Harmony)'),
+        limit: z.number().int().min(1).max(25).optional().describe('Max. Trefferzeilen (Standard 8)')
       }
     },
     async ({ query, limit }) => {
@@ -145,12 +179,15 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerTool(
-    'fmf_read_doc',
+    'greg_read_doc',
     {
-      title: 'Read doc file',
-      description: 'Read a Markdown file under docs/ (use forward slashes, e.g. intro.md or reference/fmf-hook-naming.md).',
+      title: 'Read one documentation file',
+      description:
+        'Liest **eine** Markdown-Datei unter `docs/` vollständig als Text. ' +
+        'Pfad relativ zu `docs/` mit Schrägstrich (z. B. `reference/mcp-server.md`). ' +
+        'Kein Path-Traversal: `..` wird verworfen.',
       inputSchema: {
-        path: z.string().min(1).max(512).describe('Path relative to docs/')
+        path: z.string().min(1).max(512).describe('Relativer Pfad unter docs/, z. B. intro.md')
       }
     },
     async ({ path: rel }) => {
@@ -170,20 +207,34 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerTool(
-    'fmf_hook_registry',
+    'greg_hook_registry',
     {
-      title: 'Hook registry JSON',
-      description: 'Return fmf_hooks.json (declarative FMF hook list).',
+      title: 'greg_hooks.json (vollständiger Katalog)',
+      description:
+        'Gibt die **komplette** `greg_hooks.json` zurück (Version 2, generiert aus MergedCode.md): alle öffentlichen ' +
+        'Patch-Ziele mit Namen `greg.<DOMAIN>.<Class>.<Method>.<Sig>`, Strategie, `hotLoop`, `friendlyAlias`, usw. ' +
+        'Nutzen: exakte Hook-IDs für Mods / Dispatcher; bei großen Dateien nur in kleinen Chunks im Client verarbeiten.',
       inputSchema: z.object({})
     },
     async () => {
       try {
-        const p = await resolveHooksJsonPath(dataRoot);
+        const p = await resolveGregHooksJsonPath(dataRoot);
+        if (!p) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `No greg_hooks.json found under dataRoot=${dataRoot}. Expected framework/gregFramework/greg_hooks.json or greg_hooks.json.`
+              }
+            ],
+            isError: true
+          };
+        }
         const text = await fs.readFile(p, 'utf8');
         return { content: [{ type: 'text', text }] };
       } catch (e) {
         return {
-          content: [{ type: 'text', text: `Could not read hook registry: ${e}` }],
+          content: [{ type: 'text', text: `Could not read greg_hooks.json: ${e}` }],
           isError: true
         };
       }
@@ -191,10 +242,130 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerTool(
-    'fmf_read_contributing',
+    'greg_hook_search',
+    {
+      title: 'greg_hooks.json durchsuchen (ohne volle Datei)',
+      description:
+        'Filtert Einträge in **greg_hooks.json** nach Teilstring in `name`, `description`, `patchTarget`, `methodName`, `className`. ' +
+        'Ideal, um passende `greg.*`-Hooks zu finden, ohne die ganze JSON-Datei in den Kontext zu laden.',
+      inputSchema: {
+        query: z.string().min(1).max(256).describe('Teilstring, case-insensitive'),
+        limit: z.number().int().min(1).max(50).optional().describe('Max. Treffer (Standard 15)')
+      }
+    },
+    async ({ query, limit }) => {
+      const max = limit ?? 15;
+      try {
+        const p = await resolveGregHooksJsonPath(dataRoot);
+        if (!p) {
+          return {
+            content: [{ type: 'text', text: `greg_hooks.json not found under ${dataRoot}` }],
+            isError: true
+          };
+        }
+        const raw = JSON.parse(await fs.readFile(p, 'utf8'));
+        const hooks = Array.isArray(raw.hooks) ? raw.hooks : [];
+        const q = query.toLowerCase();
+        const out = [];
+        for (const h of hooks) {
+          const blob = JSON.stringify(h).toLowerCase();
+          if (!blob.includes(q)) continue;
+          out.push(h);
+          if (out.length >= max) break;
+        }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                { query, matched: out.length, totalHooks: hooks.length, hooks: out },
+                null,
+                2
+              )
+            }
+          ]
+        };
+      } catch (e) {
+        return {
+          content: [{ type: 'text', text: String(e) }],
+          isError: true
+        };
+      }
+    }
+  );
+
+  mcpServer.registerTool(
+    'greg_hook_stats',
+    {
+      title: 'greg_hooks.json — Kurzstatistik',
+      description:
+        'Liest nur Metadaten aus **greg_hooks.json** (`version`, `description`, `stats`, `generationOptions`) ohne die `hooks`-Liste. ' +
+        'Schneller Check nach Regenerierung (parse_merged_code.py).',
+      inputSchema: z.object({})
+    },
+    async () => {
+      try {
+        const p = await resolveGregHooksJsonPath(dataRoot);
+        if (!p) {
+          return { content: [{ type: 'text', text: `greg_hooks.json not found under ${dataRoot}` }], isError: true };
+        }
+        const raw = JSON.parse(await fs.readFile(p, 'utf8'));
+        const summary = {
+          version: raw.version,
+          description: raw.description,
+          generatedFrom: raw.generatedFrom,
+          generationOptions: raw.generationOptions,
+          stats: raw.stats,
+          hookFile: p
+        };
+        return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: String(e) }], isError: true };
+      }
+    }
+  );
+
+  mcpServer.registerTool(
+    'greg_hook_registry',
+    {
+      title: 'greg_hooks.json (Legacy-Katalog)',
+      description:
+        'Liefert **greg_hooks.json** falls im `dataRoot` vorhanden (flach oder unter `FrikaModFramework/`). ' +
+        'Ältere deklarative greg/greg-Hook-Liste; für neue Arbeit **greg_hook_registry** / **greg_hook_search** bevorzugen.',
+      inputSchema: z.object({})
+    },
+    async () => {
+      try {
+        const p = await resolveLegacygregHooksJsonPath(dataRoot);
+        if (!p) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `No greg_hooks.json under dataRoot=${dataRoot}. Use greg_hook_registry if you only have greg_hooks.json.`
+              }
+            ],
+            isError: true
+          };
+        }
+        const text = await fs.readFile(p, 'utf8');
+        return { content: [{ type: 'text', text }] };
+      } catch (e) {
+        return {
+          content: [{ type: 'text', text: `Could not read legacy hook registry: ${e}` }],
+          isError: true
+        };
+      }
+    }
+  );
+
+  mcpServer.registerTool(
+    'greg_read_contributing',
     {
       title: 'CONTRIBUTING.md',
-      description: 'Read the repository CONTRIBUTING.md (conventions, workflow).',
+      description:
+        'Liest **CONTRIBUTING.md** im `dataRoot` (Konventionen, Branching, Reviews). ' +
+        'Pfad: `<dataRoot>/CONTRIBUTING.md`.',
       inputSchema: z.object({})
     },
     async () => {
@@ -211,10 +382,12 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerTool(
-    'fmf_repo_layout',
+    'greg_repo_layout',
     {
-      title: 'Repo layout overview',
-      description: 'Short Markdown overview of top-level folders (no disk read).',
+      title: 'Repo-Überblick (statisch)',
+      description:
+        'Kurze Markdown-Tabelle zu **gregCore**-Top-Level-Pfaden — **kein** Dateisystem-Scan. ' +
+        'Schneller Orientierungspunkt für LLM, bevor gezielt Docs oder Hooks geladen werden.',
       inputSchema: z.object({})
     },
     async () => ({
@@ -223,12 +396,14 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerTool(
-    'fmf_list_doc_paths',
+    'greg_list_doc_paths',
     {
-      title: 'List doc paths',
-      description: 'List Markdown paths under docs/ (for discovery).',
+      title: 'Alle Markdown-Pfade unter docs/',
+      description:
+        'Listet **relativ zu docs/** alle `*.md`-Dateien (alphabetisch/glob-Reihenfolge), begrenzt durch `limit`. ' +
+        'Discovery, wenn `greg_search_docs` zu unpräzise ist.',
       inputSchema: {
-        limit: z.number().int().min(1).max(500).optional().describe('Max paths (default 200)')
+        limit: z.number().int().min(1).max(500).optional().describe('Max. Pfade (Standard 200)')
       }
     },
     async ({ limit }) => {
@@ -252,21 +427,31 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 
   mcpServer.registerResource(
-    'fmf-repo-overview-md',
-    'fmf://repo/overview',
-    { mimeType: 'text/markdown', description: 'Monorepo layout (same as fmf_repo_layout tool)' },
+    'greg-repo-overview-md',
+    'greg://repo/overview',
+    { mimeType: 'text/markdown', description: 'Statischer gregCore/gregFramework-Überblick (wie greg_repo_layout)' },
     async () => ({
-      contents: [{ uri: 'fmf://repo/overview', text: REPO_OVERVIEW }]
+      contents: [{ uri: 'greg://repo/overview', text: REPO_OVERVIEW }]
+    })
+  );
+
+  mcpServer.registerResource(
+    'greg-repo-overview-md',
+    'greg://repo/overview',
+    { mimeType: 'text/markdown', description: 'Alias: gleicher Inhalt wie greg://repo/overview' },
+    async () => ({
+      contents: [{ uri: 'greg://repo/overview', text: REPO_OVERVIEW }]
     })
   );
 
   mcpServer.registerPrompt(
-    'fmf_modding_context',
+    'greg_modding_context',
     {
       description:
-        'Starter context for FrikaMF modding: pass an optional topic (hooks, templates, plugins, workshop).',
+        'Einstiegsprompt: gregFramework-Modding + optionaler Fokus (hooks, templates, plugins, workshop). ' +
+        'Lädt keine Dateien — kombiniere mit Tools für echte Quellen.',
       argsSchema: {
-        topic: z.string().optional().describe('Optional focus area')
+        topic: z.string().optional().describe('Optional: hooks | templates | plugins | workshop')
       }
     },
     async ({ topic }) => ({
@@ -275,7 +460,7 @@ function registerFmfTools(mcpServer, dataRoot) {
           role: 'user',
           content: {
             type: 'text',
-            text: `${FMF_INSTRUCTIONS}\n\n${REPO_OVERVIEW}\n\nOptional focus: ${topic ?? '(none)'}.\nUse MCP tools to pull exact docs and fmf_hooks.json before coding.`
+            text: `${GREG_INSTRUCTIONS}\n\n${REPO_OVERVIEW}\n\nOptional focus: ${topic ?? '(none)'}.\nUse greg_hook_search / greg_hook_registry and docs tools before coding.`
           }
         }
       ]
@@ -283,12 +468,12 @@ function registerFmfTools(mcpServer, dataRoot) {
   );
 }
 
-function createFmfMcpServer(dataRoot) {
+function creategregMcpServer(dataRoot) {
   const mcpServer = new McpServer(
-    { name: 'frika-mf-modding', version: '1.0.0' },
-    { instructions: FMF_INSTRUCTIONS }
+    { name: 'greg-mcp-modding', version: '1.1.0' },
+    { instructions: GREG_INSTRUCTIONS }
   );
-  registerFmfTools(mcpServer, dataRoot);
+  registerTools(mcpServer, dataRoot);
   return mcpServer;
 }
 
@@ -308,7 +493,7 @@ function attachStreamableMcp(app, dataRoot) {
             transports[sid] = transport;
           }
         });
-        const server = createFmfMcpServer(dataRoot);
+        const server = creategregMcpServer(dataRoot);
         await server.connect(transport);
         await transport.handleRequest(req, res, req.body);
         return;
@@ -349,7 +534,7 @@ async function main() {
   const dataRoot = path.resolve(args.dataRoot ?? defaultDataRoot());
 
   if (args.stdio) {
-    const mcpServer = createFmfMcpServer(dataRoot);
+    const mcpServer = creategregMcpServer(dataRoot);
     const transport = new StdioServerTransport();
     await mcpServer.connect(transport);
     return;
@@ -357,7 +542,7 @@ async function main() {
 
   const app = createMcpExpressApp({ host: args.host === '0.0.0.0' ? '0.0.0.0' : args.host });
   app.get('/health', (_req, res) => {
-    res.json({ ok: true, service: 'fmf-mcp', dataRoot });
+    res.json({ ok: true, service: 'greg-mcp', version: '1.1.0', dataRoot });
   });
 
   attachStreamableMcp(app, dataRoot);
@@ -369,10 +554,10 @@ async function main() {
 
   app.listen(args.port, args.host, () => {
     console.error(
-      `[fmf-mcp] listening http://${args.host}:${args.port}  (MCP: POST/GET /mcp , health: GET /health)`
+      `[greg-mcp] listening http://${args.host}:${args.port}  (MCP: POST/GET /mcp , health: GET /health)`
     );
     if (args.staticDir) {
-      console.error(`[fmf-mcp] static Docusaurus: ${path.resolve(args.staticDir)}`);
+      console.error(`[greg-mcp] static: ${path.resolve(args.staticDir)}`);
     }
   });
 

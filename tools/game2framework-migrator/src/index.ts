@@ -9,7 +9,7 @@ const repoRoot = resolve(__dirname, '..', '..', '..');
 type MapFile = { map: Record<string, string> };
 
 function loadMap(): MapFile {
-  const p = join(repoRoot, 'tools', 'fmf-hook-scanner', 'mapping', 'game2framework-map.json');
+  const p = join(repoRoot, 'tools', 'greg-hook-scanner', 'mapping', 'game2framework-map.json');
   const raw = readFileSync(p, 'utf8');
   return JSON.parse(raw) as MapFile;
 }

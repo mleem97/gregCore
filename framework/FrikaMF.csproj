@@ -268,7 +268,7 @@
     <Compile Remove="..\WorkshopUploader\**\*.cs" />
     <Compile Remove="..\StandalonePlugins\**\*.cs" />
     <Compile Remove="..\Templates\**\*.cs" />
-    <Compile Remove="FrikaMF\TestMods\FrameworkDependencyTest.cs" />
+    <Compile Remove="src\ModLoader\TestMods\FrameworkDependencyTest.cs" />
     <Compile Remove="..\JoniML\**\*.cs" />
     <Compile Remove="..\il2cpp-unpack\**\*.cs" />
     <Compile Remove="..\References\il2cpp-unpack\**\*.cs" />
@@ -282,10 +282,10 @@
     <None Include="..\workshopuploader\**\*.cs" />
     <None Include="..\WorkshopUploader\**\*.cs" />
     <None Include="..\StandalonePlugins\**\*.cs" />
-    <None Include="FrikaMF\TestMods\FrameworkDependencyTest.cs" />
-    <None Include="FrikaMF\DC2WebBridge.cs" />
-    <None Include="FrikaMF\UiModernizer.cs" />
-    <None Include="FrikaMF\ModSettingsMenuBridge.cs" />
+    <None Include="src\ModLoader\TestMods\FrameworkDependencyTest.cs" />
+    <None Include="src\ModLoader\DC2WebBridge.cs" />
+    <None Include="src\ModLoader\UiModernizer.cs" />
+    <None Include="src\ModLoader\ModSettingsMenuBridge.cs" />
     <None Include="..\JoniML\**\*.cs" />
     <None Include="..\il2cpp-unpack\**\*.cs" />
     <None Include="..\References\il2cpp-unpack\**\*.cs" />
@@ -302,5 +302,12 @@
     <None Include="..\.github\workflows\commitlint.yml" />
     <None Include="..\.github\workflows\dotnet-ci.yml" />
     <None Include="..\scripts\Find-DataCenterPath.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\greg_hooks.json" Condition="Exists('$(MSBuildProjectDirectory)\..\..\greg_hooks.json')">
+      <Link>greg_hooks.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

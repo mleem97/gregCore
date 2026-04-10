@@ -1,10 +1,10 @@
 # UI Template (React/Vite)
 
-Starter template for FMF UI replacement mods.
+Starter template for greg UI replacement mods.
 
 - Source workspace: `react-ui/`
-- Runtime export target: `FMF.UIReplacementMod/react-app.*`
-- Browser bridge: `window.fmfBridge.invoke(action, payload)` with fallback `postMessage`
+- Runtime export target: `greg.UIReplacementMod/react-app.*`
+- Browser bridge: `window.gregBridge.invoke(action, payload)` with fallback `postMessage`
 
 ## Bridge contract
 

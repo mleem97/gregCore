@@ -5,8 +5,8 @@
 
 .DESCRIPTION
   - FrikaModdingFramework.dll -> {GameRoot}/Mods
-  - FFM.Plugin.*.dll           -> {GameRoot}/FMF/Plugins
-  - FMF.ModPathRedirector.dll  -> {GameRoot}/Plugins (MelonLoader Plugins folder)
+  - greg.Plugin.*.dll           -> {GameRoot}/greg/Plugins
+  - greg.ModPathRedirector.dll  -> {GameRoot}/Plugins (MelonLoader Plugins folder)
 
   By default does **not** build or deploy WorkshopUploader (desktop MAUI UI). Use -IncludeWorkshopUploader to add:
   - WorkshopUploader (full win10-x64 folder) -> {GameRoot}/WorkshopUploader
@@ -43,12 +43,12 @@ if ([string]::IsNullOrWhiteSpace($GameDir) -or -not (Test-Path -LiteralPath $Gam
 
 $GameProjects = @(
     'framework\FrikaMF.csproj',
-    'plugins\FFM.Plugin.Multiplayer\FFM.Plugin.Multiplayer.csproj',
-    'plugins\FFM.Plugin.Sysadmin\FFM.Plugin.Sysadmin.csproj',
-    'plugins\FFM.Plugin.AssetExporter\FFM.Plugin.AssetExporter.csproj',
-    'plugins\FFM.Plugin.WebUIBridge\FFM.Plugin.WebUIBridge.csproj',
-    'plugins\FFM.Plugin.PlayerModels\FFM.Plugin.PlayerModels.csproj',
-    'mods\FMF.ModPathRedirector\FMF.ModPathRedirector.csproj'
+    'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
+    'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
+    'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
+    'plugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj',
+    'plugins\greg.Plugin.PlayerModels\greg.Plugin.PlayerModels.csproj',
+    'mods\greg.ModPathRedirector\greg.ModPathRedirector.csproj'
 )
 
 foreach ($rel in $GameProjects) {
@@ -69,8 +69,8 @@ if ($IncludeWorkshopUploader) {
 
 $Mods = Join-Path $GameDir 'Mods'
 $MlPlugins = Join-Path $GameDir 'Plugins'
-$FmfPlugins = Join-Path $GameDir 'FMF\Plugins'
-$dirs = @($Mods, $MlPlugins, $FmfPlugins)
+$GregPlugins = Join-Path $GameDir 'greg\Plugins'
+$dirs = @($Mods, $MlPlugins, $GregPlugins)
 if ($IncludeWorkshopUploader) {
     $dirs += (Join-Path $GameDir 'WorkshopUploader')
 }
@@ -82,23 +82,23 @@ if (-not (Test-Path -LiteralPath $FwDll)) { throw "Missing: $FwDll" }
 Copy-Item -LiteralPath $FwDll -Destination (Join-Path $Mods 'FrikaModdingFramework.dll') -Force
 Write-Host "[deploy] -> $Mods\FrikaModdingFramework.dll"
 
-$RedirectorDll = Join-Path $RepoRoot "mods\FMF.ModPathRedirector\bin\$Configuration\$tfm\FMF.ModPathRedirector.dll"
+$RedirectorDll = Join-Path $RepoRoot "mods\greg.ModPathRedirector\bin\$Configuration\$tfm\greg.ModPathRedirector.dll"
 if (-not (Test-Path -LiteralPath $RedirectorDll)) { throw "Missing: $RedirectorDll" }
-Copy-Item -LiteralPath $RedirectorDll -Destination (Join-Path $MlPlugins 'FMF.ModPathRedirector.dll') -Force
-Write-Host "[deploy] -> $MlPlugins\FMF.ModPathRedirector.dll"
+Copy-Item -LiteralPath $RedirectorDll -Destination (Join-Path $MlPlugins 'greg.ModPathRedirector.dll') -Force
+Write-Host "[deploy] -> $MlPlugins\greg.ModPathRedirector.dll"
 
 $pluginNames = @(
-    'FFM.Plugin.Multiplayer',
-    'FFM.Plugin.Sysadmin',
-    'FFM.Plugin.AssetExporter',
-    'FFM.Plugin.WebUIBridge',
-    'FFM.Plugin.PlayerModels'
+    'greg.Plugin.Multiplayer',
+    'greg.Plugin.Sysadmin',
+    'greg.Plugin.AssetExporter',
+    'greg.Plugin.WebUIBridge',
+    'greg.Plugin.PlayerModels'
 )
 foreach ($name in $pluginNames) {
     $src = Join-Path $RepoRoot "plugins\$name\bin\$Configuration\$tfm\$name.dll"
     if (-not (Test-Path -LiteralPath $src)) { throw "Missing: $src" }
-    Copy-Item -LiteralPath $src -Destination (Join-Path $FmfPlugins "$name.dll") -Force
-    Write-Host "[deploy] -> $FmfPlugins\$name.dll"
+    Copy-Item -LiteralPath $src -Destination (Join-Path $GregPlugins "$name.dll") -Force
+    Write-Host "[deploy] -> $GregPlugins\$name.dll"
 }
 
 if ($IncludeWorkshopUploader) {

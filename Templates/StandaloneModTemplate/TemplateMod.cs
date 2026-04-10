@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(TemplateStandaloneMod.TemplateMod), "FMF Template Mod", "0.0.1", "mleem97")]
+[assembly: MelonInfo(typeof(TemplateStandaloneMod.TemplateMod), "greg Template Mod", "0.0.1", "mleem97")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace TemplateStandaloneMod;
@@ -22,10 +22,10 @@ public sealed class TemplateMod : MelonMod
 
         if (!_frameworkAvailable)
         {
-            LoggerInstance.Error("FMF Template Mod requires FrikaModdingFramework.dll.");
+            LoggerInstance.Error("greg Template Mod requires FrikaModdingFramework.dll.");
             return;
         }
 
-        LoggerInstance.Msg("FMF Template Mod initialized.");
+        LoggerInstance.Msg("greg Template Mod initialized.");
     }
 }

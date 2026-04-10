@@ -3,25 +3,25 @@ import { createRoot } from 'react-dom/client';
 
 import './styles.css';
 
-type FmfAction = 'continue' | 'new-game' | 'multiplayer' | 'settings' | 'exit' | 'sync-state';
+type gregAction = 'continue' | 'new-game' | 'multiplayer' | 'settings' | 'exit' | 'sync-state';
 
-type FmfMessage = {
-  action: FmfAction;
+type gregMessage = {
+  action: gregAction;
   payload?: Record<string, unknown>;
   timestamp: string;
-  source: 'fmf-react-ui';
+  source: 'greg-react-ui';
 };
 
 type BridgeTransport = {
   invoke?: (action: string, payload?: Record<string, unknown>) => void;
   emit?: (action: string, payload?: Record<string, unknown>) => void;
-  postMessage?: (message: FmfMessage) => void;
+  postMessage?: (message: gregMessage) => void;
 };
 
 type RuntimeMode = 'wrapper-connected' | 'standalone-preview';
 
 type ActionCard = {
-  action: FmfAction;
+  action: gregAction;
   label: string;
   description: string;
 };
@@ -35,7 +35,7 @@ type EventEntry = {
 
 declare global {
   interface Window {
-    fmfBridge?: BridgeTransport;
+    gregBridge?: BridgeTransport;
   }
 }
 
@@ -43,7 +43,7 @@ const actionCards: ActionCard[] = [
   {
     action: 'continue',
     label: 'Continue',
-    description: 'Resume the current session through the FMF bridge.',
+    description: 'Resume the current session through the greg bridge.',
   },
   {
     action: 'new-game',
@@ -68,25 +68,25 @@ const actionCards: ActionCard[] = [
   {
     action: 'sync-state',
     label: 'Sync State',
-    description: 'Ask FMF to refresh the bridge snapshot.',
+    description: 'Ask greg to refresh the bridge snapshot.',
   },
 ];
 
 const supportedLabels = ['Continue', 'New Game', 'Multiplayer', 'Settings', 'Exit'];
 
 function detectBridge(): RuntimeMode {
-  return window.fmfBridge ? 'wrapper-connected' : 'standalone-preview';
+  return window.gregBridge ? 'wrapper-connected' : 'standalone-preview';
 }
 
-function sendToBridge(action: FmfAction, payload?: Record<string, unknown>): boolean {
-  const message: FmfMessage = {
+function sendToBridge(action: gregAction, payload?: Record<string, unknown>): boolean {
+  const message: gregMessage = {
     action,
     payload,
     timestamp: new Date().toISOString(),
-    source: 'fmf-react-ui',
+    source: 'greg-react-ui',
   };
 
-  const bridge = window.fmfBridge;
+  const bridge = window.gregBridge;
   if (bridge?.invoke) {
     bridge.invoke(action, payload);
     return true;
@@ -112,19 +112,19 @@ function sendToBridge(action: FmfAction, payload?: Record<string, unknown>): boo
 
 function App() {
   const [mode, setMode] = useState<RuntimeMode>(() => detectBridge());
-  const [lastAction, setLastAction] = useState<FmfAction>('sync-state');
+  const [lastAction, setLastAction] = useState<gregAction>('sync-state');
   const [eventLog, setEventLog] = useState<EventEntry[]>([
     {
       id: 1,
       title: 'Bridge ready',
-      detail: 'The UI is ready to talk to the FMF C# wrapper.',
+      detail: 'The UI is ready to talk to the greg C# wrapper.',
       tone: 'success',
     },
   ]);
 
   const wrapperState = useMemo(() => {
     return mode === 'wrapper-connected'
-      ? 'Connected to `FMF.UIReplacementMod` bridge'
+      ? 'Connected to `greg.UIReplacementMod` bridge'
       : 'Standalone preview mode';
   }, [mode]);
 
@@ -148,7 +148,7 @@ function App() {
     ]);
   }
 
-  function handleAction(action: FmfAction) {
+  function handleAction(action: gregAction) {
     const delivered = sendToBridge(action, { origin: 'react-ui', action });
     setLastAction(action);
     setMode(detectBridge());
@@ -156,7 +156,7 @@ function App() {
     pushEvent(
       delivered ? `Sent ${action}` : `Queued ${action}`,
       delivered
-        ? 'FMF wrapper received the command channel request.'
+        ? 'greg wrapper received the command channel request.'
         : 'No host bridge was found, so the UI stayed in preview mode.',
       delivered ? 'success' : 'warning',
     );
@@ -173,7 +173,7 @@ function App() {
             <p className="eyebrow">Frika Mod Framework</p>
             <h1>Modern React UI with C# bridge support</h1>
             <p className="subtitle">
-              This template is wired for FMF-controlled UI replacement and keeps the action labels that the C# wrapper
+              This template is wired for greg-controlled UI replacement and keeps the action labels that the C# wrapper
               can resolve directly.
             </p>
           </div>
@@ -186,7 +186,7 @@ function App() {
         <div className="stats-grid">
           <article className="stat-card">
             <span>Bridge mode</span>
-            <strong>{mode === 'wrapper-connected' ? 'FMF host attached' : 'Browser preview'}</strong>
+            <strong>{mode === 'wrapper-connected' ? 'greg host attached' : 'Browser preview'}</strong>
           </article>
           <article className="stat-card">
             <span>Last action</span>
@@ -201,7 +201,7 @@ function App() {
         <div className="content-grid">
           <section className="panel-card panel-card--primary">
             <div className="panel-card__heading">
-              <p className="panel-label">FMF bridge</p>
+              <p className="panel-label">greg bridge</p>
               <h2>Game actions</h2>
             </div>
 
@@ -229,13 +229,13 @@ function App() {
 
             <ul className="bridge-list">
               <li>
-                <strong>Primary channel:</strong> `window.fmfBridge.invoke(action, payload)`
+                <strong>Primary channel:</strong> `window.gregBridge.invoke(action, payload)`
               </li>
               <li>
                 <strong>Fallbacks:</strong> `emit`, `postMessage`, then `window.parent.postMessage(...)`
               </li>
               <li>
-                <strong>C# label match:</strong> button captions stay aligned with FMF action lookup
+                <strong>C# label match:</strong> button captions stay aligned with greg action lookup
               </li>
               <li>
                 <strong>Payload shape:</strong> `origin`, `action`, and `timestamp` for simple wrapper routing

@@ -54,7 +54,7 @@ namespace AssetExporter
             frameworkDependencyTestMod = new FrameworkDependencyTestMod(runtimeHookService);
             frameworkDependencyTestMod.Initialize();
             RefreshDebugOverlayStats(forceHookScan: true);
-            if (HasArg(Environment.GetCommandLineArgs(), "--ffm-testmod-auto"))
+            if (HasArg(Environment.GetCommandLineArgs(), "--greg-testmod-auto"))
                 frameworkDependencyTestMod.RunHealthcheck();
 
             ExportAllGameSignalsOnStartup();
@@ -261,15 +261,15 @@ namespace AssetExporter
             try
             {
                 string[] args = Environment.GetCommandLineArgs();
-                bool autoScan = HasArg(args, "--ffm-hooks-auto");
-                bool installAll = HasArg(args, "--ffm-hooks-all");
-                string catalogPath = GetArgValue(args, "--ffm-hooks-catalog=");
+                bool autoScan = HasArg(args, "--greg-hooks-auto");
+                bool installAll = HasArg(args, "--greg-hooks-all");
+                string catalogPath = GetArgValue(args, "--greg-hooks-catalog=");
 
                 if (!autoScan && string.IsNullOrWhiteSpace(catalogPath))
                     return;
 
                 int defaultMax = installAll ? int.MaxValue : 250;
-                int maxHooks = GetIntArgValue(args, "--ffm-hooks-max=", defaultMax);
+                int maxHooks = GetIntArgValue(args, "--greg-hooks-max=", defaultMax);
 
                 if (!string.IsNullOrWhiteSpace(catalogPath))
                 {

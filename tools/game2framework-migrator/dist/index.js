@@ -5,7 +5,7 @@ import { dirname } from 'node:path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..', '..', '..');
 function loadMap() {
-    const p = join(repoRoot, 'tools', 'fmf-hook-scanner', 'mapping', 'game2framework-map.json');
+    const p = join(repoRoot, 'tools', 'greg-hook-scanner', 'mapping', 'game2framework-map.json');
     const raw = readFileSync(p, 'utf8');
     return JSON.parse(raw);
 }

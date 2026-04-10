@@ -3,7 +3,7 @@
   "language": "delphi",
   "runtime": "external-process",
   "version": "1.0.0",
-  "description": "Template for FFM.Langserver.Compat adapter manifests.",
+  "description": "Template for greg.Langserver.Compat adapter manifests.",
   "hookClaims": [
     "Assembly-CSharp::Server.PowerButton",
     "Assembly-CSharp::NetworkSwitch.RepairDevice"

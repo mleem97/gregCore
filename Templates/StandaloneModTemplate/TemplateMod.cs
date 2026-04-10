@@ -16,13 +16,17 @@ public sealed class TemplateMod : MelonMod
         _frameworkAvailable = AppDomain.CurrentDomain.GetAssemblies().Any(assembly =>
         {
             string name = assembly.GetName().Name ?? string.Empty;
+            if (string.Equals(name, "gregCore", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "gregFramework", StringComparison.OrdinalIgnoreCase))
+                return true;
+
             return string.Equals(name, "FrikaModdingFramework", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "FrikaMF", StringComparison.OrdinalIgnoreCase);
         });
 
         if (!_frameworkAvailable)
         {
-            LoggerInstance.Error("greg Template Mod requires FrikaModdingFramework.dll.");
+            LoggerInstance.Error("greg Template Mod requires gregCore (legacy FrikaModdingFramework also supported).");
             return;
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using FrikaMF.Plugins;
 using AssetExporter;
+using DataCenterModLoader.LanguageBridges;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -118,6 +119,7 @@ public class Core : MelonMod
     public static MultiplayerBridge Multiplayer { get; private set; }
 
     private FFIBridge _ffiBridge;
+    private GregLanguageBridgeHost _languageBridgeHost;
     private GregLangserverCompatRuntime _langserverCompatRuntime;
     private string _modsPath;
     private bool _globalExceptionHooksInstalled;
@@ -157,6 +159,11 @@ public class Core : MelonMod
 
             CrashLog.Log("step: creating FFIBridge");
             _ffiBridge = new FFIBridge(LoggerInstance, _modsPath);
+
+            CrashLog.Log("step: creating greg language bridge host");
+            _languageBridgeHost = new GregLanguageBridgeHost(LoggerInstance, _modsPath, _ffiBridge);
+            _languageBridgeHost.Initialize();
+            _languageBridgeHost.LoadAll();
 
             CrashLog.Log("step: initializing greg.Langserver.Compat runtime");
             _langserverCompatRuntime = GregLangserverCompatRuntime.Initialize(LoggerInstance);
@@ -232,6 +239,7 @@ public class Core : MelonMod
         try
         {
             _ffiBridge?.OnSceneLoaded(sceneName);
+            _languageBridgeHost?.OnSceneLoaded(sceneName);
             UiExtensionBridge.OnSceneLoaded(sceneName);
 
             // Initialize extra technician hiring (safe to call multiple times)
@@ -254,6 +262,7 @@ public class Core : MelonMod
         try
         {
             _ffiBridge?.OnUpdate(Time.deltaTime);
+            _languageBridgeHost?.OnUpdate(Time.deltaTime);
             HandleMainMenuHotReload();
 
             if (Time.time >= _nextHarmonyGuardAt)
@@ -373,6 +382,7 @@ public class Core : MelonMod
             UiExtensionBootstrap.UnregisterBuiltInHandlers();
             UninstallGlobalExceptionHooks();
             _ffiBridge?.Shutdown();
+            _languageBridgeHost?.Shutdown();
             _ffiBridge?.Dispose();
             CrashLog.Log("step: OnApplicationQuit complete");
         }

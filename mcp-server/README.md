@@ -1,4 +1,4 @@
-# gregCore MCP server (`@frikamf/mcp-modding`)
+# gregCore MCP server (`@gregcore/mcp-modding`)
 
 **Model Context Protocol**-Server für Assistenten (Cursor, Claude Code, …): liest **Doku**, **Hook-Kataloge** und **CONTRIBUTING** aus einem konfigurierbaren `dataRoot`.
 

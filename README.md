@@ -11,7 +11,7 @@
 | **Im Workspace** | Pfad `gregFramework/gregCore/`. Überblick: [gregFramework README](../README.md). |
 | **Remote** | [`mleem97/gregCore`](https://github.com/mleem97/gregCore) |
 
-**Mod-, Plugin- und Extension-Logik** von Autoren: **C#** — [Modding language (C# only)](https://github.com/mleem97/gregWiki/blob/main/docs/reference/modding-language-requirement.md) (gregWiki).
+**Mod-, Plugin- und Extension-Logik**: C# (voll), Rust/native (voll), Lua und TypeScript/JavaScript (Bridge-Host vorbereitet, Runtime-Host im Ausbau).
 
 ---
 

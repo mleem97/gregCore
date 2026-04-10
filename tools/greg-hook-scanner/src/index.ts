@@ -19,7 +19,7 @@ type RegistryFile = {
 };
 
 function loadRegistry(): RegistryFile {
-  const p = join(repoRoot, 'FrikaModFramework', 'greg_hooks.json');
+  const p = join(repoRoot, 'gregFramework', 'greg_hooks.json');
   const raw = readFileSync(p, 'utf8');
   return JSON.parse(raw) as RegistryFile;
 }
@@ -38,7 +38,7 @@ function generateHookDocs(registry: RegistryFile): string {
   lines.push('id: greg-hooks');
   lines.push('title: greg Hook Reference');
   lines.push('sidebar_label: greg Hook Reference');
-  lines.push('description: Auto-generated from FrikaModFramework/greg_hooks.json — run tools/greg-hook-scanner.');
+  lines.push('description: Auto-generated from gregFramework/greg_hooks.json — run tools/greg-hook-scanner.');
   lines.push('---');
   lines.push('');
   lines.push(':::info');

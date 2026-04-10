@@ -15,7 +15,7 @@ public sealed class Main : GregPluginBase
 
     public override string PluginId => "greg.Plugin.Template";
 
-    public override string DisplayName => "FrikaMF Plugin Template";
+    public override string DisplayName => "gregCore Plugin Template";
 
     public override Version RequiredFrameworkVersion => ParseFrameworkVersion(ReleaseVersion.Current);
 

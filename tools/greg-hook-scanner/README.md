@@ -1,6 +1,6 @@
 # greg-hook-scanner
 
-Reads [`FrikaModFramework/greg_hooks.json`](../../FrikaModFramework/greg_hooks.json) and regenerates the Docusaurus page [`docs/wiki/framework/greg-hooks.mdx`](../../docs/wiki/framework/greg-hooks.mdx).
+Reads [`gregFramework/greg_hooks.json`](../../gregFramework/greg_hooks.json) and regenerates the Docusaurus page [`docs/wiki/framework/greg-hooks.mdx`](../../docs/wiki/framework/greg-hooks.mdx).
 
 ## Setup
 

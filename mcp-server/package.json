@@ -1,5 +1,5 @@
 {
-  "name": "@frikamf/mcp-modding",
+  "name": "@gregcore/mcp-modding",
   "version": "1.1.0",
   "description": "MCP server for gregFramework modding (docs + greg_hooks + legacy greg_hooks + CONTRIBUTING).",
   "main": "src/index.mjs",

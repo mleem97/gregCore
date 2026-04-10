@@ -273,7 +273,6 @@
     <Compile Remove="..\il2cpp-unpack\**\*.cs" />
     <Compile Remove="..\References\il2cpp-unpack\**\*.cs" />
     <Compile Remove="..\_tmp\**\*.cs" />
-    <Compile Remove="..\.bridge-sync\**\*.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="Main.cs" />
@@ -290,7 +289,6 @@
     <None Include="..\il2cpp-unpack\**\*.cs" />
     <None Include="..\References\il2cpp-unpack\**\*.cs" />
     <None Include="..\_tmp\**\*.cs" />
-    <None Include="..\.bridge-sync\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == 'true'">

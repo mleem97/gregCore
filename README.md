@@ -6,15 +6,12 @@
 
 ![Greg Framework API Banner](https://github.com/user-attachments/assets/3e78050a-67e8-4eaa-981e-7fa5cfbc466c)
 
----
+| | |
+|:---|:---|
+| **Im Workspace** | Pfad `gregFramework/gregCore/`. Überblick: [gregFramework README](../README.md). |
+| **Remote** | [`mleem97/gregCore`](https://github.com/mleem97/gregCore) |
 
-## Part of gregFramework
-
-This directory is part of the **[gregFramework](https://github.com/mleem97/gregFramework)** workspace. Clone sibling repositories side by side so each project lives at `gregFramework/<RepoName>/`. See the workspace [README](https://github.com/mleem97/gregFramework/blob/master/README.md) for the full layout and migration notes.
-
-**Remote:** [`mleem97/gregCore`](https://github.com/mleem97/gregCore) — on-disk path: `gregFramework/gregCore/`.
-
-**Mod, plugin, and extension code** shipped by authors must be implemented in **C#** — see [Modding language (C# only)](https://github.com/mleem97/gregWiki/blob/main/docs/reference/modding-language-requirement.md) in **gregWiki**.
+**Mod-, Plugin- und Extension-Logik** von Autoren: **C#** — [Modding language (C# only)](https://github.com/mleem97/gregWiki/blob/main/docs/reference/modding-language-requirement.md) (gregWiki).
 
 ---
 

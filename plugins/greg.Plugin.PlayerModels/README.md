@@ -10,8 +10,10 @@ Build your bundles with the same Unity editor family as the game. Target Unity `
 
 The runtime loader checks these locations in order:
 
-1. `{GameRoot}/DataCenter_Data/StreamingAssets/FrikaMF/PlayerModels/{ModelName}.bundle`
-2. `{MelonLoader Mods Folder}/FrikaMF/PlayerModels/{ModelName}.bundle`
+1. `{GameRoot}/DataCenter_Data/StreamingAssets/gregCore/PlayerModels/{ModelName}.bundle`
+2. `{MelonLoader Mods Folder}/gregCore/PlayerModels/{ModelName}.bundle`
+3. Legacy fallback: `{GameRoot}/DataCenter_Data/StreamingAssets/FrikaMF/PlayerModels/{ModelName}.bundle`
+4. Legacy fallback: `{MelonLoader Mods Folder}/FrikaMF/PlayerModels/{ModelName}.bundle`
 
 ## Required Prefab Structure
 

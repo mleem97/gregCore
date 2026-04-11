@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-pre.2] - 2026-04-11
+### Fixed
+- Standardized all Lua modules to camelCase (`gregUnityLuaModule`, etc.).
+- Fixed static/instance member access conflicts in `gregModSettingsMenuBridge`.
+- Corrected over-aggressive renaming of Unity engine components (e.g. `Camera.main`).
+- Normalized `gregSdk` namespace usage across the framework.
+
+### Changed
+- Separated `gregAddons` into its own logical structure (Node.js tools and optional plugins).
+- Built-in reference DLLs for out-of-the-box CI support.
+
 ## [1.0.0-pre.1] - 2026-04-11
 ### Added
 - Missing SDK APIs for all 4 languages (C#, Rust, Lua, TS/JS).

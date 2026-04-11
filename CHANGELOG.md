@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-pre.5] - 2026-04-11
+### Added
+- **Game System Bridges**: 9 neue SDK-Services zur direkten Steuerung von Spielsystemen via IL2CPP-Abstraktion.
+- **GregGameManagerService**: Kontrolle über UI-Canvas und Speichersystem.
+- **GregPlayerManagerService**: Cursor-Locking und Movement-Kontrolle.
+- **GregShopService**: Steuerung des In-Game-Shops und Spawn-Punkte.
+- **GregSwitchConfigService**: Zugriff auf Switch-OS (VLAN, LACP).
+- **GregCustomerBaseService**: Manipulation von Kunden-Apps und IP-Management.
+- **GregTechnicianService**: Mitarbeiter-Dispatching und Job-Queues.
+- **GregTimeService**: Uhrzeit-Simulation und Abfragen.
+- **Hardware Bridges**: Direkte Interaktion mit physischen Server- und Rack-Objekten.
+
 ## [1.0.0-pre.4] - 2026-04-11
 ### Added
 - **Unity Signal Normalization**: 30+ canonical hooks in `GregNativeEventHooks` based on IL2CPP snapshots.

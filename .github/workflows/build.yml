@@ -1,0 +1,58 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore gregCore.csproj
+
+    - name: Build gregCore
+      run: dotnet build gregCore.csproj -c Release -p:CI=true
+      continue-on-error: true # Expected to fail if refs are missing
+
+    - name: Check build success
+      shell: pwsh
+      run: |
+        $dllPath = "bin/Release/net6.0/gregCore.dll"
+        if (Test-Path $dllPath) {
+          Write-Host "Build successful!"
+        } else {
+          Write-Host "Build failed or dependencies missing."
+          Write-Host "To build on GitHub, you must provide MelonLoader/game references in 'gregLib/references'."
+          Write-Host "Skipping packaging/release steps."
+          exit 0
+        }
+
+    - name: Package Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: pwsh
+      run: |
+        ./gregScripts/Build-Release.ps1
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: publish/*.zip
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

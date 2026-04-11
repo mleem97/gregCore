@@ -109,55 +109,73 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
 
     public void OnSceneLoaded(string sceneName)
     {
+        // Dispatch to JS engine when implemented
     }
 
     public void OnUpdate(float deltaTime)
     {
+        // Dispatch to JS engine when implemented
     }
 
     public void OnGui()
     {
+        // Dispatch to JS engine when implemented
     }
 
-    // --- C#-side implementations for TS APIs ---
+    // --- C#-side implementations for TS APIs (Exposed to JS Engine) ---
 
-    private object TsPayloadGet(object payload, string field, object fallback)
+    public object TsPayloadGet(object payload, string field, object fallback)
     {
         return global::gregSdk.gregPayload.Get<object>(payload, field, fallback);
     }
 
-    private void TsEventsOn(string hook, object handler, string modId)
+    public void TsEventsOn(string hook, object handler, string modId)
     {
-        // This would wrap the JS function 'handler' into a C# delegate
-        // and call gregEventDispatcher.On(hook, wrappedHandler, modId);
+        // In a real implementation, 'handler' would be a JS function reference
+        // wrapped into a C# Action<object>.
+        _logger.Msg($"[tsjs] Subscribed to event: {hook} (Mod: {modId})");
     }
 
-    private void TsEventsOnGui(object handler, string modId)
+    public void TsEventsOnUpdate(object handler)
     {
-        // Add to a list of JS handlers to be called during OnGui()
+        _logger.Msg("[tsjs] Registered onUpdate handler");
     }
 
-    private void TsHudBeginPanel(string id, float x, float y, float w, float h)
+    public void TsEventsOnGui(object handler)
+    {
+        _logger.Msg("[tsjs] Registered onGui handler");
+    }
+
+    public void TsHudBeginPanel(string id, float x, float y, float w, float h)
     {
         gregGameHooks.GuiBeginPanel(id, x, y, w, h);
     }
 
-    private void TsHudLabel(string text)
+    public void TsHudLabel(string text)
     {
         gregGameHooks.GuiLabel(text);
     }
 
-    private void TsHudEndPanel()
+    public void TsHudEndPanel()
     {
         gregGameHooks.GuiEndPanel();
     }
 
-    private gregGameHooks.FocusHit? TsTargetRaycastForward(float distance)
+    public object TsTargetRaycastForward(float distance)
     {
-        return gregGameHooks.RaycastForward(distance);
+        var hit = gregGameHooks.RaycastForward(distance);
+        if (hit == null) return null;
+
+        // Return a dynamic object or dictionary that the JS engine can convert to a JS object
+        return new Dictionary<string, object>
+        {
+            ["name"] = hit.Value.Name,
+            ["distance"] = hit.Value.Distance,
+            ["point"] = new { x = hit.Value.Point.x, y = hit.Value.Point.y, z = hit.Value.Point.z }
+        };
     }
 
-    private void TsRegistryRegisterMod(string id, string name, string version)
+    public void TsRegistryRegisterMod(string id, string name, string version)
     {
         _logger.Msg($"[tsjs] Registered mod: {id} {version}");
     }

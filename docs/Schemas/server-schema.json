@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Server Definition",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "rackUnits": { "type": "integer", "minimum": 1, "maximum": 42 },
+    "powerUsageWatts": { "type": "integer", "minimum": 0 },
+    "maxIOPS": { "type": "integer", "minimum": 0 },
+    "serverTypeId": { "type": "string" },
+    "price": { "type": "number", "minimum": 0 },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "modelOverridePath": { "type": "string" }
+  },
+  "required": ["id", "name", "rackUnits"]
+}

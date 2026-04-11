@@ -1,0 +1,8 @@
+{
+  "id": "author.PackName",
+  "name": "Custom Content Pack Template",
+  "version": "1.0.0",
+  "author": "YourName",
+  "description": "Template for creating custom content packs for Data Center.",
+  "dependencies": ["greg.Core"]
+}

@@ -49,6 +49,63 @@ public static class gregNativeEventHooks
     public const string SystemButtonConfirmFireEmployee = "greg.SYSTEM.ButtonConfirmFireEmployee";
     public const string SystemButtonBuyWall = "greg.SYSTEM.ButtonBuyWall";
 
+    // —— Added per Community Feature Requests ——
+    public const string EmployeeIdleStateEntered = "greg.EMPLOYEE.IdleStateEntered";
+    public const string EmployeeIdleStateExited = "greg.EMPLOYEE.IdleStateExited";
+    public const string SystemIncidentTriggered = "greg.SYSTEM.IncidentTriggered";
+    public const string SystemIncidentResolved = "greg.SYSTEM.IncidentResolved";
+    public const string NetworkTopologyValidated = "greg.NETWORK.TopologyValidated";
+
+    // —— Content Lifecycle Hooks ——
+    public const string ContentLoaded = "greg.CONTENT.Loaded";
+    public const string ContentRegistered = "greg.CONTENT.Registered";
+    public const string ContentOverrideApplied = "greg.CONTENT.OverrideApplied";
+
+    // —— Normalized Unity Signal Hooks ——
+    public const string SystemRuntimeObjectEnabled = "greg.SYSTEM.RuntimeObjectEnabled";
+    public const string SystemRuntimeObjectDisabled = "greg.SYSTEM.RuntimeObjectDisabled";
+    public const string SystemRuntimeObjectDestroyed = "greg.SYSTEM.RuntimeObjectDestroyed";
+    public const string SystemRuntimeObjectLoaded = "greg.SYSTEM.RuntimeObjectLoaded";
+    public const string SystemApplicationQuit = "greg.SYSTEM.ApplicationQuit";
+    public const string SystemSaveStarted = "greg.SYSTEM.SaveStarted";
+    public const string SystemLoadStarted = "greg.SYSTEM.LoadStarted";
+    public const string SystemLoadCompleted = "greg.SYSTEM.LoadCompleted";
+    public const string SystemDayEnded = "greg.SYSTEM.DayEnded";
+
+    public const string InputActionTriggered = "greg.INPUT.ActionTriggered";
+    public const string InputBindingStarted = "greg.INPUT.BindingStarted";
+    public const string InputBindingApplied = "greg.INPUT.BindingApplied";
+    public const string UiPointerEnter = "greg.UI.PointerEnter";
+    public const string UiPointerExit = "greg.UI.PointerExit";
+    public const string UiPointerClick = "greg.UI.PointerClick";
+    public const string UiSubmit = "greg.UI.Submit";
+    public const string UiCancel = "greg.UI.Cancel";
+    public const string UiPauseOpened = "greg.UI.PauseOpened";
+    public const string UiPauseClosed = "greg.UI.PauseClosed";
+    public const string UiTabSelected = "greg.UI.TabSelected";
+
+    public const string CustomerRequirementEvaluated = "greg.CUSTOMER.RequirementEvaluated";
+    public const string CustomerMoneyUpdated = "greg.CUSTOMER.MoneyUpdated";
+    public const string SystemShopCartItemAdded = "greg.SYSTEM.ShopCartItemAdded";
+    public const string SystemShopCartItemRemoved = "greg.SYSTEM.ShopCartItemRemoved";
+
+    public const string NetworkCableLifecycleChanged = "greg.NETWORK.CableLifecycleChanged";
+    public const string NetworkSwitchConfigOpened = "greg.NETWORK.SwitchConfigOpened";
+    public const string NetworkSwitchConfigClosed = "greg.NETWORK.SwitchConfigClosed";
+    public const string NetworkDispatchQueued = "greg.NETWORK.DispatchQueued";
+    public const string NetworkDispatchProcessed = "greg.NETWORK.DispatchProcessed";
+    public const string ServerLoadingStarted = "greg.SERVER.LoadingStarted";
+    public const string ServerLoadingCompleted = "greg.SERVER.LoadingCompleted";
+    public const string RackDoorStateChanged = "greg.RACK.DoorStateChanged";
+    public const string WorldInteractionHovered = "greg.WORLD.InteractionHovered";
+    public const string WorldTriggerEntered = "greg.WORLD.TriggerEntered";
+    public const string WorldCollisionEntered = "greg.WORLD.CollisionEntered";
+
+    public const string EmployeeDispatchQueued = "greg.EMPLOYEE.DispatchQueued";
+    public const string EmployeeDispatchProcessed = "greg.EMPLOYEE.DispatchProcessed";
+    public const string EmployeeAnimationStateChanged = "greg.EMPLOYEE.AnimationStateChanged";
+    public const string GameplayIncidentTriggered = "greg.GAMEPLAY.IncidentTriggered";
+
     // —— Framework-only (no matching entry in greg_hooks for this pipeline) ——
     public static readonly string SystemGameDayAdvanced = gregHookName.Create(GregDomain.System, "GameDayAdvanced");
     public static readonly string CustomerAppRequirementsSatisfied = gregHookName.Create(GregDomain.Customer, "AppRequirementsSatisfied");

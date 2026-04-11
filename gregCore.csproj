@@ -8,7 +8,7 @@
     <AssemblyName>gregCore</AssemblyName>
     <RootNamespace>gregModLoader</RootNamespace>
     <Authors>MLeeM97</Authors>
-    <Version>1.0.0-pre.3</Version>
+    <Version>1.0.0-pre.4</Version>
     <Description>gregCore runtime for Data Center (native + script mod bridges)</Description>
     <NoWarn>CS1701;CS1702</NoWarn>
     <MSBuildWarningsAsMessages>MSB3243;MSB3277</MSBuildWarningsAsMessages>
@@ -42,6 +42,10 @@
     <Reference Include="UnityEngine.UIModule"><HintPath>$(MelonIl2CppDir)\UnityEngine.UIModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(MelonIl2CppDir)\UnityEngine.TextRenderingModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(MelonIl2CppDir)\UnityEngine.PhysicsModule.dll</HintPath></Reference>
+    <Reference Include="Unity.Entities"><HintPath>$(MelonIl2CppDir)\Unity.Entities.dll</HintPath></Reference>
+    <Reference Include="Unity.Collections"><HintPath>$(MelonIl2CppDir)\Unity.Collections.dll</HintPath></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(MelonIl2CppDir)\Unity.Mathematics.dll</HintPath></Reference>
+    <Reference Include="Unity.Burst"><HintPath>$(MelonIl2CppDir)\Unity.Burst.dll</HintPath></Reference>
     <Reference Include="AsmResolver"><HintPath>$(MelonNet6Dir)\AsmResolver.dll</HintPath></Reference>
     <Reference Include="AsmResolver.DotNet"><HintPath>$(MelonNet6Dir)\AsmResolver.DotNet.dll</HintPath></Reference>
     <Reference Include="AsmResolver.PE"><HintPath>$(MelonNet6Dir)\AsmResolver.PE.dll</HintPath></Reference>

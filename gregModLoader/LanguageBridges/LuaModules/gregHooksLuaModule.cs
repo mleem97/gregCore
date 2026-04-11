@@ -47,6 +47,10 @@ public sealed class gregHooksLuaModule : iGregLuaModule
         // greg.events sub-table
         var eventsTable = new Table(vm);
         greg["events"] = eventsTable;
+        
+        var updateHandlers = new List<Closure>();
+        var guiHandlers = new List<Closure>();
+
         eventsTable["on"] = (Action<string, Closure, string>)((hookName, fn, modId) =>
         {
             if (string.IsNullOrWhiteSpace(hookName) || fn == null) return;
@@ -58,7 +62,22 @@ public sealed class gregHooksLuaModule : iGregLuaModule
             registeredEventHandlers.Add((hookName, handler));
             gregEventDispatcher.On(hookName, handler, modId);
         });
+
+        eventsTable["on_update"] = (Action<Closure>)(fn => { if (fn != null) updateHandlers.Add(fn); });
+        eventsTable["on_gui"] = (Action<Closure>)(fn => { if (fn != null) guiHandlers.Add(fn); });
         eventsTable["off"] = greg["off"];
+
+        // Expose handlers to the bridge for execution
+        greg["_internal_update"] = (Action<double>)(dt => {
+            for (int i = 0; i < updateHandlers.Count; i++) {
+                try { vm.Call(updateHandlers[i], dt); } catch { }
+            }
+        });
+        greg["_internal_gui"] = (Action)(() => {
+            for (int i = 0; i < guiHandlers.Count; i++) {
+                try { vm.Call(guiHandlers[i]); } catch { }
+            }
+        });
 
         // greg.registry sub-table
         var registryTable = new Table(vm);

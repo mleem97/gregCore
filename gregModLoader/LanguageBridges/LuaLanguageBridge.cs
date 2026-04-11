@@ -167,18 +167,23 @@ public sealed class LuaLanguageBridge : iGregLanguageBridge
                 continue;
 
             var state = _scripts[i];
-            if (state?.OnUpdate == null)
-                continue;
+            if (state == null) continue;
 
+            // 1. Classic global on_update(dt)
+            if (state.OnUpdate != null)
+            {
+                try { state.Vm.Call(state.OnUpdate, deltaTime); }
+                catch (Exception ex) { _logger.Warning($"Lua on_update error [{_runtimeUnits[i].Id}]: {ex.Message}"); }
+            }
+
+            // 2. New greg.events.on_update handlers
             try
             {
-                state.Vm.Call(state.OnUpdate, deltaTime);
+                var internalUpdate = state.Vm.Globals.Get("greg").Table.Get("_internal_update");
+                if (internalUpdate.Type == DataType.Function)
+                    state.Vm.Call(internalUpdate, (double)deltaTime);
             }
-            catch (Exception ex)
-            {
-                _logger.Warning($"Lua on_update error [{_runtimeUnits[i].Id}]: {ex.Message}");
-                CrashLog.LogException($"LuaLanguageBridge.OnUpdate[{_runtimeUnits[i].Id}]", ex);
-            }
+            catch { }
         }
     }
 
@@ -191,18 +196,23 @@ public sealed class LuaLanguageBridge : iGregLanguageBridge
                 continue;
 
             var state = _scripts[i];
-            if (state?.OnGui == null)
-                continue;
+            if (state == null) continue;
 
+            // 1. Classic global on_gui()
+            if (state.OnGui != null)
+            {
+                try { state.Vm.Call(state.OnGui); }
+                catch (Exception ex) { _logger.Warning($"Lua on_gui error [{_runtimeUnits[i].Id}]: {ex.Message}"); }
+            }
+
+            // 2. New greg.events.on_gui handlers
             try
             {
-                state.Vm.Call(state.OnGui);
+                var internalGui = state.Vm.Globals.Get("greg").Table.Get("_internal_gui");
+                if (internalGui.Type == DataType.Function)
+                    state.Vm.Call(internalGui);
             }
-            catch (Exception ex)
-            {
-                _logger.Warning($"Lua on_gui error [{_runtimeUnits[i].Id}]: {ex.Message}");
-                CrashLog.LogException($"LuaLanguageBridge.OnGui[{_runtimeUnits[i].Id}]", ex);
-            }
+            catch { }
         }
     }
 

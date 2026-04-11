@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
-[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", gregModLoader.gregReleaseVersion.Current, "mleem97")]
+[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", gregModLoader.gregReleaseVersion.Current, "MLeeM97")]
 [assembly: MelonGame(null, null)]
 
 namespace gregAssetExporter

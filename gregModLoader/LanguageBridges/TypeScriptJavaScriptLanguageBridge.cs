@@ -123,7 +123,7 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
 
     private object TsPayloadGet(object payload, string field, object fallback)
     {
-        return gregFramework.gregCoreLoader.gregPayload.Get<object>(payload, field, fallback);
+        return global::gregSdk.gregPayload.Get<object>(payload, field, fallback);
     }
 
     private void TsEventsOn(string hook, object handler, string modId)
@@ -172,6 +172,9 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
         _runtimeUnits.Clear();
     }
 }
+
+
+
 
 
 

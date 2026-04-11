@@ -10,7 +10,7 @@ namespace gregModLoader.LanguageBridges.LuaModules;
 /// Read/write files, check existence, list directories.
 /// Paths are sandboxed — only game dir and userdata are accessible.
 /// </summary>
-internal sealed class GregIoLuaModule : iGregLuaModule
+public sealed class gregIoLuaModule : iGregLuaModule
 {
     public void Register(Script vm, Table greg)
     {
@@ -115,4 +115,5 @@ internal sealed class GregIoLuaModule : iGregLuaModule
         });
     }
 }
+
 

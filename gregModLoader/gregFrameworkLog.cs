@@ -4,7 +4,7 @@ using gregModLoader;
 
 namespace gregModLoader;
 
-public static class gregFrameworkLog
+public static class gregModLoaderLog
 {
     private static MelonLogger.Instance _logger;
 
@@ -59,6 +59,7 @@ public static class gregFrameworkLog
         return $"[greg/{level}/{safeCategory}] {message}";
     }
 }
+
 
 
 

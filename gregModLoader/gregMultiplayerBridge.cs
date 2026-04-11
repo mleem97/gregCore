@@ -1574,11 +1574,12 @@ public class BillboardNameTag : MonoBehaviour
 
     void LateUpdate()
     {
-        var cam = Camera.gregMain;
+        var cam = Camera.main;
         if (cam == null) return;
         transform.LookAt(transform.position + cam.transform.forward);
     }
 }
+
 
 
 

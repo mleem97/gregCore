@@ -44,7 +44,7 @@ namespace gregAssetExporter
 #else
             MelonLogger.Msg("Release-Modus aktiv: nur Game-Kommunikation/Framework-Basis, keine Dev-Exports/Hooks.");
 #endif
-            MelonLogger.Msg("Projekt: https://github.com/mleem97/gregFramework");
+            MelonLogger.Msg("Projekt: https://github.com/mleem97/gregModLoader");
             ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, gregModLoader.gregReleaseVersion.Current));
 
             RunAutoHookCommandIfRequested();
@@ -841,6 +841,7 @@ namespace gregAssetExporter
         }
     }
 }
+
 
 
 

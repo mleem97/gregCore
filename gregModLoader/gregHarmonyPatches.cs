@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using HarmonyLib;
-using gregFramework.gregCoreLoader;
+using gregSdk;
 using Il2Cpp;
 using UnityEngine;
 
@@ -568,6 +568,7 @@ internal static class Patch_ComputerShop_InteractOnClick
         }
     }
 }
+
 
 
 

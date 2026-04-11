@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using MelonLoader;
 
-namespace gregFramework.gregCoreLoader;
+namespace gregSdk;
 
 /// <summary>
-/// Central event bus for gregFramework hook payloads.
+/// Central event bus for gregModLoader hook payloads.
 /// </summary>
 public static class gregEventDispatcher
 {
@@ -223,4 +223,6 @@ public static class gregEventDispatcher
         MelonLogger.Msg($"[gregCore] Unregistered handlers and cancelable handlers for mod '{modId}'.");
     }
 }
+
+
 

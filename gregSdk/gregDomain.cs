@@ -1,4 +1,4 @@
-namespace gregFramework.gregCoreLoader;
+namespace gregSdk;
 
 /// <summary>
 /// Logical domains for greg hook names: greg.&lt;DOMAIN&gt;.&lt;Event&gt;
@@ -16,4 +16,5 @@ public enum GregDomain
     Ui,
     System
 }
+
 

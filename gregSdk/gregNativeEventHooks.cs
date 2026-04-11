@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using gregModLoader;
 
-namespace gregFramework.gregCoreLoader;
+namespace gregSdk;
 
 /// <summary>
 /// Canonical greg.* hook names for the native / FFI event pipeline (<see cref="EventDispatcher"/>).
@@ -132,5 +132,6 @@ public static class gregNativeEventHooks
         return ByEventId.TryGetValue(eventId, out hookName);
     }
 }
+
 
 

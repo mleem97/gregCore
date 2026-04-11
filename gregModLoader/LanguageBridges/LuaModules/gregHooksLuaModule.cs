@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using gregModLoader.Hooks;
-using gregFramework.gregCoreLoader;
+using gregSdk;
 using MoonSharp.Interpreter;
+using MelonLoader;
 
 namespace gregModLoader.LanguageBridges.LuaModules;
 
@@ -16,8 +17,15 @@ namespace gregModLoader.LanguageBridges.LuaModules;
 ///   <item><c>greg.emit(hookName, payload)</c> — emit custom event</item>
 /// </list>
 /// </summary>
-internal sealed class gregHooksLuaModule : iGregLuaModule
+public sealed class gregHooksLuaModule : iGregLuaModule
 {
+    private MelonLogger.Instance _logger;
+
+    public gregHooksLuaModule(MelonLogger.Instance logger = null)
+    {
+        _logger = logger ?? new MelonLogger.Instance("gregCore");
+    }
+
     public void Register(Script vm, Table greg)
     {
         var registeredEventHandlers = new List<(string hookName, Action<object> handler)>();
@@ -207,14 +215,14 @@ internal sealed class gregHooksLuaModule : iGregLuaModule
         if (ctx.Instance != null)
         {
             // Store a handle for the instance so Lua can use greg.unity on it
-            t["instance_handle"] = luaObjectHandleRegistry.Register(ctx.Instance);
+            t["instance_handle"] = gregLuaObjectHandleRegistry.Register(ctx.Instance);
         }
         if (ctx.Arguments != null)
         {
             for (int i = 0; i < ctx.Arguments.Length; i++)
             {
                 if (ctx.Arguments[i] != null)
-                    t[$"arg{i}_handle"] = luaObjectHandleRegistry.Register(ctx.Arguments[i]);
+                    t[$"arg{i}_handle"] = gregLuaObjectHandleRegistry.Register(ctx.Arguments[i]);
             }
         }
         return t;
@@ -231,6 +239,9 @@ internal sealed class gregHooksLuaModule : iGregLuaModule
         return dict;
     }
 }
+
+
+
 
 
 

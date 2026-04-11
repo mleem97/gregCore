@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using gregFramework.gregCoreLoader;
+using gregSdk;
 using MelonLoader;
 
 namespace gregModLoader;
@@ -401,6 +401,7 @@ public static class EventDispatcher
         FireSimple(EventIds.HookBridgeTriggered);
     }
 }
+
 
 
 

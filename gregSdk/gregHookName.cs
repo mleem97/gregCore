@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace gregFramework.gregCoreLoader;
+namespace gregSdk;
 
 /// <summary>
 /// Builds canonical greg hook strings: greg.&lt;DOMAIN&gt;.&lt;Action&gt;
@@ -43,4 +43,5 @@ public static class gregHookName
         _ => throw new ArgumentOutOfRangeException(nameof(domain), domain, null)
     };
 }
+
 

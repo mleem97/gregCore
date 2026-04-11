@@ -14,7 +14,7 @@ namespace gregModLoader.LanguageBridges.LuaModules;
 /// Generic Unity/Il2Cpp API surface for Lua via integer handles.
 /// All heavy Unity work stays in C#; Lua drives policy via handle IDs.
 /// </summary>
-internal sealed class GregUnityLuaModule : iGregLuaModule
+public sealed class gregUnityLuaModule : iGregLuaModule
 {
     public void Register(Script vm, Table greg)
     {
@@ -102,7 +102,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 {
                     var obj = objects[i];
                     if (obj != null)
-                        result.Append(DynValue.NewNumber(LuaObjectHandleRegistry.Register(obj)));
+                        result.Append(DynValue.NewNumber(gregLuaObjectHandleRegistry.Register(obj)));
                 }
             }
             catch (Exception ex) { CrashLog.LogException("lua:greg.unity.find", ex); }
@@ -114,13 +114,13 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Transform t = null;
                 if (obj is GameObject go) t = go.transform;
                 else if (obj is Component c) t = c.transform;
                 if (t == null) return 0;
                 var child = t.Find(childName);
-                return child != null ? LuaObjectHandleRegistry.Register(child.gameObject) : 0;
+                return child != null ? gregLuaObjectHandleRegistry.Register(child.gameObject) : 0;
             }
             catch { return 0; }
         });
@@ -128,14 +128,14 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         // greg.unity.handle_alive(handle) -> bool
         unity["handle_alive"] = (Func<int, bool>)(handle =>
         {
-            var obj = LuaObjectHandleRegistry.Resolve(handle);
+            var obj = gregLuaObjectHandleRegistry.Resolve(handle);
             if (obj == null) return false;
             if (obj is UnityEngine.Object uo) return uo != null;
             return true;
         });
 
         // greg.unity.release(handle)
-        unity["release"] = (Action<int>)(handle => LuaObjectHandleRegistry.Release(handle));
+        unity["release"] = (Action<int>)(handle => gregLuaObjectHandleRegistry.Release(handle));
     }
 
     private static void RegisterComponents(Script vm, Table unity)
@@ -145,7 +145,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 GameObject go = null;
                 if (obj is GameObject g) go = g;
                 else if (obj is Component c) go = c.gameObject;
@@ -154,7 +154,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 var type = ResolveIl2CppType(typeName);
                 if (type == null) return 0;
                 var comp = go.GetComponent(Il2CppInterop.Runtime.Il2CppType.From(type));
-                return comp != null ? LuaObjectHandleRegistry.Register(comp) : 0;
+                return comp != null ? gregLuaObjectHandleRegistry.Register(comp) : 0;
             }
             catch { return 0; }
         });
@@ -164,7 +164,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 GameObject go = null;
                 if (obj is GameObject g) go = g;
                 else if (obj is Component c) go = c.gameObject;
@@ -173,7 +173,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 var type = ResolveIl2CppType(typeName);
                 if (type == null) return 0;
                 var comp = go.AddComponent(Il2CppInterop.Runtime.Il2CppType.From(type));
-                return comp != null ? LuaObjectHandleRegistry.Register(comp) : 0;
+                return comp != null ? gregLuaObjectHandleRegistry.Register(comp) : 0;
             }
             catch { return 0; }
         });
@@ -186,7 +186,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj == null) return null;
                 var val = GetMemberValue(obj, name);
                 return val?.ToString();
@@ -199,7 +199,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj == null) return 0;
                 var val = GetMemberValue(obj, name);
                 if (val is float f) return f;
@@ -216,7 +216,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj == null) return false;
                 var val = GetMemberValue(obj, name);
                 return val is true;
@@ -229,7 +229,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj != null) SetMemberValue(obj, name, value);
             }
             catch { }
@@ -240,7 +240,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj == null) return;
                 var member = FindMember(obj.GetType(), name);
                 if (member is FieldInfo fi)
@@ -264,7 +264,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj != null) SetMemberValue(obj, name, value);
             }
             catch { }
@@ -275,10 +275,10 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj == null) return 0;
                 var val = GetMemberValue(obj, name);
-                return val != null ? LuaObjectHandleRegistry.Register(val) : 0;
+                return val != null ? gregLuaObjectHandleRegistry.Register(val) : 0;
             }
             catch { return 0; }
         });
@@ -292,7 +292,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
             var t = new Table(vm);
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Transform tr = null;
                 if (obj is GameObject go) tr = go.transform;
                 else if (obj is Component c) tr = c.transform;
@@ -313,7 +313,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Transform tr = null;
                 if (obj is GameObject go) tr = go.transform;
                 else if (obj is Component c) tr = c.transform;
@@ -328,7 +328,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Transform tr = null;
                 if (obj is GameObject go) tr = go.transform;
                 else if (obj is Component c) tr = c.transform;
@@ -343,7 +343,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Transform tr = null;
                 if (obj is GameObject go) tr = go.transform;
                 else if (obj is Component c) tr = c.transform;
@@ -358,8 +358,8 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
-                var parentObj = LuaObjectHandleRegistry.Resolve(parentHandle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
+                var parentObj = gregLuaObjectHandleRegistry.Resolve(parentHandle);
                 Transform child = null, parent = null;
                 if (obj is GameObject go) child = go.transform;
                 else if (obj is Component c) child = c.transform;
@@ -379,9 +379,9 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj is not UnityEngine.Object uo) return 0;
-                var parent = LuaObjectHandleRegistry.Resolve(parentHandle);
+                var parent = gregLuaObjectHandleRegistry.Resolve(parentHandle);
                 Transform parentT = null;
                 if (parent is GameObject pgo) parentT = pgo.transform;
                 else if (parent is Component pc) parentT = pc.transform;
@@ -389,7 +389,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 var clone = parentT != null
                     ? UnityEngine.Object.Instantiate(uo, parentT)
                     : UnityEngine.Object.Instantiate(uo);
-                return clone != null ? LuaObjectHandleRegistry.Register(clone) : 0;
+                return clone != null ? gregLuaObjectHandleRegistry.Register(clone) : 0;
             }
             catch { return 0; }
         });
@@ -399,9 +399,9 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj is UnityEngine.Object uo) UnityEngine.Object.Destroy(uo);
-                LuaObjectHandleRegistry.Release(handle);
+                gregLuaObjectHandleRegistry.Release(handle);
             }
             catch { }
         });
@@ -414,7 +414,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Material mat = null;
                 if (obj is Material m) mat = m;
                 else if (obj is Renderer r) mat = r.sharedMaterial;
@@ -439,7 +439,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 TextMeshProUGUI tmp = null;
                 if (obj is TextMeshProUGUI t) tmp = t;
                 else if (obj is GameObject go) tmp = go.GetComponent<TextMeshProUGUI>();
@@ -464,7 +464,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 TextMeshProUGUI tmp = null;
                 if (obj is TextMeshProUGUI t) tmp = t;
                 else if (obj is GameObject go) tmp = go.GetComponent<TextMeshProUGUI>();
@@ -480,7 +480,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
             var t = new Table(vm);
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 TextMeshProUGUI tmp = null;
                 if (obj is TextMeshProUGUI tt) tmp = tt;
                 else if (obj is GameObject go) tmp = go.GetComponent<TextMeshProUGUI>();
@@ -500,7 +500,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 TextMeshProUGUI tmp = null;
                 if (obj is TextMeshProUGUI t) tmp = t;
                 else if (obj is GameObject go) tmp = go.GetComponent<TextMeshProUGUI>();
@@ -520,7 +520,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 TextMesh tm = null;
                 if (obj is TextMesh t) tm = t;
                 else if (obj is GameObject go) tm = go.GetComponent<TextMesh>();
@@ -554,7 +554,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 if (Physics.Raycast(new Ray(origin, direction), out var hitInfo, (float)maxDist))
                 {
                     t["hit"] = true;
-                    t["handle"] = LuaObjectHandleRegistry.Register(hitInfo.collider.gameObject);
+                    t["handle"] = gregLuaObjectHandleRegistry.Register(hitInfo.collider.gameObject);
                     var pt = new Table(vm);
                     pt["x"] = (double)hitInfo.point.x;
                     pt["y"] = (double)hitInfo.point.y;
@@ -572,7 +572,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
             var t = new Table(vm);
             try
             {
-                var cam = Camera.gregMain;
+                var cam = Camera.main;
                 if (cam != null)
                 {
                     var pos = cam.transform.position;
@@ -594,12 +594,12 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
             try
             {
                 var go = new GameObject(name);
-                var parent = LuaObjectHandleRegistry.Resolve(parentHandle);
+                var parent = gregLuaObjectHandleRegistry.Resolve(parentHandle);
                 Transform pt = null;
                 if (parent is GameObject pgo) pt = pgo.transform;
                 else if (parent is Component pc) pt = pc.transform;
                 if (pt != null) go.transform.SetParent(pt, true);
-                return LuaObjectHandleRegistry.Register(go);
+                return gregLuaObjectHandleRegistry.Register(go);
             }
             catch { return 0; }
         });
@@ -609,7 +609,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj is GameObject go) go.name = name;
                 else if (obj is Component c) c.gameObject.name = name;
             }
@@ -621,7 +621,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 if (obj is GameObject go) return go.name;
                 if (obj is Component c) return c.gameObject?.name;
                 return null;
@@ -634,7 +634,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         {
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Component src = null;
                 if (obj is GameObject go) src = go.transform;
                 else if (obj is Component c) src = c;
@@ -643,7 +643,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 var type = ResolveIl2CppType(typeName);
                 if (type == null) return 0;
                 var comp = src.GetComponentInParent(Il2CppInterop.Runtime.Il2CppType.From(type));
-                return comp != null ? LuaObjectHandleRegistry.Register(comp) : 0;
+                return comp != null ? gregLuaObjectHandleRegistry.Register(comp) : 0;
             }
             catch { return 0; }
         });
@@ -654,7 +654,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
             var result = new Table(vm);
             try
             {
-                var obj = LuaObjectHandleRegistry.Resolve(handle);
+                var obj = gregLuaObjectHandleRegistry.Resolve(handle);
                 Component src = null;
                 if (obj is GameObject go) src = go.transform;
                 else if (obj is Component c) src = c;
@@ -667,7 +667,7 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
                 for (int i = 0; i < comps.Count; i++)
                 {
                     if (comps[i] != null)
-                        result.Append(DynValue.NewNumber(LuaObjectHandleRegistry.Register(comps[i])));
+                        result.Append(DynValue.NewNumber(gregLuaObjectHandleRegistry.Register(comps[i])));
                 }
             }
             catch { }
@@ -844,5 +844,8 @@ internal sealed class GregUnityLuaModule : iGregLuaModule
         return pi;
     }
 }
+
+
+
 
 

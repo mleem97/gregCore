@@ -530,7 +530,7 @@ public static class gregGameHooks
     {
         try
         {
-            var camera = Camera.gregMain;
+            var camera = Camera.main;
             if (camera == null) return null;
 
             var ray = new Ray(camera.transform.position, camera.transform.forward);
@@ -578,5 +578,6 @@ public static class gregGameHooks
         catch { }
     }
 }
+
 
 

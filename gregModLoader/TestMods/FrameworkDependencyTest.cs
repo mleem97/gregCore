@@ -21,7 +21,7 @@ namespace gregAssetExporter
             ModFramework.Events.Subscribe<HookInstallCompletedEvent>(OnHookInstallCompleted);
             ModFramework.Events.Subscribe<HookTriggeredEvent>(OnHookTriggered);
 
-            gregFrameworkLog.Info("testmod", "FrameworkDependencyTestMod initialized (F6=Hook healthcheck, F7=+1 money mutation)");
+            gregModLoaderLog.Info("testmod", "FrameworkDependencyTestMod initialized (F6=Hook healthcheck, F7=+1 money mutation)");
         }
 
         public void Tick()
@@ -43,17 +43,17 @@ namespace gregAssetExporter
             HookScanResult scan = runtimeHookService.ScanCandidates(maxHooks);
             HookInstallResult install = runtimeHookService.ScanAndInstall(maxHooks);
 
-            gregFrameworkLog.Info("healthcheck", $"Candidates={scan.Candidates.Count}, installed={install.Installed}, failed={install.Failed}");
+            gregModLoaderLog.Info("healthcheck", $"Candidates={scan.Candidates.Count}, installed={install.Installed}, failed={install.Failed}");
 
             int previewCount = Math.Min(scan.Candidates.Count, 10);
             for (int index = 0; index < previewCount; index++)
-                gregFrameworkLog.Debug("healthcheck", $"Hookable[{index + 1}/{previewCount}]: {scan.Candidates[index]}");
+                gregModLoaderLog.Debug("healthcheck", $"Hookable[{index + 1}/{previewCount}]: {scan.Candidates[index]}");
 
             if (install.Errors.Count > 0)
             {
                 int errorPreviewCount = Math.Min(install.Errors.Count, 10);
                 for (int index = 0; index < errorPreviewCount; index++)
-                        gregFrameworkLog.Warn("healthcheck", $"Not hookable[{index + 1}/{errorPreviewCount}]: {install.Errors[index]}");
+                        gregModLoaderLog.Warn("healthcheck", $"Not hookable[{index + 1}/{errorPreviewCount}]: {install.Errors[index]}");
             }
 
         }
@@ -64,7 +64,7 @@ namespace gregAssetExporter
             float updatedMoney = previousMoney + 1f;
 
             gregModLoader.gregGameHooks.SetPlayerMoney(updatedMoney);
-            gregFrameworkLog.Info("testmod", $"Money mutation applied: {previousMoney} -> {updatedMoney}");
+            gregModLoaderLog.Info("testmod", $"Money mutation applied: {previousMoney} -> {updatedMoney}");
         }
 
         private static void OnHookTriggered(HookTriggeredEvent hookTriggeredEvent)
@@ -73,7 +73,7 @@ namespace gregAssetExporter
                 return;
 
             if (hookTriggeredEvent.TriggerCount <= 2)
-                gregFrameworkLog.Debug("healthcheck", $"Hook trigger observed: {hookTriggeredEvent.MethodName} (count={hookTriggeredEvent.TriggerCount})");
+                gregModLoaderLog.Debug("healthcheck", $"Hook trigger observed: {hookTriggeredEvent.MethodName} (count={hookTriggeredEvent.TriggerCount})");
         }
 
         private static void OnHookScanCompleted(HookScanCompletedEvent hookScanCompletedEvent)
@@ -81,7 +81,7 @@ namespace gregAssetExporter
             if (hookScanCompletedEvent == null)
                 return;
 
-            gregFrameworkLog.Debug("healthcheck", $"HookScanCompletedEvent: {hookScanCompletedEvent.CandidatesFound} candidates");
+            gregModLoaderLog.Debug("healthcheck", $"HookScanCompletedEvent: {hookScanCompletedEvent.CandidatesFound} candidates");
         }
 
         private static void OnHookInstallCompleted(HookInstallCompletedEvent hookInstallCompletedEvent)
@@ -89,10 +89,11 @@ namespace gregAssetExporter
             if (hookInstallCompletedEvent == null)
                 return;
 
-            gregFrameworkLog.Debug("healthcheck", $"HookInstallCompletedEvent: installed={hookInstallCompletedEvent.Installed}, failed={hookInstallCompletedEvent.Failed}");
+            gregModLoaderLog.Debug("healthcheck", $"HookInstallCompletedEvent: installed={hookInstallCompletedEvent.Installed}, failed={hookInstallCompletedEvent.Failed}");
         }
     }
 }
+
 
 
 

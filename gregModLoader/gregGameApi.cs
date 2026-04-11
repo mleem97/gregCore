@@ -837,7 +837,7 @@ public class gregGameApiManager : IDisposable
 
             // Payload is passed as a GCHandle pointing to the object
             object payload = GCHandle.FromIntPtr(payloadPtr).Target;
-            string val = gregFramework.gregCoreLoader.gregPayload.Get<string>(payload, fieldName, fallback);
+            string val = global::gregSdk.gregPayload.Get<string>(payload, fieldName, fallback);
 
             if (_payloadStringPtr != IntPtr.Zero) Marshal.FreeHGlobal(_payloadStringPtr);
             _payloadStringPtr = Marshal.StringToHGlobalAnsi(val);
@@ -855,7 +855,7 @@ public class gregGameApiManager : IDisposable
             if (string.IsNullOrWhiteSpace(hookName) || handlerPtr == IntPtr.Zero) return;
 
             var rustHandler = Marshal.GetDelegateForFunctionPointer<RustEventHandler>(handlerPtr);
-            gregFramework.gregCoreLoader.gregEventDispatcher.On(hookName, payload =>
+            global::gregSdk.gregEventDispatcher.On(hookName, payload =>
             {
                 IntPtr pPtr = IntPtr.Zero;
                 GCHandle handle = default;
@@ -923,6 +923,9 @@ public class gregGameApiManager : IDisposable
         if (_raycastNamePtr != IntPtr.Zero) { Marshal.FreeHGlobal(_raycastNamePtr); _raycastNamePtr = IntPtr.Zero; }
     }
 }
+
+
+
 
 
 

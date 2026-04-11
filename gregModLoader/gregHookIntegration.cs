@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using gregFramework.gregCoreLoader;
+using gregSdk;
 
 namespace gregModLoader;
 
@@ -121,5 +121,6 @@ internal static class GregHookIntegration
         public uint EventId { get; }
     }
 }
+
 
 

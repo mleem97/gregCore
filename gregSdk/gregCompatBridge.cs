@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using MelonLoader;
 
-namespace gregFramework.gregCoreLoader;
+namespace gregSdk;
 
 /// <summary>
 /// Resolves deprecated hook name spellings to canonical greg.* names.
@@ -186,4 +186,5 @@ public static class gregCompatBridge
         return hookName;
     }
 }
+
 

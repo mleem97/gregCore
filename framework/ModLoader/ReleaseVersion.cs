@@ -1,6 +1,0 @@
-namespace gregCore;
-
-public static class ReleaseVersion
-{
-    public const string Current = "00.01.0012";
-}

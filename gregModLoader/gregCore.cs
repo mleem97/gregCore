@@ -194,9 +194,6 @@ public class gregCoreLoader : MelonMod
             CrashLog.Log("step: loading all mods");
             _ffiBridge.LoadAllMods();
 
-            CrashLog.Log("step: registering built-in UI extension handlers (gregCoreLoader)");
-            // UiExtensionBootstrap.RegisterBuiltInHandlers();
-
             // ModigApi is now fully integrated into gregCore.
             // All game API surfaces (Player, Network, Time, Localisation, UI, World)
             // are accessible via the consolidated ModigApi class.

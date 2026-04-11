@@ -101,6 +101,7 @@
     <Compile Remove="gregModLoader\gregUiModernizer.cs" />
     <Compile Remove="gregModLoader\gregModSettingsMenuBridge.cs" />
     <Compile Remove="gregModLoader\gregUiExtensionBootstrap.cs" />
+    <Compile Remove="gregModLoader\gregUiPatches.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="gregMain.cs" />
@@ -111,6 +112,7 @@
     <None Include="gregModLoader\gregUiModernizer.cs" />
     <None Include="gregModLoader\gregModSettingsMenuBridge.cs" />
     <None Include="gregModLoader\gregUiExtensionBootstrap.cs" />
+    <None Include="gregModLoader\gregUiPatches.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == 'true'">

@@ -40,10 +40,12 @@ Dieses Dokument ist der zentrale Masterplan für das Greg Framework. Es wird lau
 - [ ] **PatchPanel**: Interaktion mit passiver Netzwerk-Hardware.
 - [ ] **Tooltip & UI_Section**: Erweiterte UI-Manipulation über das HUD hinaus.
 - [ ] **AudioManager**: Steuerung von Soundeffekten und Umgebungsmusik.
+- [ ] **Network Crawler (`GregTopologyService`)**: Implementierung eines performanten Graphen-Crawlers für automatisiertes Routing.
+- [ ] **Power Simulation (`GregPowerService`)**: Rekursive Berechnung des Rack- und Raum-Stromverbrauchs.
 
 ## 📅 Phase 7: Environment & Simulation (Geplant)
 - [ ] **HRSystem**: Tiefere Integration in das Mitarbeiter-Management (Boni, Level-Up).
-- [ ] **SteamManager**: Zugriff auf Steam-Achievements und Leaderboards.
+- [ ] **SteamManager & Lobbies**: API-Queue für Steam-Lobby-Callbacks (FFI `gregGameApi`).
 - [ ] **Objectives**: Manipulation von Tutorial- und Haupt-Zielen.
 
 ## 🔄 Phase 8: Unity Scripting API Integration (Laufend)

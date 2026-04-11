@@ -8,14 +8,13 @@ The workspace is **multi-repo**: several Git checkouts live **side by side** und
 
 | Folder | Role |
 |--------|--------|
-| **`gregCore/`** | Framework: **`gregCore/gregCore.sln`**, main project **`gregCore/framework/gregCore.csproj`**; SDK under `framework/Sdk/`; MCP under `gregCore/mcp-server/` |
-| **`gregMod.<Name>/`** | Gameplay mods (often `FMF.*` assemblies), **flat** next to `gregCore/` (umbrella **`gregMods/`** is deprecated) |
-| **`gregExt.<Name>/`** | Framework plugins (`FFM.Plugin.*` / `greg.Plugin.*`), also flat (**`gregExtensions/`** deprecated) |
+| **`gregCore/`** | Framework Core: **`gregCore/gregCore.sln`**, main project **`gregCore/gregCore.csproj`**; SDK under `gregSdk/` |
+| **`gregAddons/`** | Official addons and tools: Plugins, Templates, and Node.js-based tooling (MCP, Migrator) |
+| **`gregMod.<Name>/`** | Gameplay mods (often `FMF.*` assemblies), **flat** next to `gregCore/` |
 | **`gregModmanager/`** | GregModManager / Workshop UI (`WorkshopUploader.csproj`) |
-| **`gregDataCenterExporter/`** | Exporter, templates, mirrors |
 | **`gregWiki/`** | This documentation site (Docusaurus) |
 
-Rust/native mods are loaded through the core FFI layer; bridge code lives under **`gregCore/framework/ModLoader/`** (including **`LanguageBridges/`** and **`LanguageBridges/LuaModules/`** for the Lua `greg.*` API).
+Rust/native mods are loaded through the core FFI layer; bridge code lives under **`gregCore/gregModLoader/`** (including **`LanguageBridges/`** and **`LanguageBridges/LuaModules/`** for the Lua `greg.*` API).
 
 ## Build the framework
 
@@ -23,11 +22,11 @@ Rust/native mods are loaded through the core FFI layer; bridge code lives under 
 dotnet build gregCore/gregCore.sln -c Release
 ```
 
-Or open **`gregCore/gregCore.sln`** in your IDE and build the **`gregCore/framework/gregCore.csproj`** output. A **Release** build produces **`gregCore.dll`** (the MelonLoader framework assembly — not a legacy `FrikaModdingFramework.dll` name).
+Or open **`gregCore/gregCore.sln`** in your IDE and build the **`gregCore/gregCore.csproj`** output. A **Release** build produces **`gregCore.dll`** (the MelonLoader framework assembly).
 
 For CI without a local game install, many projects support **`-p:CI=true`** (see each `.csproj`).
 
-**Prerequisites:** MelonLoader **net6** assemblies and game Il2Cpp interop — either from `{Game}/MelonLoader/` or **`gregCore/lib/references/MelonLoader`** (e.g. `python gregCore/tools/refresh_refs.py`). Set **`DATA_CENTER_GAME_DIR`** if MSBuild should discover the game path.
+**Prerequisites:** MelonLoader **net6** assemblies and game Il2Cpp interop — either from `{Game}/MelonLoader/` or **`gregCore/gregLib/references/MelonLoader`** (e.g. `python gregCore/gregTools/refresh_refs.py`). Set **`DATA_CENTER_GAME_DIR`** if MSBuild should discover the game path.
 
 ### Quick install (matches `gregCore/README.md`)
 
@@ -73,5 +72,5 @@ Reference mod: **`mods/GregShowcaseMod/`** — [Documentation hub](/wiki/develop
 
 - Markdown under **`gregWiki/docs/`**
 - Docker: from **`gregWiki/`** root — see **`gregWiki/README.md`**
-- MCP: [MCP references](/wiki/developers) — server code under **`gregCore/mcp-server/`**
+- MCP: [MCP references](/wiki/developers) — server code under **`gregAddons/mcp-server/`**
 

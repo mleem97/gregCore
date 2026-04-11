@@ -273,31 +273,16 @@
     <Compile Remove="gregMain.cs" />
     <Compile Remove="gregMainCi.cs" />
     <Compile Remove="gregTests\**\*.cs" />
-    <Compile Remove="..\workshopuploader\**\*.cs" />
-    <Compile Remove="..\WorkshopUploader\**\*.cs" />
-    <Compile Remove="..\StandalonePlugins\**\*.cs" />
-    <Compile Remove="gregTemplates\**\*.cs" />
     <Compile Remove="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
-    <Compile Remove="..\JoniML\**\*.cs" />
-    <Compile Remove="..\il2cpp-unpack\**\*.cs" />
-    <Compile Remove="..\References\il2cpp-unpack\**\*.cs" />
-    <Compile Remove="..\_tmp\**\*.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="gregMain.cs" />
     <None Include="gregMainCi.cs" />
     <None Include="gregTests\**\*.cs" />
-    <None Include="..\workshopuploader\**\*.cs" />
-    <None Include="..\WorkshopUploader\**\*.cs" />
-    <None Include="..\StandalonePlugins\**\*.cs" />
     <None Include="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
     <None Include="gregModLoader\DC2WebBridge.cs" />
     <None Include="gregModLoader\UiModernizer.cs" />
     <None Include="gregModLoader\ModSettingsMenuBridge.cs" />
-    <None Include="..\JoniML\**\*.cs" />
-    <None Include="..\il2cpp-unpack\**\*.cs" />
-    <None Include="..\References\il2cpp-unpack\**\*.cs" />
-    <None Include="..\_tmp\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == 'true'">

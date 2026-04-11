@@ -1,13 +1,15 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Jint;
+using Jint.Native;
 using MelonLoader;
 
 namespace gregModLoader.LanguageBridges;
 
 /// <summary>
-/// TypeScript/JavaScript bridge placeholder with isolated lifecycle and file discovery.
-/// Runtime execution can be attached to a JS engine without changing gregCoreLoader wiring.
+/// TypeScript/JavaScript bridge with Jint integration for runtime JS execution.
 /// </summary>
 public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
 {
@@ -16,6 +18,10 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
     private readonly MelonLogger.Instance _logger;
     private readonly string _scriptsRoot;
     private readonly List<gregRuntimeUnit> _runtimeUnits = new();
+    
+    private readonly List<Engine> _engines = new();
+    private readonly List<Action<float>> _onUpdateHandlers = new();
+    private readonly List<Action> _onGuiHandlers = new();
 
     public TypeScriptJavaScriptLanguageBridge(MelonLogger.Instance logger, string scriptsRoot)
     {
@@ -35,6 +41,11 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
 
     public int LoadScripts()
     {
+        _runtimeUnits.Clear();
+        _engines.Clear();
+        _onUpdateHandlers.Clear();
+        _onGuiHandlers.Clear();
+
         string[] js = Directory.GetFiles(_scriptsRoot, "*.js", SearchOption.AllDirectories);
         string[] ts = Directory.GetFiles(_scriptsRoot, "*.ts", SearchOption.AllDirectories);
         string[] mjs = Directory.GetFiles(_scriptsRoot, "*.mjs", SearchOption.AllDirectories);
@@ -47,7 +58,6 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
         mjs.CopyTo(loadedScripts, offset); offset += mjs.Length;
         cjs.CopyTo(loadedScripts, offset);
 
-        _runtimeUnits.Clear();
         for (int index = 0; index < loadedScripts.Length; index++)
         {
             string scriptPath = loadedScripts[index];
@@ -55,7 +65,7 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
             string unitId = $"tsjs:{relativePath}";
             bool enabled = gregModActivationService.IsEnabled(unitId, true);
 
-            _runtimeUnits.Add(new gregRuntimeUnit
+            var unit = new gregRuntimeUnit
             {
                 Id = unitId,
                 DisplayName = relativePath,
@@ -63,130 +73,140 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
                 Enabled = enabled,
                 SupportsHotReload = true,
                 IsNativeModule = false
-            });
+            };
+
+            _runtimeUnits.Add(unit);
+
+            if (enabled)
+            {
+                try
+                {
+                    var engine = new Engine(options =>
+                    {
+                        options.LimitMemory(4000000);
+                        options.TimeoutInterval(TimeSpan.FromSeconds(5));
+                    });
+
+                    var eventsObj = new Dictionary<string, object>
+                    {
+                        ["onUpdate"] = new Action<JsValue>(handler =>
+                        {
+                            _onUpdateHandlers.Add(dt => engine.Invoke(handler, dt));
+                        }),
+                        ["onGui"] = new Action<JsValue>(handler =>
+                        {
+                            _onGuiHandlers.Add(() => engine.Invoke(handler));
+                        }),
+                        ["on"] = new Action<string, JsValue, string>((hook, handler, modId) =>
+                        {
+                            gregSdk.gregEventDispatcher.On(hook, payload => {
+                                try {
+                                    engine.Invoke(handler, JsValue.FromObject(engine, payload));
+                                } catch(Exception e) {
+                                    _logger.Error($"Event execution failed in JS: {e}");
+                                }
+                            }, string.IsNullOrEmpty(modId) ? unit.Id : modId);
+                        }),
+                        ["off"] = new Action<string>(hook => {
+                            gregSdk.gregEventDispatcher.UnregisterAll(unit.Id);
+                        })
+                    };
+
+                    var hudObj = new Dictionary<string, object>
+                    {
+                        ["beginPanel"] = new Action<string, float, float, float, float>(gregGameHooks.GuiBeginPanel),
+                        ["label"] = new Action<string>(gregGameHooks.GuiLabel),
+                        ["endPanel"] = new Action(gregGameHooks.GuiEndPanel)
+                    };
+
+                    var targetObj = new Dictionary<string, object>
+                    {
+                        ["raycastForward"] = new Func<float, object>(distance =>
+                        {
+                            var hit = gregGameHooks.RaycastForward(distance);
+                            if (hit == null) return null;
+                            return new Dictionary<string, object> {
+                                ["name"] = hit.Value.Name,
+                                ["distance"] = hit.Value.Distance,
+                                ["point"] = new Dictionary<string, float> { ["x"] = hit.Value.Point.x, ["y"] = hit.Value.Point.y, ["z"] = hit.Value.Point.z }
+                            };
+                        })
+                    };
+
+                    var payloadObj = new Dictionary<string, object>
+                    {
+                        ["get"] = new Func<object, string, object, object>(global::gregSdk.gregPayload.Get<object>)
+                    };
+
+                    var gregObj = new Dictionary<string, object>
+                    {
+                        ["log"] = new Action<string>(msg => _logger.Msg($"[tsjs:{unit.DisplayName}] {msg}")),
+                        ["events"] = eventsObj,
+                        ["hud"] = hudObj,
+                        ["target"] = targetObj,
+                        ["payload"] = payloadObj
+                    };
+
+                    engine.SetValue("greg", gregObj);
+
+                    engine.Execute(File.ReadAllText(scriptPath));
+                    _engines.Add(engine);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Failed to load TS/JS script '{unit.DisplayName}': {ex}");
+                }
+            }
         }
 
-        _logger.Msg($"gregCore TS/JS bridge discovered {_runtimeUnits.Count} script(s).");
+        _logger.Msg($"gregCore TS/JS bridge evaluated {_engines.Count} active script(s).");
         return _runtimeUnits.Count;
     }
 
-    public IReadOnlyList<gregRuntimeUnit> GetRuntimeUnits()
-    {
-        return _runtimeUnits;
-    }
+    public IReadOnlyList<gregRuntimeUnit> GetRuntimeUnits() => _runtimeUnits;
 
     public bool SetUnitEnabled(string unitId, bool enabled)
     {
-        if (string.IsNullOrWhiteSpace(unitId) || !unitId.StartsWith("tsjs:", StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        for (int index = 0; index < _runtimeUnits.Count; index++)
+        for (int i = 0; i < _runtimeUnits.Count; i++)
         {
-            var unit = _runtimeUnits[index];
-            if (!string.Equals(unit.Id, unitId, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            gregModActivationService.SetEnabled(unitId, enabled);
-            _runtimeUnits[index] = new gregRuntimeUnit
+            if (_runtimeUnits[i].Id.Equals(unitId, StringComparison.OrdinalIgnoreCase))
             {
-                Id = unit.Id,
-                DisplayName = unit.DisplayName,
-                Language = unit.Language,
-                Enabled = enabled,
-                SupportsHotReload = unit.SupportsHotReload,
-                IsNativeModule = unit.IsNativeModule
-            };
-            return true;
+                gregModActivationService.SetEnabled(unitId, enabled);
+                return true;
+            }
         }
-
         return false;
     }
 
-    public int ReloadEnabledUnits()
-    {
-        return LoadScripts();
-    }
+    public int ReloadEnabledUnits() => LoadScripts();
 
-    public void OnSceneLoaded(string sceneName)
-    {
-        // Dispatch to JS engine when implemented
-    }
+    public void OnSceneLoaded(string sceneName) { }
 
     public void OnUpdate(float deltaTime)
     {
-        // Dispatch to JS engine when implemented
+        foreach (var handler in _onUpdateHandlers)
+        {
+            try { handler(deltaTime); } catch { }
+        }
     }
 
     public void OnGui()
     {
-        // Dispatch to JS engine when implemented
-    }
-
-    // --- C#-side implementations for TS APIs (Exposed to JS Engine) ---
-
-    public object TsPayloadGet(object payload, string field, object fallback)
-    {
-        return global::gregSdk.gregPayload.Get<object>(payload, field, fallback);
-    }
-
-    public void TsEventsOn(string hook, object handler, string modId)
-    {
-        // In a real implementation, 'handler' would be a JS function reference
-        // wrapped into a C# Action<object>.
-        _logger.Msg($"[tsjs] Subscribed to event: {hook} (Mod: {modId})");
-    }
-
-    public void TsEventsOnUpdate(object handler)
-    {
-        _logger.Msg("[tsjs] Registered onUpdate handler");
-    }
-
-    public void TsEventsOnGui(object handler)
-    {
-        _logger.Msg("[tsjs] Registered onGui handler");
-    }
-
-    public void TsHudBeginPanel(string id, float x, float y, float w, float h)
-    {
-        gregGameHooks.GuiBeginPanel(id, x, y, w, h);
-    }
-
-    public void TsHudLabel(string text)
-    {
-        gregGameHooks.GuiLabel(text);
-    }
-
-    public void TsHudEndPanel()
-    {
-        gregGameHooks.GuiEndPanel();
-    }
-
-    public object TsTargetRaycastForward(float distance)
-    {
-        var hit = gregGameHooks.RaycastForward(distance);
-        if (hit == null) return null;
-
-        // Return a dynamic object or dictionary that the JS engine can convert to a JS object
-        return new Dictionary<string, object>
+        foreach (var handler in _onGuiHandlers)
         {
-            ["name"] = hit.Value.Name,
-            ["distance"] = hit.Value.Distance,
-            ["point"] = new { x = hit.Value.Point.x, y = hit.Value.Point.y, z = hit.Value.Point.z }
-        };
-    }
-
-    public void TsRegistryRegisterMod(string id, string name, string version)
-    {
-        _logger.Msg($"[tsjs] Registered mod: {id} {version}");
-    }
-
-    private void TsFrameworkPublishTick(float deltaTime, int frame)
-    {
-        gregAssetExporter.ModFramework.Events.Publish(new gregAssetExporter.ModTickEvent(deltaTime, frame));
+            try { handler(); } catch { }
+        }
     }
 
     public void Shutdown()
     {
+        foreach (var unit in _runtimeUnits)
+        {
+            gregSdk.gregEventDispatcher.UnregisterAll(unit.Id);
+        }
+        _engines.Clear();
+        _onUpdateHandlers.Clear();
+        _onGuiHandlers.Clear();
         _runtimeUnits.Clear();
     }
 }

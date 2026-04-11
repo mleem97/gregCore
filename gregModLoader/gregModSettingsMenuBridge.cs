@@ -249,8 +249,8 @@ public static class ModSettingsMenuBridge
         GUI.Label(new Rect(x, y, w, 24f), "Mods", _titleStyle);
         y += 30f;
 
-        var gregCoreLoader = gregCoreLoader.Instance;
-        var units = gregCoreLoader?.GetRuntimeUnits();
+        var loader = gregCoreLoader.Instance;
+        var units = loader?.GetRuntimeUnits();
         if (units == null || units.Count == 0)
         {
             GUI.Label(new Rect(x, y, w, 24f), "Keine Runtime-Units gefunden.", _labelStyle);
@@ -272,7 +272,7 @@ public static class ModSettingsMenuBridge
             string label = $"{unit.DisplayName} [{unit.Language}]{hotloadSuffix}";
             bool updated = GUI.Toggle(new Rect(8f, rowY, w - 40f, 24f), unit.Enabled, label, _labelStyle);
             if (updated != unit.Enabled)
-                gregCoreLoader?.SetRuntimeUnitEnabled(unit.Id, updated);
+                gregCoreLoader.Instance.SetRuntimeUnitEnabled(unit.Id, updated);
 
             rowY += 30f;
         }
@@ -281,7 +281,7 @@ public static class ModSettingsMenuBridge
         y += scrollHeight + 10f;
 
         if (GUI.Button(new Rect(x, y, 340f, 34f), "Enabled Runtime-Units neu laden", _buttonStyle))
-            gregCoreLoader?.ReloadRuntimeUnits();
+            gregCoreLoader.Instance.ReloadRuntimeUnits();
     }
 
     private static void EnsureStyles()
@@ -337,6 +337,7 @@ public static class ModSettingsMenuBridge
         return _keyOptions[(index + 1) % _keyOptions.Length];
     }
 }
+
 
 
 

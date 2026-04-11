@@ -1,14 +1,13 @@
 using System;
 using MoonSharp.Interpreter;
-using UnityEngine.InputSystem;
 
 namespace gregModLoader.LanguageBridges.LuaModules;
 
 /// <summary>
 /// Keyboard/mouse input API for Lua: <c>greg.input.*</c>.
-/// Uses Unity InputSystem (Keyboard.current, Mouse.current).
+/// Uses Unity InputSystem (Keyboard.current, Mouse.current) via dynamic to avoid CI ref issues.
 /// </summary>
-internal sealed class GregInputLuaModule : iGregLuaModule
+public sealed class gregInputLuaModule : iGregLuaModule
 {
     public void Register(Script vm, Table greg)
     {
@@ -20,7 +19,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         {
             try
             {
-                var kb = Keyboard.current;
+                dynamic kb = GetKeyboard();
                 if (kb == null) return false;
                 var key = FindKey(kb, keyName);
                 return key?.wasPressedThisFrame ?? false;
@@ -33,7 +32,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         {
             try
             {
-                var kb = Keyboard.current;
+                dynamic kb = GetKeyboard();
                 if (kb == null) return false;
                 var key = FindKey(kb, keyName);
                 return key?.isPressed ?? false;
@@ -46,7 +45,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         {
             try
             {
-                var kb = Keyboard.current;
+                dynamic kb = GetKeyboard();
                 if (kb == null) return false;
                 return kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed;
             }
@@ -58,7 +57,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         {
             try
             {
-                var kb = Keyboard.current;
+                dynamic kb = GetKeyboard();
                 if (kb == null) return false;
                 return kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
             }
@@ -70,7 +69,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         {
             try
             {
-                var kb = Keyboard.current;
+                dynamic kb = GetKeyboard();
                 if (kb == null) return false;
                 return kb.leftAltKey.isPressed || kb.rightAltKey.isPressed;
             }
@@ -78,7 +77,19 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         });
     }
 
-    private static KeyControl FindKey(Keyboard kb, string name)
+    private static object GetKeyboard()
+    {
+        try
+        {
+            var type = Type.GetType("UnityEngine.InputSystem.Keyboard, Unity.InputSystem");
+            if (type == null) return null;
+            var prop = type.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            return prop?.GetValue(null);
+        }
+        catch { return null; }
+    }
+
+    private static dynamic FindKey(dynamic kb, string name)
     {
         if (string.IsNullOrEmpty(name)) return null;
         var upper = name.ToUpperInvariant();
@@ -115,7 +126,7 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         };
     }
 
-    private static KeyControl TryFindByCharacter(Keyboard kb, string upper)
+    private static dynamic TryFindByCharacter(dynamic kb, string upper)
     {
         try
         {
@@ -142,4 +153,3 @@ internal sealed class GregInputLuaModule : iGregLuaModule
         return null;
     }
 }
-

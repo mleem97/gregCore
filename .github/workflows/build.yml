@@ -25,17 +25,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore gregCore.csproj
 
-    - name: Fetch References (Optional)
-      shell: pwsh
-      run: |
-        if ("${{ secrets.REFS_URL }}" -ne "") {
-          Write-Host "Downloading references from private storage..."
-          Invoke-WebRequest -Uri "${{ secrets.REFS_URL }}" -OutFile "refs.zip"
-          Expand-Archive -Path "refs.zip" -DestinationPath "gregLib/references/MelonLoader" -Force
-        } else {
-          Write-Host "No REFS_URL secret found. Attempting to build with available local refs or stubs."
-        }
-
     - name: Build gregCore
       run: dotnet build gregCore.csproj -c Release -p:CI=true
 

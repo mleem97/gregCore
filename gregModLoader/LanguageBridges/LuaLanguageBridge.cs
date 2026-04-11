@@ -27,10 +27,10 @@ public sealed class LuaLanguageBridge : iGregLanguageBridge
         _logger = logger;
         _scriptsRoot = scriptsRoot;
 
-        _modules.Add(new GregHooksLuaModule());
-        _modules.Add(new GregUnityLuaModule());
-        _modules.Add(new GregIoLuaModule());
-        _modules.Add(new GregInputLuaModule());
+        _modules.Add(new gregHooksLuaModule());
+        _modules.Add(new gregUnityLuaModule());
+        _modules.Add(new gregIoLuaModule());
+        _modules.Add(new gregInputLuaModule());
     }
 
     public string LanguageName => "lua";

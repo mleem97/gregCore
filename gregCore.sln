@@ -3,35 +3,35 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore", "framework\gregCore.csproj", "{73B346A1-72BC-4F8C-BDAF-C2E88AB9CF69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore", "gregCore.csproj", "{73B346A1-72BC-4F8C-BDAF-C2E88AB9CF69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.Multiplayer", "plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj", "{E6D8D7AD-8D3F-4B1B-97A4-5D6F8F2E0D21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.Multiplayer", "gregPlugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj", "{E6D8D7AD-8D3F-4B1B-97A4-5D6F8F2E0D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.Sysadmin", "plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj", "{A4E7C117-6B5D-4B93-9EAA-3F6B57F04A11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.Sysadmin", "gregPlugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj", "{A4E7C117-6B5D-4B93-9EAA-3F6B57F04A11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.AssetExporter", "plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj", "{B94A2C75-9A9F-4B40-B31A-2CFE7F98D302}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.AssetExporter", "gregPlugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj", "{B94A2C75-9A9F-4B40-B31A-2CFE7F98D302}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.WebUIBridge", "plugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj", "{CE7A3418-3D0E-4C36-9DAB-DA10C8D115A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.WebUIBridge", "gregPlugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj", "{CE7A3418-3D0E-4C36-9DAB-DA10C8D115A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.PlayerModels", "plugins\greg.Plugin.PlayerModels\greg.Plugin.PlayerModels.csproj", "{55617471-4812-4318-89EE-4D683627C0B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.Plugin.PlayerModels", "gregPlugins\greg.Plugin.PlayerModels\greg.Plugin.PlayerModels.csproj", "{55617471-4812-4318-89EE-4D683627C0B1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{9A0CCAB9-4303-13B4-2371-F1B97FF5B728}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gregFramework", "gregFramework", "{9A0CCAB9-4303-13B4-2371-F1B97FF5B728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "framework\gregCore.Tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "gregTests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{808186BE-9BD0-DD1D-D574-36EEAD1E7F8F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gregTemplates", "gregTemplates", "{808186BE-9BD0-DD1D-D574-36EEAD1E7F8F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "greg.BasedModTemplate", "greg.BasedModTemplate", "{0D50760A-4608-825E-3147-27B97EEF2715}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "greg.BasedModTemplate", "gregTemplates\greg.BasedModTemplate", "{0D50760A-4608-825E-3147-27B97EEF2715}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.BasedModTemplate.Tests", "Templates\greg.BasedModTemplate\greg.BasedModTemplate.Tests\greg.BasedModTemplate.Tests.csproj", "{8197E906-D238-4CD3-98FA-F3370C48E10C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.BasedModTemplate.Tests", "gregTemplates\greg.BasedModTemplate\greg.BasedModTemplate.Tests\greg.BasedModTemplate.Tests.csproj", "{8197E906-D238-4CD3-98FA-F3370C48E10C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "greg.PluginTemplate", "greg.PluginTemplate", "{66B749B9-2F30-0E72-8FBA-6450C74961C4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "greg.PluginTemplate", "gregTemplates\greg.PluginTemplate", "{66B749B9-2F30-0E72-8FBA-6450C74961C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.PluginTemplate.Tests", "Templates\greg.PluginTemplate\greg.PluginTemplate.Tests\greg.PluginTemplate.Tests.csproj", "{A885BEAB-67A2-43FF-A36F-8924AFE18DAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greg.PluginTemplate.Tests", "gregTemplates\greg.PluginTemplate\greg.PluginTemplate.Tests\greg.PluginTemplate.Tests.csproj", "{A885BEAB-67A2-43FF-A36F-8924AFE18DAD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneModTemplate", "StandaloneModTemplate", "{8B9800BC-F0E7-A512-A593-7F0B54529F14}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneModTemplate", "gregTemplates\StandaloneModTemplate", "{8B9800BC-F0E7-A512-A593-7F0B54529F14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandaloneModTemplate.Tests", "Templates\StandaloneModTemplate\StandaloneModTemplate.Tests\StandaloneModTemplate.Tests.csproj", "{1DE311B4-7958-442E-A7C3-9A41E46D6B0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandaloneModTemplate.Tests", "gregTemplates\StandaloneModTemplate\StandaloneModTemplate.Tests\StandaloneModTemplate.Tests.csproj", "{1DE311B4-7958-442E-A7C3-9A41E46D6B0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

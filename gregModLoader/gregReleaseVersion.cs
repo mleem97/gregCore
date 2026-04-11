@@ -2,5 +2,5 @@ namespace gregModLoader;
 
 public static class gregReleaseVersion
 {
-    public const string Current = "1.0.0-pre.2";
+    public const string Current = "1.0.0-pre.3";
 }

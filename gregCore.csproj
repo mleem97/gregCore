@@ -97,15 +97,23 @@
     <Compile Remove="gregMainCi.cs" />
     <Compile Remove="gregTests\**\*.cs" />
     <Compile Remove="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
+    <Compile Remove="gregModLoader\gregDC2WebBridge.cs" />
+    <Compile Remove="gregModLoader\gregUiModernizer.cs" />
+    <Compile Remove="gregModLoader\gregModSettingsMenuBridge.cs" />
+    <Compile Remove="gregModLoader\gregUiExtensionBootstrap.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="gregMain.cs" />
     <None Include="gregMainCi.cs" />
     <None Include="gregTests\**\*.cs" />
     <None Include="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
-    <None Include="gregModLoader\DC2WebBridge.cs" />
-    <None Include="gregModLoader\UiModernizer.cs" />
-    <None Include="gregModLoader\ModSettingsMenuBridge.cs" />
+    <None Include="gregModLoader\gregDC2WebBridge.cs" />
+    <None Include="gregModLoader\gregUiModernizer.cs" />
+    <None Include="gregModLoader\gregModSettingsMenuBridge.cs" />
+    <None Include="gregModLoader\gregUiExtensionBootstrap.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CI)' == 'true'">
   </ItemGroup>
 
   <ItemGroup>

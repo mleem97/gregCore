@@ -8,7 +8,7 @@
     <AssemblyName>gregCore</AssemblyName>
     <RootNamespace>gregModLoader</RootNamespace>
     <Authors>MLeeM97</Authors>
-    <Version>1.0.0-pre.5</Version>
+    <Version>1.0.0-pre.6</Version>
     <Description>gregCore runtime for Data Center (native + script mod bridges)</Description>
     <NoWarn>CS1701;CS1702</NoWarn>
     <MSBuildWarningsAsMessages>MSB3243;MSB3277</MSBuildWarningsAsMessages>

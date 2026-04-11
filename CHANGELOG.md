@@ -4,19 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-pre.6] - 2026-04-11
+### Added
+- **Phase 5 Implementation**: Initial SDK bridges for Economy and Data.
+- **GregBalanceService**: Access to financial data, salaries, and income simulation.
+- **GregLocalisationService**: Direct access to the game's internal translation system.
+- **Roadmap Expansion**: Added Phase 8 (Unity Scripting API) and refactored all documentation to English with Material Symbols.
+
 ## [1.0.0-pre.5] - 2026-04-11
 ### Added
-- **Game System Bridges**: 9 neue SDK-Services zur direkten Steuerung von Spielsystemen via IL2CPP-Abstraktion.
-- **GregGameManagerService**: Kontrolle über UI-Canvas und Speichersystem.
-- **GregPlayerManagerService**: Cursor-Locking und Movement-Kontrolle.
-- **GregShopService**: Steuerung des In-Game-Shops und Spawn-Punkte.
-- **GregSwitchConfigService**: Zugriff auf Switch-OS (VLAN, LACP).
-- **GregCustomerBaseService**: Manipulation von Kunden-Apps und IP-Management.
-- **GregTechnicianService**: Mitarbeiter-Dispatching und Job-Queues.
-- **GregTimeService**: Uhrzeit-Simulation und Abfragen.
-- **Hardware Bridges**: Direkte Interaktion mit physischen Server- und Rack-Objekten.
-
-## [1.0.0-pre.4] - 2026-04-11
+- **Game System Bridges**: 9 new SDK services for direct control of game systems via IL2CPP abstraction.
+- **Hardware Bridges**: Direct interaction with physical server and rack objects.
 ### Added
 - **Unity Signal Normalization**: 30+ canonical hooks in `GregNativeEventHooks` based on IL2CPP snapshots.
 - **Full Category Registries**: Offizielle SDK-Registries für Server, Switches, Kunden, Mitarbeiter, SFP, Kabel, Möbel und Items.

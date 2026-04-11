@@ -1,98 +1,203 @@
 ---
 id: framework-readiness
-title: gregCore Framework Readiness Analysis
-description: Structured readiness analysis for community feature requests against current gregCore wiki and repository evidence.
+title: FRAMEWORK READINESS — gregCore vs Community Feature Requests
 slug: /developers/framework-readiness
+description: Structured readiness analysis for gregCore against the full A-H community requirement catalog.
 ---
 
 ## 1. Executive Summary
 
-Assessment scope: **43** community requirements (A-01 .. H-03).
+Analysierter Umfang: **43** Community-Anforderungen (A-01 bis H-03).
 
-| Classification | Count | Meaning |
+| Status | Anzahl | Bedeutung |
 | --- | ---: | --- |
-| ✅ READY | 1 | Can be built now as external mod with currently verified hooks/APIs |
-| ⚠️ PARTIAL | 24 | Partly possible; framework extension needed for robust/official support |
-| ❌ MISSING | 14 | Required framework capability not present/documented |
-| 🚫 GAME-LEVEL | 4 | Requires game-level systems/source behavior outside documented gregCore control |
+| ✅ READY | 1 | Mit aktuell verifizierten Hooks/APIs direkt als Mod umsetzbar |
+| ⚠️ PARTIAL | 24 | Teilweise umsetzbar, benötigt Framework-Erweiterung |
+| ❌ MISSING | 14 | Framework-Komponente fehlt zwingend |
+| 🚫 GAME-LEVEL | 4 | Erfordert Spielquellcode oder nicht freigelegte Spielsystme |
 
-**High-level conclusion:** gregCore currently provides a strong **event/hook foundation** (`gregNativeEventHooks`, `gregEventDispatcher`, `gregPayload`, `gregCompatBridge`) but lacks first-class **typed content registries**, **model override service**, and several **domain-specific runtime services** needed for full custom-content ecosystem support.
+Kernaussage: gregCore ist als **Hook-/Event-Backbone** solide (`GregNativeEventHooks`, `GregEventDispatcher`, `GregPayload`, `GregCompatBridge`), aber nicht vollständig als **Content-Registry-Framework** (typed registries, model-override service, domain services).
 
 ## 2. Analyse-Methodik
 
-- **Source priority applied:** Wiki first, repository second.
-- **Wiki evidence used:**
+- **Priorität angewendet:** Wiki zuerst, Repository als Verifikation.
+- **Wiki-Sources (parallel geprüft):**
   - `docs/02_development/concepts/hooks-and-events.md`
   - `docs/02_development/api-reference/hooks-catalog.md`
   - `docs/content-creation/implementation-backlog.md`
-- **Repository evidence used (parallel check):**
-  - `gregSdk/gregNativeEventHooks.cs`
-  - `gregSdk/gregEventDispatcher.cs`
-  - `gregSdk/gregPayload.cs`
-  - `gregSdk/gregCompatBridge.cs`
-  - `gregMain.cs`
-  - `gregModLoader/Plugins/gregPluginBase.cs`
-  - `gregModLoader/Plugins/gregRegistry.cs`
-- **Status criteria:**
-  - **✅ READY:** required behavior can be expressed with verified hooks/APIs and no new framework contract.
-  - **⚠️ PARTIAL:** foundation exists, but stable/maintainable delivery needs SDK/plugin additions.
-  - **❌ MISSING:** no documented/verified framework primitive for required capability.
-  - **🚫 GAME-LEVEL:** needs game-internal systems beyond documented modding surface.
+- **Repository-Sources (parallel geprüft):**
+  - `gregCore/gregSdk/gregNativeEventHooks.cs`
+  - `gregCore/gregSdk/gregEventDispatcher.cs`
+  - `gregCore/gregSdk/gregPayload.cs`
+  - `gregCore/gregSdk/gregCompatBridge.cs`
+  - `gregCore/gregMain.cs`
+  - `gregCore/gregModLoader/Plugins/gregPluginBase.cs`
+  - `gregCore/gregModLoader/Plugins/gregRegistry.cs`
+
+Bewertungslogik:
+
+- ✅ READY: Ohne neue Framework-Verträge realisierbar.
+- ⚠️ PARTIAL: Technisch startbar, aber stabiler Betrieb braucht SDK/Plugin-Erweiterung.
+- ❌ MISSING: Notwendige Framework-Fähigkeit existiert nicht.
+- 🚫 GAME-LEVEL: Ohne tiefe, nicht dokumentierte Spielintegration nicht realistisch.
 
 ## 3. Readiness-Matrix
 
-| ID | Feature | Status | Verfügbare Hooks/APIs | Fehlende Framework-Komponente | Layer |
+| ID | Feature | Status | Verfügbare Hooks/APIs | Fehlende Komponente | Layer |
 | --- | --- | --- | --- | --- | --- |
-| A-01 | Employee idle dance | ⚠️ PARTIAL | `greg.SYSTEM.ButtonConfirmHire`, `greg.EMPLOYEE.CustomHired` | `GregEmployeeStateService` idle-state exposure | harmony + SDK |
-| A-02 | Extend employee AI states/behaviors | ❌ MISSING | Hire/fire related events only | AI behavior registry + state machine extension API | harmony + SDK |
-| A-03 | New employee types with skills/specialization | ⚠️ PARTIAL | Event bus + payload helpers | Typed employee-class registry | SDK + Plugin |
-| B-01 | Preconfigured switches at purchase | ⚠️ PARTIAL | `greg.SYSTEM.ButtonBuyShopItem`, `greg.NETWORK.InsertSFP` | Purchase-time postprocessor for auto-port provisioning | harmony + SDK |
-| B-02 | Port-profile switch configurator | ❌ MISSING | Cable/SFP events available | Port profile model + per-port config API | SDK |
-| B-03 | High rear-port-count switches | ⚠️ PARTIAL | Network cable/connect events | Switch type/content registry | SDK + Plugin |
-| B-04 | 1HE density + matching high-port switches | ⚠️ PARTIAL | Rack/server/switch hooks | Rack-unit constraints + SKU integration API | harmony + SDK |
-| B-05 | Bulk populate ports from module box | ⚠️ PARTIAL | `greg.NETWORK.InsertSFP`, `greg.SYSTEM.ButtonBuyShopItem` | Batch operations service for ports | SDK |
-| B-06 | Cable manager (auto-route tool) | ❌ MISSING | `greg.NETWORK.CreateNewCable`, remove/speed hooks | Route planner + safe auto-connect API | SDK + Plugin |
-| B-07 | Cable audit mode with wrong-link highlight | ⚠️ PARTIAL | Cable created/removed/link hooks | Topology validation + visual highlight bridge | Plugin + UI |
-| B-08 | Colorblind cable mode | ✅ READY | Existing UI/mod event surface + model/UI overrides possible | None strictly required (optional UI helper service) | Mod Layer + UI |
-| B-09 | WDM infrastructure | 🚫 GAME-LEVEL | Generic cable events only | Optical/wavelength simulation systems not exposed | game-level + harmony |
-| B-10 | Managed switch with VLAN/tagging/trunk | ❌ MISSING | Link/register hooks | L2 config model + packet policy simulation API | SDK + gameplay systems |
-| B-11 | DHCP server feature | ❌ MISSING | Limited network hooks | IP lease service + client stack integration | SDK + gameplay systems |
-| B-12 | Larger port boxes | ⚠️ PARTIAL | Shop and SFP insertion events | Inventory/container definition registry | SDK |
-| C-01 | Higher-tier configurable servers | ⚠️ PARTIAL | `greg.SERVER.*`, shop/customer hooks | Server type registry + balancing service | SDK |
-| C-02 | 1HE servers | ⚠️ PARTIAL | Rack/server install/unmount hooks | Rack slot geometry constraints API | harmony + SDK |
-| C-03 | Server IOPS upgrade tiers | ⚠️ PARTIAL | Server/customer events | Upgrade path registry + stats recomputation contract | SDK |
-| C-04 | Higher-tier cables/ports configurable | ⚠️ PARTIAL | Cable create/remove/speed/sfp hooks | Typed cable/SFP registries + compatibility matrix | SDK |
-| C-05 | iPerf/speedtest server+client | ⚠️ PARTIAL | `greg.NETWORK.NetWatchDispatched`, speed hooks | Test-session service + per-link telemetry API | Plugin + SDK |
-| D-01 | Different customers with richer requirements | ⚠️ PARTIAL | `greg.SYSTEM.ButtonCustomerChosen`, customer req satisfied/failed | Customer definition registry + rule engine | SDK |
-| D-02 | Random configurable customer requirements | ⚠️ PARTIAL | Customer acceptance/satisfaction hooks | Requirement generator service + seeding config | Plugin + SDK |
-| D-03 | Dynamic hardware price fluctuations | ⚠️ PARTIAL | Shop hooks (`ButtonBuyShopItem`, checkout) | Pricing policy service with lifecycle hooks | Plugin + SDK |
-| D-04 | Power usage and electricity cost gameplay | ⚠️ PARTIAL | Server/switch power/broken hooks | Global energy simulation and billing API | SDK + gameplay layer |
-| D-05 | Auto IP assignment | ⚠️ PARTIAL | `greg.SERVER.AppIDChanged`, network link hooks | IP allocation service and conflict resolver | SDK |
-| E-01 | Label tapes for racks/cables (free text) | ⚠️ PARTIAL | Rack/network hooks, payload API | Persistent labeling store + UI input bridge | Plugin + UI |
-| E-02 | Duplicate full rack including cables | ⚠️ PARTIAL | Rack unmount + cable events | Topology clone transaction API | SDK + harmony |
-| E-03 | HexViewer-like universal info panel | ⚠️ PARTIAL | `gregEventDispatcher`, hooks/events, `gregMain` OnGUI proof | Unified object metadata adapter for all entities | Plugin + SDK |
-| E-04 | Bottom inventory slots/item bar | ❌ MISSING | Shop/cart hooks only | Inventory UI extension points + input binding service | UI + Plugin |
-| E-05 | Cooling/heat management display + gameplay | 🚫 GAME-LEVEL | No verified thermal hooks | Thermal simulation systems not exposed | game-level |
-| F-01 | Lights off / buyable ceiling lamps | ❌ MISSING | Wall/shop events only | Lighting object registry + world-light controls | harmony + SDK |
-| F-02 | Multi floors, doors, windows, chairs | 🚫 GAME-LEVEL | No verified structural build API | Structural world generation/building systems | game-level |
-| F-03 | Wall rail transport automation | ❌ MISSING | No logistics hooks verified | Conveyor/transport actor framework | SDK + game logic hooks |
-| F-04 | Dustpan & brush cleanup trays | ⚠️ PARTIAL | `greg.SYSTEM.oveSpawnedItemRemoved` | World-item classification + cleanup action API | Plugin + SDK |
-| F-05 | Rack power-supply mechanics | ⚠️ PARTIAL | Server/switch power hooks | Power topology model + failure propagation | SDK |
-| F-06 | Active cooling management and failures | 🚫 GAME-LEVEL | No cooling event surface verified | Cooling simulation + environment model | game-level |
-| G-01 | Dynamic events (power/cooling/traffic spikes) | ⚠️ PARTIAL | `SystemGameDayAdvanced`, power hooks, NetWatch | Event scheduler + incident framework | Plugin + SDK |
-| G-02 | Cyber events (hacker, DDoS, antivirus minigame) | ❌ MISSING | NetWatch and basic network hooks | Security scenario framework + threat simulation APIs | Plugin + SDK + gameplay |
-| G-03 | Cable audit with color highlights | ⚠️ PARTIAL | Cable/link hooks + NetWatch | Topology analyzer + highlight rendering adapter | Plugin + UI |
-| G-04 | Performance mode (disable effects/reduce textures) | ⚠️ PARTIAL | `gregMain` update/gui lifecycle proves runtime toggle pattern | Standardized performance profile service | Plugin + SDK |
-| H-01 | Replace existing 3D models | ❌ MISSING | No official model override API documented | `GregModelOverrideService` (registry + fallback) | Plugin + SDK |
-| H-02 | Custom models for new content | ⚠️ PARTIAL | Content files + mod loading possible | Official model binding contract per content type | SDK + Plugin |
-| H-03 | Visual NPC models for new employee types | ❌ MISSING | Employee custom hire/fire events only | Employee visual binding/skin registry | SDK + harmony |
+| A-01 | Mitarbeiter tanzen bei Idle | ⚠️ PARTIAL | `greg.EMPLOYEE.CustomHired`, `greg.SYSTEM.ButtonConfirmHire` | Employee idle-state hooks/service | harmony + SDK |
+| A-02 | Mitarbeiter-KI erweiterbar | ❌ MISSING | Hire/fire hooks, EventBus | AI state-machine extension API | harmony + SDK |
+| A-03 | Neue Mitarbeiter-Typen | ⚠️ PARTIAL | `GregEventDispatcher`, `GregPayload` | `GregEmployeeRegistry` | SDK + Plugin |
+| B-01 | Vorkonfigurierte Switches | ⚠️ PARTIAL | `greg.SYSTEM.ButtonBuyShopItem`, `greg.NETWORK.InsertSFP` | Purchase post-processor service | harmony + SDK |
+| B-02 | Switch-Port-Konfigurator | ❌ MISSING | Network hooks vorhanden | Per-port config model/API | SDK |
+| B-03 | Mehr Rear-Ports | ⚠️ PARTIAL | Cable/register hooks | `GregSwitchRegistry` | SDK |
+| B-04 | 1HE High-Density-Switches | ⚠️ PARTIAL | Rack/server hooks | Rack geometry/constraints API | harmony + SDK |
+| B-05 | Massenbestückung Modul-Box | ⚠️ PARTIAL | SFP hooks | Batch port operation service | SDK |
+| B-06 | Kabel-Manager auto-routing | ❌ MISSING | Cable create/remove hooks | Topology routing service | SDK + Plugin |
+| B-07 | Cable-Audit-Mode | ⚠️ PARTIAL | Cable/link hooks, NetWatch | Topology audit + highlight adapter | Plugin + UI |
+| B-08 | Farbenblind-Modus Kabeltypen | ✅ READY | UI overlay + hook data | Optional helper only | Mod Layer |
+| B-09 | WDM-Infrastruktur | 🚫 GAME-LEVEL | Generic network hooks only | Optical simulation model | game-level |
+| B-10 | Managed Switch VLAN/Tagging | ❌ MISSING | Link/connect events | VLAN policy engine | SDK + gameplay |
+| B-11 | DHCP-Server Feature | ❌ MISSING | Event surface limited | Lease/allocation service | SDK + gameplay |
+| B-12 | Größere Port-Boxen | ⚠️ PARTIAL | Shop events | Inventory container registry | SDK |
+| C-01 | Höhertier-Server | ⚠️ PARTIAL | `greg.SERVER.*`, shop hooks | `GregServerRegistry` + balancing | SDK |
+| C-02 | 1HE-Server | ⚠️ PARTIAL | rack mount/unmount hooks | Rack-unit constraint API | harmony + SDK |
+| C-03 | Server-IOPS-Upgrade | ⚠️ PARTIAL | server/customer hooks | Upgrade path registry | SDK |
+| C-04 | Höhertier-Kabel/Ports | ⚠️ PARTIAL | cable speed/sfp hooks | Cable/SFP typed registries | SDK |
+| C-05 | iPerf/Speedtest im Spiel | ⚠️ PARTIAL | `greg.NETWORK.NetWatchDispatched` | Test session orchestration API | Plugin + SDK |
+| D-01 | Unterschiedliche Kundenanforderungen | ⚠️ PARTIAL | `greg.SYSTEM.ButtonCustomerChosen`, customer req hooks | `GregCustomerRegistry` + rule engine | SDK |
+| D-02 | Zufällige Kundenanforderungen | ⚠️ PARTIAL | customer acceptance hooks | Requirement generator service | Plugin + SDK |
+| D-03 | Dynamische Preisschwankungen | ⚠️ PARTIAL | shop hooks | Dynamic pricing service | Plugin + SDK |
+| D-04 | Stromverbrauch/Stromkosten | ⚠️ PARTIAL | server power hooks | Energy simulation service | SDK + gameplay |
+| D-05 | Auto-IP-Vergabe | ⚠️ PARTIAL | server app-id and network hooks | IP allocation service | SDK |
+| E-01 | Beschriftungs-Tapes | ⚠️ PARTIAL | rack/network hooks | Persistent label store + UI input | Plugin + UI |
+| E-02 | Rack-Kopieren inkl. Kabel | ⚠️ PARTIAL | rack/network hooks | Topology clone transaction API | SDK + harmony |
+| E-03 | HexViewer-Panel | ⚠️ PARTIAL | verified event bus + hooks | Unified metadata adapter for all entities | Plugin + SDK |
+| E-04 | Inventar-Slots / Item-Leiste | ❌ MISSING | no verified inventory UI API | Inventory UI extension API | UI + Plugin |
+| E-05 | Kühlung/Abwärme Anzeige+Gameplay | 🚫 GAME-LEVEL | no thermal hook surface | Cooling simulation model | game-level |
+| F-01 | Lichter / Deckenlampen | ❌ MISSING | wall purchase hook only | Lighting registry + runtime controls | harmony + SDK |
+| F-02 | Mehrere Stockwerke/Türen/Wände | 🚫 GAME-LEVEL | no structural building API | world-building systems | game-level |
+| F-03 | Transport-Automatisierung | ❌ MISSING | no logistics hooks verified | transport actor framework | SDK + gameplay |
+| F-04 | Dustpan & Brush cleanup | ⚠️ PARTIAL | `greg.SYSTEM.oveSpawnedItemRemoved` | world item type/action API | Plugin + SDK |
+| F-05 | Stromversorgung für Racks | ⚠️ PARTIAL | power hooks available | power topology graph service | SDK |
+| F-06 | Kühlungsmanagement aktiv | 🚫 GAME-LEVEL | no cooling event surface | cooling system integration | game-level |
+| G-01 | Dynamische Events | ⚠️ PARTIAL | day/save/load hooks | incident scheduler/orchestrator | Plugin + SDK |
+| G-02 | Hacker/DDoS/Firewall | ❌ MISSING | NetWatch + generic hooks | security simulation framework | Plugin + SDK + gameplay |
+| G-03 | Kabel-Audit Farb-Highlights | ⚠️ PARTIAL | cable/netwatch hooks | topology analyzer + highlight API | Plugin + UI |
+| G-04 | Performance-Mod | ⚠️ PARTIAL | `gregMain` lifecycle proof (`OnUpdate`, `OnGUI`) | standardized performance profile service | Plugin + SDK |
+| H-01 | Austausch bestehender 3D-Modelle | ❌ MISSING | no official model override API | `GregModelOverrideService` | Plugin + SDK |
+| H-02 | Eigene Modelle für neue Inhalte | ⚠️ PARTIAL | data-driven conventions possible | official model binding contract | SDK + Plugin |
+| H-03 | NPC-Modelle für neue Mitarbeiter | ❌ MISSING | employee events only | employee visual binding registry | SDK + harmony |
 
-## 4. Zusammenfassung für Beitrag-Entwickler
+## 4. Detailanalyse pro Kategorie
 
-**Highest-impact Top 3 extensions:**
+### A — Employee / NPC
+- Heute möglich: Reaktion auf Einstellungs-/Entlassungsereignisse.
+- Fehlend: Idle-state und AI-state hooks; registrierbare employee classes.
+- Ziel-Layer: `gregSdk` + `harmony`.
 
-1. **Typed content registries** (`GregContentRegistry` family)
-2. **Model override service** (official replacement + fallback)
-3. **Network compatibility kernel** (switch/SFP/cable matrix)
+### B — Netzwerk / Switches / Ports
+- Heute möglich: Beobachtung von Kabel-, SFP-, Link- und Speed-Ereignissen.
+- Fehlend: Typed registries + compatibility matrix + route planner.
+- Ziel-Layer: `gregSdk` zuerst, Plugin-Tools danach.
 
-These three unlock the broadest part of A–H requests at once.
+### C — Server / Hardware
+- Heute möglich: Server lifecycle/power/broken/repair Observability.
+- Fehlend: server types, density constraints, upgrade contracts.
+- Ziel-Layer: `gregSdk` + selective `harmony`.
+
+### D — Kunden / Wirtschaft
+- Heute möglich: customer selection + requirement pass/fail events.
+- Fehlend: customer policy engine, randomizer, dynamic pricing, power economy.
+- Ziel-Layer: `gregSdk` + plugin policy modules.
+
+### E — UI / QoL
+- Heute möglich: native OnGUI overlays and hook-driven panels.
+- Fehlend: unified metadata adapter, inventory UI extension, persistent labels.
+- Ziel-Layer: Plugin + SDK contracts.
+
+### F — Umgebung / Gebäude
+- Heute möglich: begrenzte Reaktionen auf item remove / wall purchase.
+- Fehlend: strukturelle Gebäude- und Klimasysteme.
+- Ziel-Layer: überwiegend game-level, teils `harmony`-heavy.
+
+### G — Events / Gameplay
+- Heute möglich: event triggering via day/save/load + telemetry hooks.
+- Fehlend: orchestrator for incidents and security scenario system.
+- Ziel-Layer: Plugin orchestrator + SDK contracts.
+
+### H — 3D / Visual
+- Heute möglich: partielle model references in mod-side data.
+- Fehlend: official model override/binding API with fallback/conflict handling.
+- Ziel-Layer: Plugin runtime + SDK contract.
+
+## 5. Fehlende Framework-Komponenten (konsolidiert)
+
+### FEHLT: GregContentRegistry (typed categories)
+**Betrifft Features:** A-03, B-03, B-12, C-01, C-03, C-04, D-01, H-02  
+**Layer:** `framework/Sdk/`  
+**Warum nötig:** Ohne typed registries bleiben Inhalte modlokal und nicht frameworkweit konsistent.
+
+### FEHLT: GregNetworkCompatibilityService
+**Betrifft Features:** B-01, B-02, B-05, B-06, B-10, B-11, C-04  
+**Layer:** `framework/Sdk/` + plugins  
+**Warum nötig:** Port-/SFP-/Kabel-Regeln brauchen zentralen, reproduzierbaren Resolver.
+
+### FEHLT: GregEmployeeStateService
+**Betrifft Features:** A-01, A-02, H-03  
+**Layer:** `framework/harmony/` + `framework/Sdk/`  
+**Warum nötig:** Idle/AI transitions sind aktuell nicht als stabile Hook-Oberfläche verfügbar.
+
+### FEHLT: GregModelOverrideService
+**Betrifft Features:** H-01, H-02, H-03, E-03  
+**Layer:** plugins + SDK  
+**Warum nötig:** Kein offizieller runtime override lifecycle mit fallback und Konfliktauflösung.
+
+### FEHLT: GregCustomerPolicyEngine
+**Betrifft Features:** D-01, D-02, D-05  
+**Layer:** SDK  
+**Warum nötig:** Kundenregeln/Budget/Assignment sind nicht als offizieller Evaluator modelliert.
+
+### FEHLT: GregIncidentOrchestrator
+**Betrifft Features:** G-01, G-02  
+**Layer:** plugins + SDK hooks  
+**Warum nötig:** Dynamische Ereignisse brauchen Scheduler + lifecycle/state persistence.
+
+## 6. MISSING Status (Language Bridges)
+
+### 6.1 Konsolidierung aller aktuellen MISSING-Dateien
+
+| Datei | Fehlende Bereiche | Layer |
+| --- | --- | --- |
+| `plugins/greg.Plugin.HexViewer/lua/MISSING.md` | Lua event bridge, payload bridge, HUD bridge, targeting bridge | `framework/ModLoader`, `framework/Sdk` |
+| `plugins/greg.Plugin.HexViewer/ts/MISSING.md` | TS event bridge, payload bridge, HUD bridge, targeting bridge | `framework/ModLoader`, `framework/Sdk` |
+| `plugins/greg.Plugin.HexViewer/rs/MISSING.md` | Rust event bridge, payload bridge, HUD bridge, targeting bridge | `framework/ModLoader`, `framework/Sdk` |
+
+### 6.2 Zusammengefasste Lücken aus allen MISSING-Dateien
+
+- Es fehlt eine **dokumentierte LanguageBridge-Vertragsfläche** für Lua/TS/Rust (Subscribe, Update, GUI callbacks).
+- Es fehlt eine **sprachübergreifende Payload-Bridge** mit stabilen Getter-Signaturen analog zu `GregPayload.Get<T>(...)`.
+- Es fehlt eine **native HUD-Bridge** (IMGUI proxy API) für Nicht-C#-Sprachen.
+- Es fehlt eine **Targeting-Bridge** (Camera-forward Raycast) in allen Nicht-C#-Bridges.
+- Ergebnis: HexViewer in Lua/TS/Rust bleibt **UNVERIFIED** bis die Bridge-Verträge offiziell dokumentiert und implementiert sind.
+
+## 7. Empfohlener Implementierungsplan
+
+### Phase 1 – Framework-Fundament (BLOCKING)
+- Typed content registries
+- Schema validation + cross-reference checks
+- Network compatibility service
+- Employee state hook expansion
+
+### Phase 2 – Feature-Layer
+- Customer policy engine
+- Model override service (with fallback/conflict)
+- Topology audit service
+- UI metadata adapter
+
+### Phase 3 – Mod-Layer (externe Modder)
+- Content packs für server/switch/customer/cable/sfp/furniture
+- QoL plugins (labels, cable audit, performance modes)
+
+### Phase 4 – Long-Term / GAME-LEVEL
+- Features mit tiefer Spielsystem-Abhängigkeit (cooling simulation, advanced building, WDM, security minigame)

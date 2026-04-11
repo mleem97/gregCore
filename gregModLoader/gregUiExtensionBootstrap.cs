@@ -21,18 +21,21 @@ public static class UiExtensionBootstrap
 
         _registered = true;
 
-        gregUiExtensionBridge.RegisterWebReplacement((root, screenKey) => DC2WebBridge.TryApplyOrReplace(root, screenKey));
+        // Web replacement is disabled by default to prioritize native UI modernization.
+        // It can still be registered by external plugins if needed.
+        gregUiExtensionBridge.RegisterWebReplacement(null);
+        
         gregUiExtensionBridge.RegisterWebConfiguration(
-            getEnabled: () => DC2WebBridge.Enabled,
-            setEnabled: enabled => DC2WebBridge.Enabled = enabled,
-            setProfileReplaceMode: (profileKey, replace) => DC2WebBridge.SetProfileReplaceMode(profileKey, replace),
-            resetAppliedState: root => DC2WebBridge.ResetAppliedState(root));
+            getEnabled: () => false,
+            setEnabled: enabled => { },
+            setProfileReplaceMode: (profileKey, replace) => { },
+            resetAppliedState: root => { });
 
         gregUiExtensionBridge.RegisterUiHandlers(
             tryModernize: (root, sourceTag) => gregUiModernizer.TryModernize(root, sourceTag),
-            onSceneLoaded: sceneName => ModSettingsMenuBridge.OnSceneLoaded(sceneName),
-            drawGui: ModSettingsMenuBridge.DrawGUI,
-            onSettingsOpened: mainMenu => ModSettingsMenuBridge.OnSettingsOpened(mainMenu));
+            onSceneLoaded: sceneName => gregModSettingsMenuBridge.OnSceneLoaded(sceneName),
+            drawGui: gregModSettingsMenuBridge.DrawGUI,
+            onSettingsOpened: mainMenu => gregModSettingsMenuBridge.OnSettingsOpened(mainMenu));
 
         MelonLogger.Msg("gregCore: built-in UI extension handlers registered (full gregMain menu replace + settings/modernizer UI).");
     }

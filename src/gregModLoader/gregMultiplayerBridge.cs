@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Il2Cpp;
-using Il2CppTMPro;
+using TMPro;
 
 namespace greg.Core;
 

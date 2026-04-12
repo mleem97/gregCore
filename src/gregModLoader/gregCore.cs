@@ -149,6 +149,12 @@ public class gregCoreLoader : MelonMod
             gregModActivationService.Initialize(LoggerInstance);
             CrashLog.Log("step: gregModActivationService initialized");
 
+            GregUiReplacementManager.Instance.LoadFromConfig();
+            CrashLog.Log("step: GregUiReplacementManager initialized");
+
+            GregUIManager.Init();
+            CrashLog.Log("step: GregUIManager initialized");
+
             ModSaveCompatibilityService.Initialize();
 
             _modsPath = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "RustMods");
@@ -285,6 +291,7 @@ public class gregCoreLoader : MelonMod
             _languageBridgeHost?.OnUpdate(Time.deltaTime);
             HandleMainMenuHotReload();
             HandleModConfigHotkey();
+            gregMainHudReplacement.OnUpdate();
 
             if (Time.time >= _nextHarmonyGuardAt)
             {
@@ -312,7 +319,7 @@ public class gregCoreLoader : MelonMod
         var keyboard = Keyboard.current;
         if (keyboard != null && keyboard.f6Key.wasPressedThisFrame)
         {
-            gregModConfigManager.Toggle(true);
+            gregModConfigManager.Toggle(!gregModConfigManager.IsOpen);
         }
     }
 

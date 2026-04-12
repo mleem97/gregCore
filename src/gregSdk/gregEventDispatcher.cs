@@ -82,6 +82,9 @@ public static class gregEventDispatcher
         if (string.IsNullOrWhiteSpace(hookName))
             return;
 
+        // Notify global monitor
+        greg.Core.Scripting.GregHookBus.NotifyAny(hookName, payload);
+
         List<Subscription> snapshot;
         lock (Sync)
         {

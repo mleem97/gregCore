@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0.7] - 2026-04-12
+### Added
+- **gregUI**: Complete UI manipulation layer for UGUI (`src/UI/`).
+- **GregUIManager**: Central canvas registry and lifecycle management.
+- **GregUITheme**: Design system tokens (The Luminescent Architect).
+- **GregUIBuilder**: Fluent builder API for mod developers.
+- **UI Components**: `GregPanel`, `GregButton`, `GregLabel`, `GregToggle`, `GregSlider`, `GregBadge`, `GregSeparator`.
+- **HexViewer Integration**: UI Tree Inspector (F1), Hook Monitor (F2), Element Inspector (F3).
+- **UI Hooks**: New hook category `greg.UI.*` for monitoring game UI events (MainMenu, PauseMenu, HUD, Tooltips).
+
+### Changed
+- `gregCoreLoader.OnInitializeMelon`: Now registers `GregUIManager`.
+- `gregUiExtensionBridge.OnSceneLoaded`: Now notifies `GregUIManager`.
+
 ## [v1.0.0.6] - 2026-04-12
 ### Added
 - **Game Compatibility Update**: Verified compatibility with *Data Center* patch `v1.0.45.5`.

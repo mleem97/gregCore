@@ -59,6 +59,47 @@ This page is **generated** from `gregCore/framework/Sdk/GregNativeEventHooks.cs`
 | ``SystemHookBridgeInstalled`` | ``GregHookName.Create(GregDomain.System, "HookBridgeInstalled")`` |
 | ``SystemHookBridgeTriggered`` | ``GregHookName.Create(GregDomain.System, "HookBridgeTriggered")`` |
 
+## UI Hooks  `greg.UI.*`
+
+All UI hooks fire AFTER the game's UI method completes (Postfix).
+Mod devs subscribe via `GregHookBus.On("greg.UI.X.Y", handler)`.
+
+### greg.UI.Canvas.Ready
+| Field | Value |
+|-------|-------|
+| Status | `ENABLED` |
+| Layer | GregUIManager |
+| Trigger | Root canvas found after scene init |
+| Payload | `{ canvasName: string }` |
+| Since | v1.0.0.7 |
+
+### greg.UI.MainMenu.Opened
+| Field | Value |
+|-------|-------|
+| Status | `ENABLED` |
+| Layer | Patch — MainMenuStartPatch |
+| Trigger | Main menu screen starts |
+| Payload | `{ instanceId: int }` |
+| Since | v1.0.0.7 |
+
+### greg.UI.PauseMenu.Opened
+| Field | Value |
+|-------|-------|
+| Status | `ENABLED` |
+| Layer | Patch — PauseMenuOpenPatch |
+| Trigger | Pause menu is enabled |
+| Payload | `{ instanceId: int }` |
+| Since | v1.0.0.7 |
+
+### greg.UI.PauseMenu.Closed
+| Field | Value |
+|-------|-------|
+| Status | `ENABLED` |
+| Layer | Patch — PauseMenuClosePatch |
+| Trigger | Pause menu is disabled |
+| Payload | `{ instanceId: int }` |
+| Since | v1.0.0.7 |
+
 ## Event id to hook mapping
 
 | Event id (uint) | EventIds name | GregNativeEventHooks field | Hook string |

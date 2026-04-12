@@ -653,6 +653,15 @@ public static class gregApi
         var shop = FindFirstShopWithNetworkMapScreen();
         return shop?.networkMapScreen;
     }
+
+    // ════════════════════════════════════════════════════════════════════════════════════
+    // UI REPLACEMENT API: Overrides and Positioning
+    // ════════════════════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Access the UI replacement service to register custom UI overrides (position, scale, active state).
+    /// </summary>
+    public static greg.Sdk.Services.IGregUiReplacementService UiReplacement => greg.Core.UI.GregUiReplacementManager.Instance.Service;
 }
 
 /// <summary>

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Il2Cpp;
-using Il2CppTMPro;
+using TMPro;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using greg.Core;

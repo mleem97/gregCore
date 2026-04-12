@@ -1,35 +1,34 @@
-:rotating_light: **Major Update: gregCore Pre-Release 7 is LIVE! (Phase 5 & Namespace Unification)**
+:rotating_light: **Major Update: gregCore v1.0.0.7 is LIVE! (gregUI Framework & HexViewer Integration)**
 
 Hey everyone,
 
-We've just reached a massive milestone in the evolution of the Greg Framework! Today we are dropping **gregCore Pre-Release 7**, which brings the long-awaited **Phase 5: Economy & Data** and a complete overhaul of our internal architecture.
+We've just reached another massive milestone! Today we are dropping **gregCore v1.0.0.7**, which introduces the brand-new **gregUI Framework** and deep integration with the **HexViewer** for advanced developer tooling.
 
 ---
 
-:wrench: **What's new in Pre-Release 7?**
+:wrench: **What's new in v1.0.0.7?**
 
-This update focuses on deep data integration and professionalizing our codebase.
+This update focuses on UI extensibility and modularity.
 
-:dna: **Unified 'greg' Namespace** — We have converted the entire framework to a clean, unified namespace structure. No more `Modig` or `gregModLoader` clutter. Everything is now under `greg.Core`, `greg.Sdk`, and `greg.UI`.
-:money_with_wings: **Phase 5: Economy & Data** — Full access to the game's economic simulation.
-    *   **GregBalanceService**: Real-time access to income, expenses, and monthly snapshots.
-    *   **GregSaveService**: Persistent data bridges for mods to store custom state.
-:map: **Universal Localisation** — Direct bridge to `Il2Cpp.Localisation`. Mods can now register their own terms, enabling full translation support for the entire ecosystem.
-:factory: **SysAdmin Reborn** — The SysAdmin mod has been refactored into **`greg.AutoEmployees`**, now maintained by **teamGreg / Joniii11**.
-
----
-
-:bug: **Join the Bug Hunt!**
-
-We need you to push these new data systems to their limits:
-
-:small_blue_diamond: **Test Economy Bridges:** Verify that money and balance snapshots match the in-game UI.
-:small_blue_diamond: **Mod Translation:** Try using `GregLocalisation.GetTerm` in your mods and let us know if the injection works correctly.
-:small_blue_diamond: **Save Data Integrity:** Check if your custom mod data persists correctly through game restarts.
+:paintbrush: **gregUI Framework** — A complete UI manipulation layer for UGUI.
+    *   **GregUIBuilder**: Fluent API for modders to create panels and components with 5 lines of code.
+    *   **Luminescent Architect Design System**: Standardized tokens for colors, spacing, and glow effects.
+    *   **Live UI Replacements**: Users can now override any game UI element (position, scale, color) via `ui_overrides.json`.
+:joystick: **Advanced Hooking** — New `greg.UI.*` hook category. Subscribe to MainMenu, PauseMenu, and HUD events.
+:mag: **Developer Tooling** — HexViewer integration with F1 (UI Tree), F2 (Hook Monitor), and F3 (Element Inspector).
 
 ---
 
-:package: **Download**
+:package: **Installation**
+
+1.  **Requirement**: Ensure you have [MelonLoader v0.6.1](https://github.com/LavaGang/MelonLoader/releases) installed for *Data Center*.
+2.  **Files**: 
+    *   Copy `gregCore.dll` to your game's `Mods/` folder.
+    *   Copy `Jint.dll` and `Esprima.dll` to your game's `MelonLoader/Libs/` folder.
+    *   Copy `greg_hooks.json` to your game's root directory (next to the `.exe`).
+3.  **Launch**: Start the game. You should see "gregCore v1.0.0.7 initialized" in the console.
+
+---
 
 :point_right: **[Download gregCore v1.0.0.7 on GitHub](https://github.com/mleem97/gregCore/releases/tag/v1.0.0.7)**
 

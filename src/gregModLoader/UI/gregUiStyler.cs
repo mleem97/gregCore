@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using Il2CppTMPro;
+using TMPro;
 
 namespace greg.Core.UI;
 

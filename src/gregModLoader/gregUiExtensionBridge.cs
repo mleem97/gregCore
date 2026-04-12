@@ -229,6 +229,12 @@ public static class gregUiExtensionBridge
 
             // Apply Luminescent Style to vanilla UI
             gregUiStyler.ApplyLuminescentStyle();
+
+            // Apply custom UI overrides and replacements
+            GregUiReplacementManager.Instance.ApplyOverrides();
+
+            // Notify gregUI manager
+            GregUIManager.OnSceneLoaded(sceneName);
         }
         catch (Exception ex)
         {

@@ -35,5 +35,26 @@ We use a strict `vX.X.X.P` format:
   - `MoonSharp` (Source-integrated)
   - `Jint` (Bundled)
 
+## ⚖️ Disclaimer & Credits
+
+- **gregCore** uses code from [DataCenter-RustBridge](https://github.com/Joniii11/DataCenter-RustBridge) for the Rust implementation. **Joniii11** is an active part of **teamGreg**.
+- **gregModmanager** utilizes modloading capabilities derived from [DataCenter-ModLoader](https://github.com/ASavageSwan/-DataCenter-ModLoader).
+- **MoonSharp**: Used for Lua scripting support. Licensed under the [MIT License](https://opensource.org/licenses/MIT).
+- **Jint**: Used for JavaScript/TypeScript execution. Licensed under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
+- **Harmony**: Used for runtime patching. Licensed under the [MIT License](https://opensource.org/licenses/MIT).
+- Special thanks to all contributors and the creators of the libraries used in this project.
+
+## 🚀 Join the Team!
+
+To truly build the ultimate modding framework for *Data Center*, we still have a solid chunk of work ahead of us. That's why I am constantly on the lookout for fellow creators who want to join the team.
+
+No matter what your strengths are, we are looking for people to:
+- **Write Code** (C#, Rust, Lua, TS)
+- **Create Models** (3D assets, new hardware... or more Steves!)
+- **Write Docs** (Wiki, documentation, maintaining guides)
+- **Or just play the game** (Testing, finding bugs, and giving feedback)
+
+Everyone is absolutely welcome! If you want to be a part of the project, just shoot me a quick DM on **Discord** or visit [gregframework.eu](https://gregframework.eu).
+
 ---
 *© 2026 teamGreg | [gregframework.eu](https://gregframework.eu)*

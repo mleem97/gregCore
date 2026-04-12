@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
-[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", gregModLoader.gregReleaseVersion.Current, "MLeeM97")]
+[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace gregAssetExporter
@@ -21,13 +21,13 @@ namespace gregAssetExporter
         private bool exportBetaNotUsed = true;
         private bool showDebugOverlay = true;
 
-        private readonly gregModLoader.Il2CppEventCatalogService eventCatalogService = new gregModLoader.Il2CppEventCatalogService();
-        private readonly gregModLoader.Il2CppGameplayIndexService gameplayIndexService = new gregModLoader.Il2CppGameplayIndexService();
-        private readonly gregModLoader.RuntimeHookService runtimeHookService = new gregModLoader.RuntimeHookService();
-        private readonly gregModLoader.GameSignalSnapshotService gameSignalSnapshotService = new gregModLoader.GameSignalSnapshotService();
+        private readonly greg.Exporter.Il2CppEventCatalogService eventCatalogService = new greg.Exporter.Il2CppEventCatalogService();
+        private readonly greg.Exporter.Il2CppGameplayIndexService gameplayIndexService = new greg.Exporter.Il2CppGameplayIndexService();
+        private readonly greg.Exporter.RuntimeHookService runtimeHookService = new greg.Exporter.RuntimeHookService();
+        private readonly greg.Exporter.GameSignalSnapshotService gameSignalSnapshotService = new greg.Exporter.GameSignalSnapshotService();
 
 #if DEBUG
-        private gregModLoader.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod;
+        private greg.Exporter.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod;
         private Texture2D debugOverlayBackgroundTexture;
         private int debugHooksAvailable;
         private int debugHookEventsAvailable;
@@ -46,13 +46,13 @@ namespace gregAssetExporter
             MelonLogger.Msg("Debug-Modus aktiv: F5 Toggle UI | F6 Healthcheck | F8 Export | F11 Katalog | F12 Hooks.");
 #endif
             MelonLogger.Msg("Projekt: https://github.com/mleem97/gregModLoader");
-            gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModInitializedEvent(DateTime.UtcNow, gregModLoader.gregReleaseVersion.Current));
+            greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
 
             RunAutoHookCommandIfRequested();
 
 #if DEBUG
-            gregModLoader.ModFramework.Events.Subscribe<gregModLoader.HookTriggeredEvent>(OnHookTriggered);
-            frameworkDependencyTestMod = new gregModLoader.TestMods.FrameworkDependencyTestMod(runtimeHookService);
+            greg.Exporter.ModFramework.Events.Subscribe<greg.Exporter.HookTriggeredEvent>(OnHookTriggered);
+            frameworkDependencyTestMod = new greg.Exporter.TestMods.FrameworkDependencyTestMod(runtimeHookService);
             frameworkDependencyTestMod.Initialize();
             RefreshDebugOverlayStats(forceHookScan: true);
 
@@ -62,7 +62,7 @@ namespace gregAssetExporter
 
         public override void OnUpdate()
         {
-            gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModTickEvent(Time.deltaTime, Time.frameCount));
+            greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModTickEvent(Time.deltaTime, Time.frameCount));
 
 #if DEBUG
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
@@ -93,7 +93,7 @@ namespace gregAssetExporter
             {
                 exportBetaNotUsed = !exportBetaNotUsed;
                 MelonLogger.Msg($"Beta-Export (nicht verwendete Assets) ist jetzt: {(exportBetaNotUsed ? "AKTIV" : "INAKTIV")}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ToggleChangedEvent(DateTime.UtcNow, "ExportBetaNotUsed", exportBetaNotUsed));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ToggleChangedEvent(DateTime.UtcNow, "ExportBetaNotUsed", exportBetaNotUsed));
             }
 
             if (Keyboard.current != null && Keyboard.current.f11Key.wasPressedThisFrame)
@@ -120,7 +120,7 @@ namespace gregAssetExporter
 
             string notUsedState = exportBetaNotUsed ? "ON" : "OFF";
             string overlayText =
-                $"<b>gregCore v{gregModLoader.gregReleaseVersion.Current}</b>\n" +
+                $"<b>gregCore v{greg.Core.gregReleaseVersion.Current}</b>\n" +
                 $"Hooks: {debugHooksAvailable:D5} | Events: {debugHookEventsAvailable:D5} | Missing: {debugNotYetImplemented:D5}\n" +
                 $"[F5] Hide | [F6] Health | [F8] Export | [F11] Catalog | [F12] Hooks";
 
@@ -161,7 +161,7 @@ namespace gregAssetExporter
                 }
 
                 int eventCount = 0;
-                var eventFields = typeof(gregModLoader.EventIds).GetFields(BindingFlags.Public | BindingFlags.Static);
+                var eventFields = typeof(greg.Exporter.EventIds).GetFields(BindingFlags.Public | BindingFlags.Static);
                 for (int index = 0; index < eventFields.Length; index++)
                 {
                     FieldInfo field = eventFields[index];
@@ -191,7 +191,7 @@ namespace gregAssetExporter
             catch (Exception ex)
             {
                 MelonLogger.Error($"Startup-Snapshot fehlgeschlagen: {ex.Message}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "StartupSnapshot", ex.Message));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "StartupSnapshot", ex.Message));
             }
         }
 
@@ -206,13 +206,13 @@ namespace gregAssetExporter
 
                 MelonLogger.Msg($"IL2CPP Event-Katalog exportiert: {filePath}");
                 MelonLogger.Msg($"IL2CPP Gameplay-Index exportiert: {gameplayIndex}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.Il2CppCatalogExportedEvent(DateTime.UtcNow, filePath, linesCount));
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.Il2CppGameplayIndexExportedEvent(DateTime.UtcNow, gameplayIndex));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.Il2CppCatalogExportedEvent(DateTime.UtcNow, filePath, linesCount));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.Il2CppGameplayIndexExportedEvent(DateTime.UtcNow, gameplayIndex));
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"Fehler beim Export des IL2CPP Event-Katalogs: {ex.Message}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "Il2CppCatalog", ex.Message));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "Il2CppCatalog", ex.Message));
             }
         }
 
@@ -240,7 +240,7 @@ namespace gregAssetExporter
             catch (Exception ex)
             {
                 MelonLogger.Error($"Fehler beim Installieren der Runtime-Hooks: {ex.Message}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "RuntimeHooks", ex.Message));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "RuntimeHooks", ex.Message));
             }
         }
 
@@ -263,7 +263,7 @@ namespace gregAssetExporter
             catch (Exception ex)
             {
                 MelonLogger.Error($"Fehler beim Installieren der Catalog-Hooks: {ex.Message}");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "CatalogHooks", ex.Message));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "CatalogHooks", ex.Message));
             }
         }
 
@@ -331,7 +331,7 @@ namespace gregAssetExporter
             return int.TryParse(raw, out int parsed) && parsed > 0 ? parsed : fallback;
         }
 
-        private static void OnHookTriggered(gregModLoader.HookTriggeredEvent evt)
+        private static void OnHookTriggered(greg.Exporter.HookTriggeredEvent evt)
         {
             if (evt.TriggerCount <= 3 || evt.TriggerCount % 100 == 0)
             {
@@ -341,7 +341,7 @@ namespace gregAssetExporter
 
         private void ExportAllResources()
         {
-            gregModLoader.ModFramework.Events.Publish(new gregModLoader.ExportStartedEvent(DateTime.UtcNow, exportPath));
+            greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ExportStartedEvent(DateTime.UtcNow, exportPath));
 
             string currentGamePath = Path.Combine(exportPath, "CurrentGame");
             string modelsPath = Path.Combine(currentGamePath, "Models");
@@ -465,7 +465,7 @@ namespace gregAssetExporter
                 catch (Exception ex)
                 {
                     MelonLogger.Warning($"Export-Fehler bei Objekt '{obj.name}': {ex.Message}");
-                    gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "ExportObject", ex.Message));
+                    greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "ExportObject", ex.Message));
                 }
             }
 
@@ -528,7 +528,7 @@ namespace gregAssetExporter
                 $"notUsedTextures={notUsedTextureCount}"
             };
             File.WriteAllLines(Path.Combine(settingsPath, "summary.txt"), summaryLines);
-            gregModLoader.ModFramework.Events.Publish(new gregModLoader.ExportCompletedEvent(DateTime.UtcNow, currentGamePath, settingLines.Count));
+            greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ExportCompletedEvent(DateTime.UtcNow, currentGamePath, settingLines.Count));
         }
 
         private IEnumerable<GameObject> EnumerateAllSceneObjects(bool includeInactive)
@@ -592,7 +592,7 @@ namespace gregAssetExporter
             if (Mouse.current == null)
             {
                 MelonLogger.Warning("Keine Maus verfügbar.");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "UIPath", "Keine Maus verfügbar"));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "UIPath", "Keine Maus verfügbar"));
                 return;
             }
 
@@ -603,7 +603,7 @@ namespace gregAssetExporter
             if (eventSystemType == null || pointerEventDataType == null || raycastResultType == null)
             {
                 MelonLogger.Warning("UI EventSystem-Typen konnten nicht aufgelöst werden.");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "UIPath", "UI EventSystem-Typen konnten nicht aufgelöst werden"));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "UIPath", "UI EventSystem-Typen konnten nicht aufgelöst werden"));
                 return;
             }
 
@@ -611,7 +611,7 @@ namespace gregAssetExporter
             if (currentEventSystem == null)
             {
                 MelonLogger.Warning("Kein aktives EventSystem gefunden.");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "UIPath", "Kein aktives EventSystem gefunden"));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "UIPath", "Kein aktives EventSystem gefunden"));
                 return;
             }
 
@@ -622,7 +622,7 @@ namespace gregAssetExporter
             if (il2CppListGeneric == null)
             {
                 MelonLogger.Warning("Il2Cpp-Liste für UI-Raycasts konnte nicht aufgelöst werden.");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "UIPath", "Il2Cpp-Liste für UI-Raycasts konnte nicht aufgelöst werden"));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "UIPath", "Il2Cpp-Liste für UI-Raycasts konnte nicht aufgelöst werden"));
                 return;
             }
 
@@ -642,7 +642,7 @@ namespace gregAssetExporter
             if (getItemMethod == null)
             {
                 MelonLogger.Warning("Il2Cpp-Raycast-Liste konnte nicht gelesen werden.");
-                gregModLoader.ModFramework.Events.Publish(new gregModLoader.ModErrorEvent(DateTime.UtcNow, "UIPath", "Il2Cpp-Raycast-Liste konnte nicht gelesen werden"));
+                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModErrorEvent(DateTime.UtcNow, "UIPath", "Il2Cpp-Raycast-Liste konnte nicht gelesen werden"));
                 return;
             }
 

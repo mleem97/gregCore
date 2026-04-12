@@ -7,7 +7,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>gregCore</AssemblyName>
-    <Version>1.0.0.6</Version>
+    <Version>1.0.0.7</Version>
     <RootNamespace>gregModLoader</RootNamespace>
     <Authors>MLeeM97</Authors>
     <Description>gregCore runtime for Data Center (native + script mod bridges)</Description>
@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MelonNet6Dir>$(MSBuildProjectDirectory)\gregLib\references\MelonLoader\net6</MelonNet6Dir>
-    <MelonIl2CppDir>$(MSBuildProjectDirectory)\gregLib\references\MelonLoader\Il2CppAssemblies</MelonIl2CppDir>
+    <MelonNet6Dir>$(MSBuildProjectDirectory)\lib\references\MelonLoader\net6</MelonNet6Dir>
+    <MelonIl2CppDir>$(MSBuildProjectDirectory)\lib\references\MelonLoader\Il2CppAssemblies</MelonIl2CppDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -98,14 +98,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="gregMain.cs" />
     <Compile Remove="gregMainCi.cs" />
     <Compile Remove="tests\**\*.cs" />
+    <Compile Remove="My project\**\*.cs" />
+    <Compile Remove="gregCoreUnity\**\*.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="gregMain.cs" />
     <None Include="gregMainCi.cs" />
     <None Include="tests\**\*.cs" />
+    <None Include="My project\**\*" />
+    <None Include="gregCoreUnity\**\*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == 'true'">

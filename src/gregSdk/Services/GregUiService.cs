@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using TMPro;
 using Il2Cpp;
 
 namespace greg.Sdk.Services;
@@ -74,17 +73,17 @@ public static class GregUiService
         return btn;
     }
 
-    public static TextMeshProUGUI CreateLabel(Transform parent, string name, string text, int fontSize = 14)
+    public static Il2CppTMPro.TextMeshProUGUI CreateLabel(Transform parent, string name, string text, int fontSize = 14)
     {
         var go = new GameObject(name);
         go.transform.SetParent(parent, false);
         var rt = go.AddComponent<RectTransform>();
         rt.sizeDelta = new Vector2(200, 50);
-        var tmp = go.AddComponent<TextMeshProUGUI>();
+        var tmp = go.AddComponent<Il2CppTMPro.TextMeshProUGUI>();
         tmp.text = text;
         tmp.fontSize = fontSize;
         tmp.color = LuminescentArchitect.OnSurface;
-        tmp.alignment = TextAlignmentOptions.Left;
+        tmp.alignment = Il2CppTMPro.TextAlignmentOptions.Left;
         return tmp;
     }
 

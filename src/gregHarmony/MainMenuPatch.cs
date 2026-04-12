@@ -3,8 +3,6 @@ using Il2Cpp;
 using UnityEngine;
 using UnityEngine.UI;
 using greg.Core.UI;
-using TMPro;
-using TMPro;
 using System.Collections;
 
 namespace greg.Harmony;

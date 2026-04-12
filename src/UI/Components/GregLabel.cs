@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 
 namespace greg.Core.UI.Components;
 

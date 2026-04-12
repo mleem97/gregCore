@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
 [assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", gregModLoader.gregReleaseVersion.Current, "MLeeM97")]
-[assembly: MelonGame(null, null)]
+[assembly: MelonGame("Waseku", "Data Center")]
 
 namespace gregAssetExporter
 {
@@ -20,20 +20,20 @@ namespace gregAssetExporter
         private string exportPath = string.Empty;
         private bool exportBetaNotUsed = true;
         private bool showDebugOverlay = true;
-        
+
         private readonly gregModLoader.Il2CppEventCatalogService eventCatalogService = new gregModLoader.Il2CppEventCatalogService();
         private readonly gregModLoader.Il2CppGameplayIndexService gameplayIndexService = new gregModLoader.Il2CppGameplayIndexService();
         private readonly gregModLoader.RuntimeHookService runtimeHookService = new gregModLoader.RuntimeHookService();
         private readonly gregModLoader.GameSignalSnapshotService gameSignalSnapshotService = new gregModLoader.GameSignalSnapshotService();
-        
-    #if DEBUG
+
+#if DEBUG
         private gregModLoader.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod;
         private Texture2D debugOverlayBackgroundTexture;
         private int debugHooksAvailable;
         private int debugHookEventsAvailable;
         private int debugNotYetImplemented;
         private bool debugOverlayStatsInitialized;
-    #endif
+#endif
 
         public override void OnInitializeMelon()
         {
@@ -55,7 +55,7 @@ namespace gregAssetExporter
             frameworkDependencyTestMod = new gregModLoader.TestMods.FrameworkDependencyTestMod(runtimeHookService);
             frameworkDependencyTestMod.Initialize();
             RefreshDebugOverlayStats(forceHookScan: true);
-            
+
             ExportAllGameSignalsOnStartup();
 #endif
         }
@@ -131,12 +131,12 @@ namespace gregAssetExporter
             var boxRect = new Rect(marginX, topY, width, height);
 
             GUI.DrawTexture(boxRect, debugOverlayBackgroundTexture, ScaleMode.StretchToFill);
-            
+
             var style = new GUIStyle(GUI.skin.label);
             style.richText = true;
             style.fontSize = 14;
             style.padding = new RectOffset(10, 10, 5, 5);
-            
+
             GUI.Label(boxRect, overlayText, style);
         }
 

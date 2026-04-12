@@ -28,7 +28,7 @@ Dieses Dokument ist der zentrale Masterplan für das Greg Framework. Es wird lau
 - [x] ~~30+ Normalisierte Unity-Signale (`GregNativeEventHooks`)~~
 - [x] ~~Automatisierte Unit-Tests in `gregCore.Tests`~~
 - [x] ~~9 System-Bridges (Shop, Time, Player etc.)~~
-- [x] ~~Pre-Release v1.0.0-pre.5 veröffentlicht~~
+- [x] ~~Pre-Release v1.0.0 veröffentlicht~~
 
 ## 🚧 Phase 5: Economy & Data (In Arbeit)
 - [ ] **SaveSystem & SaveData**: Abstraktion des Speichervorgangs. Ermöglicht Custom-Save-Daten für Mods.

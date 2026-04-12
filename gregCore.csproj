@@ -4,11 +4,12 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>gregCore</AssemblyName>
+    <Version>1.0.0.6</Version>
     <RootNamespace>gregModLoader</RootNamespace>
     <Authors>MLeeM97</Authors>
-    <Version>1.0.0-pre.6</Version>
     <Description>gregCore runtime for Data Center (native + script mod bridges)</Description>
     <NoWarn>CS1701;CS1702</NoWarn>
     <MSBuildWarningsAsMessages>MSB3243;MSB3277</MSBuildWarningsAsMessages>
@@ -94,30 +95,17 @@
 
   <ItemGroup>
     <PackageReference Include="Jint" Version="3.0.1" />
-    <PackageReference Include="MoonSharp" Version="2.0.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="gregMain.cs" />
     <Compile Remove="gregMainCi.cs" />
-    <Compile Remove="gregTests\**\*.cs" />
-    <Compile Remove="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
-    <Compile Remove="gregModLoader\gregDC2WebBridge.cs" />
-    <Compile Remove="gregModLoader\gregUiModernizer.cs" />
-    <Compile Remove="gregModLoader\gregModSettingsMenuBridge.cs" />
-    <Compile Remove="gregModLoader\gregUiExtensionBootstrap.cs" />
-    <Compile Remove="gregModLoader\gregUiPatches.cs" />
+    <Compile Remove="tests\**\*.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
     <None Include="gregMain.cs" />
     <None Include="gregMainCi.cs" />
-    <None Include="gregTests\**\*.cs" />
-    <None Include="gregModLoader\TestMods\FrameworkDependencyTest.cs" />
-    <None Include="gregModLoader\gregDC2WebBridge.cs" />
-    <None Include="gregModLoader\gregUiModernizer.cs" />
-    <None Include="gregModLoader\gregModSettingsMenuBridge.cs" />
-    <None Include="gregModLoader\gregUiExtensionBootstrap.cs" />
-    <None Include="gregModLoader\gregUiPatches.cs" />
+    <None Include="tests\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == 'true'">

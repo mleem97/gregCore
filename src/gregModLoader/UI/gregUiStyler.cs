@@ -27,53 +27,28 @@ public static class gregUiStyler
 
                 string name = img.gameObject.name.ToLower();
 
-                // Check if it's a structural element (Panel/Background)
-                if (name.Contains("background") || name.Contains("panel") || name.Contains("border"))
+                // ONLY target specific UI elements to prevent "everything transparent" bug
+                if (name.Contains("settings") || name.Contains("menu") || name.Contains("panel") || name.Contains("popup"))
                 {
-                    img.color = Abyss;
+                    // Slightly more opaque Abyss for readability
+                    img.color = new Color(0.00f, 0.07f, 0.06f, 0.95f);
                     
-                    // Remove 1px solid borders if they exist (via Outline component)
                     var outline = img.GetComponent<Outline>();
-                    if (outline != null)
-                    {
-                        UnityEngine.Object.Destroy(outline);
-                    }
+                    if (outline != null) outline.enabled = false; // Disable instead of Destroy
                 }
-                // Check if it's an interactive element (Button)
-                else if (name.Contains("button") || img.GetComponent<Button>() != null)
+                else if (img.GetComponent<Button>() != null)
                 {
                     img.color = SurfaceContainer;
-                    
-                    var btn = img.GetComponent<Button>();
-                    if (btn != null)
-                    {
-                        var colors = btn.colors;
-                        colors.normalColor = SurfaceContainer;
-                        colors.highlightedColor = PrimaryTeal;
-                        colors.pressedColor = new Color(0.03f, 0.75f, 0.65f, 1f);
-                        btn.colors = colors;
-                    }
                 }
             }
 
-            // Restyle Typography (Editorial Edge)
+            // Restyle Text
             var texts = UnityEngine.Object.FindObjectsOfType<TextMeshProUGUI>(true);
             foreach (var txt in texts)
             {
                 if (txt == null) continue;
-                
-                // Swap default white/black to OnSurface for reduced eye strain
-                if (txt.color.r > 0.8f && txt.color.g > 0.8f && txt.color.b > 0.8f) // Nearly white
-                {
-                    txt.color = OnSurface;
-                }
-                else if (txt.color.r < 0.2f && txt.color.g < 0.2f && txt.color.b < 0.2f) // Nearly black
-                {
-                    txt.color = PrimaryTeal;
-                }
+                if (txt.color.r > 0.7f && txt.color.g > 0.7f) txt.color = OnSurface;
             }
-
-            MelonLoader.MelonLogger.Msg("[gregCore] Luminescent Architect style applied to vanilla UI.");
         }
         catch (Exception ex)
         {

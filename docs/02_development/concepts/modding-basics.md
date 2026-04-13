@@ -1,36 +1,36 @@
-ï»¿---
+---
 id: developers
 title: Documentation hub
 sidebar_label: Documentation hub
 slug: /developers
-description: Technical documentation for mod authors, plugin authors, and repo contributors â€” hooks, workspace, releases, and internals.
+description: Technical documentation for mod authors, plugin authors, and repo contributors — hooks, workspace, releases, and internals.
 ---
 
 # Documentation hub
 
 Use this index if you **build mods or plugins**, work on **framework** code, or contribute to **repositories and docs**.
 
-**Players** â€” install and troubleshooting: **[For players](/players)** (not part of this wiki sidebar).
+**Players** — install and troubleshooting: **[For players](/players)** (not part of this wiki sidebar).
 
-**Architecture:** read **[System architecture & documentation principles](/wiki/getting-started/architecture)** first â€” canonical **ModManager â†’ Framework â†’ Plugins â†’ Mods** model, priorities (stability, maintainability, DX), and wiki writing rules.
+**Architecture:** read **[System architecture & documentation principles](/wiki/getting-started/architecture)** first — canonical **ModManager ? Framework ? Plugins ? Mods** model, priorities (stability, maintainability, DX), and wiki writing rules.
 
 ## Workspace & onboarding
 
-- [Getting started](/wiki/getting-started/quickstart) â€” split-repo layout, build core, hook naming
-- [Documentation layout](/wiki/getting-started/quickstart) â€” how `docs/` is organized
-- [Workspace map](/wiki/getting-started/architecture) â€” folders on disk
+- [Getting started](/wiki/getting-started/quickstart) — split-repo layout, build core, hook naming
+- [Documentation layout](/wiki/getting-started/quickstart) — how `docs/` is organized
+- [Workspace map](/wiki/getting-started/architecture) — folders on disk
 
 ## Framework
 
 - [Architecture](/wiki/getting-started/architecture)
 - [Greg hooks & event runtime](/wiki/development/concepts/hooks-and-events)
-- [FMF hooks](/wiki/reference/fmf-hook-naming)
+- [greg hooks](/wiki/reference/greg-hook-naming)
 - [Hexmod](/wiki/developers)
 
-## Plugins (`FFM.Plugin.*`) & mods (`FMF.*`)
+## Plugins (`greg.Plugin.*`) & mods (`greg.*`)
 
 - [Plugins overview](/mods)
-- [Mods overview](/mods) â€” gameplay mods and framework catalog
+- [Mods overview](/mods) — gameplay mods and framework catalog
 
 ## Guides (authors & repo)
 
@@ -54,10 +54,10 @@ Use this index if you **build mods or plugins**, work on **framework** code, or 
 
 - [Wiki mapping](/wiki/developers)
 - [Mod store vision](/wiki/developers)
-- [FMF hook naming](/wiki/reference/fmf-hook-naming)
-- [FMF hooks catalog](/wiki/reference/fmf-hook-naming)
+- [greg hook naming](/wiki/reference/greg-hook-naming)
+- [greg hooks catalog](/wiki/reference/greg-hook-naming)
 - [MCP server](/wiki/developers)
-- [Release channels](/wiki/developers) â€” where authors publish (Workshop vs GitHub); players see a short summary on [/players](/players)
+- [Release channels](/wiki/developers) — where authors publish (Workshop vs GitHub); players see a short summary on [/players](/players)
 - [Reference data files](/wiki/developers)
 - [Modding language requirement](/wiki/developers)
 

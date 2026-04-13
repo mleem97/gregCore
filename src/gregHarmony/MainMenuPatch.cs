@@ -144,7 +144,7 @@ public static class MainMenuPatch
             }
 
             modsButtonGo.transform.SetSiblingIndex(settingsBtn.transform.GetSiblingIndex() + 1);
-            MelonLoader.MelonLogger.Msg("[gregCore] v1.0.0.23: MODS button injected via resilient polling.");
+            MelonLoader.MelonLogger.Msg("[gregCore] v1.0.0.30: MODS button injected via resilient polling.");
         }
         catch (System.Exception ex) {
             greg.Core.CrashLog.LogException("MainMenuPatch.InjectModsButton", ex);

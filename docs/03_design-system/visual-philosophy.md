@@ -1,16 +1,16 @@
-ï»¿---
+---
 sidebar_label: Luminescent design system
 description: Visual and interaction guidelines for the docs site (Luminescent Architect).
 ---
 
-The **Frika Mod Framework** (FMF) is the product name for all Docusaurus branding (site title, navbar, page titles). **Luminescent Architect** names this visual design system only.
+The **gregCore Mod Framework** (greg) is the product name for all Docusaurus branding (site title, navbar, page titles). **Luminescent Architect** names this visual design system only.
 
 # Design System Specification: The Luminescent Architect
 
 ## 1. Overview & Creative North Star
 
 **The Creative North Star: "The Luminescent Architect"**  
-This design system moves away from the "flat-and-boxy" utility of standard modding sites. It treats code and community interaction as an architectural feat. We achieve a high-end editorial feel through **Tonal Depth** and **Intentional Asymmetry**. Instead of rigid grids that feel like a spreadsheet, we use overlapping layers and "light-bleed" to guide the userâ€™s eye. The goal is a digital environment that feels like a high-end laboratory: sterile, precise, yet pulsing with the energy of the teal primary accent.
+This design system moves away from the "flat-and-boxy" utility of standard modding sites. It treats code and community interaction as an architectural feat. We achieve a high-end editorial feel through **Tonal Depth** and **Intentional Asymmetry**. Instead of rigid grids that feel like a spreadsheet, we use overlapping layers and "light-bleed" to guide the user’s eye. The goal is a digital environment that feels like a high-end laboratory: sterile, precise, yet pulsing with the energy of the teal primary accent.
 
 ## 2. Color & Atmospheric Theory
 
@@ -44,7 +44,7 @@ Implementation reference: `wiki/src/css/custom.css` (`@theme` tokens, `.btn-prim
 The contrast between the technical precision of **Inter** and the geometric authority of **Space Grotesk** defines the brand.
 
 - **Display & Headlines (Space Grotesk):** Use these for hero sections and documentation titles. High-contrast and slightly wider tracking (+2%) creates an authoritative, "tech-brochure" aesthetic. Tailwind / utility: `font-headline`.
-- **Body & Labels (Inter):** Reserved for technical data and long-form wiki content. Interâ€™s tall x-height ensures readability against the dark `background`. Default body uses `font-sans`.
+- **Body & Labels (Inter):** Reserved for technical data and long-form wiki content. Inter’s tall x-height ensures readability against the dark `background`. Default body uses `font-sans`.
 - **Code Blocks:** Must use a monospaced font (JetBrains Mono) nested in `surface-container-highest` to differentiate logic from documentation. Utility: `font-mono` / Infima monospace variables.
 
 ## 4. Elevation & Depth
@@ -78,7 +78,7 @@ We abandon the traditional drop-shadow. Depth is achieved via **Tonal Layering**
 - **Container:** `surface-container-highest` with a `md` (0.75rem) corner radius.
 - **Syntax Highlighting:** Use `tertiary` (#64D0FF) for functions, `secondary` (#1CEDE1) for strings, and `error_dim` (#D7383B) for keywords.
 
-## 6. Doâ€™s and Donâ€™ts
+## 6. Do’s and Don’ts
 
 ### Do:
 
@@ -86,11 +86,11 @@ We abandon the traditional drop-shadow. Depth is achieved via **Tonal Layering**
 - **Do** allow for generous "negative space." High-end editorial design requires breathing room to feel premium.
 - **Do** use `surface_bright` as a very subtle "top-light" gradient on large containers to simulate overhead lighting.
 
-### Donâ€™t:
+### Don’t:
 
-- **Donâ€™t** use pure white (#FFFFFF) for text. Always use `on_surface` (#C0FCF6) to reduce eye strain in dark mode.
-- **Donâ€™t** use 1px solid borders to separate sidebar items; use vertical spacing or a subtle background hover state.
-- **Donâ€™t** use standard "drop shadows" (Black/Grey). Always tint your shadows with the background or accent color to maintain tonal harmony.
+- **Don’t** use pure white (#FFFFFF) for text. Always use `on_surface` (#C0FCF6) to reduce eye strain in dark mode.
+- **Don’t** use 1px solid borders to separate sidebar items; use vertical spacing or a subtle background hover state.
+- **Don’t** use standard "drop shadows" (Black/Grey). Always tint your shadows with the background or accent color to maintain tonal harmony.
 
 ## 7. Token map (implementation)
 

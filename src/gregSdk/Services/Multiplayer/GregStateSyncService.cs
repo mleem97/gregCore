@@ -7,7 +7,7 @@ namespace greg.Sdk.Services.Multiplayer;
 /// <summary>
 /// Core SDK service for synchronizing mod state across connected players.
 /// Handles: Rack blueprints, IPAM configs, Greg task assignments.
-/// Extracted from FFM.Plugin.Multiplayer (gregMod.Multiplayer).
+/// Extracted from greg.Plugin.Multiplayer (gregMod.Multiplayer).
 /// Currently stub — ready for network integration.
 /// </summary>
 public static class GregStateSyncService

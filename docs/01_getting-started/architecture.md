@@ -1,14 +1,14 @@
-Ôªø---
+---
 title: System architecture & documentation principles
 sidebar_label: Architecture principles
-description: Canonical stack model (ModManager ‚Üí Framework ‚Üí Plugins ‚Üí Mods), priorities, and how wiki pages should align.
+description: Canonical stack model (ModManager ? Framework ? Plugins ? Mods), priorities, and how wiki pages should align.
 ---
 
 # System architecture & documentation principles
 
-This page is the **canonical reference** for how gregFramework documentation describes the stack: **ModManager (MAUI) ‚Üí modding framework / SDK ‚Üí plugins ‚Üí mods**, plus priorities (stability first), the hook-proxy idea, and **authoring rules**. All wiki content must be written in **English** only.
+This page is the **canonical reference** for how gregFramework documentation describes the stack: **ModManager (MAUI) ? modding framework / SDK ? plugins ? mods**, plus priorities (stability first), the hook-proxy idea, and **authoring rules**. All wiki content must be written in **English** only.
 
-Detail pages (individual mods, plugins, releases) should align with this model without repeating the full narrative each time ‚Äî **link here** for the big picture.
+Detail pages (individual mods, plugins, releases) should align with this model without repeating the full narrative each time ó **link here** for the big picture.
 
 ## Layer model (target architecture)
 
@@ -16,17 +16,17 @@ Describe the runtime as a **layered system**, not a flat list of DLLs:
 
 | Layer | Role | Typical workspace artifacts |
 |--------|--------|------------------------------|
-| **1. ModManager (front-end)** | UI to enable/disable mods and plugins, ordering, configuration, game state (e.g. no save loaded, level loading). Talks to the framework through **well-defined** interfaces (shared library, config files, IPC, named pipes, HTTP ‚Äî depending on implementation). | `gregModmanager/` ‚Äî **Gregtools Modmanager** (MAUI, e.g. `WorkshopUploader.csproj`). |
-| **2. Modding framework / SDK** | Stable API surface for plugins and mods: lifecycle, events, versioning, dependencies, logging, error handling. Hooks Unity / MelonLoader / IL2CPP and **maps** low-level events to **framework events** (hook proxy). | `gregCore/` ‚Äî e.g. `framework/` (**`gregCore` runtime**), Harmony integration, **native FFI** (`FfiBridge`), hook registry. |
-| **3. Plugins** | Extend the framework (new services, hook types, optional ModManager UI). Clear extension points. | `FFM.Plugin.*`, repos **`gregExt.<Name>/`**. |
-| **4. Mods** | User extensions via the **documented** framework API; avoid direct IL2CPP details where possible; load in isolation; soft-fail on errors. | `FMF.*`, repos **`gregMod.<Name>/`**. |
+| **1. ModManager (front-end)** | UI to enable/disable mods and plugins, ordering, configuration, game state (e.g. no save loaded, level loading). Talks to the framework through **well-defined** interfaces (shared library, config files, IPC, named pipes, HTTP ó depending on implementation). | `gregModmanager/` ó **Gregtools Modmanager** (MAUI, e.g. `WorkshopUploader.csproj`). |
+| **2. Modding framework / SDK** | Stable API surface for plugins and mods: lifecycle, events, versioning, dependencies, logging, error handling. Hooks Unity / MelonLoader / IL2CPP and **maps** low-level events to **framework events** (hook proxy). | `gregCore/` ó e.g. `framework/` (**`gregCore` runtime**), Harmony integration, **native FFI** (`FfiBridge`), hook registry. |
+| **3. Plugins** | Extend the framework (new services, hook types, optional ModManager UI). Clear extension points. | `greg.Plugin.*`, repos **`gregExt.<Name>/`**. |
+| **4. Mods** | User extensions via the **documented** framework API; avoid direct IL2CPP details where possible; load in isolation; soft-fail on errors. | `greg.*`, repos **`gregMod.<Name>/`**. |
 
-**Mnemonic:** `ModManager ‚Üí Framework ‚Üí Plugins ‚Üí Mods`.
+**Mnemonic:** `ModManager ? Framework ? Plugins ? Mods`.
 
 ### Hook proxy and hotloading (concept)
 
 - The framework should map **Unity / IL2CPP events** (MelonLoader hooks, patches) to **stable, named framework events** (e.g. level loaded, scene changed, update) so mods do not couple to concrete Unity signatures.
-- **Hotloading** mods is a target state: load only in **safe** states (e.g. no active save, menu), re-bind on level change ‚Äî exact rules live in framework code and should appear in technical articles **only** when anchored in the repo.
+- **Hotloading** mods is a target state: load only in **safe** states (e.g. no active save, menu), re-bind on level change ó exact rules live in framework code and should appear in technical articles **only** when anchored in the repo.
 
 These wiki pages do **not** mandate a specific implementation; they **align** authors and readers on the same vocabulary.
 
@@ -36,7 +36,7 @@ Documentation and reviews in the gregFramework space typically assume:
 
 - **C# / .NET** (modern language features, best practices)
 - **Unity with IL2CPP**
-- **MelonLoader** and modular **FMF** / **FFM** stacks
+- **MelonLoader** and modular **greg** / **greg** stacks
 - **.NET MAUI** for the ModManager (deployment, installer, release vs debug issues)
 - Debugging, logging, tracing, crash analysis (including outside the IDE)
 
@@ -44,25 +44,25 @@ Documentation and reviews in the gregFramework space typically assume:
 
 When documentation or API design must choose, use this **order**:
 
-1. **Stability and fault tolerance** ‚Äî faulty mods must not tear down the whole system arbitrarily; clear error paths and logging.
-2. **Clean architecture and maintainability** ‚Äî clear layers, documented interfaces.
-3. **Developer experience** ‚Äî understandable APIs, hooks, logging for mod authors.
+1. **Stability and fault tolerance** ó faulty mods must not tear down the whole system arbitrarily; clear error paths and logging.
+2. **Clean architecture and maintainability** ó clear layers, documented interfaces.
+3. **Developer experience** ó understandable APIs, hooks, logging for mod authors.
 4. **Performance and low invasiveness** toward the game.
-5. **Extensibility and long-term compatibility** ‚Äî versioning, dependency rules.
+5. **Extensibility and long-term compatibility** ó versioning, dependency rules.
 
 ## Rules for wiki authors
 
-- **Terminology:** Always name the layer (ModManager, framework, plugin, mod). Do not conflate ‚Äúplugin‚Äù and ‚Äúmod‚Äù without context.
+- **Terminology:** Always name the layer (ModManager, framework, plugin, mod). Do not conflate ìpluginî and ìmodî without context.
 - **Language:** **English only** for all user-facing documentation in `docs/`, the homepage, and UI strings in this site.
 - **Repos:** Keep paths such as `gregCore/`, `gregMod.*`, `gregExt.*`, `gregModmanager/` consistent with the [Workspace map](/wiki/getting-started/architecture) and [Repository architecture](/wiki/development/concepts/hooks-and-events).
-- **No invented APIs:** New pages must not promise hooks or events that are not evidenced in core/registry ‚Äî link to [FMF hooks](/wiki/reference/fmf-hook-naming) and the [Hooks catalog](/wiki/reference/greg-hooks-catalog).
+- **No invented APIs:** New pages must not promise hooks or events that are not evidenced in core/registry ó link to [greg hooks](/wiki/reference/greg-hook-naming) and the [Hooks catalog](/wiki/reference/greg-hooks-catalog).
 - **Cross-links:** Entry [Developers & contributors](/wiki/developers), architecture [Repository architecture](/wiki/development/concepts/hooks-and-events), language rule [Modding language support](/wiki/developers).
 
 ## See also
 
-- [Repository architecture](/wiki/development/concepts/hooks-and-events) ‚Äî multi-repo layout and core
-- [Getting started](/wiki/getting-started/quickstart) ‚Äî workspace and build
-- [Mods ‚Äî Framework](/mods) ‚Äî runtime from mod authors‚Äô perspective
-- [Plugins overview](/mods) ‚Äî `FFM.Plugin.*`
+- [Repository architecture](/wiki/development/concepts/hooks-and-events) ó multi-repo layout and core
+- [Getting started](/wiki/getting-started/quickstart) ó workspace and build
+- [Mods ó Framework](/mods) ó runtime from mod authorsí perspective
+- [Plugins overview](/mods) ó `greg.Plugin.*`
 - [Mod developers](/wiki/developers)
 

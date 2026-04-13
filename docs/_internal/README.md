@@ -10,5 +10,5 @@ This page exists as a compatibility target for legacy generated links in the hoo
 Use the canonical catalog pages instead:
 
 - [Greg hooks catalog](/wiki/reference/greg-hooks-catalog)
-- [FMF hook naming](/wiki/reference/fmf-hook-naming)
+- [greg hook naming](/wiki/reference/greg-hook-naming)
 - [Greg hooks & events](/wiki/development/concepts/hooks-and-events)

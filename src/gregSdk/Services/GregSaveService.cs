@@ -1,38 +1,59 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using MelonLoader;
-using MelonLoader.Utils;
 using Newtonsoft.Json;
-using HarmonyLib;
-using Il2Cpp;
 
 namespace greg.Sdk.Services;
 
 /// <summary>
-/// Service for handling mod-specific save data to bypass IL2CPP serialization limits.
+/// Service for handling mod-specific save data.
+/// Implements Task 1.2: gregSaveService.
 /// </summary>
 public static class GregSaveService
 {
-    private static readonly string SaveDir = Path.Combine(MelonEnvironment.UserDataDirectory, "gregFramework", "Saves");
-    private static readonly Dictionary<string, Dictionary<string, object>> _modData = new();
+    public static event Action OnBeforeSave;
+    public static event Action OnAfterLoad;
 
-    public static void Init()
+    internal static void TriggerOnBeforeSave() => OnBeforeSave?.Invoke();
+    internal static void TriggerOnAfterLoad() => OnAfterLoad?.Invoke();
+
+    internal static string BaseSavePathOverride { get; set; }
+    private static string BaseSavePath => BaseSavePathOverride ?? Path.Combine(Application.persistentDataPath, "gregFramework");
+
+    private static void EnsureDirectory()
     {
-        if (!Directory.Exists(SaveDir)) Directory.CreateDirectory(SaveDir);
+        if (!Directory.Exists(BaseSavePath))
+            Directory.CreateDirectory(BaseSavePath);
+    }
+
+    private static string GetPath(string modId) => Path.Combine(BaseSavePath, $"{modId}.json");
+
+    /// <summary>
+    /// Implements Task 1.2 sub-goal: Initialization.
+    /// </summary>
+    public static void Init() 
+    {
+        EnsureDirectory();
+        MelonLogger.Msg("[GregSaveService] Initialized.");
     }
 
     /// <summary>
     /// Stores data for a specific mod and key.
     /// </summary>
-    public static void SetData(string modId, string key, object data)
+    public static void SetData<T>(string modId, string key, T data)
     {
-        if (!_modData.TryGetValue(modId, out var dict))
+        try
         {
-            dict = new Dictionary<string, object>();
-            _modData[modId] = dict;
+            EnsureDirectory();
+            var wrapper = new SaveWrapper<T> { key = key, data = data };
+            var json = JsonConvert.SerializeObject(wrapper, Formatting.Indented);
+            File.WriteAllText(GetPath(modId), json);
         }
-        dict[key] = data;
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[GregSaveService] Failed to set data for {modId}: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -40,86 +61,29 @@ public static class GregSaveService
     /// </summary>
     public static T GetData<T>(string modId, string key, T defaultValue = default)
     {
-        if (_modData.TryGetValue(modId, out var dict) && dict.TryGetValue(key, out var val))
+        try
         {
-            try
-            {
-                if (val is T typedVal) return typedVal;
-                // Handle JSON deserialization if it was loaded from file as JObject/JArray
-                string json = JsonConvert.SerializeObject(val);
-                return JsonConvert.DeserializeObject<T>(json);
-            }
-            catch { return defaultValue; }
+            string path = GetPath(modId);
+            if (!File.Exists(path)) return defaultValue;
+
+            string json = File.ReadAllText(path);
+            var wrapper = JsonConvert.DeserializeObject<SaveWrapper<T>>(json);
+            
+            if (wrapper != null && wrapper.key == key)
+                return wrapper.data;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Warning($"[GregSaveService] Failed to get data for {modId}: {ex.Message}");
         }
         return defaultValue;
     }
 
-    /// <summary>
-    /// Saves all mod data to a file corresponding to the game's current save slot.
-    /// </summary>
-    public static void Save(string slotName)
+    private class SaveWrapper<T>
     {
-        try
-        {
-            string path = Path.Combine(SaveDir, $"{slotName}_greg.json");
-            File.WriteAllText(path, JsonConvert.SerializeObject(_modData, Formatting.Indented));
-            MelonLogger.Msg($"[GregSaveService] Saved mod data for slot: {slotName}");
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[GregSaveService] Failed to save: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Loads mod data for a specific save slot.
-    /// </summary>
-    public static void Load(string slotName)
-    {
-        try
-        {
-            string path = Path.Combine(SaveDir, $"{slotName}_greg.json");
-            if (!File.Exists(path))
-            {
-                _modData.Clear();
-                return;
-            }
-
-            var data = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(File.ReadAllText(path));
-            if (data != null)
-            {
-                _modData.Clear();
-                foreach (var kvp in data) _modData[kvp.Key] = kvp.Value;
-            }
-            MelonLogger.Msg($"[GregSaveService] Loaded mod data for slot: {slotName}");
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[GregSaveService] Failed to load: {ex.Message}");
-        }
+        public string key;
+        public T data;
     }
 }
 
-/// <summary>
-/// Harmony patches to trigger GregSaveService during game save/load.
-/// </summary>
-[HarmonyPatch(typeof(SaveSystem), nameof(SaveSystem.SaveGame))]
-public static class SaveSystem_SavePatch
-{
-    public static void Postfix(string savename)
-    {
-        // 1.0.45.5 alignment: Detect slot from argument or static property
-        string slot = string.IsNullOrEmpty(savename) ? (SaveSystem.loadSaveName ?? "auto") : savename;
-        GregSaveService.Save(slot);
-    }
-}
 
-[HarmonyPatch(typeof(SaveSystem), nameof(SaveSystem.LoadGame))]
-public static class SaveSystem_LoadPatch
-{
-    public static void Postfix(string savename)
-    {
-        string slot = string.IsNullOrEmpty(savename) ? (SaveSystem.loadSaveName ?? "auto") : savename;
-        GregSaveService.Load(slot);
-    }
-}

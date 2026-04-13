@@ -1,4 +1,4 @@
-﻿---
+---
 title: Sponsors
 sidebar_label: Sponsors
 ---
@@ -8,7 +8,7 @@ Thank you for supporting the GregFramework ecosystem.
 
 ## Top Sponsor (VIP)
 
-- **💎 The Ecosystem Architect ($50/month):** [@tobiasreichel](https://github.com/tobiasreichel)
+- **?? The Ecosystem Architect ($50/month):** [@tobiasreichel](https://github.com/tobiasreichel)
 
 Premium benefits currently assigned:
 
@@ -18,34 +18,34 @@ Premium benefits currently assigned:
 
 ## Sponsorship Tiers
 
-### ☕ $1 / month – The Coffee Supporter
+### ? $1 / month � The Coffee Supporter
 
 - GitHub sponsor badge
 - Discord `Supporter` role
 - Eternal gratitude
 
-### 🥉 $5 / month – Bronze Backer (Active Player)
+### ?? $5 / month � Bronze Backer (Active Player)
 
 Includes all previous perks, plus:
 
 - Credits entry in GregTools Mod Manager (`Special Thanks / Sponsors`)
 - Access to sponsor-only Discord chat for spoilers/WIP/dev updates
 
-### 🥈 $15 / month – Silver Tester (Early Access)
+### ?? $15 / month � Silver Tester (Early Access)
 
 Includes all previous perks, plus:
 
 - Early access to pre-release and beta builds
 - Roadmap voting access for Silver+ backers
 
-### 🥇 $25 / month – Gold Developer (Pro Modder)
+### ?? $25 / month � Gold Developer (Pro Modder)
 
 Includes all previous perks, plus:
 
 - Priority handling for framework bug reports
 - Official Gold sponsor mention in repository `README.md`
 
-### 💎 $50 / month – The Ecosystem Architect (Premium/VIP)
+### ?? $50 / month � The Ecosystem Architect (Premium/VIP)
 
 Includes all previous perks, plus:
 

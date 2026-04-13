@@ -40,6 +40,10 @@ namespace gregAssetExporter
 
         public override void OnInitializeMelon()
         {
+            // --- gregCore Diagnostic & Session Logging ---
+            greg.Core.Diagnostic.GregSessionLogger.Initialize();
+            greg.Core.Diagnostic.GregSessionLogger.Log("Initializing gregCore Framework...");
+
             // --- gregCore Framework Internal Initialization ---
             greg.Sdk.Services.GregSaveService.Init();
             greg.Sdk.Services.GregUiService.SetGlobalScale(0.85f); // Use user-preferred 0.85x by default
@@ -58,6 +62,12 @@ namespace gregAssetExporter
             MelonLogger.Msg("Want to help building the future of Modding in DataCenter? Join our Discord: discord.gg/greg");
             MelonLogger.Msg($"gregCore provides {greg.Sdk.Services.GregModRegistry.GetLoadedMods().Count} registered mods.");
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
+        }
+
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        {
+            MelonLogger.Msg($"[gregCore] Scene Loaded: {sceneName}. Triggering data export...");
+            greg.Core.Exporter.DataExporter.RunFullExport();
         }
 
         public override void OnApplicationQuit()

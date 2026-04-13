@@ -1,4 +1,4 @@
-ï»¿---
+---
 id: greg-hooks-catalog
 title: greg hooks catalog
 slug: /reference/greg-hooks-catalog
@@ -77,7 +77,7 @@ Mod devs subscribe via `GregHookBus.On("greg.UI.X.Y", handler)`.
 | Field | Value |
 |-------|-------|
 | Status | `ENABLED` |
-| Layer | Patch â€” MainMenuStartPatch |
+| Layer | Patch — MainMenuStartPatch |
 | Trigger | Main menu screen starts |
 | Payload | `{ instanceId: int }` |
 | Since | v1.0.0.7 |
@@ -86,7 +86,7 @@ Mod devs subscribe via `GregHookBus.On("greg.UI.X.Y", handler)`.
 | Field | Value |
 |-------|-------|
 | Status | `ENABLED` |
-| Layer | Patch â€” PauseMenuOpenPatch |
+| Layer | Patch — PauseMenuOpenPatch |
 | Trigger | Pause menu is enabled |
 | Payload | `{ instanceId: int }` |
 | Since | v1.0.0.7 |
@@ -95,7 +95,7 @@ Mod devs subscribe via `GregHookBus.On("greg.UI.X.Y", handler)`.
 | Field | Value |
 |-------|-------|
 | Status | `ENABLED` |
-| Layer | Patch â€” PauseMenuClosePatch |
+| Layer | Patch — PauseMenuClosePatch |
 | Trigger | Pause menu is disabled |
 | Payload | `{ instanceId: int }` |
 | Since | v1.0.0.7 |
@@ -151,7 +151,7 @@ Unknown event ids resolve to ``greg.SYSTEM.UnmappedNativeEvent`` via ``GregNativ
 
 ## See also
 
-- [greg hook naming](/wiki/reference/fmf-hook-naming)
+- [greg hook naming](/wiki/reference/greg-hook-naming)
 - [EventIds source](https://github.com/mleem97/gregFramework/blob/main/gregCore/framework/ModLoader/EventDispatcher.cs)
 - [GregNativeEventHooks source](https://github.com/mleem97/gregFramework/blob/main/gregCore/framework/Sdk/GregNativeEventHooks.cs)
 - [Greg hooks & event runtime](/wiki/development/concepts/hooks-and-events)

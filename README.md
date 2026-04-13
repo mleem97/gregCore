@@ -1,4 +1,4 @@
-﻿# gregCore - Framework Core
+# gregCore - Framework Core
 
 > The heart of the gregFramework modding ecosystem for Data Center.
 

@@ -809,7 +809,7 @@ public sealed class gregUnityLuaModule : iGregLuaModule
         if (t != null) return t;
 
         // Try Il2CppTMPro
-        t = Type.GetType($"Il2CppTMPro.{typeName}, Unity.TextMeshPro");
+        t = Type.GetType($"Il2CppTMPro.{typeName}, Il2CppTMPro");
         if (t != null) return t;
 
         // Try UnityEngine

@@ -1,4 +1,4 @@
-﻿---
+---
 id: docusaurus-workflow
 title: Docusaurus Contributor Workflow
 slug: /contributors/docusaurus-workflow

@@ -6,7 +6,7 @@ completion_promise: "DONE"
 started_at: "2026-04-11T12:00:00Z"
 ---
 
-Ich migriere mein Modding-Framework von einem alten Legacy-Stand ("FrikaModFramework") zu meinem neuen GregFramework. Du bist ein Senior DevOps & Technical Writer. Deine Aufgabe ist es, das aktuelle Verzeichnis radikal aufzuräumen, zu bereinigen und in eine neue Docusaurus-Struktur zu überführen.
+Ich migriere mein Modding-Framework von einem alten Legacy-Stand ("gregCoreModFramework") zu meinem neuen GregFramework. Du bist ein Senior DevOps & Technical Writer. Deine Aufgabe ist es, das aktuelle Verzeichnis radikal aufzuräumen, zu bereinigen und in eine neue Docusaurus-Struktur zu überführen.
 
 Phase 1: Flatten & Clean (Vorbereitung)
 
@@ -16,9 +16,9 @@ Lösche danach alle nun leeren Unterordner.
 
 WICHTIG: Scanne JEDE Datei (Markdown, MDX, JSON, TXT). Ersetze alle Vorkommen der folgenden Begriffe (case-insensitive) durch "GregFramework":
 
-Frika / FrikaMod
-FrikaModFramework
-FMF / FFM
+gregCore / gregCoreMod
+gregCoreModFramework
+greg / greg
 Luminescent Design System -> GregFramework Design System
 
 Phase 2: Struktur-Migration (Neuordnung)
@@ -35,8 +35,8 @@ hooks-and-events.md (Basis: greg-hooks-and-events.md)
 modding-basics.md (Basis: developers.md)
 
 📂 api-reference/
-hooks-catalog.md (Basis: fmf-hooks-catalog.md oder greg-hooks-catalog.md)
-naming-conventions.md (Basis: fmf-hook-naming.md)
+hooks-catalog.md (Basis: greg-hooks-catalog.md oder greg-hooks-catalog.md)
+naming-conventions.md (Basis: greg-hook-naming.md)
 
 📂 hooks-library/
 KONSOLIDIERUNG: Suche alle Dateien, die mit NETWORK-, EMPLOYEE-, GAMEPLAY-, SYSTEM-, SERVER-, PLAYER-, RACK-, CUSTOMER- und UI- beginnen.

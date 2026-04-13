@@ -294,7 +294,7 @@ public sealed class gregLangserverCompatRuntime
                 "gregCore.dll",
                 "greg.UIReplacementMod.dll",
                 "greg.JoniMLCompatMod.dll",
-                "FMF.HexLabelMod.dll" // bootstrap stub, mod logic is in Lua
+                "greg.HexLabelMod.dll" // bootstrap stub, mod logic is in Lua
             };
 
             var candidates = Directory.GetFiles(_modsDirectory, "*.dll", SearchOption.TopDirectoryOnly)

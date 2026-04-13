@@ -27,9 +27,9 @@ Install path:
 
 Examples:
 
-- `FFM.Plugin.AssetExporter.dll`
-- `FFM.Plugin.Multiplayer.dll`
-- `FFM.Plugin.WebUIBridge.dll`
+- `greg.Plugin.AssetExporter.dll`
+- `greg.Plugin.Multiplayer.dll`
+- `greg.Plugin.WebUIBridge.dll`
 
 ### Native addons (`.dll` / `.so`, Rust bridge modules)
 
@@ -49,7 +49,7 @@ Use this path only for native bridge modules exposed through the gregCore Rust r
 Recommended PowerShell examples:
 
 ```powershell
-Copy-Item .\FFM.Plugin.AssetExporter.dll "C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods\" -Force
+Copy-Item .\greg.Plugin.AssetExporter.dll "C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods\" -Force
 Copy-Item .\hexviewer_rust.dll "C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods\RustMods\" -Force
 ```
 

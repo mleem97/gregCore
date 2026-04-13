@@ -44,7 +44,7 @@ namespace gregAssetExporter
             // --- Consolidated Mod Systems ---
             greg.Mods.HexViewerUI.Init();
             // ResetSwitch init (ModConfig requires local reference if not automated)
-            greg.Mods.ResetSwitch.Config.ModConfig.Register();
+            greg.Mods.ResetSwitch.Config.ModConfig.Init();
             
             // Apply Deep-Layer Hijacker Patches
             var harmony = new HarmonyLib.Harmony("greg.core.hijacker");

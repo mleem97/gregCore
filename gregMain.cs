@@ -13,7 +13,7 @@ using greg.Core;
 
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
-[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97")]
+[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97 (teamGreg)")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace gregAssetExporter
@@ -43,15 +43,8 @@ namespace gregAssetExporter
             // --- gregCore Framework Internal Initialization ---
             greg.Sdk.Services.GregSaveService.Init();
             greg.Sdk.Services.GregUiService.SetGlobalScale(0.85f); // Use user-preferred 0.85x by default
-            
-            // --- Consolidated Mod Systems ---
-            greg.Mods.HexViewerUI.Init();
-            
-            // IPAM Integration
-            greg.Mods.IPAM.Core.IpamEngine.Instance.Initialize();
-
-            // ResetSwitch init (ModConfig requires local reference if not automated)
-            greg.Mods.ResetSwitch.Config.ModConfig.Init();
+            greg.Sdk.Services.GregHudService.Initialize();
+            greg.Sdk.Services.MCP.GregMCPServer.Start();
             
             // Apply Deep-Layer Hijacker Patches
             var harmony = new HarmonyLib.Harmony("greg.core.hijacker");
@@ -61,29 +54,20 @@ namespace gregAssetExporter
             exportPath = Path.Combine(MelonEnvironment.ModsDirectory, "ExportedAssets");
             if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
-            MelonLogger.Msg($"gregCore Framework v{greg.Core.gregReleaseVersion.Current} loaded (Unified Build).");
+            MelonLogger.Msg($"gregCore Framework v{greg.Core.gregReleaseVersion.Current} loaded (SDK-only build).");
+            MelonLogger.Msg("Want to help building the future of Modding in DataCenter? Join our Discord: discord.gg/greg");
+            MelonLogger.Msg($"gregCore provides {greg.Sdk.Services.GregModRegistry.GetLoadedMods().Count} registered mods.");
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
+        }
+
+        public override void OnApplicationQuit()
+        {
+            greg.Sdk.Services.MCP.GregMCPServer.Stop();
         }
 
         public override void OnUpdate()
         {
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModTickEvent(Time.deltaTime, Time.frameCount));
-
-            // Run Integrated Mod Loops
-            greg.Mods.HexViewerUI.OnUpdate();
-            
-            if (Keyboard.current != null && Keyboard.current.f8Key.wasPressedThisFrame)
-            {
-                greg.Mods.ResetSwitch.UI.ResetPanelUI.Toggle();
-            }
-            greg.Mods.ResetSwitch.UI.ResetPanelUI.UpdateFocus();
-
-            // IPAM Hooks
-            if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
-            {
-                greg.Mods.IPAM.Core.IpamEngine.Instance.RefreshNetworkState();
-                greg.Sdk.Services.GregNotificationService.ShowToast("Network State Refreshed.", greg.Sdk.Services.ToastType.Info, 2f);
-            }
 
 #if DEBUG
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
@@ -93,7 +77,6 @@ namespace gregAssetExporter
 
             if (!showDebugOverlay) return;
 
-            // Note: F8 is now used by ResetSwitch. Moving Exporter export to Ctrl+F8
             if (Keyboard.current != null && Keyboard.current.ctrlKey.isPressed && Keyboard.current.f8Key.wasPressedThisFrame)
             {
                 ExportAllResources();

@@ -48,6 +48,17 @@ public static class GregUiService
         return canvas;
     }
 
+    public static GameObject CreatePanel(string title, Vector2 size)
+    {
+        var canvas = CreateCanvas(title);
+        var panelGo = new GameObject("Panel");
+        panelGo.transform.SetParent(canvas.transform, false);
+        var rect = panelGo.AddComponent<RectTransform>();
+        rect.sizeDelta = size;
+        rect.anchoredPosition = Vector2.zero;
+        return panelGo;
+    }
+
     public static void SetGlobalScale(float scale)
     {
         GlobalScale = Mathf.Clamp(scale, 0.5f, 2.0f);

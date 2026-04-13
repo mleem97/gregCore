@@ -103,14 +103,17 @@ public struct GameAPITable
     public IntPtr SetVlanDisallowed;
     public IntPtr IsVlanAllowed;
 
-    // v10 — Targeting v2
-    public IntPtr RaycastForwardV2;
+    // v11 — SDK services (Targeting v3, HUD, Metadata)
+    public IntPtr HudUpdateJadeBox;
+    public IntPtr HudHideJadeBox;
+    public IntPtr GetTargetInfo;
+    public IntPtr GetMetadata;
 }
 
 // manages the api table, delegates stored as fields to prevent GC
 public class gregGameApiManager : IDisposable
 {
-    public const uint API_VERSION = 10;
+    public const uint API_VERSION = 11;
 
     private IntPtr _tablePtr;
     private GameAPITable _table;
@@ -149,6 +152,10 @@ public class gregGameApiManager : IDisposable
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void GuiEndPanelDelegate();
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int RaycastForwardDelegate(float maxDistance, IntPtr outName, IntPtr outDistance, IntPtr outX, IntPtr outY, IntPtr outZ);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int RaycastForwardV2Delegate(float maxDistance, IntPtr outName, IntPtr outDistance, IntPtr outX, IntPtr outY, IntPtr outZ, IntPtr outEntityHandle);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void HudUpdateJadeBoxDelegate(IntPtr title, IntPtr subHeader, IntPtr entriesJson);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void HudHideJadeBoxDelegate();
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int GetTargetInfoDelegate(float maxDistance, IntPtr outType, IntPtr outName, IntPtr outDist, IntPtr outX, IntPtr outY, IntPtr outZ);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate IntPtr GetMetadataDelegate(float maxDistance);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void PublishTickDelegate(float deltaTime, int frame);
 
     // v9 delegate types
@@ -257,6 +264,10 @@ public class gregGameApiManager : IDisposable
     private readonly GuiEndPanelDelegate _guiEndPanel;
     private readonly RaycastForwardDelegate _raycastForward;
     private readonly RaycastForwardV2Delegate _raycastForwardV2;
+    private readonly HudUpdateJadeBoxDelegate _hudUpdateJadeBox;
+    private readonly HudHideJadeBoxDelegate _hudHideJadeBox;
+    private readonly GetTargetInfoDelegate _getTargetInfo;
+    private readonly GetMetadataDelegate _getMetadata;
     private readonly PublishTickDelegate _publishTick;
 
     // v9
@@ -365,8 +376,11 @@ public class gregGameApiManager : IDisposable
         _setVlanDisallowed = SetVlanDisallowedImpl;
         _isVlanAllowed = IsVlanAllowedImpl;
 
-        // v10
-        _raycastForwardV2 = RaycastForwardV2Impl;
+        // v11
+        _hudUpdateJadeBox = HudUpdateJadeBoxImpl;
+        _hudHideJadeBox = HudHideJadeBoxImpl;
+        _getTargetInfo = GetTargetInfoImpl;
+        _getMetadata = GetMetadataImpl;
 
         _table = new GameAPITable
         {
@@ -453,7 +467,13 @@ public class gregGameApiManager : IDisposable
             IsVlanAllowed = Marshal.GetFunctionPointerForDelegate(_isVlanAllowed),
 
             // v10
-            RaycastForwardV2 = Marshal.GetFunctionPointerForDelegate(_raycastForwardV2),
+            // RaycastForwardV2 = Marshal.GetFunctionPointerForDelegate(_raycastForwardV2),
+            
+            // v11
+            HudUpdateJadeBox = Marshal.GetFunctionPointerForDelegate(_hudUpdateJadeBox),
+            HudHideJadeBox = Marshal.GetFunctionPointerForDelegate(_hudHideJadeBox),
+            GetTargetInfo = Marshal.GetFunctionPointerForDelegate(_getTargetInfo),
+            GetMetadata = Marshal.GetFunctionPointerForDelegate(_getMetadata),
         };
 
         _tablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GameAPITable>());
@@ -1005,6 +1025,80 @@ public class gregGameApiManager : IDisposable
             return gregGameHooks.IsVlanAllowed(switchId, portIndex, vlanId);
         }
         catch { return 0; }
+    }
+
+    // v11
+    private void HudUpdateJadeBoxImpl(IntPtr titlePtr, IntPtr subHeaderPtr, IntPtr entriesJsonPtr)
+    {
+        try
+        {
+            string title = Marshal.PtrToStringAnsi(titlePtr) ?? "";
+            string subHeader = Marshal.PtrToStringAnsi(subHeaderPtr) ?? "";
+            string json = Marshal.PtrToStringAnsi(entriesJsonPtr) ?? "";
+
+            var entries = new List<greg.Sdk.Services.GregMetadataEntry>();
+            if (!string.IsNullOrEmpty(json))
+            {
+                var parts = json.Split(';');
+                foreach (var part in parts)
+                {
+                    var fields = part.Split('|');
+                    if (fields.Length >= 2)
+                    {
+                        string label = fields[0];
+                        string val = fields[1];
+                        Color c = Color.white;
+                        if (fields.Length >= 3) ColorUtility.TryParseHtmlString(fields[2], out c);
+                        entries.Add(new greg.Sdk.Services.GregMetadataEntry(label, val, c));
+                    }
+                }
+            }
+            greg.Sdk.Services.GregHudService.UpdateJadeBox(title, subHeader, entries);
+        }
+        catch { }
+    }
+
+    private void HudHideJadeBoxImpl() => greg.Sdk.Services.GregHudService.HideJadeBox();
+
+    private int GetTargetInfoImpl(float maxDistance, IntPtr outType, IntPtr outName, IntPtr outDist, IntPtr outX, IntPtr outY, IntPtr outZ)
+    {
+        var info = greg.Sdk.Services.GregTargetingService.GetTargetInfo(maxDistance);
+        if (info.TargetType == greg.Sdk.Services.GregTargetType.None) return 0;
+
+        if (outType != IntPtr.Zero)
+        {
+            if (_raycastNamePtr != IntPtr.Zero) Marshal.FreeHGlobal(_raycastNamePtr);
+            _raycastNamePtr = Marshal.StringToHGlobalAnsi(info.TargetType.ToString());
+            Marshal.WriteIntPtr(outType, _raycastNamePtr);
+        }
+        if (outName != IntPtr.Zero)
+        {
+            var namePtr = Marshal.StringToHGlobalAnsi(info.Name);
+            Marshal.WriteIntPtr(outName, namePtr); 
+        }
+        if (outDist != IntPtr.Zero) Marshal.Copy(new float[] { info.Distance }, 0, outDist, 1);
+        if (outX != IntPtr.Zero) Marshal.Copy(new float[] { info.HitPoint.x }, 0, outX, 1);
+        if (outY != IntPtr.Zero) Marshal.Copy(new float[] { info.HitPoint.y }, 0, outY, 1);
+        if (outZ != IntPtr.Zero) Marshal.Copy(new float[] { info.HitPoint.z }, 0, outZ, 1);
+
+        return 1;
+    }
+
+    private IntPtr GetMetadataImpl(float maxDistance)
+    {
+        var info = greg.Sdk.Services.GregTargetingService.GetTargetInfo(maxDistance);
+        var entries = greg.Sdk.Services.GregComponentMetadataService.GetMetadata(info);
+        
+        var sb = new System.Text.StringBuilder();
+        foreach (var entry in entries)
+        {
+            if (sb.Length > 0) sb.Append(";");
+            sb.Append($"{entry.Label}|{entry.Value}|#{ColorUtility.ToHtmlStringRGB(entry.ValueColor)}");
+        }
+        
+        if (_payloadStringPtr != IntPtr.Zero) Marshal.FreeHGlobal(_payloadStringPtr);
+        _payloadStringPtr = Marshal.StringToHGlobalAnsi(sb.ToString());
+        return _payloadStringPtr;
     }
 
     public void Dispose()

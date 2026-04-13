@@ -31,6 +31,7 @@ public sealed class LuaLanguageBridge : iGregLanguageBridge
         _modules.Add(new gregUnityLuaModule());
         _modules.Add(new gregIoLuaModule());
         _modules.Add(new gregInputLuaModule());
+        _modules.Add(new LuaModules.gregSdkLuaModule());
     }
 
     public string LanguageName => "lua";

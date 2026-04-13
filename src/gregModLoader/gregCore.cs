@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-[assembly: MelonInfo(typeof(greg.Core.gregCoreLoader), "gregCore", greg.Core.gregReleaseVersion.Current, "MLeeM97")]
+[assembly: MelonInfo(typeof(greg.Core.gregCoreLoader), "gregCore", greg.Core.gregReleaseVersion.Current, "MLeeM97 (teamGreg)")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace greg.Core;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using Jint;
 using Jint.Native;
 using MelonLoader;
@@ -116,33 +117,58 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
 
                     var hudObj = new Dictionary<string, object>
                     {
-                        ["beginPanel"] = new Action<string, float, float, float, float>(gregGameHooks.GuiBeginPanel),
-                        ["label"] = new Action<string>(gregGameHooks.GuiLabel),
-                        ["endPanel"] = new Action(gregGameHooks.GuiEndPanel)
+                        ["updateJadeBox"] = new Action<string, string, object>((title, subHeader, entries) => {
+                            var list = new List<greg.Sdk.Services.GregMetadataEntry>();
+                            // Handle JS object/array to C# list
+                            if (entries is IEnumerable<object> e) {
+                                foreach(var item in e) {
+                                    if (item is IDictionary<string, object> d) {
+                                        string label = d.ContainsKey("label") ? d["label"]?.ToString() : "";
+                                        string val = d.ContainsKey("value") ? d["value"]?.ToString() : "";
+                                        ColorUtility.TryParseHtmlString(d.ContainsKey("color") ? d["color"]?.ToString() : "#FFFFFF", out var c);
+                                        list.Add(new greg.Sdk.Services.GregMetadataEntry(label, val, c));
+                                    }
+                                }
+                            }
+                            greg.Sdk.Services.GregHudService.UpdateJadeBox(title, subHeader, list);
+                        }),
+                        ["hideJadeBox"] = new Action(greg.Sdk.Services.GregHudService.HideJadeBox)
                     };
 
                     var targetObj = new Dictionary<string, object>
                     {
-                        ["raycastForward"] = new Func<float, object>(distance =>
+                        ["getTargetInfo"] = new Func<float, object>(distance =>
                         {
-                            var hit = gregGameHooks.RaycastForward(distance);
-                            if (hit == null) return null;
-                            var result = new Dictionary<string, object> {
-                                ["name"] = hit.Value.Name,
-                                ["distance"] = hit.Value.Distance,
-                                ["point"] = new Dictionary<string, float> { ["x"] = hit.Value.Point.x, ["y"] = hit.Value.Point.y, ["z"] = hit.Value.Point.z }
+                            var info = greg.Sdk.Services.GregTargetingService.GetTargetInfo(distance);
+                            return new Dictionary<string, object> {
+                                ["type"] = info.TargetType.ToString(),
+                                ["name"] = info.Name,
+                                ["distance"] = info.Distance,
+                                ["hitPoint"] = new Dictionary<string, float> { ["x"] = info.HitPoint.x, ["y"] = info.HitPoint.y, ["z"] = info.HitPoint.z }
                             };
-                            if (hit.Value.Entity != null)
-                            {
-                                result["entityHandle"] = gregLuaObjectHandleRegistry.Register(hit.Value.Entity);
-                            }
-                            return result;
                         })
                     };
 
-                    var payloadObj = new Dictionary<string, object>
+                    var metadataObj = new Dictionary<string, object>
                     {
-                        ["get"] = new Func<object, string, object, object>(global::greg.Sdk.gregPayload.Get<object>)
+                        ["getMetadata"] = new Func<float, object>(distance =>
+                        {
+                            var info = greg.Sdk.Services.GregTargetingService.GetTargetInfo(distance);
+                            var entries = greg.Sdk.Services.GregComponentMetadataService.GetMetadata(info);
+                            var jsEntries = new List<object>();
+                            foreach(var entry in entries) {
+                                jsEntries.Add(new Dictionary<string, object> {
+                                    ["label"] = entry.Label,
+                                    ["value"] = entry.Value,
+                                    ["color"] = $"#{ColorUtility.ToHtmlStringRGB(entry.ValueColor)}"
+                                });
+                            }
+                            return new Dictionary<string, object> {
+                                ["title"] = info.TargetType == greg.Sdk.Services.GregTargetType.None ? "SCANNING..." : info.TargetType.ToString().ToUpper(),
+                                ["subHeader"] = info.TargetType == greg.Sdk.Services.GregTargetType.None ? "" : "TELEMETRY",
+                                ["entries"] = jsEntries
+                            };
+                        })
                     };
 
                     var gregObj = new Dictionary<string, object>
@@ -151,7 +177,7 @@ public sealed class TypeScriptJavaScriptLanguageBridge : iGregLanguageBridge
                         ["events"] = eventsObj,
                         ["hud"] = hudObj,
                         ["target"] = targetObj,
-                        ["payload"] = payloadObj
+                        ["metadata"] = metadataObj
                     };
 
                     engine.SetValue("greg", gregObj);

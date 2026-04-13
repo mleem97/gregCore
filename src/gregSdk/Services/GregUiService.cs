@@ -38,12 +38,18 @@ public static class GregUiService
     {
         var go = new GameObject(name);
         UnityEngine.Object.DontDestroyOnLoad(go);
+        
         var canvas = go.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = sortingOrder;
+
+        // Implementation of the Ultimate Hijack Blueprint Phase 3 (Scaling Standard)
         var scaler = go.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920 / GlobalScale, 1080 / GlobalScale);
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+        
         _trackedScalers.Add(scaler);
         go.AddComponent<GraphicRaycaster>();
         return canvas;

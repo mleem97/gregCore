@@ -108,6 +108,28 @@ public static class gregModConfigManager
             GregUiService.CreateModernButton(_contentRoot, "HideHUD", "HIDE MAIN HUD", () => {
                 GregUiService.TakeoverVanillaUi(GameObject.Find("MainHUD"));
             });
+
+            GregUiService.AddSeparator(_contentRoot);
+
+            AddSettingHeader("Global UI Scale");
+            var scaleRow = GregUiService.CreateModernPanel(_contentRoot, "ScaleRow", new Vector2(800, 60));
+            scaleRow.GetComponent<Image>().color = new Color(0, 0, 0, 0.2f);
+            GregUiService.AddHorizontalLayout(scaleRow, 20);
+
+            float currentScale = GregUiService.GlobalScale;
+            GregUiService.CreateLabel(scaleRow.transform, "ScaleLabel", $"CURRENT SCALE: {currentScale:F1}x", 14);
+
+            GregUiService.CreateModernButton(scaleRow.transform, "ScaleDown", "DECREASE (0.1x)", () => {
+                GregUiService.SetGlobalScale(GregUiService.GlobalScale - 0.1f);
+                GregConfigService.Set("gregCore", "GlobalUiScale", GregUiService.GlobalScale);
+                ShowTab("UI");
+            });
+
+            GregUiService.CreateModernButton(scaleRow.transform, "ScaleUp", "INCREASE (0.1x)", () => {
+                GregUiService.SetGlobalScale(GregUiService.GlobalScale + 0.1f);
+                GregConfigService.Set("gregCore", "GlobalUiScale", GregUiService.GlobalScale);
+                ShowTab("UI");
+            });
         }
         else if (tabId == "MAINTENANCE")
         {

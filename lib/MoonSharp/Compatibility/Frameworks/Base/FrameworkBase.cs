@@ -73,3 +73,4 @@ namespace MoonSharp.Interpreter.Compatibility.Frameworks
 		public abstract MethodInfo GetMethod(Type resourcesType, string v, Type[] type);
 	}
 }
+

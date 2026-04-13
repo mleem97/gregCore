@@ -214,3 +214,4 @@ Expected line:
 - Add on-screen label via UI bridge API.
 - Persist latest hovered hex in a Lua table for quick recall.
 - Add command toggle (`/hexviewer on|off`) if your command bridge is enabled.
+

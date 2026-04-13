@@ -52,3 +52,4 @@ public class GregToggle : IGregUIComponent
         return go;
     }
 }
+

@@ -247,3 +247,4 @@ namespace MoonSharp.Interpreter.DataStructs
 		}
 	}
 }
+

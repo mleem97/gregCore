@@ -71,3 +71,4 @@ Write-Host "Next steps:"
 Write-Host "  1) Replace model.obj/model.mtl/texture.png/icon.png with real assets"
 Write-Host "  2) Align config.json to current ExampleMod schema"
 Write-Host "  3) Start game and verify object appears in shop"
+

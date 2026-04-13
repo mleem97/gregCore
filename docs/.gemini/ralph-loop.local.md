@@ -70,3 +70,4 @@ Phase 4: Cleanup
 Lösche alle verbleibenden Dateien im Root, die nicht in die neue Struktur einsortiert wurden (außer Konfigurationsdateien).
 
 Ziel: Ein sauberer, logischer Dokumentations-Baum, der sich wie aus einem Guss liest und keine Spuren des alten Namens mehr enthält.
+

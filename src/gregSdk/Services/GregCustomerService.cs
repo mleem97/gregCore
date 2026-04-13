@@ -228,3 +228,4 @@ public static class GregCustomerService
         return GetCurrentSpeed(customerId) / required;
     }
 }
+

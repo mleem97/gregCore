@@ -32,3 +32,4 @@ namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 		protected abstract object Invoke(Script script, object obj, object[] pars, int argscount);
 	}
 }
+

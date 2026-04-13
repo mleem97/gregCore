@@ -13,7 +13,7 @@ using greg.Core;
 
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
-[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97 (teamGreg)")]
+[assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97, Joniii11 (teamGreg)")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace gregAssetExporter
@@ -106,49 +106,37 @@ namespace gregAssetExporter
             {
                 InstallRuntimeHooks();
             }
+
+            if (showDebugOverlay)
+            {
+                if (!debugOverlayStatsInitialized)
+                    RefreshDebugOverlayStats(forceHookScan: true);
+
+                var entries = new List<greg.Sdk.Services.GregMetadataEntry>
+                {
+                    new greg.Sdk.Services.GregMetadataEntry("HOOKS", debugHooksAvailable.ToString("D5"), new Color(0.38f, 0.96f, 0.85f)),
+                    new greg.Sdk.Services.GregMetadataEntry("EVENTS", debugHookEventsAvailable.ToString("D5"), new Color(0.38f, 0.96f, 0.85f)),
+                    new greg.Sdk.Services.GregMetadataEntry("MISSING", debugNotYetImplemented.ToString("D5"), Color.red),
+                    new greg.Sdk.Services.GregMetadataEntry("SCENES", UnityEngine.SceneManagement.SceneManager.sceneCount.ToString(), Color.white),
+                    new greg.Sdk.Services.GregMetadataEntry("FPS", (1f / Time.unscaledDeltaTime).ToString("F0"), Color.yellow)
+                };
+
+                greg.Sdk.Services.GregHudService.UpdateJadeBox(
+                    "GREG_CORE", 
+                    $"v{greg.Core.gregReleaseVersion.Current} | DBG_MODE", 
+                    entries
+                );
+            }
+            else
+            {
+                greg.Sdk.Services.GregHudService.HideJadeBox();
+            }
 #endif
         }
 
 #if DEBUG
-        public override void OnGUI()
-        {
-            if (!showDebugOverlay) return;
-
-            EnsureDebugOverlayAssets();
-
-            if (!debugOverlayStatsInitialized)
-                RefreshDebugOverlayStats(forceHookScan: true);
-
-            string overlayText =
-                $"<b>gregCore v{greg.Core.gregReleaseVersion.Current}</b>\n" +
-                $"Hooks: {debugHooksAvailable:D5} | Events: {debugHookEventsAvailable:D5} | Missing: {debugNotYetImplemented:D5}\n" +
-                $"[F5] Hide | [F6] Health | [F8] Export | [F11] Catalog | [F12] Hooks";
-
-            const float marginX = 10f;
-            const float topY = 10f;
-            const float height = 70f;
-            float width = 450f;
-            var boxRect = new Rect(marginX, topY, width, height);
-
-            GUI.DrawTexture(boxRect, debugOverlayBackgroundTexture, ScaleMode.StretchToFill);
-
-            // Use direct GUIStyle initialization
-            GUIStyle style = new GUIStyle();
-            if (GUI.skin != null && GUI.skin.label != null)
-            {
-                style.font = GUI.skin.label.font;
-            }
-            style.richText = true;
-            style.fontSize = 14;
-            // IL2CPP RectOffset might not have 4-arg ctor in some builds, setting manually
-            style.padding = new RectOffset();
-            style.padding.left = 10;
-            style.padding.right = 10;
-            style.padding.top = 5;
-            style.padding.bottom = 5;
-
-            GUI.Label(boxRect, overlayText, style);
-        }
+        // OnGUI removed in favor of GregHudService (Premium UI)
+#endif
 
         private void EnsureDebugOverlayAssets()
         {
@@ -863,3 +851,4 @@ namespace gregAssetExporter
         }
     }
 }
+

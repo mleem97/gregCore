@@ -50,3 +50,4 @@ public static class GregSessionLogger
         Log(message, "VERBOSE");
     }
 }
+

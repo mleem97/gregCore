@@ -16,3 +16,4 @@ if (-not (Test-Path -LiteralPath $PublishDir)) {
 New-Item -ItemType Directory -Path $dest -Force | Out-Null
 Copy-Item -Path (Join-Path $PublishDir "*") -Destination $dest -Recurse -Force
 Write-Host "Copied to $dest"
+

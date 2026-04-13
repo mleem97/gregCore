@@ -38,3 +38,4 @@ if oid:
         rest = _strip_leading_version(first)
         lines[0] = f"{ver}: {rest}" if rest else ver
         commit.message = "\n".join(lines).encode("utf-8")  # noqa: F821
+

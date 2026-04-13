@@ -159,3 +159,4 @@ public class GregPanel : IGregUIElement
 }
 
 public enum GregUIAnchor { TopLeft, TopRight, TopCenter, Center, BottomLeft, BottomRight, BottomCenter }
+

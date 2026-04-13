@@ -49,3 +49,4 @@ namespace MoonSharp.Interpreter.Interop
 		bool IsStatic { get; }
 	}
 }
+

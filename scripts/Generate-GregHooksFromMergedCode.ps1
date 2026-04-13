@@ -16,3 +16,4 @@ $py = Join-Path $PSScriptRoot "parse_merged_code.py"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "OK: $OutJson"
+

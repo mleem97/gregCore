@@ -118,3 +118,4 @@ gregBus.on("greg.UI.HeaderRowAdded", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.UI.HeaderRowAdded` as the canonical routing key end-to-end.
 
+

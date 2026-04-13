@@ -223,3 +223,4 @@ namespace MoonSharp.Interpreter.CoreLib.IO
 		}
 	}
 }
+

@@ -180,3 +180,4 @@ namespace MoonSharp.Interpreter.Execution.VM
 		}
 	}
 }
+

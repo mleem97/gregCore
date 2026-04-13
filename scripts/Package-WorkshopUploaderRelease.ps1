@@ -68,3 +68,4 @@ $sizeMb = [math]::Round((Get-Item -LiteralPath $zipPath).Length / 1MB, 2)
 Write-Host ""
 Write-Host "[pack] OK: $zipPath ($sizeMb MB)"
 Write-Host "[pack] Inner folder in archive: $folderName\"
+

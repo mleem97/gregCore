@@ -118,3 +118,4 @@ gregBus.on("greg.UI.SalaryRowAdded", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.UI.SalaryRowAdded` as the canonical routing key end-to-end.
 
+

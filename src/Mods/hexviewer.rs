@@ -50,3 +50,4 @@ pub extern "C" fn mod_update(dt: f32) {
     // 3. Update the HUD
     (api.hud_update_jade_box)(title.as_ptr(), sub_header.as_ptr(), entries_json.as_ptr());
 }
+

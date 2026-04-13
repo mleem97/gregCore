@@ -201,3 +201,4 @@ Bewertungslogik:
 
 ### Phase 4 – Long-Term / GAME-LEVEL
 - Features mit tiefer Spielsystem-Abhängigkeit (cooling simulation, advanced building, WDM, security minigame)
+

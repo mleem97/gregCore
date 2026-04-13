@@ -25,3 +25,4 @@ public class GregLabel : IGregUIComponent
         return go;
     }
 }
+

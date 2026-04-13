@@ -8,3 +8,4 @@ node_modules/
 
 # Specifically allow reference DLLs for CI
 !gregLib/references/
+

@@ -9,3 +9,4 @@ public class CustomerDefinition
     public string[] RequirementRules { get; set; } = System.Array.Empty<string>();
     public string[] OwnershipRules { get; set; } = System.Array.Empty<string>();
 }
+

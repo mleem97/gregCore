@@ -239,3 +239,4 @@ Copy `dist/index.js` to your bridge/plugin module location (depends on plugin se
 - Display hex value in an in-game HTML overlay.
 - Add filter by domain (`UI`, `SYSTEM`, `PLAYER`).
 - Add debounce to reduce spam.
+

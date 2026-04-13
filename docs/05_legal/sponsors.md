@@ -58,3 +58,4 @@ Includes all previous perks, plus:
 Use a repository workflow file at `.github/workflows/sponsor-tier-sync.yml` to export current sponsor tiers and drive Discord/website sync jobs.
 
 
+

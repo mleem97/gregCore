@@ -75,3 +75,4 @@ Bindings are **not** auto-generated for all languages; stubs are for contributor
 - [greg hooks catalog](/wiki/reference/greg-hook-naming) — Short overview / Redirect
 - [greg hooks](/wiki/reference/greg-hook-naming) — declarative surface (may be superseded by the core registry)
 
+

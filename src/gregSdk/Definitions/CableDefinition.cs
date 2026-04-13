@@ -9,3 +9,4 @@ public class CableDefinition
     public float LatencyMs { get; set; } = 0.1f;
     public float Durability { get; set; } = 100.0f;
 }
+

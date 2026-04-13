@@ -82,3 +82,4 @@ Checklist:
 - Use `GregEventDispatcher` rather than direct cross-mod coupling.
 - Guard all critical runtime paths with error handling.
 - Log clear startup/shutdown messages for support diagnostics.
+

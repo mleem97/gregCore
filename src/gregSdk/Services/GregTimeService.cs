@@ -38,3 +38,4 @@ public static class GregTimeService
         return GetInstance()?.day ?? 0;
     }
 }
+

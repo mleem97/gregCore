@@ -10,3 +10,4 @@ namespace MoonSharp.Interpreter.Execution.VM
 		public CoroutineState State = CoroutineState.NotStarted;
 	}
 }
+

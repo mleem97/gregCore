@@ -15,3 +15,4 @@ namespace MoonSharp.Interpreter
 	/// <returns>The return value of the script function</returns>
 	public delegate T ScriptFunctionDelegate<T>(params object[] args);
 }
+

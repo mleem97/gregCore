@@ -98,3 +98,4 @@ public static class GregLocalisationService
         return instance != null ? (int)instance.currentlySelectedLanguage : (int)Localisation.Languages.English;
     }
 }
+

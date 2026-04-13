@@ -6,3 +6,4 @@ namespace MoonSharp.Interpreter.Tree
 		void CompileAssignment(Execution.VM.ByteCode bc, int stackofs, int tupleidx);
 	}
 }
+

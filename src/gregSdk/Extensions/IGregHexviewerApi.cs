@@ -13,3 +13,4 @@ namespace greg.Sdk.Extensions
         void Toggle();
     }
 }
+

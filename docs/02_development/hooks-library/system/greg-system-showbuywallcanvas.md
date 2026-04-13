@@ -118,3 +118,4 @@ gregBus.on("greg.SYSTEM.ShowBuyWallCanvas", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.SYSTEM.ShowBuyWallCanvas` as the canonical routing key end-to-end.
 
+

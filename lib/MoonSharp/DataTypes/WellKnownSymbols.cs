@@ -17,3 +17,4 @@ namespace MoonSharp.Interpreter
 		public const string ENV = "_ENV";
 	}
 }
+

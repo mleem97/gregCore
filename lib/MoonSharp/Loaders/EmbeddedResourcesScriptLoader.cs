@@ -66,3 +66,4 @@ namespace MoonSharp.Interpreter.Loaders
 		}
 	}
 }
+

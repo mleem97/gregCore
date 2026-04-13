@@ -6,3 +6,4 @@
   "description": "Template for creating custom content packs for Data Center.",
   "dependencies": ["greg.Core"]
 }
+

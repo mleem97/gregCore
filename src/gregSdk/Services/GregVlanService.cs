@@ -229,3 +229,4 @@ public static class GregVlanService
     public static bool IsVlanSupported() => true;
     public static string GetAssessmentLevel() => "FULL";
 }
+

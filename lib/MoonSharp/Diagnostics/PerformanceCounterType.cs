@@ -16,3 +16,4 @@ namespace MoonSharp.Interpreter.Diagnostics
 		TimeMilliseconds,
 	}
 }
+

@@ -242,3 +242,4 @@ Copy-Item .\target\release\hexviewer.dll "C:\Program Files (x86)\Steam\steamapps
 - Parse payload structs for richer labels.
 - Add in-game toggle via shared config file.
 - Emit events to C# side for UI rendering.
+

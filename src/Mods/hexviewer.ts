@@ -36,3 +36,4 @@ greg.events.onUpdate((dt: number) => {
 });
 
 greg.log("HexViewer TypeScript Engine Started.");
+

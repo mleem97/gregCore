@@ -14,3 +14,4 @@ public class SwitchValidator : IContentValidator<SwitchDefinition>
         return true;
     }
 }
+

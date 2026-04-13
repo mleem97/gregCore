@@ -36,3 +36,4 @@ public class GregUiReplacementManifest
     /// <summary>Priority of the override (higher overrides lower).</summary>
     public int Priority { get; set; } = 0;
 }
+

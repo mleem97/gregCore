@@ -11,10 +11,11 @@ public static class GregUiService
 {
     public static class LuminescentArchitect
     {
-        public static readonly Color Surface = new Color(0.00f, 0.07f, 0.06f, 0.95f);
-        public static readonly Color SurfaceContainer = new Color(0.00f, 0.12f, 0.11f, 0.98f);
+        public static readonly Color Surface = new Color(0.00f, 0.05f, 0.04f, 0.88f); // Slightly more transparent
+        public static readonly Color SurfaceContainer = new Color(0.00f, 0.10f, 0.09f, 0.92f);
         public static readonly Color PrimaryTeal = new Color(0.38f, 0.96f, 0.85f, 1f);
-        public static readonly Color OnSurface = new Color(0.75f, 0.99f, 0.96f, 1f);
+        public static readonly Color GlowTeal = new Color(0.38f, 0.96f, 0.85f, 0.25f);
+        public static readonly Color OnSurface = new Color(0.85f, 1.00f, 0.98f, 1f); // Brighter text
     }
 
     private static readonly Dictionary<string, Action<GameObject>> _replacements = new();
@@ -77,7 +78,11 @@ public static class GregUiService
         rt.sizeDelta = size;
         var img = go.AddComponent<Image>();
         img.color = LuminescentArchitect.Surface;
-        img.type = Image.Type.Sliced;
+        
+        var outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.38f, 0.96f, 0.85f, 0.15f);
+        outline.effectDistance = new Vector2(1, -1);
+        
         return go;
     }
 
@@ -97,6 +102,10 @@ public static class GregUiService
         colors.highlightedColor = LuminescentArchitect.PrimaryTeal;
         colors.pressedColor = new Color(0.03f, 0.75f, 0.65f, 1f);
         btn.colors = colors;
+
+        var outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.38f, 0.96f, 0.85f, 0.4f);
+        outline.effectDistance = new Vector2(1, -1);
 
         var textGo = new GameObject("Text");
         textGo.transform.SetParent(go.transform, false);
@@ -180,3 +189,4 @@ public static class GregUiService
         MelonLoader.MelonLogger.Msg($"[gregCore] UI Takeover: {vanillaRoot.name}");
     }
 }
+

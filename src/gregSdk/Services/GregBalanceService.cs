@@ -63,3 +63,4 @@ public static class GregBalanceService
         return GetLatestSnapshot().penalties;
     }
 }
+

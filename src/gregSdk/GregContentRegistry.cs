@@ -61,3 +61,4 @@ public class GregContentRegistry<TDefinition> : IGregContentRegistry<TDefinition
         _registry.Clear();
     }
 }
+

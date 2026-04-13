@@ -18,3 +18,4 @@ namespace MoonSharp.Interpreter
 		public string Name { get; set; }
 	}
 }
+

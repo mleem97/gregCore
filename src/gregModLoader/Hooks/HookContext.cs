@@ -60,3 +60,4 @@ public sealed class HookContext
     public IDictionary<string, object> Metadata { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 }
 
+

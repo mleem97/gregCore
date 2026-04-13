@@ -70,3 +70,4 @@ namespace MoonSharp.Interpreter.Interop
 		bool IsTypeCompatible(Type type, object obj);
 	}
 }
+

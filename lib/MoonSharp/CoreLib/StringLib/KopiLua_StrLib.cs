@@ -996,3 +996,4 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 
 	}
 }
+

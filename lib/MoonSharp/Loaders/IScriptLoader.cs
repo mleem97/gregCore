@@ -38,3 +38,4 @@ namespace MoonSharp.Interpreter.Loaders
 		string ResolveModuleName(string modname, Table globalContext);
 	}
 }
+

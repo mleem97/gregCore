@@ -235,3 +235,4 @@ GregFramework über MCP oder Named Pipes (localhost).
 - Erkläre Entscheidungen kurz (warum dieser Ansatz, nicht nur was)
 - Code in C# Blöcken, kompilierbar oder klar mit Platzhaltern markiert
 - Verweise immer auf die relevante Schicht im Architektur-Tree
+

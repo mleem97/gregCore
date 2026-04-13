@@ -40,3 +40,4 @@ namespace MoonSharp.Interpreter.Debugging
 		MaxValue
 	}
 }
+

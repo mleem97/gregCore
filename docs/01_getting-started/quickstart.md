@@ -74,3 +74,4 @@ Reference mod: **`mods/GregShowcaseMod/`** — [Documentation hub](/wiki/developer
 - Docker: from **`gregWiki/`** root — see **`gregWiki/README.md`**
 - MCP: [MCP references](/wiki/developers) — server code under **`gregAddons/mcp-server/`**
 
+

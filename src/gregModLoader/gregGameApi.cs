@@ -1111,3 +1111,4 @@ public class gregGameApiManager : IDisposable
         if (_raycastNamePtr != IntPtr.Zero) { Marshal.FreeHGlobal(_raycastNamePtr); _raycastNamePtr = IntPtr.Zero; }
     }
 }
+

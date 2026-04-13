@@ -33,3 +33,4 @@ use a preexisting loader like EmbeddedResourcesScriptLoader or UnityAssetsScript
 		}
 	}
 }
+

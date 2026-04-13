@@ -10,3 +10,4 @@ public interface IGregContentRegistry<TDefinition>
     bool Remove(string id);
     void Clear();
 }
+

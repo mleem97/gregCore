@@ -85,3 +85,4 @@ namespace MoonSharp.Interpreter.Tree
 		}
 	}
 }
+

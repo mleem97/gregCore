@@ -298,3 +298,4 @@ namespace MoonSharp.Interpreter.CoreLib
 		}
 	}
 }
+

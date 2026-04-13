@@ -12,3 +12,4 @@ public class ServerDefinition
     public string[] Tags { get; set; } = System.Array.Empty<string>();
     public string ModelOverridePath { get; set; }
 }
+

@@ -258,3 +258,4 @@ namespace MoonSharp.Interpreter.Interop
 		void AssignObjectUnchecked(object o, Table data);
 	}
 }
+

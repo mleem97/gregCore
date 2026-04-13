@@ -9,3 +9,4 @@
 | **`harmony/`** | Optional: per Generator erzeugte Domain-Harmony-Klassen (`Generate-GregHooksFromIl2CppDump.ps1`). |
 
 `greg_hooks.json` wird bei Build aus dem **Monorepo-Root** (`../../greg_hooks.json`) neben die DLL kopiert, sofern die Datei existiert.
+

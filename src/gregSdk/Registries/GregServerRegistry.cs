@@ -6,3 +6,4 @@ public class GregServerRegistry : GregContentRegistry<ServerDefinition>
 {
     public GregServerRegistry() : base(x => x.Id) { }
 }
+

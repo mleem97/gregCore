@@ -20,3 +20,4 @@ namespace MoonSharp.Interpreter.Platforms
 		StdErr
 	}
 }
+

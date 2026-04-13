@@ -120,3 +120,4 @@ gregBus.on("greg.EMPLOYEE.IsDeviceAlreadyAssigned", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.EMPLOYEE.IsDeviceAlreadyAssigned` as the canonical routing key end-to-end.
 
+

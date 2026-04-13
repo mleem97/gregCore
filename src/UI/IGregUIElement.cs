@@ -15,3 +15,4 @@ public interface IGregUIElement
     void   Toggle();
     void   Destroy();
 }
+

@@ -58,3 +58,4 @@ Dieses Dokument ist der zentrale Masterplan für das Greg Framework. Es wird lau
 ## Technischer Status
 - **Aktuelle Coverage**: ~65% der IL2CPP-Kernlogik bridged.
 - **Letzter Snapshot-Abgleich**: 11. April 2026
+

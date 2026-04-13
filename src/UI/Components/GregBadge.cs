@@ -35,3 +35,4 @@ public class GregBadge : IGregUIComponent
         return go;
     }
 }
+

@@ -53,3 +53,4 @@ public sealed class HookerInstallResult
 New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
 Set-Content -Path $target -Value $stub -Encoding UTF8
 Write-Host "Created hooker bridge scaffold: $target"
+

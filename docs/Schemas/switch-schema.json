@@ -16,3 +16,4 @@
   },
   "required": ["id", "name", "frontPorts", "throughputGbps"]
 }
+

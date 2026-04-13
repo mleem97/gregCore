@@ -32,3 +32,4 @@ namespace MoonSharp.Interpreter
 		Dead
 	}
 }
+

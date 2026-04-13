@@ -12,3 +12,4 @@ public static class GregNetworkTopologyPatch
         // Trigger framework event for topology change
     }
 }
+

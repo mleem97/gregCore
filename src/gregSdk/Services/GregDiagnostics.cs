@@ -14,3 +14,4 @@ public static class GregDiagnostics
         Console.WriteLine($"[GregCore][ContentWarning][{category}] {id}: {message}");
     }
 }
+

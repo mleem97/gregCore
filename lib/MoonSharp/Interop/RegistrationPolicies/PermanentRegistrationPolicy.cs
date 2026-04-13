@@ -36,3 +36,4 @@ namespace MoonSharp.Interpreter.Interop.RegistrationPolicies
 		}
 	}
 }
+

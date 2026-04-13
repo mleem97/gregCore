@@ -12,3 +12,4 @@ Use the canonical catalog pages instead:
 - [Greg hooks catalog](/wiki/reference/greg-hooks-catalog)
 - [greg hook naming](/wiki/reference/greg-hook-naming)
 - [Greg hooks & events](/wiki/development/concepts/hooks-and-events)
+

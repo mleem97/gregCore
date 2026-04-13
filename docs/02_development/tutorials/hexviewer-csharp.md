@@ -336,3 +336,4 @@ Copy-Item .\gregMod.HexViewer\bin\Release\net6.0\gregMod.HexViewer.dll "C:\Progr
 - Render on-screen UI instead of log-only output.
 - Add config file to enable/disable selected hook groups.
 - Map hex ID to domain labels (Rack/Server/Customer).
+

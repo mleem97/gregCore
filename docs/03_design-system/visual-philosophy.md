@@ -96,3 +96,4 @@ We abandon the traditional drop-shadow. Depth is achieved via **Tonal Layering**
 
 Semantic colors are defined as Tailwind v4 `@theme` variables in `wiki/src/css/custom.css` (e.g. `--color-primary`, `--color-on-surface`, `--color-surface-container-low`). Prefer those utilities in React pages (`bg-background`, `text-on-surface`, `border-outline-variant/15`) so the site stays aligned with this spec.
 
+

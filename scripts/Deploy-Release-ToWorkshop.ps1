@@ -266,3 +266,4 @@ if (-not (Test-Path -LiteralPath $mmMetaPath)) {
 Write-Host ""
 Write-Host "[workshop] Done. All projects packaged under: $WorkshopRoot"
 Write-Host "[workshop] Use WorkshopUploader to publish each folder to Steam."
+

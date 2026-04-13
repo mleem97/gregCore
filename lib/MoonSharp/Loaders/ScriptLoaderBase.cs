@@ -137,3 +137,4 @@ namespace MoonSharp.Interpreter.Loaders
 		public bool IgnoreLuaPathGlobal { get; set; }
 	}
 }
+

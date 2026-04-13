@@ -7,3 +7,4 @@ public class ServerTypeDefinition
     public int UnlockLevel { get; set; }
     public string Classification { get; set; } = string.Empty;
 }
+

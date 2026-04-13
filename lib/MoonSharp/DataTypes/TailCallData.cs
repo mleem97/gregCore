@@ -29,3 +29,4 @@ namespace MoonSharp.Interpreter
 		public DynValue ErrorHandlerBeforeUnwind { get; set; }
 	}
 }
+

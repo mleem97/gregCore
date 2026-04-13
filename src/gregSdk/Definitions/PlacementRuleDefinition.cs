@@ -8,3 +8,4 @@ public class PlacementRuleDefinition
     public bool RequiresPower { get; set; }
     public bool RequiresNetwork { get; set; }
 }
+

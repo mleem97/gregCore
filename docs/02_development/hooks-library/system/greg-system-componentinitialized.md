@@ -128,3 +128,4 @@ gregBus.on("greg.SYSTEM.ComponentInitialized", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.SYSTEM.ComponentInitialized` as the canonical routing key end-to-end.
 
+

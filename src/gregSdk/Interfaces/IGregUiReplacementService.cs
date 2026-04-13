@@ -23,3 +23,4 @@ public interface IGregUiReplacementService
     /// <summary>Checks if a path has an override.</summary>
     bool HasOverride(string uiPath, out GregUiReplacementManifest manifest);
 }
+

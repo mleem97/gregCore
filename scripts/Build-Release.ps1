@@ -44,3 +44,4 @@ Compress-Archive -Path "$tmpDir\*" -DestinationPath $zipPath -Force
 Remove-Item -Recurse -Force $tmpDir
 
 Write-Host "--- Successfully packaged gregCore to $zipPath ---" -ForegroundColor Green
+

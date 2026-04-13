@@ -15,3 +15,4 @@ namespace MoonSharp.Interpreter.Interop.BasicDescriptors
 		void PrepareForWiring(Table t);
 	}
 }
+

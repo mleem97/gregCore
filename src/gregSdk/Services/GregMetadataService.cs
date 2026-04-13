@@ -20,3 +20,4 @@ public static class GregMetadataService
         return _metadata.TryGetValue(entityId, out var data) ? data : _emptyMetadata;
     }
 }
+

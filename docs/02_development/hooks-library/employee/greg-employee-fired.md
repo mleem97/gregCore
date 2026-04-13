@@ -118,3 +118,4 @@ gregBus.on("greg.EMPLOYEE.Fired", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.EMPLOYEE.Fired` as the canonical routing key end-to-end.
 
+

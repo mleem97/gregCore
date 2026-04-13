@@ -136,3 +136,4 @@ public static class GregModelSwapperService
         MelonLogger.Msg($"[GregModelSwapperService] Applied '{model.ModelName}' to {(isPlayer ? "player" : "NPC")} '{target.name}'.");
     }
 }
+

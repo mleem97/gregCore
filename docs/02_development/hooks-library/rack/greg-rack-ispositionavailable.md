@@ -118,3 +118,4 @@ gregBus.on("greg.RACK.IsPositionAvailable", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.RACK.IsPositionAvailable` as the canonical routing key end-to-end.
 
+

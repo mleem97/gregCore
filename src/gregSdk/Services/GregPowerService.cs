@@ -11,3 +11,4 @@ public static class GregPowerService
     public static void RegisterConsumer(string deviceId, int watts) { }
     public static void UnregisterConsumer(string deviceId) { }
 }
+

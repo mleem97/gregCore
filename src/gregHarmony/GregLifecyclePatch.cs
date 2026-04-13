@@ -21,3 +21,4 @@ public static class GregTimePatch
         // Trigger greg.SYSTEM.IncidentTriggered logic
     }
 }
+

@@ -686,3 +686,4 @@ namespace MoonSharp.Interpreter
 		}
 	}
 }
+

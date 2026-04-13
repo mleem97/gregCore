@@ -13,3 +13,4 @@ public class SwitchDefinition
     public float Price { get; set; }
     public string ModelOverridePath { get; set; }
 }
+

@@ -460,3 +460,4 @@ internal static class GregPowerHooks
     [System.IO.File]::WriteAllText($powerFile, $stub, [System.Text.UTF8Encoding]::new($false))
     Write-Host "Wrote stub $powerFile"
 }
+

@@ -25,3 +25,4 @@ namespace MoonSharp.Interpreter
 		TreatAsColon
 	}
 }
+

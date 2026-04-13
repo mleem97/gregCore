@@ -123,3 +123,4 @@ namespace MoonSharp.Interpreter.Interop
 		}
 	}
 }
+

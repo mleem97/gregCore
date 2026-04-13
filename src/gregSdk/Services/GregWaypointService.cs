@@ -14,3 +14,4 @@ public static class GregWaypointService
     }
     public static void RecalculateAllWaypoints() { }
 }
+

@@ -15,3 +15,4 @@ function Resolve-WorkshopUploaderMonorepoDir {
     }
     throw "WorkshopUploader.csproj not found under workshopuploader\ or WorkshopUploader\ (repo root: $RepoRoot)"
 }
+

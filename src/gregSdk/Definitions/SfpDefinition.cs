@@ -7,3 +7,4 @@ public class SfpDefinition
     public string[] CompatibilityTags { get; set; } = System.Array.Empty<string>();
     public decimal Price { get; set; }
 }
+

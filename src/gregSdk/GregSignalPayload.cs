@@ -26,3 +26,4 @@ public struct GregSignalPayload
     public float Delta { get; set; }
     public string RawArgsJson { get; set; }
 }
+

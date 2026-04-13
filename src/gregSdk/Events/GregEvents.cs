@@ -30,3 +30,4 @@ public class TopologyChangedEvent { public List<string> AffectedNodes; }
 
 // ═══ Reset Events ═══
 public class ResetEvent          { public string SwitchId; public string ResetType; }
+

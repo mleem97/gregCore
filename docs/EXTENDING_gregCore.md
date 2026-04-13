@@ -335,3 +335,4 @@ Example:
 ```
 
 This rule prevents undocumented ad-hoc APIs and keeps extensions compatible with the core architecture.
+

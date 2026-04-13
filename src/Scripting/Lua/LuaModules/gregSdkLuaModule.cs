@@ -79,3 +79,4 @@ public sealed class gregSdkLuaModule : iGregLuaModule
         hud["hide_jade_box"] = (Action)(() => GregHudService.HideJadeBox());
     }
 }
+

@@ -24,3 +24,4 @@ Hi everyone! Here is a compact overview of all the new features, fixes, and brid
 - **UI & Config:** Resolved an issue with UI transparency and improved the accessibility of mod configurations in the menu.
 
 Grab the latest build on GitHub and happy modding! If you notice any bugs, feel free to report them. :fire:
+

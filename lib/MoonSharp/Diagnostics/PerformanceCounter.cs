@@ -29,3 +29,4 @@ namespace MoonSharp.Interpreter.Diagnostics
 		LastValue
 	}
 }
+

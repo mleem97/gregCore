@@ -10,3 +10,4 @@ public class EmployeeDefinition
     public bool IsAvailable { get; set; } = true;
     public string VisualPrefabId { get; set; }
 }
+

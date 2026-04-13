@@ -43,3 +43,4 @@ public static class GregShopService
         GetInstance()?.FreeUpSpawnPoint(pointIndex);
     }
 }
+

@@ -118,3 +118,4 @@ gregBus.on("greg.CUSTOMER.SpeedOnCustomerBaseAppChanged", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.CUSTOMER.SpeedOnCustomerBaseAppChanged` as the canonical routing key end-to-end.
 
+

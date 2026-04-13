@@ -114,3 +114,4 @@ namespace MoonSharp.Interpreter.Tree.Fast_Interface
 
 	}
 }
+

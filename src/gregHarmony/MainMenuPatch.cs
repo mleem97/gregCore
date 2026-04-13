@@ -1,34 +1,87 @@
+using System;
+using System.Collections;
 using HarmonyLib;
 using Il2Cpp;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
-using greg.Core.UI;
-using System.Collections;
+using greg.Core.UI.Components;
 
 namespace greg.Harmony;
+
+public static class MainMenuController
+{
+    private static GregMainMenuReplacement _menuInstance;
+
+    public static void Initialize()
+    {
+        if (_menuInstance != null) return;
+
+        var go = new GameObject("GregMainMenu_Root");
+        _menuInstance = go.AddComponent<GregMainMenuReplacement>();
+
+        _menuInstance.Configure(
+            onPlay: OnPlayClicked,
+            onSettings: OnSettingsClicked,
+            onMods: OnModsClicked,
+            onQuit: OnQuitClicked
+        );
+    }
+
+    public static void Show() => _menuInstance?.Show();
+    public static void Hide() => _menuInstance?.Hide();
+
+    private static void OnPlayClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Play clicked");
+        Hide();
+        greg.Core.UI.UIRouter.SetMode(UIMode.Playing);
+    }
+
+    private static void OnSettingsClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Settings clicked");
+        greg.Core.UI.UIRouter.SetMode(UIMode.Settings);
+    }
+
+    private static void OnModsClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Mods clicked");
+        greg.Core.UI.gregModConfigManager.Toggle(true);
+    }
+
+    private static void OnQuitClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Quit clicked");
+        Application.Quit();
+    }
+}
 
 [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
 public static class MainMenuPatch
 {
+    private static bool _isOriginalMenuDisabled = false;
+
     static void Postfix(MainMenu __instance)
     {
-        MelonLoader.MelonCoroutines.Start(EnsureModsButtonCoroutine(__instance));
+        MelonLoader.MelonCoroutines.Start(DisableOriginalMenuCoroutine(__instance));
     }
 
-    public static IEnumerator EnsureModsButtonCoroutine(MainMenu menu)
+    private static IEnumerator DisableOriginalMenuCoroutine(MainMenu menu)
     {
         int retries = 0;
-        GameObject settingsBtn = null;
+        GameObject[] canvasesToDisable = null;
 
-        // Poll for the settings button up to 5 seconds
         while (retries < 20)
         {
-            settingsBtn = GameObject.Find("Canvas/MiddleMenu/Buttons/Settings") 
-                       ?? GameObject.Find("Settings") 
-                       ?? (menu != null ? menu.settings : null);
-
-            if (settingsBtn != null && settingsBtn.activeInHierarchy)
+            var allCanvases = Resources.FindObjectsOfTypeAll<Canvas>();
+            if (allCanvases.Length > 0)
             {
+                canvasesToDisable = new GameObject[allCanvases.Length];
+                for (int i = 0; i < allCanvases.Length; i++)
+                {
+                    canvasesToDisable[i] = allCanvases[i].gameObject;
+                }
                 break;
             }
 
@@ -36,118 +89,71 @@ public static class MainMenuPatch
             yield return new WaitForSeconds(0.25f);
         }
 
-        if (settingsBtn != null)
+        if (canvasesToDisable != null)
         {
-            InjectModsButton(settingsBtn);
-            StyleMenuButtons(settingsBtn.transform.parent);
-            InjectVersionDisplay(settingsBtn.transform.root);
-            
-            // Enhance Background
-            if (menu != null && menu.middleBackground != null)
-            {
-                var img = menu.middleBackground.GetComponent<Image>();
-                if (img != null) img.color = new Color(0.00f, 0.07f, 0.06f, 0.95f);
-            }
+            DisableGameCanvases(canvasesToDisable);
         }
         else
         {
-            MelonLoader.MelonLogger.Warning("[gregCore] Failed to find Settings button in MainMenu for MODS injection.");
+            MelonLogger.Warning("[gregCore] No canvases found.");
         }
+
+        yield return new WaitForSeconds(0.3f);
+
+        InitializeGregMenu();
     }
 
-    private static System.Action _modsButtonAction;
-
-    public static void StyleMenuButtons(Transform buttonContainer)
+    private static void DisableGameCanvases(GameObject[] allCanvases)
     {
-        if (buttonContainer == null) return;
+        if (_isOriginalMenuDisabled) return;
 
-        for (int i = 0; i < buttonContainer.childCount; i++)
+        string[] keepCanvases = new string[]
         {
-            Transform child = buttonContainer.GetChild(i);
-            if (child == null) continue;
+            "Canvas_OverAll",
+            "CountersCanvas",
+            "Canvas_Main"
+        };
 
-            var btn = child.GetComponent<Button>();
-            if (btn == null && child.GetComponent<ButtonExtended>() == null) continue;
-
-            var img = child.GetComponent<Image>();
-            if (img != null) img.color = new Color(0.00f, 0.12f, 0.11f, 0.90f);
-
-            var text = child.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null) text.color = Color.white;
-        }
-    }
-
-    public static void InjectVersionDisplay(Transform root)
-    {
-        try
+        foreach (var canvasGo in allCanvases)
         {
-            if (GameObject.Find("greg_VersionDisplay") != null) return;
-
-            var versionGo = new GameObject("greg_VersionDisplay");
-            versionGo.transform.SetParent(root, false);
-
-            var rect = versionGo.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0, 0);
-            rect.anchorMax = new Vector2(0, 0);
-            rect.pivot = new Vector2(0, 0);
-            rect.anchoredPosition = new Vector2(10, 10);
-            rect.sizeDelta = new Vector2(400, 30);
-
-            var text = versionGo.AddComponent<TextMeshProUGUI>();
-            text.text = $"gregCore v{greg.Core.gregReleaseVersion.Current} <color=#1CEDE1>[teamGreg]</color>";
-            text.fontSize = 14;
-            text.color = new Color(0.38f, 0.96f, 0.85f, 0.7f);
-            text.alignment = TextAlignmentOptions.BottomLeft;
-        }
-        catch (System.Exception ex)
-        {
-            greg.Core.CrashLog.LogException("MainMenuPatch.InjectVersionDisplay", ex);
-        }
-    }
-
-    public static void InjectModsButton(GameObject settingsBtn)
-    {
-        try
-        {
-            if (GameObject.Find("greg_ModsButton") != null) return;
-
-            // Fresh Clone
-            GameObject modsButtonGo = Object.Instantiate(settingsBtn, settingsBtn.transform.parent);
-            modsButtonGo.name = "greg_ModsButton";
-
-            // PURGE all existing uGUI button logic from the clone
-            var button = modsButtonGo.GetComponent<Button>();
-            if (button != null)
+            if (canvasGo == null) continue;
+            
+            string canvasName = canvasGo.name;
+            
+            bool shouldKeep = false;
+            foreach (var keep in keepCanvases)
             {
-                button.onClick = new Button.ButtonClickedEvent(); 
-                button.onClick.RemoveAllListeners();
-                
-                // Keep static reference to prevent GC issues in IL2CPP
-                if (_modsButtonAction == null)
+                if (canvasName.Contains(keep))
                 {
-                    _modsButtonAction = new System.Action(() => {
-                        MelonLoader.MelonLogger.Msg("[gregCore] Opening Mod Configuration...");
-                        gregModConfigManager.Toggle(true);
-                    });
+                    shouldKeep = true;
+                    break;
                 }
-                button.onClick.AddListener(_modsButtonAction);
             }
 
-            // Styling: Luminescent Architect
-            var img = modsButtonGo.GetComponent<Image>();
-            if (img != null) img.color = new Color(0.00f, 0.12f, 0.11f, 0.90f);
-
-            var textComp = modsButtonGo.GetComponentInChildren<TextMeshProUGUI>();
-            if (textComp != null) {
-                textComp.text = "MODS";
-                textComp.color = new Color(0.38f, 0.96f, 0.85f, 1f);
+            if (!shouldKeep && !canvasGo.name.Contains("GregMainMenu"))
+            {
+                canvasGo.SetActive(false);
+                MelonLogger.Msg($"[gregCore] Disabled canvas: {canvasName}");
             }
-
-            modsButtonGo.transform.SetSiblingIndex(settingsBtn.transform.GetSiblingIndex() + 1);
-            MelonLoader.MelonLogger.Msg("[gregCore] v1.0.0.30: MODS button injected via resilient polling.");
         }
-        catch (System.Exception ex) {
-            greg.Core.CrashLog.LogException("MainMenuPatch.InjectModsButton", ex);
+
+        _isOriginalMenuDisabled = true;
+        MelonLogger.Msg("[gregCore] Original game canvases disabled.");
+    }
+
+    private static void InitializeGregMenu()
+    {
+        try
+        {
+            greg.Core.UI.UIRouter.Initialize();
+            MainMenuController.Initialize();
+            MainMenuController.Show();
+            MelonLogger.Msg("[gregCore] GregMainMenuReplacement initialized successfully.");
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[gregCore] Failed to initialize GregMenu: {ex.Message}");
+            greg.Core.CrashLog.LogException("MainMenuPatch.InitializeGregMenu", ex);
         }
     }
 }

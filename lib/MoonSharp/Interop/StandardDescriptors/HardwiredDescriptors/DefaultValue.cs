@@ -6,3 +6,4 @@ namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 		public static readonly DefaultValue Instance = new DefaultValue();
 	}
 }
+

@@ -15,3 +15,4 @@ namespace MoonSharp.Interpreter.Execution.VM
 		MethodCall = 0x20,
 	}
 }
+

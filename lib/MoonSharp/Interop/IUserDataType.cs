@@ -45,3 +45,4 @@ namespace MoonSharp.Interpreter.Interop
 		DynValue MetaIndex(Script script, string metaname);
 	}
 }
+

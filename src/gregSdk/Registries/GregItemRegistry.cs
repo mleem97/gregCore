@@ -6,3 +6,4 @@ public class GregItemRegistry : GregContentRegistry<ItemDefinition>
 {
     public GregItemRegistry() : base(x => x.Id) { }
 }
+

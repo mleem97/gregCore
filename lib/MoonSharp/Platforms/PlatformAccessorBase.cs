@@ -260,3 +260,4 @@ namespace MoonSharp.Interpreter.Platforms
 		}
 	}
 }
+

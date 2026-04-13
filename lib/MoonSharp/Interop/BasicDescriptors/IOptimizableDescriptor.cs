@@ -13,3 +13,4 @@ namespace MoonSharp.Interpreter.Interop.BasicDescriptors
 		void Optimize();
 	}
 }
+

@@ -14,3 +14,4 @@ namespace MoonSharp.Interpreter.Compatibility
 		public static FrameworkBase Do { get { return s_FrameworkCurrent; } }
 	}
 }
+

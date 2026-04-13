@@ -6,3 +6,4 @@ public class GregFurnitureRegistry : GregContentRegistry<FurnitureDefinition>
 {
     public GregFurnitureRegistry() : base(x => x.Id) { }
 }
+

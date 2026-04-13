@@ -90,3 +90,4 @@ namespace MoonSharp.Interpreter.CoreLib
 		}
 	}
 }
+

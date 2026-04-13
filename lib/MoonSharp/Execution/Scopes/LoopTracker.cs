@@ -15,3 +15,4 @@ namespace MoonSharp.Interpreter.Execution
 		public FastStack<ILoop> Loops = new FastStack<ILoop>(16384);
 	}
 }
+

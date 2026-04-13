@@ -16,3 +16,4 @@ After sync, `gregCore.csproj` will prefer `lib/references/MelonLoader` when `net
 Optional: `python tools/refresh_refs.py --watch` polls for interop changes after game updates.
 
 See also: `MANIFEST.txt` (generated) and `tools/diff_assembly_metadata.py`.
+

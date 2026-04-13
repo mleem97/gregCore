@@ -118,3 +118,4 @@ gregBus.on("greg.UI.SectionTitleAdded", (payload) => {
 
 When using RPC/WebSocket transport, keep `greg.UI.SectionTitleAdded` as the canonical routing key end-to-end.
 
+

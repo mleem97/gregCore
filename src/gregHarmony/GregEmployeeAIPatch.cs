@@ -12,3 +12,4 @@ public static class GregEmployeeAIPatch
         greg.Sdk.Services.GregEmployeeAIBridge.ForceStateTransition(__instance.name, "Initialize");
     }
 }
+

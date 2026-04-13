@@ -27,3 +27,4 @@ namespace MoonSharp.Interpreter
 		public string Namespace { get; set; }
 	}
 }
+

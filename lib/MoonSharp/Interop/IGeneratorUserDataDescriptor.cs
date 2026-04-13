@@ -39,3 +39,4 @@ namespace MoonSharp.Interpreter.Interop
 		IUserDataDescriptor Generate(Type type);
 	}
 }
+

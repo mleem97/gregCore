@@ -25,3 +25,4 @@ namespace MoonSharp.Interpreter.Debugging
 		HasLineBasedBreakpoints = 0x4
 	}
 }
+

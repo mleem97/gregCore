@@ -45,3 +45,4 @@ namespace MoonSharp.Interpreter
 		public static TablePair Nil { get { return s_NilNode; } }
 	}
 }
+

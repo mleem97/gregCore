@@ -9,3 +9,4 @@ public static class GregRopeService
     public static void SetRopeColor(string ropeId, string hexColor) { }
     public static void AttachRope(string ropeId, string startEntityId, string endEntityId) { }
 }
+

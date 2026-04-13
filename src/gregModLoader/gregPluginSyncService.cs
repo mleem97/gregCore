@@ -228,3 +228,4 @@ public sealed class PluginSyncManifestEntry
     public string Sha256 { get; set; } = string.Empty;
 }
 
+

@@ -7,3 +7,4 @@ public class ItemDefinition
     public string Type { get; set; } = string.Empty;
     public bool IsStackable { get; set; }
 }
+

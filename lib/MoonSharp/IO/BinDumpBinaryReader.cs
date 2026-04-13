@@ -59,3 +59,4 @@ namespace MoonSharp.Interpreter.IO
 		}
 	}
 }
+

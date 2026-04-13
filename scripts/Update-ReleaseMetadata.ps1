@@ -264,3 +264,4 @@ function Update-ReleaseMetadata {
 
 Update-ReleaseMetadata -Bump $Bump -Version $Version -Summary $Summary -SkipChangelog:$SkipChangelog
 
+

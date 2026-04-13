@@ -9,3 +9,4 @@ public class FurnitureDefinition
     public string Category { get; set; } = string.Empty;
     public string[] InteractionEffects { get; set; } = System.Array.Empty<string>();
 }
+

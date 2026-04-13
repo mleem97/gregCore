@@ -103,3 +103,4 @@ namespace MoonSharp.Interpreter.Execution.Scopes
 		}
 	}
 }
+

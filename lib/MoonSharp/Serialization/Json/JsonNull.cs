@@ -27,3 +27,4 @@ namespace MoonSharp.Interpreter.Serialization.Json
 		}
 	}
 }
+

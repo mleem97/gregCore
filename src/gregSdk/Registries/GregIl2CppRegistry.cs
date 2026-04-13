@@ -37,3 +37,4 @@ public static class GregIl2CppRegistry
         return go.AddComponent<T>();
     }
 }
+

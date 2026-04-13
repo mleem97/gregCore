@@ -30,3 +30,4 @@ public static class GregReusableFunctionsPatch
         // Hook into core color conversion if needed
     }
 }
+

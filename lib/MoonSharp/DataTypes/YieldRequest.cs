@@ -17,3 +17,4 @@ namespace MoonSharp.Interpreter
 		public bool Forced { get; internal set; }
 	}
 }
+

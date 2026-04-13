@@ -60,3 +60,4 @@ namespace MoonSharp.Interpreter.Diagnostics.PerformanceCounters
 		}
 	}
 }
+

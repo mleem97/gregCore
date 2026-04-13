@@ -33,3 +33,4 @@ public class FixedTableUI : MonoBehaviour
         Debug.Log($"[gregUI] Table Row: {col1} | {col2} | {col3}");
     }
 }
+

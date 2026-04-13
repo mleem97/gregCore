@@ -33,3 +33,4 @@ This update focuses on UI extensibility and modularity.
 :point_right: **[Download gregCore v1.0.0.7 on GitHub](https://github.com/mleem97/gregCore/releases/tag/v1.0.0.7)**
 
 Thank you for being part of this journey! — Your **teamGreg**
+

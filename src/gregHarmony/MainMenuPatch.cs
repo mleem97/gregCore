@@ -5,6 +5,7 @@ using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
+using greg.Core.UI;
 using greg.Core.UI.Components;
 
 namespace greg.Harmony;
@@ -35,19 +36,31 @@ public static class MainMenuController
     {
         MelonLogger.Msg("[MainMenu] Play clicked");
         Hide();
-        greg.Core.UI.UIRouter.SetMode(UIMode.Playing);
+        
+        if (GameUIButtons.ClickLoadButton())
+        {
+            MelonLogger.Msg("[MainMenu] Load button invoked via reflection");
+        }
+        else
+        {
+            GameMethodInvoker.Invoke(GameUIElements.Types.MainGameManager, "LoadGame");
+        }
+        
+        UIRouter.SetMode(UIMode.Playing);
     }
 
     private static void OnSettingsClicked()
     {
         MelonLogger.Msg("[MainMenu] Settings clicked");
-        greg.Core.UI.UIRouter.SetMode(UIMode.Settings);
+        UIRouter.SetMode(UIMode.Settings);
+        
+        GameUIButtons.ClickButton("PauseMenuCanvas/Pause menu -  Settings Scripts");
     }
 
     private static void OnModsClicked()
     {
         MelonLogger.Msg("[MainMenu] Mods clicked");
-        greg.Core.UI.gregModConfigManager.Toggle(true);
+        gregModConfigManager.Toggle(true);
     }
 
     private static void OnQuitClicked()
@@ -145,7 +158,7 @@ public static class MainMenuPatch
     {
         try
         {
-            greg.Core.UI.UIRouter.Initialize();
+            UIRouter.Initialize();
             MainMenuController.Initialize();
             MainMenuController.Show();
             MelonLogger.Msg("[gregCore] GregMainMenuReplacement initialized successfully.");

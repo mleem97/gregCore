@@ -77,6 +77,20 @@ public sealed class gregSdkLuaModule : iGregLuaModule
         });
 
         hud["hide_jade_box"] = (Action)(() => GregHudService.HideJadeBox());
+
+        // --- UI Hijack Service (v12) ---
+        var ui = new Table(vm);
+        sdk["ui"] = ui;
+
+        ui["hijack_canvas"] = (Action<string, bool>)((name, active) => {
+            var canvas = GameObject.FindObjectsOfType<Canvas>(true).FirstOrDefault(c => c.name == name);
+            if (canvas != null) canvas.gameObject.SetActive(active);
+        });
+
+        ui["create_modern_canvas"] = (Func<string, int, UserData>)((name, sorting) => {
+            var canvas = GregUiService.CreateCanvas(name, sorting);
+            return UserData.Create(canvas);
+        });
     }
 }
 

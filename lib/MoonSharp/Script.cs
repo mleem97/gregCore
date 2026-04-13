@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using MoonSharp.Interpreter.CoreLib;
 using MoonSharp.Interpreter.Debugging;
@@ -23,7 +25,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// The version of the MoonSharp engine
 		/// </summary>
-		public const string VERSION = "2.0.0.0";
+		public const string VERSION = "3.0.0.0";
 
 		/// <summary>
 		/// The Lua version being supported
@@ -85,7 +87,7 @@ namespace MoonSharp.Interpreter
 		public static ScriptOptions DefaultOptions { get; private set; }
 
 		/// <summary>
-		/// Gets access to the script options. 
+		/// Gets access to the script options.
 		/// </summary>
 		public ScriptOptions Options { get; private set; }
 
@@ -331,7 +333,6 @@ namespace MoonSharp.Interpreter
 			return Call(func);
 		}
 
-
 		/// <summary>
 		/// Loads and executes a stream containing a Lua/MoonSharp script.
 		/// </summary>
@@ -546,6 +547,29 @@ namespace MoonSharp.Interpreter
 		}
 
 		/// <summary>
+		/// Creates a new coroutine, recycling buffers from a dead coroutine to skip slower buffer creation in Mono.
+		/// </summary>
+		/// <param name="coroutine">The <see cref="Coroutine"/> to recycle. This coroutine's state must be <see cref="CoroutineState.Dead"/></param>
+		/// <param name="function">The function</param>
+		/// <returns>
+		/// The new coroutine handle.
+		/// </returns>
+		public DynValue RecycleCoroutine(Coroutine coroutine, DynValue function)
+		{
+			this.CheckScriptOwnership(coroutine);
+			this.CheckScriptOwnership(function);
+
+			if (coroutine == null || coroutine.Type != Coroutine.CoroutineType.Coroutine)
+				throw new InvalidOperationException("coroutine is not CoroutineType.Coroutine");
+			if (function == null || function.Type != DataType.Function)
+				throw new InvalidOperationException("function is not DataType.Function");
+			if (coroutine.State != CoroutineState.Dead)
+				throw new InvalidOperationException("coroutine's state must be CoroutineState.Dead to recycle");
+
+			return coroutine.Recycle(m_MainProcessor, function.Function);
+		}
+
+		/// <summary>
 		/// Creates a coroutine pointing at the specified function.
 		/// </summary>
 		/// <param name="function">The function.</param>
@@ -560,9 +584,7 @@ namespace MoonSharp.Interpreter
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the debugger is enabled.
-		/// Note that unless a debugger attached, this property returns a 
-		/// value which might not reflect the real status of the debugger.
-		/// Use this property if you want to disable the debugger for some 
+		/// Use this property if you want to disable the debugger for some
 		/// executions.
 		/// </summary>
 		public bool DebuggerEnabled
@@ -579,13 +601,30 @@ namespace MoonSharp.Interpreter
 		public void AttachDebugger(IDebugger debugger)
 		{
 			DebuggerEnabled = true;
-			m_Debugger = debugger;
-			m_MainProcessor.AttachDebugger(debugger);
 
-			foreach (SourceCode src in m_Sources)
-				SignalSourceCodeChange(src);
+			if (debugger != m_Debugger)
+			{
+				DetachDebugger();
 
-			SignalByteCodeChange();
+				m_Debugger = debugger;
+				m_MainProcessor.AttachDebugger(debugger);
+
+				foreach (SourceCode src in m_Sources)
+					SignalSourceCodeChange(src);
+
+				SignalByteCodeChange();
+			}
+		}
+
+		/// <summary>
+		/// Detach the attached debugger. This usually should be called by the debugger itself and not by user code.
+		/// </summary>
+		/// <param name="debugger">The debugger object.</param>
+		public void DetachDebugger()
+		{
+			DebuggerEnabled = false;
+			m_Debugger = null;
+			m_MainProcessor.DetachDebugger();
 		}
 
 		/// <summary>
@@ -708,17 +747,17 @@ namespace MoonSharp.Interpreter
 		/// those cases where the execution engine is not really running - for example for dynamic expression
 		/// or calls from CLR to CLR callbacks
 		/// </summary>
-		internal ScriptExecutionContext CreateDynamicExecutionContext(CallbackFunction func = null)
+		public ScriptExecutionContext CreateDynamicExecutionContext(CallbackFunction func = null, int stackFrameIndex = -1)
 		{
-			return new ScriptExecutionContext(m_MainProcessor, func, null, isDynamic: true);
+			return new ScriptExecutionContext(m_MainProcessor, func, null, true, stackFrameIndex);
 		}
 
 		/// <summary>
-		/// MoonSharp (like Lua itself) provides a registry, a predefined table that can be used by any CLR code to 
-		/// store whatever Lua values it needs to store. 
-		/// Any CLR code can store data into this table, but it should take care to choose keys 
-		/// that are different from those used by other libraries, to avoid collisions. 
-		/// Typically, you should use as key a string GUID, a string containing your library name, or a 
+		/// MoonSharp (like Lua itself) provides a registry, a predefined table that can be used by any CLR code to
+		/// store whatever Lua values it needs to store.
+		/// Any CLR code can store data into this table, but it should take care to choose keys
+		/// that are different from those used by other libraries, to avoid collisions.
+		/// Typically, you should use as key a string GUID, a string containing your library name, or a
 		/// userdata with the address of a CLR object in your code.
 		/// </summary>
 		public Table Registry

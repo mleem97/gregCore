@@ -9,9 +9,13 @@ namespace greg.Sdk;
 /// </summary>
 public static class gregEventDispatcher
 {
+    private const int MaxEmitDepth = 64;
+
     private static readonly object Sync = new();
     private static readonly Dictionary<string, List<Subscription>> Handlers = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, List<CancelableSubscription>> CancelableHandlers = new(StringComparer.Ordinal);
+    [ThreadStatic]
+    private static int _emitDepth;
 
     private sealed class Subscription
     {
@@ -82,28 +86,43 @@ public static class gregEventDispatcher
         if (string.IsNullOrWhiteSpace(hookName))
             return;
 
-        // Notify global monitor
-        greg.Core.Scripting.GregHookBus.NotifyAny(hookName, payload);
-
-        List<Subscription> snapshot;
-        lock (Sync)
+        if (_emitDepth >= MaxEmitDepth)
         {
-            if (!Handlers.TryGetValue(hookName, out var list) || list.Count == 0)
-                return;
-
-            snapshot = new List<Subscription>(list);
+            MelonLogger.Warning($"[gregCore] Emit depth limit reached ({MaxEmitDepth}) for '{hookName}'. Event dropped to prevent recursion overflow.");
+            return;
         }
 
-        foreach (var sub in snapshot)
+        _emitDepth++;
+
+        try
         {
-            try
+            // Notify global monitor
+            greg.Core.Scripting.GregHookBus.NotifyAny(hookName, payload);
+
+            List<Subscription> snapshot;
+            lock (Sync)
             {
-                sub.Handler?.Invoke(payload);
+                if (!Handlers.TryGetValue(hookName, out var list) || list.Count == 0)
+                    return;
+
+                snapshot = new List<Subscription>(list);
             }
-            catch (Exception ex)
+
+            foreach (var sub in snapshot)
             {
-                MelonLogger.Warning($"[gregCore] Handler for '{hookName}' threw: {ex.Message}");
+                try
+                {
+                    sub.Handler?.Invoke(payload);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[gregCore] Handler for '{hookName}' threw: {ex.Message}");
+                }
             }
+        }
+        finally
+        {
+            _emitDepth--;
         }
     }
 

@@ -506,6 +506,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 					var = v.Tuple.Length >= 3 ? v.Tuple[2] : DynValue.Nil;
 
 					m_ValueStack.Push(DynValue.NewTuple(f, s, var));
+					return;
 				}
 				else if (f.Type == DataType.Table)
 				{
@@ -514,6 +515,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 					if (callmeta == null || callmeta.IsNil())
 					{
 						m_ValueStack.Push(EnumerableWrapper.ConvertTable(f.Table));
+						return;
 					}
 				}
 			}
@@ -703,7 +705,10 @@ namespace MoonSharp.Interpreter.Execution.VM
 				IList<DynValue> args = CreateArgsListForFunctionCall(argsCount, 0);
 				// we expand tuples before callbacks
 				// args = DynValue.ExpandArgumentsToList(args);
-				SourceRef sref = GetCurrentSourceRef(instructionPtr);
+
+				// instructionPtr - 1: instructionPtr already points to the next instruction at this moment
+				// but we need the current instruction here
+				SourceRef sref = GetCurrentSourceRef(instructionPtr - 1);
 
 				m_ExecutionStack.Push(new CallStackItem()
 				{
@@ -717,9 +722,17 @@ namespace MoonSharp.Interpreter.Execution.VM
 					Flags = flags,
 				});
 
-				var ret = fn.Callback.Invoke(new ScriptExecutionContext(this, fn.Callback, sref), args, isMethodCall: thisCall);
-				m_ValueStack.RemoveLast(argsCount + 1);
-				m_ValueStack.Push(ret);
+				try
+				{
+					var ret = fn.Callback.Invoke(new ScriptExecutionContext(this, fn.Callback, sref), args,
+						isMethodCall: thisCall);
+					m_ValueStack.RemoveLast(argsCount + 1);
+					m_ValueStack.Push(ret);
+				}
+				catch (Exception e)
+				{
+					throw e;
+				}
 
 				m_ExecutionStack.Pop();
 
@@ -733,7 +746,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 					BasePointer = m_ValueStack.Count,
 					ReturnAddress = instructionPtr,
 					Debug_EntryPoint = fn.Function.EntryPointByteCodeLocation,
-					CallingSourceRef = GetCurrentSourceRef(instructionPtr),
+					CallingSourceRef = GetCurrentSourceRef(instructionPtr - 1), // See right above in GetCurrentSourceRef(instructionPtr - 1)
 					ClosureScope = fn.Function.ClosureContext,
 					ErrorHandler = handler,
 					Continuation = continuation,

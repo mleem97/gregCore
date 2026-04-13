@@ -52,11 +52,7 @@ namespace MoonSharp.Interpreter.Interop
 		/// </summary>
 		public static string GetClrVisibility(this Type type)
 		{
-#if NETFX_CORE
-			var t = type.GetTypeInfo();
-#else
 			Type t = type;
-#endif
 			if (t.IsPublic || t.IsNestedPublic)
 				return "public";
 			if ((t.IsNotPublic && (!t.IsNested)) || (t.IsNestedAssembly))

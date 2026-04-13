@@ -129,12 +129,10 @@ public class gregCoreLoader : MelonMod
     private bool _diagnosticDisablePatches;
     private bool _diagnosticDisableBridges;
 
-#if DEBUG
     private readonly Il2CppEventCatalogService _il2CppEventCatalog = new Il2CppEventCatalogService();
     private readonly Il2CppGameplayIndexService _il2CppGameplayIndex = new Il2CppGameplayIndexService();
     private readonly RuntimeHookService _runtimeHookService = new RuntimeHookService();
     private readonly GameSignalSnapshotService _gameSignalSnapshot = new GameSignalSnapshotService();
-#endif
 
     public override void OnInitializeMelon()
     {
@@ -148,6 +146,9 @@ public class gregCoreLoader : MelonMod
             CrashLog.Log("step: CrashLog initialized");
             gregModActivationService.Initialize(LoggerInstance);
             CrashLog.Log("step: gregModActivationService initialized");
+
+            greg.Sdk.Services.GregSaveService.Init();
+            CrashLog.Log("step: GregSaveService initialized");
 
             GregUiReplacementManager.Instance.LoadFromConfig();
             CrashLog.Log("step: GregUiReplacementManager initialized");
@@ -233,7 +234,6 @@ public class gregCoreLoader : MelonMod
             LoggerInstance.Msg("API: Access game systems via gregApi (Player, Network, Time, Localisation, UI, World)");
             ModFramework.Events.Publish(new ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
 
-#if DEBUG
             try
             {
                 string diagnosticsDir = Path.Combine(MelonEnvironment.GameRootDirectory, "gregCore", "Diagnostics");
@@ -249,7 +249,7 @@ public class gregCoreLoader : MelonMod
                 LoggerInstance.Warning($"gregCore: IL2CPP diagnostics snapshot failed: {ex.Message}");
                 CrashLog.LogException("Il2CppDiagnostics", ex);
             }
-#endif
+
             CrashLog.Log("step: OnInitializeMelon complete");
         }
         catch (Exception ex)
@@ -317,8 +317,11 @@ public class gregCoreLoader : MelonMod
     private void HandleModConfigHotkey()
     {
         var keyboard = Keyboard.current;
-        if (keyboard != null && keyboard.f6Key.wasPressedThisFrame)
+        if (keyboard == null) return;
+
+        if (keyboard.f6Key.wasPressedThisFrame)
         {
+            LoggerInstance.Msg("[gregCore] F6 pressed. Toggling Mod Config UI...");
             gregModConfigManager.Toggle(!gregModConfigManager.IsOpen);
         }
     }

@@ -499,9 +499,7 @@ namespace MoonSharp.Interpreter
 				if (m_Object is UserData)
 				{
 					UserData ud = (UserData)m_Object;
-					string str = ud.Descriptor.AsString(ud.Object);
-					if (str != null)
-						return str;
+					return ud.Descriptor.Name;
 				}
 
 				return refid.FormatTypeString(typeString);
@@ -874,7 +872,12 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public T ToObject<T>()
 		{
-			return (T)ToObject(typeof(T));
+			T myObject = (T)ToObject(typeof(T));
+			if (myObject == null) {
+				return default(T);
+			}
+
+			return myObject;
 		}
 
 #if HASDYNAMIC

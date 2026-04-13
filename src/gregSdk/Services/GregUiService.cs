@@ -124,6 +124,16 @@ public static class GregUiService
         return hlg;
     }
 
+    public static void AddSeparator(Transform parent)
+    {
+        var go = new GameObject("Separator");
+        go.transform.SetParent(parent, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(0, 2);
+        var img = go.AddComponent<Image>();
+        img.color = new Color(0.38f, 0.96f, 0.85f, 0.2f);
+    }
+
     public static void TakeoverVanillaUi(GameObject vanillaRoot)
     {
         if (vanillaRoot == null) return;

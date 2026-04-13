@@ -32,6 +32,9 @@ public static class GregHookBus
     /// For now, we'll implement a simple callback mechanism.
     /// </summary>
     private static Action<string, object> _onAny;
+    [ThreadStatic]
+    private static bool _isNotifyingAny;
+
     public static void OnAny(Action<string, object> handler)
     {
         _onAny += handler;
@@ -42,6 +45,32 @@ public static class GregHookBus
     /// </summary>
     internal static void NotifyAny(string hookName, object payload)
     {
-        _onAny?.Invoke(hookName, payload);
+        if (_isNotifyingAny)
+            return;
+
+        var handlers = _onAny;
+        if (handlers == null)
+            return;
+
+        _isNotifyingAny = true;
+        try
+        {
+            foreach (Delegate handler in handlers.GetInvocationList())
+            {
+                try
+                {
+                    ((Action<string, object>)handler).Invoke(hookName, payload);
+                }
+                catch (Exception ex)
+                {
+                    MelonLoader.MelonLogger.Warning($"[gregCore] OnAny handler '{handler.Method.DeclaringType?.Name}.{handler.Method.Name}' threw and was removed: {ex.Message}");
+                    _onAny -= (Action<string, object>)handler;
+                }
+            }
+        }
+        finally
+        {
+            _isNotifyingAny = false;
+        }
     }
 }

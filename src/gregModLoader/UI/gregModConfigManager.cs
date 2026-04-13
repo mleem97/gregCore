@@ -21,13 +21,9 @@ public static class gregModConfigManager
         if (_root == null) return;
 
         _root.SetActive(open);
+        GregUiFocusManager.RequestFocus(open);
         
-        if (open)
-        {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else
+        if (!open)
         {
             GregConfigService.Save();
         }
@@ -50,6 +46,7 @@ public static class gregModConfigManager
             GregUiService.AddHorizontalLayout(tabBar, 20);
 
             GregUiService.CreateModernButton(tabBar.transform, "TabMods", "MODS", () => ShowTab("MODS"));
+            GregUiService.CreateModernButton(tabBar.transform, "TabMaintenance", "MAINTENANCE", () => ShowTab("MAINTENANCE"));
             GregUiService.CreateModernButton(tabBar.transform, "TabUI", "UI TAKEOVER", () => ShowTab("UI"));
 
             // 2. Scroll Area
@@ -111,6 +108,39 @@ public static class gregModConfigManager
             GregUiService.CreateModernButton(_contentRoot, "HideHUD", "HIDE MAIN HUD", () => {
                 GregUiService.TakeoverVanillaUi(GameObject.Find("MainHUD"));
             });
+        }
+        else if (tabId == "MAINTENANCE")
+        {
+            AddSettingHeader("Network Maintenance");
+            var switches = GregNetworkMaintenanceService.GetAllInstalledSwitches();
+            
+            int brokenCount = 0;
+            foreach (var s in switches) if (s.IsBroken || !s.HasPhysicalFlow) brokenCount++;
+
+            GregUiService.CreateModernButton(_contentRoot, "ResetAll", $"RESET ALL BROKEN ({brokenCount})", () => {
+                GregNetworkMaintenanceService.ResetAllBrokenSwitches();
+                ShowTab("MAINTENANCE");
+            });
+
+            GregUiService.AddSeparator(_contentRoot);
+
+            foreach (var sw in switches)
+            {
+                string statusColor = sw.IsBroken ? "red" : (sw.HasPhysicalFlow ? "#61F4D8" : "orange");
+                string statusText = sw.IsBroken ? "BROKEN" : (sw.HasPhysicalFlow ? "FLOWING" : "NO FLOW");
+                
+                var row = GregUiService.CreateModernPanel(_contentRoot, $"Switch_{sw.Id}", new Vector2(800, 40));
+                row.GetComponent<Image>().color = new Color(0, 0, 0, 0.2f);
+                GregUiService.AddHorizontalLayout(row, 10);
+
+                GregUiService.CreateLabel(row.transform, "Name", sw.Label, 14);
+                GregUiService.CreateLabel(row.transform, "Status", $"<color={statusColor}>{statusText}</color>", 12);
+                
+                GregUiService.CreateModernButton(row.transform, "Reset", "FACTORY RESET", () => {
+                    GregNetworkMaintenanceService.FactoryReset(sw.NativeInstance);
+                    ShowTab("MAINTENANCE");
+                });
+            }
         }
     }
 

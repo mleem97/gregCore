@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using MoonSharp.Interpreter.Compatibility;
 
 namespace MoonSharp.Interpreter.Interop.Converters
@@ -141,9 +142,14 @@ namespace MoonSharp.Interpreter.Interop.Converters
 						return NumericConversions.DoubleToType(underType, value.Number);
 					}
 					if (NumericConversions.NumericTypes.Contains(desiredType))
-						return NumericConversions.DoubleToType(desiredType, value.Number);
+					{
+						object d = NumericConversions.DoubleToType(desiredType, value.Number);
+						if (d.GetType() == desiredType)
+							return d;
+						break;
+					}
 					if (stringSubType != StringConversions.StringSubtype.None)
-						str = value.Number.ToString();
+						str = value.Number.ToString(CultureInfo.InvariantCulture);
 					break;
 				case DataType.String:
 					if (stringSubType != StringConversions.StringSubtype.None)
@@ -211,7 +217,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 				return WEIGHT_EXACT_MATCH;
 
 			StringConversions.StringSubtype stringSubType = StringConversions.GetStringSubtype(desiredType);
-			
+
 			Type nt = Nullable.GetUnderlyingType(desiredType);
 			Type nullableType = null;
 

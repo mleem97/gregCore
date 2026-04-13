@@ -1,4 +1,5 @@
 using System;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
@@ -565,6 +566,33 @@ public static class gregGameHooks
             if (sw == null) return 0;
 
             return sw.IsVlanAllowedOnPort(portIndex, vlanId) ? 1 : 0;
+        }
+        catch { return 0; }
+    }
+
+    public static Il2CppSystem.Collections.Generic.Dictionary<int, Il2CppSystem.Collections.Generic.List<int>> GetDisallowedVlansPerPort(NetworkSwitch sw)
+    {
+        try
+        {
+            if (sw == null) return null;
+            return Traverse.Create(sw).Field("disallowedVlansPerPort").GetValue<Il2CppSystem.Collections.Generic.Dictionary<int, Il2CppSystem.Collections.Generic.List<int>>>();
+        }
+        catch { return null; }
+    }
+
+    public static int ClearDisallowedVlansPerPort(NetworkSwitch sw)
+    {
+        try
+        {
+            if (sw == null) return 0;
+            var dict = GetDisallowedVlansPerPort(sw);
+            if (dict != null)
+            {
+                int count = dict.Count;
+                dict.Clear();
+                return count;
+            }
+            return 0;
         }
         catch { return 0; }
     }

@@ -48,6 +48,7 @@ namespace MoonSharp.Interpreter
 			RegisterType<AnonWrapper>(InteropAccessMode.HideMembers);
 			RegisterType<EnumerableWrapper>(InteropAccessMode.NoReflectionAllowed);
 			RegisterType<JsonNull>(InteropAccessMode.Reflection);
+			RegisterType<JsonEmptyArray>(InteropAccessMode.Reflection);
 
 			DefaultAccessMode = InteropAccessMode.LazyOptimized;
 		}
@@ -144,11 +145,7 @@ namespace MoonSharp.Interpreter
 		{
 			if (asm == null)
 			{
-				#if NETFX_CORE || DOTNET_CORE
-					throw new NotSupportedException("Assembly.GetCallingAssembly is not supported on target framework.");
-				#else
-					asm = Assembly.GetCallingAssembly();
-				#endif
+				asm = Assembly.GetCallingAssembly();
 			}
 
 			TypeDescriptorRegistry.RegisterAssembly(asm, includeExtensionTypes);
@@ -179,7 +176,7 @@ namespace MoonSharp.Interpreter
 		}
 
 		/// <summary>
-		/// Unregisters a type. 
+		/// Unregisters a type.
 		/// WARNING: unregistering types at runtime is a dangerous practice and may cause unwanted errors.
 		/// Use this only for testing purposes or to re-register the same type in a slightly different way.
 		/// Additionally, it's a good practice to discard all previous loaded scripts after calling this method.
@@ -395,7 +392,7 @@ namespace MoonSharp.Interpreter
 			return registeredTypesPairs.Select(p => p.Value.Type);
 		}
 
-		
+
 
 	}
 }

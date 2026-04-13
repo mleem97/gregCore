@@ -35,6 +35,17 @@ namespace MoonSharp.Interpreter.Execution.VM
 			debugger.SetDebugService(new DebugService(m_Script, this));
 		}
 
+		internal void DetachDebugger()
+		{
+			if (m_Debug.DebuggerAttached != null)
+			{
+				m_Debug.DebuggerAttached.SetDebugService(null);
+				m_Debug.DebuggerAttached = null;
+			}
+
+			m_Debug.LineBasedBreakPoints = false;
+		}
+
 		internal bool DebuggerEnabled
 		{
 			get { return m_Debug.DebuggerEnabled; }
@@ -65,7 +76,8 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 
 			if (m_Debug.DebuggerAttached.IsPauseRequested() ||
-				(instr.SourceCodeRef != null && instr.SourceCodeRef.Breakpoint && isOnDifferentRef))
+				(instr.SourceCodeRef != null && instr.SourceCodeRef.Breakpoint && isOnDifferentRef && (
+					instr.SourceCodeRef.BreakpointCondition == null || instr.SourceCodeRef.BreakpointCondition.Evaluate().Boolean)))
 			{
 				m_Debug.DebuggerCurrentAction = DebuggerAction.ActionType.None;
 				m_Debug.DebuggerCurrentActionTarget = -1;
@@ -144,6 +156,15 @@ namespace MoonSharp.Interpreter.Execution.VM
 					case DebuggerAction.ActionType.HardRefresh:
 						RefreshDebugger(true, instructionPtr);
 						break;
+					case DebuggerAction.ActionType.ViewFrame:
+						var callStack = Debugger_GetCallStack(instr.SourceCodeRef);
+
+						if (action.StackFrame >= 0 && action.StackFrame < callStack.Count)
+						{
+							RefreshDebugger(false, instructionPtr, action.StackFrame);
+						}
+
+						break;
 					case DebuggerAction.ActionType.None:
 					default:
 						break;
@@ -154,22 +175,38 @@ namespace MoonSharp.Interpreter.Execution.VM
 		private void ResetBreakPoints(DebuggerAction action)
 		{
 			SourceCode src = m_Script.GetSourceCode(action.SourceID);
-			ResetBreakPoints(src, new HashSet<int>(action.Lines));
+
+			var breakpointLines = new Dictionary<int, DynamicExpression>();
+
+			foreach (var line in action.Lines)
+			{
+				breakpointLines.Add(line, null);
+			}
+
+			ResetBreakPoints(src, breakpointLines);
 		}
 
-		internal HashSet<int> ResetBreakPoints(SourceCode src, HashSet<int> lines)
+		internal Dictionary<int, DynamicExpression> ResetBreakPoints(SourceCode src, Dictionary<int, DynamicExpression> lineBreakpoints)
 		{
-			HashSet<int> result = new HashSet<int>();
+			var result = new Dictionary<int, DynamicExpression>();
 
 			foreach (SourceRef srf in src.Refs)
 			{
 				if (srf.CannotBreakpoint)
 					continue;
 
-				srf.Breakpoint = lines.Contains(srf.FromLine);
+				if (lineBreakpoints.TryGetValue(srf.FromLine, out var condition))
+				{
+					srf.Breakpoint = true;
+					srf.BreakpointCondition = condition;
 
-				if (srf.Breakpoint)
-					result.Add(srf.FromLine);
+					result.Add(srf.FromLine, condition);
+				}
+				else
+				{
+					srf.Breakpoint = false;
+					srf.BreakpointCondition = null;
+				}
 			}
 
 			return result;
@@ -253,8 +290,13 @@ namespace MoonSharp.Interpreter.Execution.VM
 				return true;
 		}
 
-		private void RefreshDebugger(bool hard, int instructionPtr)
+		private void RefreshDebugger(bool hard, int instructionPtr, int stackFrameIndex = -1)
 		{
+			if (stackFrameIndex < 0)
+			{
+				stackFrameIndex = 0;
+			}
+
 			SourceRef sref = GetCurrentSourceRef(instructionPtr);
 			ScriptExecutionContext context = new ScriptExecutionContext(this, null, sref);
 
@@ -262,14 +304,16 @@ namespace MoonSharp.Interpreter.Execution.VM
 			List<WatchItem> callStack = Debugger_GetCallStack(sref);
 			List<WatchItem> watches = Debugger_RefreshWatches(context, watchList);
 			List<WatchItem> vstack = Debugger_RefreshVStack();
-			List<WatchItem> locals = Debugger_RefreshLocals(context);
+			List<WatchItem> locals = Debugger_RefreshLocals(stackFrameIndex);
+			List<WatchItem> closure = Debugger_RefreshClosure(stackFrameIndex);
 			List<WatchItem> threads = Debugger_RefreshThreads(context);
 
-			m_Debug.DebuggerAttached.Update(WatchType.CallStack, callStack);
-			m_Debug.DebuggerAttached.Update(WatchType.Watches, watches);
-			m_Debug.DebuggerAttached.Update(WatchType.VStack, vstack);
-			m_Debug.DebuggerAttached.Update(WatchType.Locals, locals);
-			m_Debug.DebuggerAttached.Update(WatchType.Threads, threads);
+			m_Debug.DebuggerAttached.Update(WatchType.CallStack, callStack, -1);
+			m_Debug.DebuggerAttached.Update(WatchType.Watches, watches, -1);
+			m_Debug.DebuggerAttached.Update(WatchType.VStack, vstack, -1);
+			m_Debug.DebuggerAttached.Update(WatchType.Locals, locals, stackFrameIndex);
+			m_Debug.DebuggerAttached.Update(WatchType.Closure, closure, stackFrameIndex);
+			m_Debug.DebuggerAttached.Update(WatchType.Threads, threads, -1);
 
 			if (hard)
 				m_Debug.DebuggerAttached.RefreshBreakpoints(m_Debug.BreakPoints);
@@ -306,28 +350,55 @@ namespace MoonSharp.Interpreter.Execution.VM
 			return watchList.Select(w => Debugger_RefreshWatch(context, w)).ToList();
 		}
 
-		private List<WatchItem> Debugger_RefreshLocals(ScriptExecutionContext context)
+		private List<WatchItem> Debugger_RefreshLocals(int stackFrameIndex)
 		{
 			List<WatchItem> locals = new List<WatchItem>();
-			var top = this.m_ExecutionStack.Peek();
+			var frame = m_ExecutionStack.Peek(stackFrameIndex);
 
-			if (top != null && top.Debug_Symbols != null && top.LocalScope != null)
+			if (frame != null && frame.Debug_Symbols != null && frame.LocalScope != null)
 			{
-				int len = Math.Min(top.Debug_Symbols.Length, top.LocalScope.Length);
+				int len = Math.Min(frame.Debug_Symbols.Length, frame.LocalScope.Length);
 
 				for (int i = 0; i < len; i++)
 				{
 					locals.Add(new WatchItem()
 					{
 						IsError = false,
-						LValue = top.Debug_Symbols[i],
-						Value = top.LocalScope[i],
-						Name = top.Debug_Symbols[i].i_Name
+						LValue = frame.Debug_Symbols[i],
+						Value = frame.LocalScope[i],
+						Name = frame.Debug_Symbols[i].i_Name
 					});
 				}
 			}
 
 			return locals;
+		}
+
+		private List<WatchItem> Debugger_RefreshClosure(int stackFrameIndex)
+		{
+			List<WatchItem> variables = new List<WatchItem>();
+			var frame = m_ExecutionStack.Peek(stackFrameIndex);
+
+			var closure = frame?.ClosureScope;
+
+			if (closure != null)
+			{
+				for (int i = 0; i < closure.Symbols.Length; i++)
+				{
+					var name = closure.Symbols[i];
+					var symbolRef = SymbolRef.Upvalue(closure.Symbols[i], i);
+
+					variables.Add(new WatchItem()
+					{
+						IsError = false,
+						LValue = symbolRef,
+						Value = frame.ClosureScope[i],
+						Name = name
+					});
+				}
+			}
+
+			return variables;
 		}
 
 		private WatchItem Debugger_RefreshWatch(ScriptExecutionContext context, DynamicExpression dynExpr)

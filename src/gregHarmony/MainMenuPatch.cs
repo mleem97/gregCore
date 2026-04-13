@@ -41,6 +41,13 @@ public static class MainMenuPatch
             InjectModsButton(settingsBtn);
             StyleMenuButtons(settingsBtn.transform.parent);
             InjectVersionDisplay(settingsBtn.transform.root);
+            
+            // Enhance Background
+            if (menu != null && menu.middleBackground != null)
+            {
+                var img = menu.middleBackground.GetComponent<Image>();
+                if (img != null) img.color = new Color(0.00f, 0.07f, 0.06f, 0.95f);
+            }
         }
         else
         {
@@ -48,20 +55,25 @@ public static class MainMenuPatch
         }
     }
 
+    private static System.Action _modsButtonAction;
+
     public static void StyleMenuButtons(Transform buttonContainer)
     {
         if (buttonContainer == null) return;
 
-        foreach (Transform child in buttonContainer)
+        for (int i = 0; i < buttonContainer.childCount; i++)
         {
+            Transform child = buttonContainer.GetChild(i);
+            if (child == null) continue;
+
             var btn = child.GetComponent<Button>();
             if (btn == null && child.GetComponent<ButtonExtended>() == null) continue;
 
             var img = child.GetComponent<Image>();
-            if (img != null) img.color = new Color(0.00f, 0.07f, 0.06f, 0.85f);
+            if (img != null) img.color = new Color(0.00f, 0.12f, 0.11f, 0.90f);
 
             var text = child.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null) text.color = new Color(0.38f, 0.96f, 0.85f, 1f);
+            if (text != null) text.color = Color.white;
         }
     }
 
@@ -79,7 +91,7 @@ public static class MainMenuPatch
             rect.anchorMax = new Vector2(0, 0);
             rect.pivot = new Vector2(0, 0);
             rect.anchoredPosition = new Vector2(10, 10);
-            rect.sizeDelta = new Vector2(300, 30);
+            rect.sizeDelta = new Vector2(400, 30);
 
             var text = versionGo.AddComponent<TextMeshProUGUI>();
             text.text = $"gregCore v{greg.Core.gregReleaseVersion.Current} <color=#1CEDE1>[teamGreg]</color>";
@@ -110,16 +122,20 @@ public static class MainMenuPatch
                 button.onClick = new Button.ButtonClickedEvent(); 
                 button.onClick.RemoveAllListeners();
                 
-                // Add OUR listener
-                button.onClick.AddListener((System.Action)(() => {
-                    MelonLoader.MelonLogger.Msg("[gregCore] Opening Mod Configuration...");
-                    gregModConfigManager.Toggle(true);
-                }));
+                // Keep static reference to prevent GC issues in IL2CPP
+                if (_modsButtonAction == null)
+                {
+                    _modsButtonAction = new System.Action(() => {
+                        MelonLoader.MelonLogger.Msg("[gregCore] Opening Mod Configuration...");
+                        gregModConfigManager.Toggle(true);
+                    });
+                }
+                button.onClick.AddListener(_modsButtonAction);
             }
 
             // Styling: Luminescent Architect
             var img = modsButtonGo.GetComponent<Image>();
-            if (img != null) img.color = new Color(0.00f, 0.07f, 0.06f, 0.85f);
+            if (img != null) img.color = new Color(0.00f, 0.12f, 0.11f, 0.90f);
 
             var textComp = modsButtonGo.GetComponentInChildren<TextMeshProUGUI>();
             if (textComp != null) {

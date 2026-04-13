@@ -108,15 +108,28 @@ public struct GameAPITable
     public IntPtr HudHideJadeBox;
     public IntPtr GetTargetInfo;
     public IntPtr GetMetadata;
+
+    // v12 — UI Hijack (Master Prompt Architecture)
+    public IntPtr UiHijackCanvas;
+    public IntPtr UiCreateModernCanvas;
+    public IntPtr UiSetRectAnchors;
 }
 
 // manages the api table, delegates stored as fields to prevent GC
 public class gregGameApiManager : IDisposable
 {
-    public const uint API_VERSION = 11;
+    public const uint API_VERSION = 12;
 
     private IntPtr _tablePtr;
     private GameAPITable _table;
+
+    // ... (existing delegates)
+
+    // v12 delegates
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void UiHijackCanvasDelegate(IntPtr canvasName, uint active);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate IntPtr UiCreateModernCanvasDelegate(IntPtr name, int sortingOrder);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void UiSetRectAnchorsDelegate(IntPtr transformPtr, float xMin, float yMin, float xMax, float yMax);
+
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void LogDelegate(IntPtr message);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate double GetDoubleDelegate();
@@ -382,6 +395,11 @@ public class gregGameApiManager : IDisposable
         _getTargetInfo = GetTargetInfoImpl;
         _getMetadata = GetMetadataImpl;
 
+        // v12
+        _uiHijackCanvas = UiHijackCanvasImpl;
+        _uiCreateModernCanvas = UiCreateModernCanvasImpl;
+        _uiSetRectAnchors = UiSetRectAnchorsImpl;
+
         _table = new GameAPITable
         {
             ApiVersion = API_VERSION,
@@ -466,19 +484,54 @@ public class gregGameApiManager : IDisposable
             SetVlanDisallowed = Marshal.GetFunctionPointerForDelegate(_setVlanDisallowed),
             IsVlanAllowed = Marshal.GetFunctionPointerForDelegate(_isVlanAllowed),
 
-            // v10
-            // RaycastForwardV2 = Marshal.GetFunctionPointerForDelegate(_raycastForwardV2),
-            
             // v11
             HudUpdateJadeBox = Marshal.GetFunctionPointerForDelegate(_hudUpdateJadeBox),
             HudHideJadeBox = Marshal.GetFunctionPointerForDelegate(_hudHideJadeBox),
             GetTargetInfo = Marshal.GetFunctionPointerForDelegate(_getTargetInfo),
             GetMetadata = Marshal.GetFunctionPointerForDelegate(_getMetadata),
+
+            // v12
+            UiHijackCanvas = Marshal.GetFunctionPointerForDelegate(_uiHijackCanvas),
+            UiCreateModernCanvas = Marshal.GetFunctionPointerForDelegate(_uiCreateModernCanvas),
+            UiSetRectAnchors = Marshal.GetFunctionPointerForDelegate(_uiSetRectAnchors),
         };
 
         _tablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GameAPITable>());
         Marshal.StructureToPtr(_table, _tablePtr, false);
     }
+
+    // v12 Implementations
+    private void UiHijackCanvasImpl(IntPtr namePtr, uint active)
+    {
+        try {
+            string name = Marshal.PtrToStringAnsi(namePtr);
+            var canvas = GameObject.FindObjectsOfType<Canvas>(true).FirstOrDefault(c => c.name == name);
+            if (canvas != null) canvas.gameObject.SetActive(active != 0);
+        } catch {}
+    }
+
+    private IntPtr UiCreateModernCanvasImpl(IntPtr namePtr, int sortingOrder)
+    {
+        try {
+            string name = Marshal.PtrToStringAnsi(namePtr);
+            var canvas = global::greg.Sdk.Services.GregUiService.CreateCanvas(name, sortingOrder);
+            return canvas.transform.Pointer; 
+        } catch { return IntPtr.Zero; }
+    }
+
+    private void UiSetRectAnchorsImpl(IntPtr transformPtr, float xMin, float yMin, float xMax, float yMax)
+    {
+        try {
+            var rt = new RectTransform(transformPtr);
+            rt.anchorMin = new Vector2(xMin, yMin);
+            rt.anchorMax = new Vector2(xMax, yMax);
+        } catch {}
+    }
+
+    private readonly UiHijackCanvasDelegate _uiHijackCanvas;
+    private readonly UiCreateModernCanvasDelegate _uiCreateModernCanvas;
+    private readonly UiSetRectAnchorsDelegate _uiSetRectAnchors;
+
 
     public IntPtr GetTablePointer() => _tablePtr;
 

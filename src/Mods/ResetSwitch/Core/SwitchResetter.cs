@@ -169,8 +169,8 @@ public static class SwitchResetter
     {
         try
         {
-            MelonLogger.Msg($"[Reset] Calling greg.Mods.ResetSwitchService.FactoryResetSwitch() on {sw.switchId}");
-            greg.Mods.ResetSwitchService.FactoryResetSwitch(sw);
+            MelonLogger.Msg($"[Reset] Calling greg.Sdk.Services.GregResetSwitchService.FactoryResetSwitch() on {sw.switchId}");
+            greg.Sdk.Services.GregResetSwitchService.FactoryResetSwitch(sw);
             return true;
         }
         catch (Exception ex)

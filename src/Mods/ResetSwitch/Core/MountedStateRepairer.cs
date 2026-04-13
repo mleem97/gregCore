@@ -168,7 +168,7 @@ public static class MountedStateRepairer
         {
             MelonLogger.Msg($"[MountedRepairer] === REPAIR START: {sw.switchId} ({label}) ===");
 
-            if (greg.Mods.ResetSwitchService.RepairMountedState(sw) && sw.isOn)
+            if (greg.Sdk.Services.GregResetSwitchService.RepairMountedState(sw) && sw.isOn)
             {
                 reason = "repaired";
                 MelonLogger.Msg($"[MountedRepairer] === REPAIR RESULT: {sw.switchId} → FIXED ===");

@@ -7,6 +7,8 @@ using UnityEngine;
 using Il2Cpp;
 using MelonLoader;
 using greg.Mods.ResetSwitch.Integration;
+using greg.Sdk.Services;
+
 
 namespace greg.Mods.ResetSwitch.Core;
 
@@ -33,7 +35,7 @@ public static class SwitchScanner
     {
         MelonLogger.Msg("[SwitchScanner] Starting scan (label-mode, no hierarchy walk)...");
         var result = new List<SwitchInfo>();
-        var scanItems = greg.Mods.ResetSwitchService.ScanAllSwitches();
+        var scanItems = GregResetSwitchService.ScanAllSwitches();
         var switches = new List<NetworkSwitch>();
         foreach (var item in scanItems)
         {

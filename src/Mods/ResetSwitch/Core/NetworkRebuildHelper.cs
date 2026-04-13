@@ -6,6 +6,6 @@ public static class NetworkRebuildHelper
 {
     public static void ForceRebuild(string reason)
     {
-        greg.Mods.ResetSwitchService.ForceNetworkRebuild(reason);
+        greg.Sdk.Services.GregResetSwitchService.ForceNetworkRebuild(reason);
     }
 }

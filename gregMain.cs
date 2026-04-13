@@ -8,6 +8,8 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using greg.Diagnostic;
+
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
 [assembly: MelonInfo(typeof(gregAssetExporter.gregMain), "gregCore Framework", greg.Core.gregReleaseVersion.Current, "MLeeM97")]

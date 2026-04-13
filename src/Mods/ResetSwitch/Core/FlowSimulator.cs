@@ -16,12 +16,12 @@ public static class FlowSimulator
     /// </summary>
     public static bool HasPathToService(string startSwitchId)
     {
-        return greg.Mods.ResetSwitchService.HasPathToService(startSwitchId);
+        return greg.Sdk.Services.GregResetSwitchService.HasPathToService(startSwitchId);
     }
 
     public static DeepFlowStatus Evaluate(NetworkSwitch sw)
     {
-        return greg.Mods.ResetSwitchService.EvaluateDeepStatus(sw) switch
+        return greg.Sdk.Services.GregResetSwitchService.EvaluateDeepStatus(sw) switch
         {
             GregDeepFlowStatus.Active => DeepFlowStatus.Active,
             GregDeepFlowStatus.Idle => DeepFlowStatus.Idle,

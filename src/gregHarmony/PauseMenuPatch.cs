@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using greg.Core.UI;
 
-namespace greg.Harmony;
+namespace gregCoreSDK.Harmony;
 
 [HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.OnEnable))]
 public static class PauseMenuPatch

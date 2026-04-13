@@ -1,7 +1,7 @@
 using System.IO;
 using MelonLoader.Utils;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 /// <summary>
 /// Canonical paths under the game root and MelonLoader <see cref="MelonEnvironment.UserDataDirectory"/>.

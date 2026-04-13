@@ -4,7 +4,7 @@ using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 /// <summary>
 /// Consolidated Modig API layer providing safe, documented access to gregCoreLoader game systems.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace greg.Core.UI.Components;
+namespace gregCoreSDK.Core.UI.Components;
 
 /// <summary>
 /// A base panel component using gregUI theme.
@@ -22,6 +22,7 @@ public class GregPanel : IGregUIElement
     private bool _isVisible = false;
 
     public bool IsVisible => _isVisible;
+    public GameObject PanelRoot => _panelGO;
 
     public void Attach(Canvas rootCanvas)
     {

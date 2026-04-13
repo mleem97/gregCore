@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MelonLoader;
 using UnityEngine;
 
-namespace greg.Core.UI;
+namespace gregCoreSDK.Core.UI;
 
 /// <summary>
 /// Central registry for all gregUI elements.

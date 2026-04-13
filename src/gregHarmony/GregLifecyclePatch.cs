@@ -2,7 +2,7 @@ using HarmonyLib;
 using greg.Sdk;
 using Il2Cpp;
 
-namespace greg.Harmony;
+namespace gregCoreSDK.Harmony;
 
 [HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.OnLoad))]
 public static class GregLifecyclePatch

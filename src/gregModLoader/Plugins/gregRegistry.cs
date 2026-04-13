@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MelonLoader;
 
-namespace greg.Core.Plugins;
+namespace gregCoreSDK.Core.Plugins;
 
 /// <summary>
 /// Central runtime registry for standalone gregCore plugins.

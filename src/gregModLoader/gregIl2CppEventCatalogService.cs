@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace greg.Exporter
+namespace gregCoreSDK.Exporter
 {
     public sealed class Il2CppEventCatalogService
     {

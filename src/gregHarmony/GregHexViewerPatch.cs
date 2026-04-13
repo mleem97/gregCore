@@ -6,7 +6,7 @@ using greg.Sdk;
 using greg.Core;
 using Il2Cpp;
 
-namespace greg.Harmony;
+namespace gregCoreSDK.Harmony;
 
 [HarmonyPatch(typeof(Interact), nameof(Interact.OnHoverOver))]
 public static class GregHexViewerPatch

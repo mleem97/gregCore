@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace greg.Core.UI;
+namespace gregCoreSDK.Core.UI;
 
 /// <summary>
 /// Interface for all gregUI elements.

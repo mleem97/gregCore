@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using MelonLoader;
 using MelonLoader.Utils;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 public sealed class PluginSyncService
 {

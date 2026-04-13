@@ -1,6 +1,6 @@
 using System;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 public static class GregDiagnostics
 {

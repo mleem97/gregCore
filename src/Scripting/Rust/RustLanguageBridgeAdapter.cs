@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MelonLoader;
 using greg.Core;
 
-namespace greg.Core.Scripting.Rust;
+namespace gregCoreSDK.Core.Scripting.Rust;
 
 /// <summary>
 /// Adapter that represents native Rust/C mod support inside the shared language host.

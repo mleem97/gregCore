@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using MelonLoader;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 internal static class gregModActivationService
 {

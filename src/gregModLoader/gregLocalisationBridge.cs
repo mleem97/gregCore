@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 /// <summary>
 /// Custom text resolver delegate for localisation interception.

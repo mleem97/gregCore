@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 public interface IGregContentRegistry<TDefinition>
 {

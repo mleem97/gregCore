@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace greg.Exporter
+namespace gregCoreSDK.Exporter
 {
     public sealed class ModEventHub
     {

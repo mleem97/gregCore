@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 /// <summary>
 /// Builds canonical greg hook strings: greg.&lt;DOMAIN&gt;.&lt;Action&gt;

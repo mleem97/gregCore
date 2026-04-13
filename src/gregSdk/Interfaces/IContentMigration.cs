@@ -1,4 +1,4 @@
-namespace greg.Sdk.Interfaces;
+namespace gregCoreSDK.Sdk.Interfaces;
 
 public interface IContentMigration
 {

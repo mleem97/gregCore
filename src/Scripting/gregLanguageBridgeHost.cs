@@ -5,7 +5,7 @@ using MelonLoader;
 using MelonLoader.Utils;
 using greg.Core;
 
-namespace greg.Core.Scripting;
+namespace gregCoreSDK.Core.Scripting;
 
 /// <summary>
 /// gregCoreLoader SDK runtime host that orchestrates language bridges and keeps failures isolated.

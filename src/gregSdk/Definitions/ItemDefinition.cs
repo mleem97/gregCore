@@ -1,4 +1,4 @@
-namespace greg.Sdk.Definitions;
+namespace gregCoreSDK.Sdk.Definitions;
 
 public class ItemDefinition
 {

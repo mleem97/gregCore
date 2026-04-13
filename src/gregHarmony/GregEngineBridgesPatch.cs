@@ -2,7 +2,7 @@ using HarmonyLib;
 using greg.Sdk.Services;
 using Il2Cpp;
 
-namespace greg.Harmony;
+namespace gregCoreSDK.Harmony;
 
 [HarmonyPatch(typeof(PacketSpawnerSystem), nameof(PacketSpawnerSystem.OnUpdate))]
 public static class GregPacketSpawnerPatch

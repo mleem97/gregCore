@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 public static class GregIPAllocationService
 {

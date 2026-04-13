@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Il2Cpp;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 public static class GregUiService
 {

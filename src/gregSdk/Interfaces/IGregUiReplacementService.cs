@@ -1,7 +1,7 @@
 using greg.Sdk.Definitions;
 using UnityEngine;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Service for managing and applying UI replacements and overrides.

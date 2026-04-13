@@ -1,4 +1,4 @@
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 /// <summary>
 /// Logical domains for greg hook names: greg.&lt;DOMAIN&gt;.&lt;Event&gt;

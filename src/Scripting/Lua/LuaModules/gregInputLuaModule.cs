@@ -1,7 +1,7 @@
 using System;
 using MoonSharp.Interpreter;
 
-namespace greg.Core.Scripting.Lua;
+namespace gregCoreSDK.Core.Scripting.Lua;
 
 /// <summary>
 /// Keyboard/mouse input API for Lua: <c>greg.input.*</c>.

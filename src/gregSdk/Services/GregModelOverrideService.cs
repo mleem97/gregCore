@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using greg.Sdk.Definitions;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 public class GregModelOverrideService : IGregModelOverrideService
 {

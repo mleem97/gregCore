@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using MelonLoader.Utils;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 /// <summary>
 /// Keeps framework/mod state isolated from vanilla save data and repairs broken sidecar data.

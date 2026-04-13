@@ -1,7 +1,7 @@
 using System.Linq;
 using greg.Sdk.Registries;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 public static class GregNetworkCompatibilityService
 {

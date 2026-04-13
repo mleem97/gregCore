@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace greg.Core.UI.Components;
+namespace gregCoreSDK.Core.UI.Components;
 
 public class GregBadge : IGregUIComponent
 {

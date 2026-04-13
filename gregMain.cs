@@ -37,27 +37,20 @@ namespace gregAssetExporter
 
         public override void OnInitializeMelon()
         {
-            // Erstellt den Ordner im Spielverzeichnis/Mods/ExportedAssets
+            // --- gregCore Framework Internal Initialization ---
+            greg.Sdk.Services.GregSaveService.Init();
+            greg.Sdk.Services.GregUiService.SetGlobalScale(0.85f); // Use user-preferred 0.85x by default
+            
+            // Apply Deep-Layer Hijacker Patches
+            var harmony = new HarmonyLib.Harmony("greg.core.hijacker");
+            harmony.PatchAll(typeof(greg.Sdk.Internal.GregUiHijacker).Assembly);
+
+            // --- Legacy Exporter Initialization ---
             exportPath = Path.Combine(MelonEnvironment.ModsDirectory, "ExportedAssets");
             if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
-            MelonLogger.Msg("gregCore Framework geladen.");
-#if DEBUG
-            MelonLogger.Msg("Debug-Modus aktiv: F5 Toggle UI | F6 Healthcheck | F8 Export | F11 Katalog | F12 Hooks.");
-#endif
-            MelonLogger.Msg("Projekt: https://github.com/mleem97/gregModLoader");
+            MelonLogger.Msg("gregCore Framework v1.0.45.5 geladen.");
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
-
-            RunAutoHookCommandIfRequested();
-
-#if DEBUG
-            greg.Exporter.ModFramework.Events.Subscribe<greg.Exporter.HookTriggeredEvent>(OnHookTriggered);
-            frameworkDependencyTestMod = new greg.Exporter.TestMods.FrameworkDependencyTestMod(runtimeHookService);
-            frameworkDependencyTestMod.Initialize();
-            RefreshDebugOverlayStats(forceHookScan: true);
-
-            ExportAllGameSignalsOnStartup();
-#endif
         }
 
         public override void OnUpdate()

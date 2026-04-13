@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
 using MelonLoader;
 
-namespace greg.Core.UI;
+namespace gregCoreSDK.Core.UI;
 
 /// <summary>
 /// Manages UI focus, cursor visibility, and player controller state.

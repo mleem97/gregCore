@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Bridge for the Waypoint Initialization System (cable routing and topology).

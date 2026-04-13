@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace greg.Core.UI;
+namespace gregCoreSDK.Core.UI;
 
 /// <summary>
 /// Maps "The Luminescent Architect" design tokens to Unity Color/Font objects.

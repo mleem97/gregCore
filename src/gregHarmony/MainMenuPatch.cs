@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using greg.Core.UI;
 using System.Collections;
 
-namespace greg.Harmony;
+namespace gregCoreSDK.Harmony;
 
 [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
 public static class MainMenuPatch

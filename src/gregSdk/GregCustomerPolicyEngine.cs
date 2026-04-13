@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using greg.Sdk.Definitions;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 public static class GregCustomerPolicyEngine
 {

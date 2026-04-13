@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace greg.Core.Scripting.Lua;
+namespace gregCoreSDK.Core.Scripting.Lua;
 
 /// <summary>
 /// Thread-safe registry mapping integer handles to live .NET/Il2Cpp objects.

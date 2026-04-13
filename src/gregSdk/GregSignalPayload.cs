@@ -1,6 +1,6 @@
 using System;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 /// <summary>
 /// Mandatory payload fields for normalized Unity signal conversion.

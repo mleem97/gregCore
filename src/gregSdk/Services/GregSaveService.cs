@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using HarmonyLib;
 using Il2Cpp;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Service for handling mod-specific save data to bypass IL2CPP serialization limits.

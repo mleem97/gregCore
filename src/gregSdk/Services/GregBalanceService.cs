@@ -3,7 +3,7 @@ using MelonLoader;
 using UnityEngine;
 using Il2Cpp;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Bridge service for the game's economic simulation and balance sheet.
@@ -49,7 +49,7 @@ public static class GregBalanceService
         if (player != null)
         {
             player.money += amount;
-            gregEventDispatcher.Trigger(gregNativeEventHooks.PlayerCoinChanged, new { Amount = amount, NewTotal = player.money });
+            gregEventDispatcher.Emit(gregNativeEventHooks.PlayerCoinChanged, new { Amount = amount, NewTotal = player.money });
         }
     }
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using greg.Sdk.Interfaces;
 using greg.Sdk.Services;
 
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 public class GregContentRegistry<TDefinition> : IGregContentRegistry<TDefinition>
 {

@@ -4,7 +4,7 @@ using Il2Cpp;
 using UnityEngine;
 using greg.Sdk.Services;
 
-namespace greg.Sdk.Internal;
+namespace gregCoreSDK.Sdk.Internal;
 
 /// <summary>
 /// Deep-layer UI interceptor that swaps vanilla panels for gregCore replacements.

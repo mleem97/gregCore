@@ -1,6 +1,6 @@
 using greg.Sdk.Definitions;
 
-namespace greg.Sdk.Registries;
+namespace gregCoreSDK.Sdk.Registries;
 
 public class GregEmployeeRegistry : GregContentRegistry<EmployeeDefinition>
 {

@@ -5,7 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using greg.Core.Scripting;
 
-namespace greg.Core.UI.Patches;
+namespace gregCoreSDK.Core.UI.Patches;
 
 [HarmonyPatch(typeof(StaticUIElements), nameof(StaticUIElements.Awake))]
 public class StaticUIElementsAwakePatch

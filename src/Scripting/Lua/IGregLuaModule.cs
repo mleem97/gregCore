@@ -1,6 +1,6 @@
 using MoonSharp.Interpreter;
 
-namespace greg.Core.Scripting.Lua;
+namespace gregCoreSDK.Core.Scripting.Lua;
 
 /// <summary>
 /// Implement this interface to inject C#-backed API into every Lua <see cref="Script"/>

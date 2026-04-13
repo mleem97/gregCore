@@ -4,7 +4,7 @@ using greg.Sdk.Definitions;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Implementation of the UI replacement and override service.

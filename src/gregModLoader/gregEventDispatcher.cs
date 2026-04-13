@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using greg.Sdk;
 using MelonLoader;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 // must match dc_api/src/events.rs
 public static class EventIds

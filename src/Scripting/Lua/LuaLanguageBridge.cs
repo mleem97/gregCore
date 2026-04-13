@@ -5,7 +5,7 @@ using MelonLoader;
 using MoonSharp.Interpreter;
 using greg.Core;
 
-namespace greg.Core.Scripting.Lua;
+namespace gregCoreSDK.Core.Scripting.Lua;
 
 /// <summary>
 /// Lua bridge backed by MoonSharp. Each discovered .lua file gets its own <see cref="Script"/>

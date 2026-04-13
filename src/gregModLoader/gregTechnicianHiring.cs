@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Il2Cpp;
 using UnityEngine;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 /// <summary>
 /// Manages 7 extra hireable technician employees.

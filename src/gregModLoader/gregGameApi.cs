@@ -6,7 +6,7 @@ using MelonLoader;
 using UnityEngine;
 using greg.Core.Scripting.Lua;
 
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 // function pointer table for rust mods, append-only
 [StructLayout(LayoutKind.Sequential)]

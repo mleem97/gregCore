@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace greg.Exporter
+namespace gregCoreSDK.Exporter
 {
     public sealed class Il2CppGameplayIndexService
     {

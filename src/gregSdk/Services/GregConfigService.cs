@@ -5,7 +5,7 @@ using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 /// <summary>
 /// Handles live mod configurations and persistence.

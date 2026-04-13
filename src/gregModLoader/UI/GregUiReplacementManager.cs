@@ -8,7 +8,7 @@ using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace greg.Core.UI;
+namespace gregCoreSDK.Core.UI;
 
 /// <summary>
 /// Singleton manager for UI replacements. Handles persistence and global application of overrides.

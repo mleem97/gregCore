@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace greg.Sdk.Definitions;
+namespace gregCoreSDK.Sdk.Definitions;
 
 /// <summary>
 /// Manifest for a UI replacement or override.

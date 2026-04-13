@@ -6,9 +6,10 @@
     <Nullable>disable</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PlatformTarget>x64</PlatformTarget>
+    <OutputType>Library</OutputType>
     <AssemblyName>gregCore</AssemblyName>
     <Version>1.0.0.7</Version>
-    <RootNamespace>gregModLoader</RootNamespace>
+    <RootNamespace>greg</RootNamespace>
     <Authors>MLeeM97</Authors>
     <Description>gregCore runtime for Data Center (native + script mod bridges)</Description>
     <NoWarn>CS1701;CS1702</NoWarn>
@@ -99,14 +100,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="gregMain.cs" />
     <Compile Remove="gregMainCi.cs" />
     <Compile Remove="tests\**\*.cs" />
     <Compile Remove="My project\**\*.cs" />
     <Compile Remove="gregCoreUnity\**\*.cs" />
     <Compile Remove="**\obj\**\*.cs" />
     <Compile Remove="**\bin\**\*.cs" />
-    <None Include="gregMain.cs" />
     <None Include="gregMainCi.cs" />
     <None Include="tests\**\*.cs" />
     <None Include="My project\**\*" />

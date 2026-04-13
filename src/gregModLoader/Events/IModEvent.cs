@@ -1,6 +1,6 @@
 using System;
 
-namespace greg.Exporter
+namespace gregCoreSDK.Exporter
 {
     public interface iModEvent
     {

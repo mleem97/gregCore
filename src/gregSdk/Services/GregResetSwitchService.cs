@@ -5,7 +5,7 @@ using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
 
-namespace greg.Sdk.Services;
+namespace gregCoreSDK.Sdk.Services;
 
 public enum GregDeepFlowStatus
 {

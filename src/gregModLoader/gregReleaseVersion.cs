@@ -1,4 +1,4 @@
-namespace greg.Core;
+namespace gregCoreSDK.Core;
 
 public static class gregReleaseVersion
 {

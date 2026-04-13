@@ -2,7 +2,7 @@ using System;
 using greg.Sdk;
 using greg.Exporter;
 
-namespace greg.Core.Scripting;
+namespace gregCoreSDK.Core.Scripting;
 
 /// <summary>
 /// High-level event bus for gregCore hooks.

@@ -1,7 +1,7 @@
 using greg.Sdk.Definitions;
 using greg.Sdk.Interfaces;
 
-namespace greg.Sdk.Validators;
+namespace gregCoreSDK.Sdk.Validators;
 
 public class ServerValidator : IContentValidator<ServerDefinition>
 {

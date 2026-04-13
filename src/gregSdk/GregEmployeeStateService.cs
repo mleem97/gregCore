@@ -1,4 +1,4 @@
-namespace greg.Sdk;
+namespace gregCoreSDK.Sdk;
 
 public static class GregEmployeeStateService
 {

@@ -1,4 +1,4 @@
-﻿
+
 namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 {
 	public sealed class DefaultValue

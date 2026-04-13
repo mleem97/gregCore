@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Interop.RegistrationPolicies;
 
 namespace MoonSharp.Interpreter.Interop

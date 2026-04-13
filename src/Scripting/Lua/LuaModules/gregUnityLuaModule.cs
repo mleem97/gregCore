@@ -8,7 +8,7 @@ using MoonSharp.Interpreter;
 using UnityEngine;
 using greg.Core;
 
-namespace gregCoreSDK.Core.Scripting.Lua;
+namespace greg.Core.Scripting.Lua;
 
 /// <summary>
 /// Generic Unity/Il2Cpp API surface for Lua via integer handles.

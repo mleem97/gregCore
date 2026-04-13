@@ -1,4 +1,4 @@
-﻿#if UNITY_5
+#if UNITY_5
 // Dummy implementation for Unity targets
 using System;
 using System.IO;

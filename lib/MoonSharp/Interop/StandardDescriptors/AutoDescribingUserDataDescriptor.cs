@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop;
 

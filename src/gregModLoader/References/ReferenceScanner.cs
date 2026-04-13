@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using MelonLoader;
 
-namespace gregCoreSDK.Core.References;
+namespace greg.Core.References;
 
 /// <summary>
 /// Recursively scans a references folder and loads all valid managed assemblies.

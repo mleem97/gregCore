@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace gregCoreSDK.Core.Scripting;
+namespace greg.Core.Scripting;
 
 /// <summary>
 /// Plugin-layer language bridge abstraction for script/native hosts.

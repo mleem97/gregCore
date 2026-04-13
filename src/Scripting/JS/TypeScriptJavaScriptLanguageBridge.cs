@@ -8,7 +8,7 @@ using MelonLoader;
 using greg.Core;
 using greg.Core.Scripting.Lua;
 
-namespace gregCoreSDK.Core.Scripting.JS;
+namespace greg.Core.Scripting.JS;
 
 /// <summary>
 /// TypeScript/JavaScript bridge with Jint integration for runtime JS execution.

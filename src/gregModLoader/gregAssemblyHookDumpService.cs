@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 internal static class AssemblyHookDumpService
 {

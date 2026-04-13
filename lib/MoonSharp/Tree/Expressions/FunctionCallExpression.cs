@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Execution;
 

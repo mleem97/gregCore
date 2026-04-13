@@ -41,6 +41,11 @@ namespace gregAssetExporter
             greg.Sdk.Services.GregSaveService.Init();
             greg.Sdk.Services.GregUiService.SetGlobalScale(0.85f); // Use user-preferred 0.85x by default
             
+            // --- Consolidated Mod Systems ---
+            greg.Mods.HexViewerUI.Init();
+            // ResetSwitch init (ModConfig requires local reference if not automated)
+            greg.Mods.ResetSwitch.Config.ModConfig.Register();
+            
             // Apply Deep-Layer Hijacker Patches
             var harmony = new HarmonyLib.Harmony("greg.core.hijacker");
             harmony.PatchAll(typeof(greg.Sdk.Internal.GregUiHijacker).Assembly);
@@ -49,13 +54,22 @@ namespace gregAssetExporter
             exportPath = Path.Combine(MelonEnvironment.ModsDirectory, "ExportedAssets");
             if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
-            MelonLogger.Msg("gregCore Framework v1.0.45.5 geladen.");
+            MelonLogger.Msg("gregCore Framework v1.0.45.5 loaded (Unified Build).");
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
         }
 
         public override void OnUpdate()
         {
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModTickEvent(Time.deltaTime, Time.frameCount));
+
+            // Run Integrated Mod Loops
+            greg.Mods.HexViewerUI.OnUpdate();
+            
+            if (Keyboard.current != null && Keyboard.current.f8Key.wasPressedThisFrame)
+            {
+                greg.Mods.ResetSwitch.UI.ResetPanelUI.Toggle();
+            }
+            greg.Mods.ResetSwitch.UI.ResetPanelUI.UpdateFocus();
 
 #if DEBUG
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
@@ -67,7 +81,8 @@ namespace gregAssetExporter
 
             frameworkDependencyTestMod?.Tick();
 
-            if (Keyboard.current != null && Keyboard.current.f8Key.wasPressedThisFrame)
+            // Note: F8 is now used by ResetSwitch. Moving Exporter export to Ctrl+F8
+            if (Keyboard.current != null && Keyboard.current.ctrlKey.isPressed && Keyboard.current.f8Key.wasPressedThisFrame)
             {
                 ExportAllResources();
             }

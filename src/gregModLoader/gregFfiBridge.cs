@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using MelonLoader;
 using greg.Core.Scripting;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 public class gregFfiBridge : IDisposable
 {

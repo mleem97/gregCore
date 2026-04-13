@@ -5,7 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using greg.Core.Scripting;
 
-namespace gregCoreSDK.Core.UI.Patches;
+namespace greg.Core.UI.Patches;
 
 [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
 public class MainMenuStartPatch

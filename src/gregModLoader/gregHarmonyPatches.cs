@@ -5,7 +5,7 @@ using greg.Sdk;
 using Il2Cpp;
 using UnityEngine;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 // harmony patches -> rust events
 

@@ -1,7 +1,7 @@
 using System;
 using MelonLoader;
 
-namespace gregCoreSDK.Core.Plugins;
+namespace greg.Core.Plugins;
 
 /// <summary>
 /// Base class for gregCore standalone plugins.

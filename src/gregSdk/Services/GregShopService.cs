@@ -3,7 +3,7 @@ using MelonLoader;
 using UnityEngine;
 using Il2Cpp;
 
-namespace gregCoreSDK.Sdk.Services;
+namespace greg.Sdk.Services;
 
 /// <summary>
 /// Bridge service for interacting with the Computer Shop (Hardware Purchasing).

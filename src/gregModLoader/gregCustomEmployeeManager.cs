@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 public class CustomEmployeeEntry
 {

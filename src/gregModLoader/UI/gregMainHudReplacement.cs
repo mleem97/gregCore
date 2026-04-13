@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using greg.Sdk.Services;
 using Il2Cpp;
 
-namespace gregCoreSDK.Core.UI;
+namespace greg.Core.UI;
 
 /// <summary>
 /// Replaces the Main HUD with a Luminescent Architect styled version.

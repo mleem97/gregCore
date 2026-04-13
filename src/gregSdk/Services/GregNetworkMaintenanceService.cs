@@ -7,7 +7,7 @@ using MelonLoader;
 using UnityEngine;
 using greg.Core;
 
-namespace gregCoreSDK.Sdk.Services;
+namespace greg.Sdk.Services;
 
 public static class GregNetworkMaintenanceService
 {

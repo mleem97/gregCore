@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Execution.VM;
 using MoonSharp.Interpreter.Interop.LuaStateInterop;

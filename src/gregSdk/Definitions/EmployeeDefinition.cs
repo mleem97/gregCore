@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Sdk.Definitions;
+namespace greg.Sdk.Definitions;
 
 public class EmployeeDefinition
 {

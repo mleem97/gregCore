@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Execution.VM;
 
 namespace MoonSharp.Interpreter.Execution

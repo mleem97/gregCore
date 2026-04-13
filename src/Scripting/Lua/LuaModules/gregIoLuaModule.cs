@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MoonSharp.Interpreter;
 
-namespace gregCoreSDK.Core.Scripting.Lua;
+namespace greg.Core.Scripting.Lua;
 
 /// <summary>
 /// File system API for Lua: <c>greg.io.*</c>.

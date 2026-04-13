@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors;
 
 namespace MoonSharp.Interpreter.Interop.RegistrationPolicies

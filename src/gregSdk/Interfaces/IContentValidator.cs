@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Sdk.Interfaces;
+namespace greg.Sdk.Interfaces;
 
 public interface IContentValidator<T>
 {

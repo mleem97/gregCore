@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using greg.Sdk.Services;
 
-namespace gregCoreSDK.Core.UI;
+namespace greg.Core.UI;
 
 public static class gregModConfigManager
 {

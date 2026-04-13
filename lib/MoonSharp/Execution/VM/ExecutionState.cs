@@ -1,4 +1,4 @@
-﻿using MoonSharp.Interpreter.DataStructs;
+using MoonSharp.Interpreter.DataStructs;
 
 namespace MoonSharp.Interpreter.Execution.VM
 {

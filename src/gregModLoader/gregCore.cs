@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 [assembly: MelonInfo(typeof(greg.Core.gregCoreLoader), "gregCore", greg.Core.gregReleaseVersion.Current, "MLeeM97")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 // file-based crash logger, never throws
 public static class CrashLog

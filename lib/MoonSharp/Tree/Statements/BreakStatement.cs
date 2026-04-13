@@ -1,4 +1,4 @@
-﻿using MoonSharp.Interpreter.Debugging;
+using MoonSharp.Interpreter.Debugging;
 using MoonSharp.Interpreter.Execution;
 using MoonSharp.Interpreter.Execution.VM;
 

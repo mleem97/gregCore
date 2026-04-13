@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter.Execution;
 
 namespace MoonSharp.Interpreter.Tree.Expressions

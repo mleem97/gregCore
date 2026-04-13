@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Il2Cpp;
 
-namespace gregCoreSDK.Sdk.Services;
+namespace greg.Sdk.Services;
 
 /// <summary>
 /// Skeleton for first-class custom content support in gregCore.

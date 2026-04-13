@@ -1,4 +1,4 @@
-﻿using MoonSharp.Interpreter.Interop.BasicDescriptors;
+using MoonSharp.Interpreter.Interop.BasicDescriptors;
 
 namespace MoonSharp.Interpreter.Interop
 {

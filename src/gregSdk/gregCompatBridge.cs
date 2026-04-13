@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using MelonLoader;
 
-namespace gregCoreSDK.Sdk;
+namespace greg.Sdk;
 
 /// <summary>
 /// Resolves deprecated hook name spellings to canonical greg.* names.

@@ -1,4 +1,4 @@
-﻿
+
 namespace MoonSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor

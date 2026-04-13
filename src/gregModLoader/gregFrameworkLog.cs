@@ -2,7 +2,7 @@ using MelonLoader;
 using System;
 using greg.Core;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 public static class gregModLoaderLog
 {

@@ -4,7 +4,7 @@ using Il2Cpp;
 using UnityEngine;
 using greg.Core;
 
-namespace gregCoreSDK.Core.UI;
+namespace greg.Core.UI;
 
 /// <summary>
 /// Bridge for **UI** features (web replacement, modernizer, mod settings menu). Not related to

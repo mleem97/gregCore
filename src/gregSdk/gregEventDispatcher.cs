@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MelonLoader;
 
-namespace gregCoreSDK.Sdk;
+namespace greg.Sdk;
 
 /// <summary>
 /// Central event bus for gregModLoader hook payloads.

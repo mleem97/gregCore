@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace gregCoreSDK.Core.UI.Components;
+namespace greg.Core.UI.Components;
 
 public class GregToggle : IGregUIComponent
 {

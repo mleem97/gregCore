@@ -7,7 +7,7 @@ using MelonLoader;
 using greg.Core;
 using greg.Core.Scripting.Lua;
 
-namespace gregCoreSDK.Core.Scripting.Lua;
+namespace greg.Core.Scripting.Lua;
 
 /// <summary>
 /// Connects Lua scripts to the gregCore event/hook system.

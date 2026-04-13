@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Sdk;
+namespace greg.Sdk;
 
 public class GregModelOverrideService : IGregModelOverrideService
 {

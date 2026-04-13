@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace gregCoreSDK.Sdk;
+namespace greg.Sdk;
 
 /// <summary>
 /// Helpers for anonymous payload objects passed through <see cref="gregEventDispatcher"/>.

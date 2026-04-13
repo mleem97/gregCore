@@ -1,4 +1,4 @@
-﻿#if HASDYNAMIC
+#if HASDYNAMIC
 using System;
 using System.Collections.Generic;
 using System.IO;

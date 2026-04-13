@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;

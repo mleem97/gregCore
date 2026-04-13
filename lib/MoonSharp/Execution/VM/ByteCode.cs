@@ -1,4 +1,4 @@
-﻿#define EMIT_DEBUG_OPS
+#define EMIT_DEBUG_OPS
 
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿
+
 namespace MoonSharp.Interpreter.Tree
 {
 	interface IVariable

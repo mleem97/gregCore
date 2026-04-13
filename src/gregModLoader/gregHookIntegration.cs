@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using greg.Sdk;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 /// <summary>
 /// Emits canonical greg.* events for the native FFI pipeline. Hook names come from

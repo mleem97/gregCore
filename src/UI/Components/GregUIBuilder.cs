@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace gregCoreSDK.Core.UI.Components;
+namespace greg.Core.UI.Components;
 
 public class GregUIBuilder
 {

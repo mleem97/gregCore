@@ -5,7 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using greg.Core.Scripting;
 
-namespace gregCoreSDK.Core.UI.Patches;
+namespace greg.Core.UI.Patches;
 
 [HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.OnEnable))]
 public class PauseMenuOpenPatch

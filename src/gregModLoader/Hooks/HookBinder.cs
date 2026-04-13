@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using MelonLoader;
 
-namespace gregCoreSDK.Core.Hooks;
+namespace greg.Core.Hooks;
 
 /// <summary>
 /// Binds raw game assembly methods to greg hook aliases and dispatches before/after handlers.

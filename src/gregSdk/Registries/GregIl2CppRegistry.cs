@@ -2,7 +2,7 @@ using System;
 using MelonLoader;
 using UnityEngine;
 
-namespace gregCoreSDK.Sdk.Registries;
+namespace greg.Sdk.Registries;
 
 /// <summary>
 /// Registry for custom IL2CPP types to bypass [AddComponent] limits.

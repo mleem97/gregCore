@@ -4,7 +4,7 @@ using Il2Cpp;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 // safe game state accessors, returns defaults when singletons are null
 public static class gregGameHooks

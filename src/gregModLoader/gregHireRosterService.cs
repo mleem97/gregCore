@@ -6,7 +6,7 @@ using System.Text.Json;
 using Il2Cpp;
 using MelonLoader.Utils;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 public sealed class AvailableHireEntry
 {

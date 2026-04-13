@@ -1,6 +1,6 @@
 using System;
 
-namespace gregCoreSDK.Exporter
+namespace greg.Exporter
 {
     public sealed class Il2CppCatalogExportedEvent : iModEvent
     {

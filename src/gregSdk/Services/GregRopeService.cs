@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Sdk.Services;
+namespace greg.Sdk.Services;
 
 /// <summary>
 /// Bridge for the GogoGaga Rope/Cable physics system used in the game.

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace gregCoreSDK.Core.UI.Components;
+namespace greg.Core.UI.Components;
 
 public class GregLabel : IGregUIComponent
 {

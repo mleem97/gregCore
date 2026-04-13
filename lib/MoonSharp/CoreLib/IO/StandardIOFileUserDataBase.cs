@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace MoonSharp.Interpreter.CoreLib.IO
 {

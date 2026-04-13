@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Loaders;

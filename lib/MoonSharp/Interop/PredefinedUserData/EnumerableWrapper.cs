@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using MoonSharp.Interpreter.Interop.Converters;
 
 namespace MoonSharp.Interpreter.Interop

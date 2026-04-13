@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace gregCoreSDK.Core.UI.Components;
+namespace greg.Core.UI.Components;
 
 /// <summary>
 /// A base panel component using gregUI theme.

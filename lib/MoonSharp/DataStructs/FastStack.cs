@@ -1,4 +1,4 @@
-﻿#if !USE_DYNAMIC_STACKS
+#if !USE_DYNAMIC_STACKS
 
 using System;
 using System.Collections.Generic;

@@ -2,7 +2,7 @@ using HarmonyLib;
 using greg.Sdk.Services;
 using Il2Cpp;
 
-namespace gregCoreSDK.Harmony;
+namespace greg.Harmony;
 
 [HarmonyPatch(typeof(Server), nameof(Server.OnLoadingStarted))]
 public static class GregServerModelPatch

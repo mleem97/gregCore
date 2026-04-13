@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using greg.Core.Hooks;
 
-namespace gregCoreSDK.Exporter
+namespace greg.Exporter
 {
     public sealed class RuntimeHookService
     {

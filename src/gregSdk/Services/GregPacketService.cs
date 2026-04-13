@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Sdk.Services;
+namespace greg.Sdk.Services;
 
 /// <summary>
 /// Bridge for the Packet Spawner System (visualized internet traffic).

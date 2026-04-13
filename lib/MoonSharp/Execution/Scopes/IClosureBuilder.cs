@@ -1,4 +1,4 @@
-﻿
+
 namespace MoonSharp.Interpreter.Execution
 {
 	internal interface IClosureBuilder

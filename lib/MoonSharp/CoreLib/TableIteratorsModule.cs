@@ -1,4 +1,4 @@
-﻿// Disable warnings about XML documentation
+// Disable warnings about XML documentation
 #pragma warning disable 1591
 
 

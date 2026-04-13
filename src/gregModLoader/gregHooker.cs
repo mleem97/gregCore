@@ -9,7 +9,7 @@ using HarmonyLib;
 using greg.Core;
 using greg.Core.Hooks;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 public static class gregHooker
 {

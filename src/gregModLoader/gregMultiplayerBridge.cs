@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Il2Cpp;
 
-namespace gregCoreSDK.Core;
+namespace greg.Core;
 
 /// <summary>
 /// Manages the multiplayer bridge between C# (MelonLoader) and the Rust DLL (dc_multiplayer.dll).

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using greg.Core;
 
-namespace gregCoreSDK.Sdk;
+namespace greg.Sdk;
 
 /// <summary>
 /// Canonical greg.* hook names for the native / FFI event pipeline (<see cref="EventDispatcher"/>).

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace gregCoreSDK.Core.Hooks;
+namespace greg.Core.Hooks;
 
 /// <summary>
 /// Runtime context for an greg hook invocation.

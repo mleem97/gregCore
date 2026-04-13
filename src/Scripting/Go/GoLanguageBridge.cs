@@ -4,7 +4,7 @@ using System.IO;
 using MelonLoader;
 using greg.Core;
 
-namespace gregCoreSDK.Core.Scripting.Go;
+namespace greg.Core.Scripting.Go;
 
 /// <summary>
 /// Go Language Bridge (v1.0.0.6)

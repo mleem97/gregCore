@@ -1,4 +1,4 @@
-namespace gregCoreSDK.Core.Scripting;
+namespace greg.Core.Scripting;
 
 public sealed class gregRuntimeUnit
 {

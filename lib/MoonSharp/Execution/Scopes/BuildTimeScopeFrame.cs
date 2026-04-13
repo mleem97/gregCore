@@ -1,4 +1,4 @@
-﻿using MoonSharp.Interpreter.Tree.Statements;
+using MoonSharp.Interpreter.Tree.Statements;
 
 namespace MoonSharp.Interpreter.Execution.Scopes
 {

@@ -1,6 +1,6 @@
 using greg.Sdk.Definitions;
 
-namespace gregCoreSDK.Sdk.Registries;
+namespace greg.Sdk.Registries;
 
 public class GregServerTypeRegistry : GregContentRegistry<ServerTypeDefinition>
 {

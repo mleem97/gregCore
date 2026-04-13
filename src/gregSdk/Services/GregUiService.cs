@@ -17,6 +17,22 @@ public static class GregUiService
         public static readonly Color OnSurface = new Color(0.75f, 0.99f, 0.96f, 1f);
     }
 
+    private static readonly Dictionary<string, Action<GameObject>> _replacements = new();
+
+    public static void RegisterReplacement(string panelName, Action<GameObject> factory)
+    {
+        _replacements[panelName] = factory;
+        MelonLoader.MelonLogger.Msg($"[gregCore] Registered UI Replacement for: {panelName}");
+    }
+
+    public static bool TryGetReplacement(string panelName, out Action<GameObject> factory)
+    {
+        return _replacements.TryGetValue(panelName, out factory);
+    }
+
+    public static float GlobalScale { get; private set; } = 0.85f;
+    private static List<CanvasScaler> _trackedScalers = new();
+
     public static Canvas CreateCanvas(string name, int sortingOrder = 1000000)
     {
         var go = new GameObject(name);
@@ -26,9 +42,20 @@ public static class GregUiService
         canvas.sortingOrder = sortingOrder;
         var scaler = go.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.referenceResolution = new Vector2(1920 / GlobalScale, 1080 / GlobalScale);
+        _trackedScalers.Add(scaler);
         go.AddComponent<GraphicRaycaster>();
         return canvas;
+    }
+
+    public static void SetGlobalScale(float scale)
+    {
+        GlobalScale = Mathf.Clamp(scale, 0.5f, 2.0f);
+        foreach (var scaler in _trackedScalers)
+        {
+            if (scaler != null)
+                scaler.referenceResolution = new Vector2(1920 / GlobalScale, 1080 / GlobalScale);
+        }
     }
 
     public static GameObject CreateModernPanel(Transform parent, string name, Vector2 size)

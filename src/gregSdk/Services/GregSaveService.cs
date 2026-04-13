@@ -106,20 +106,20 @@ public static class GregSaveService
 [HarmonyPatch(typeof(SaveSystem), nameof(SaveSystem.SaveGame))]
 public static class SaveSystem_SavePatch
 {
-    public static void Postfix()
+    public static void Postfix(string savename)
     {
-        // Data Center doesn't seem to expose the slot name easily in the call, 
-        // we might need to find where the current slot is stored.
-        // For now, use "default".
-        GregSaveService.Save("auto");
+        // 1.0.45.5 alignment: Detect slot from argument or static property
+        string slot = string.IsNullOrEmpty(savename) ? (SaveSystem.loadSaveName ?? "auto") : savename;
+        GregSaveService.Save(slot);
     }
 }
 
 [HarmonyPatch(typeof(SaveSystem), nameof(SaveSystem.LoadGame))]
 public static class SaveSystem_LoadPatch
 {
-    public static void Postfix()
+    public static void Postfix(string savename)
     {
-        GregSaveService.Load("auto");
+        string slot = string.IsNullOrEmpty(savename) ? (SaveSystem.loadSaveName ?? "auto") : savename;
+        GregSaveService.Load(slot);
     }
 }

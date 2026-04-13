@@ -43,12 +43,23 @@ public static class GregBalanceService
         return PlayerManager.instance?.playerClass?.money ?? 0f;
     }
 
-    public static void SetMoney(float amount)
+    public static void AddMoney(float amount)
     {
         var player = PlayerManager.instance?.playerClass;
         if (player != null)
         {
-            player.money = amount;
+            player.money += amount;
+            gregEventDispatcher.Trigger(gregNativeEventHooks.PlayerCoinChanged, new { Amount = amount, NewTotal = player.money });
         }
+    }
+
+    public static float GetTotalRevenue()
+    {
+        return GetLatestSnapshot().revenue;
+    }
+
+    public static float GetTotalPenalties()
+    {
+        return GetLatestSnapshot().penalties;
     }
 }

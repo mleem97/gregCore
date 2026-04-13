@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using greg.Diagnostic;
+using greg.Core;
 
 
 // Namespace gregAssetExporter muss zu deiner AssemblyInfo passen
@@ -29,7 +30,7 @@ namespace gregAssetExporter
         private readonly greg.Exporter.GameSignalSnapshotService gameSignalSnapshotService = new greg.Exporter.GameSignalSnapshotService();
 
 #if DEBUG
-        private greg.Exporter.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod;
+        // private greg.Exporter.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod; // TODO: removed, class does not exist
         private Texture2D debugOverlayBackgroundTexture;
         private int debugHooksAvailable;
         private int debugHookEventsAvailable;
@@ -45,6 +46,10 @@ namespace gregAssetExporter
             
             // --- Consolidated Mod Systems ---
             greg.Mods.HexViewerUI.Init();
+            
+            // IPAM Integration
+            greg.Mods.IPAM.Core.IpamEngine.Instance.Initialize();
+
             // ResetSwitch init (ModConfig requires local reference if not automated)
             greg.Mods.ResetSwitch.Config.ModConfig.Init();
             
@@ -56,7 +61,7 @@ namespace gregAssetExporter
             exportPath = Path.Combine(MelonEnvironment.ModsDirectory, "ExportedAssets");
             if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
-            MelonLogger.Msg("gregCore Framework v1.0.45.5 loaded (Unified Build).");
+            MelonLogger.Msg($"gregCore Framework v{greg.Core.gregReleaseVersion.Current} loaded (Unified Build).");
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModInitializedEvent(DateTime.UtcNow, greg.Core.gregReleaseVersion.Current));
         }
 
@@ -73,6 +78,13 @@ namespace gregAssetExporter
             }
             greg.Mods.ResetSwitch.UI.ResetPanelUI.UpdateFocus();
 
+            // IPAM Hooks
+            if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
+            {
+                greg.Mods.IPAM.Core.IpamEngine.Instance.RefreshNetworkState();
+                greg.Sdk.Services.GregNotificationService.ShowToast("Network State Refreshed.", greg.Sdk.Services.ToastType.Info, 2f);
+            }
+
 #if DEBUG
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
             {
@@ -80,8 +92,6 @@ namespace gregAssetExporter
             }
 
             if (!showDebugOverlay) return;
-
-            frameworkDependencyTestMod?.Tick();
 
             // Note: F8 is now used by ResetSwitch. Moving Exporter export to Ctrl+F8
             if (Keyboard.current != null && Keyboard.current.ctrlKey.isPressed && Keyboard.current.f8Key.wasPressedThisFrame)
@@ -92,18 +102,6 @@ namespace gregAssetExporter
             if (Keyboard.current != null && Keyboard.current.f6Key.wasPressedThisFrame)
             {
                 RefreshDebugOverlayStats(forceHookScan: true);
-            }
-
-            if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
-            {
-                LogUiPathUnderCursor();
-            }
-
-            if (Keyboard.current != null && Keyboard.current.f10Key.wasPressedThisFrame)
-            {
-                exportBetaNotUsed = !exportBetaNotUsed;
-                MelonLogger.Msg($"Beta-Export (nicht verwendete Assets) ist jetzt: {(exportBetaNotUsed ? "AKTIV" : "INAKTIV")}");
-                greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ToggleChangedEvent(DateTime.UtcNow, "ExportBetaNotUsed", exportBetaNotUsed));
             }
 
             if (Keyboard.current != null && Keyboard.current.f11Key.wasPressedThisFrame)
@@ -128,7 +126,6 @@ namespace gregAssetExporter
             if (!debugOverlayStatsInitialized)
                 RefreshDebugOverlayStats(forceHookScan: true);
 
-            string notUsedState = exportBetaNotUsed ? "ON" : "OFF";
             string overlayText =
                 $"<b>gregCore v{greg.Core.gregReleaseVersion.Current}</b>\n" +
                 $"Hooks: {debugHooksAvailable:D5} | Events: {debugHookEventsAvailable:D5} | Missing: {debugNotYetImplemented:D5}\n" +
@@ -142,10 +139,20 @@ namespace gregAssetExporter
 
             GUI.DrawTexture(boxRect, debugOverlayBackgroundTexture, ScaleMode.StretchToFill);
 
-            var style = new GUIStyle(GUI.skin.label);
+            // Use direct GUIStyle initialization
+            GUIStyle style = new GUIStyle();
+            if (GUI.skin != null && GUI.skin.label != null)
+            {
+                style.font = GUI.skin.label.font;
+            }
             style.richText = true;
             style.fontSize = 14;
-            style.padding = new RectOffset(10, 10, 5, 5);
+            // IL2CPP RectOffset might not have 4-arg ctor in some builds, setting manually
+            style.padding = new RectOffset();
+            style.padding.left = 10;
+            style.padding.right = 10;
+            style.padding.top = 5;
+            style.padding.bottom = 5;
 
             GUI.Label(boxRect, overlayText, style);
         }
@@ -171,7 +178,7 @@ namespace gregAssetExporter
                 }
 
                 int eventCount = 0;
-                var eventFields = typeof(greg.Exporter.EventIds).GetFields(BindingFlags.Public | BindingFlags.Static);
+                var eventFields = typeof(EventIds).GetFields(BindingFlags.Public | BindingFlags.Static);
                 for (int index = 0; index < eventFields.Length; index++)
                 {
                     FieldInfo field = eventFields[index];
@@ -189,6 +196,7 @@ namespace gregAssetExporter
             }
         }
 #endif
+
 
         private void ExportAllGameSignalsOnStartup()
         {

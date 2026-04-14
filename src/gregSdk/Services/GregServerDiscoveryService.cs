@@ -32,6 +32,7 @@ public class ServerInfo
 /// </summary>
 public static class GregServerDiscoveryService
 {
+    private static int _lastServerCount = -1;
     private static readonly Regex LabelRegex = new Regex(
         @"^(.*)-([A-Z]-\d{1,3}|[A-Z]\d{2,3})$",
         RegexOptions.Compiled);
@@ -85,7 +86,11 @@ public static class GregServerDiscoveryService
                     Instance = sv
                 });
             }
-            MelonLogger.Msg($"[ServerDiscovery] Scanned {result.Count} servers");
+            if (result.Count != _lastServerCount)
+            {
+                _lastServerCount = result.Count;
+                MelonLogger.Msg($"[ServerDiscovery] Scanned {result.Count} servers");
+            }
         }
         catch (Exception ex)
         {

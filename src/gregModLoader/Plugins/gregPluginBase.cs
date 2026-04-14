@@ -4,10 +4,15 @@ using MelonLoader;
 namespace greg.Core.Plugins;
 
 /// <summary>
-/// Base class for gregCore standalone plugins.
+/// Base class for gregCore standalone plugins (extensions).
 /// </summary>
-public abstract class gregPluginBase : MelonMod
+public abstract class gregPluginBase : gregModBase
 {
+    /// <summary>
+    /// Extension plugins always require gregCore to function.
+    /// </summary>
+    public override string[] RequiredDependencies => new[] { "gregCore" };
+
     /// <summary>
     /// Gets the plugin's unique identifier.
     /// </summary>
@@ -31,7 +36,7 @@ public abstract class gregPluginBase : MelonMod
     /// <summary>
     /// Registers the plugin with the central framework registry.
     /// </summary>
-    public override void OnInitializeMelon()
+    public override void OnInitializeMod()
     {
         gregRegistry.RegisterPlugin(this);
     }

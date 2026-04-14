@@ -9,18 +9,17 @@ on:
 
 jobs:
   build:
-    # Funktioniert auf GitHub (windows-latest) und Gitea Runners mit entsprechendem Label
-    runs-on: ${{ github.server_url == 'https://github.com' && 'windows-latest' || 'windows' }}
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 9.0.x
 
     - name: Restore dependencies
       run: dotnet restore gregCore.csproj
@@ -28,18 +27,29 @@ jobs:
     - name: Build gregCore
       run: dotnet build gregCore.csproj -c Release -p:CI=true
 
-    - name: Package Release
-      if: startsWith(github.ref, 'refs/tags/v')
+    - name: Create Artifacts
       shell: pwsh
       run: |
-        ./gregScripts/Build-Release.ps1
+        $outDir = "publish"
+        New-Item -ItemType Directory -Path $outDir -Force
+        Copy-Item "bin/Release/net6.0/gregCore.dll" $outDir/
+        if (Test-Path "bin/Release/net6.0/gregCore.pdb") { Copy-Item "bin/Release/net6.0/gregCore.pdb" $outDir/ }
+        # Zip it
+        Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/gregCore-v1.0.0.30-pre.zip"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: gregCore-binaries
+        path: publish/*.dll
 
     - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
       with:
+        tag_name: latest
+        name: gregCore Latest Build
+        prerelease: true
         files: publish/*.zip
-        body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

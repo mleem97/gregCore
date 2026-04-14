@@ -28,6 +28,24 @@ public static class UIRouterHooks
         {
             GregMainMenuReplacement.Instance?.Hide();
         }
+
+        if (to == UIMode.Paused)
+        {
+            GregPauseMenuReplacement.Instance?.Show();
+        }
+        else
+        {
+            GregPauseMenuReplacement.Instance?.Hide();
+        }
+
+        if (to == UIMode.ComputerShop)
+        {
+            GregShopReplacement.Instance?.Show();
+        }
+        else
+        {
+            GregShopReplacement.Instance?.Hide();
+        }
     }
 }
 

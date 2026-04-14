@@ -3,7 +3,9 @@ using HarmonyLib;
 using Il2Cpp;
 using UnityEngine;
 using UnityEngine.UI;
+using MelonLoader;
 using greg.Core.UI;
+using greg.Core.UI.Components;
 
 namespace greg.Harmony;
 
@@ -13,53 +15,79 @@ public static class PauseMenuPatch
     static void Postfix(PauseMenu __instance)
     {
         UIRouter.SetMode(UIMode.Paused);
-        MelonLoader.MelonCoroutines.Start(DelayedInjection(__instance));
-    }
-
-    private static IEnumerator DelayedInjection(PauseMenu menu)
-    {
-        yield return new WaitForSeconds(0.5f);
-        InjectModsButton(menu);
-    }
-
-    public static void InjectModsButton(PauseMenu menu)
-    {
-        try
+        InitializeReplacement();
+        
+        // Hide original UI elements safely
+        if (__instance.gameObject.activeSelf)
         {
-            if (GameObject.Find("greg_PauseModsButton") != null) return;
-
-            GameObject resumeBtn = menu.resumeButton;
-            if (resumeBtn == null) return;
-
-            GameObject modsButtonGo = Object.Instantiate(resumeBtn, resumeBtn.transform.parent);
-            modsButtonGo.name = "greg_PauseModsButton";
-
-            var button = modsButtonGo.GetComponent<Button>();
-            if (button != null)
-            {
-                button.onClick = new Button.ButtonClickedEvent();
-                button.onClick.RemoveAllListeners();
-                button.onClick.AddListener((System.Action)(() => {
-                    gregModConfigManager.Toggle(true);
-                }));
-            }
-
-            var img = modsButtonGo.GetComponent<Image>();
-            if (img != null) img.color = new Color(0.00f, 0.07f, 0.06f, 0.85f);
-
-            var textComp = modsButtonGo.GetComponentInChildren<TextMeshProUGUI>();
-            if (textComp != null) {
-                textComp.text = "MODS";
-                textComp.color = new Color(0.38f, 0.96f, 0.85f, 1f);
-            }
-
-            modsButtonGo.transform.SetSiblingIndex(resumeBtn.transform.parent.childCount - 1);
-            
-            MelonLoader.MelonLogger.Msg("[gregCore] MODS button injected into Pause Menu.");
+             // We can't disable the object itself because it might break game logic
+             // but we can disable the visual child elements.
+             foreach(Transform child in __instance.transform)
+             {
+                 child.gameObject.SetActive(false);
+             }
         }
-        catch (System.Exception ex) {
-            greg.Core.CrashLog.LogException("PauseMenuPatch.InjectModsButton", ex);
-        }
+        
+        GregPauseMenuReplacement.Instance?.Show();
+    }
+
+    private static void InitializeReplacement()
+    {
+        if (GregPauseMenuReplacement.Instance != null) return;
+        
+        var go = new GameObject("GregPauseMenu_Root");
+        var comp = go.AddComponent<GregPauseMenuReplacement>();
+        comp.Configure(
+            onResume: OnResumeClicked,
+            onSettings: OnSettingsClicked,
+            onSave: OnSaveClicked,
+            onLoad: OnLoadClicked,
+            onMods: OnModsClicked,
+            onQuitToMenu: OnQuitToMenuClicked,
+            onQuitToDesktop: OnQuitToDesktopClicked
+        );
+    }
+
+    private static void OnResumeClicked()
+    {
+        GregPauseMenuReplacement.Instance?.Hide();
+        UIRouter.SetMode(UIMode.Playing);
+        // Find the PauseMenu original instance and call Resume
+        var menu = UnityEngine.Object.FindObjectOfType<PauseMenu>();
+        menu?.Resume();
+    }
+
+    private static void OnSettingsClicked()
+    {
+        MelonLogger.Msg("[PauseMenu] Settings clicked");
+    }
+
+    private static void OnSaveClicked()
+    {
+        MelonLogger.Msg("[PauseMenu] Save clicked");
+        GameUIButtons.ClickSaveButton();
+    }
+
+    private static void OnLoadClicked()
+    {
+        MelonLogger.Msg("[PauseMenu] Load clicked");
+        GameUIButtons.ClickLoadButton();
+    }
+
+    private static void OnModsClicked()
+    {
+        gregModConfigManager.Toggle(true);
+    }
+
+    private static void OnQuitToMenuClicked()
+    {
+        MelonLogger.Msg("[PauseMenu] Quit to Menu clicked");
+        GameUIButtons.ClickButtonByName("QuitToMenu"); 
+    }
+
+    private static void OnQuitToDesktopClicked()
+    {
+        Application.Quit();
     }
 }
 
@@ -68,6 +96,7 @@ public static class PauseMenuResumePatch
 {
     static void Postfix()
     {
+        GregPauseMenuReplacement.Instance?.Hide();
         UIRouter.SetMode(UIMode.Playing);
     }
 }

@@ -180,23 +180,52 @@ public static class GameUIButtons
 {
     public static bool ClickButton(string buttonPath)
     {
-        var button = GameObject.Find(buttonPath);
-        if (button == null)
-        {
-            MelonLogger.Warning($"[GameUIButtons] Button not found: {buttonPath}");
-            return false;
-        }
+        var button = FindButton(buttonPath);
+        if (button == null) return false;
 
-        var btn = button.GetComponent<UnityEngine.UI.Button>();
-        if (btn == null)
-        {
-            MelonLogger.Warning($"[GameUIButtons] No Button component: {buttonPath}");
-            return false;
-        }
-
-        btn.onClick?.Invoke();
+        button.onClick?.Invoke();
         MelonLogger.Msg($"[GameUIButtons] Clicked: {buttonPath}");
         return true;
+    }
+
+    private static UnityEngine.UI.Button FindButton(string path)
+    {
+        var go = GameObject.Find(path);
+        if (go != null) return go.GetComponent<UnityEngine.UI.Button>();
+
+        // If not found (likely inactive), check all buttons
+        var allButtons = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Button>();
+        foreach (var btn in allButtons)
+        {
+            if (GetGameObjectPath(btn.gameObject).Contains(path)) return btn;
+        }
+        return null;
+    }
+
+    private static string GetGameObjectPath(GameObject obj)
+    {
+        string path = "/" + obj.name;
+        while (obj.transform.parent != null)
+        {
+            obj = obj.transform.parent.gameObject;
+            path = "/" + obj.name + path;
+        }
+        return path;
+    }
+
+    public static bool ClickButtonByName(string buttonName)
+    {
+         var allButtons = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Button>();
+         foreach (var btn in allButtons)
+         {
+             if (btn.name == buttonName)
+             {
+                 btn.onClick?.Invoke();
+                 MelonLogger.Msg($"[GameUIButtons] Clicked by name: {buttonName}");
+                 return true;
+             }
+         }
+         return false;
     }
 
     public static bool ClickButtonInCanvas(string canvasName, string buttonName)
@@ -206,7 +235,17 @@ public static class GameUIButtons
 
     public static bool ClickLoadButton()
     {
-        return ClickButton("PauseMenuCanvas/Pause menu -  Settings Scripts/PanelArea/PanelBackground/SystemPanel/Game/LoadButton");
+        return ClickButtonByName("LoadGame") || ClickButton("Canvas - MainMenuScript/HorizontalLayout/MainMenu/LoadGame") || ClickButton("PauseMenuCanvas/Pause menu -  Settings Scripts/PanelArea/PanelBackground/SystemPanel/Game/LoadButton");
+    }
+
+    public static bool ClickNewGameButton()
+    {
+        return ClickButtonByName("NewGame") || ClickButton("Canvas - MainMenuScript/HorizontalLayout/MainMenu/NewGame");
+    }
+
+    public static bool ClickContinueButton()
+    {
+        return ClickButtonByName("Continue") || ClickButton("Canvas - MainMenuScript/HorizontalLayout/MainMenu/Continue");
     }
 
     public static bool ClickSaveButton()
@@ -223,4 +262,10 @@ public static class GameUIButtons
     {
         return ClickButton("PauseMenuCanvas/Pause menu -  Settings Scripts/PanelArea/PanelBackground/SystemPanel/Game/MainMenuButton");
     }
+
+    public static bool ClickReportBugButton() => ClickButtonByName("Report Bug") || ClickButton("Canvas - MainMenuScript/HorizontalLayout/MainMenu/Report Bug");
+    public static bool ClickDiscordButton() => ClickButtonByName("Discord") || ClickButton("Canvas - MainMenuScript/TopRight_VerticalLayout/Discord");
+    public static bool ClickWishlistButton() => ClickButtonByName("Wishlist") || ClickButton("Canvas - MainMenuScript/TopRight_VerticalLayout/Wishlist");
+    public static bool ClickTwitterButton() => ClickButton("Canvas - MainMenuScript/Twitter/Button");
+    public static bool ClickStatsButton() => ClickButtonByName("SteamStats") || ClickButton("Canvas - MainMenuScript/Leaderboards and stats/SteamStats");
 }

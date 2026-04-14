@@ -25,10 +25,17 @@ public class GregMainMenuReplacement : MonoBehaviour
     private bool _isVisible = false;
     private float _scaleFactor = 1f;
 
-    private Action _onPlayClicked;
+    private Action _onContinueClicked;
+    private Action _onNewGameClicked;
+    private Action _onLoadGameClicked;
     private Action _onSettingsClicked;
     private Action _onModsClicked;
     private Action _onQuitClicked;
+    private Action _onReportBugClicked;
+    private Action _onDiscordClicked;
+    private Action _onWishlistClicked;
+    private Action _onTwitterClicked;
+    private Action _onStatsClicked;
 
     private float _animTime = 0f;
     private const float ANIM_DURATION = 0.6f;
@@ -43,12 +50,19 @@ public class GregMainMenuReplacement : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Configure(Action onPlay, Action onSettings, Action onMods, Action onQuit)
+    public void Configure(Action onContinue, Action onNewGame, Action onLoadGame, Action onSettings, Action onMods, Action onQuit, Action onReportBug, Action onDiscord, Action onWishlist, Action onTwitter, Action onStats)
     {
-        _onPlayClicked = onPlay;
+        _onContinueClicked = onContinue;
+        _onNewGameClicked = onNewGame;
+        _onLoadGameClicked = onLoadGame;
         _onSettingsClicked = onSettings;
         _onModsClicked = onMods;
         _onQuitClicked = onQuit;
+        _onReportBugClicked = onReportBug;
+        _onDiscordClicked = onDiscord;
+        _onWishlistClicked = onWishlist;
+        _onTwitterClicked = onTwitter;
+        _onStatsClicked = onStats;
     }
 
     public void Show()
@@ -286,9 +300,16 @@ public class GregMainMenuReplacement : MonoBehaviour
 
         float btnHeight = 56f * _scaleFactor;
 
-        CreateMenuButton("PLAY", GregButtonStyle.Primary, btnHeight, () => _onPlayClicked?.Invoke());
+        CreateMenuButton("CONTINUE", GregButtonStyle.Primary, btnHeight, () => _onContinueClicked?.Invoke());
+        CreateMenuButton("NEW GAME", GregButtonStyle.Secondary, btnHeight, () => _onNewGameClicked?.Invoke());
+        CreateMenuButton("LOAD GAME", GregButtonStyle.Secondary, btnHeight, () => _onLoadGameClicked?.Invoke());
         CreateMenuButton("SETTINGS", GregButtonStyle.Secondary, btnHeight, () => _onSettingsClicked?.Invoke());
         CreateMenuButton("MODS", GregButtonStyle.Secondary, btnHeight, () => _onModsClicked?.Invoke());
+        CreateMenuButton("REPORT BUG", GregButtonStyle.Secondary, btnHeight, () => _onReportBugClicked?.Invoke());
+        CreateMenuButton("DISCORD", GregButtonStyle.Secondary, btnHeight, () => _onDiscordClicked?.Invoke());
+        CreateMenuButton("WISHLIST", GregButtonStyle.Secondary, btnHeight, () => _onWishlistClicked?.Invoke());
+        CreateMenuButton("TWITTER", GregButtonStyle.Secondary, btnHeight, () => _onTwitterClicked?.Invoke());
+        CreateMenuButton("STATS", GregButtonStyle.Secondary, btnHeight, () => _onStatsClicked?.Invoke());
         CreateMenuButton("QUIT", GregButtonStyle.Danger, btnHeight, () => _onQuitClicked?.Invoke());
     }
 

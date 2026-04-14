@@ -35,31 +35,50 @@ public static class MainMenuController
         _menuInstance = AddComponentSafe<GregMainMenuReplacement>(go);
 
         _menuInstance?.Configure(
-            onPlay: OnPlayClicked,
+            onContinue: OnContinueClicked,
+            onNewGame: OnNewGameClicked,
+            onLoadGame: OnLoadGameClicked,
             onSettings: OnSettingsClicked,
             onMods: OnModsClicked,
-            onQuit: OnQuitClicked
+            onQuit: OnQuitClicked,
+            onReportBug: OnReportBugClicked,
+            onDiscord: OnDiscordClicked,
+            onWishlist: OnWishlistClicked,
+            onTwitter: OnTwitterClicked,
+            onStats: OnStatsClicked
         );
     }
 
     public static void Show() => _menuInstance?.Show();
     public static void Hide() => _menuInstance?.Hide();
 
-    private static void OnPlayClicked()
+    private static void OnContinueClicked()
     {
-        MelonLogger.Msg("[MainMenu] Play clicked");
+        MelonLogger.Msg("[MainMenu] Continue clicked");
         Hide();
-        
+        if (GameUIButtons.ClickContinueButton())
+        {
+            UIRouter.SetMode(UIMode.Playing);
+        }
+    }
+
+    private static void OnNewGameClicked()
+    {
+        MelonLogger.Msg("[MainMenu] New Game clicked");
+        Hide();
+        if (GameUIButtons.ClickNewGameButton())
+        {
+            UIRouter.SetMode(UIMode.Playing);
+        }
+    }
+
+    private static void OnLoadGameClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Load Game clicked");
         if (GameUIButtons.ClickLoadButton())
         {
-            MelonLogger.Msg("[MainMenu] Load button invoked via reflection");
+             Hide();
         }
-        else
-        {
-            GameMethodInvoker.Invoke(GameUIElements.Types.MainGameManager, "LoadGame");
-        }
-        
-        UIRouter.SetMode(UIMode.Playing);
     }
 
     private static void OnSettingsClicked()
@@ -74,6 +93,36 @@ public static class MainMenuController
     {
         MelonLogger.Msg("[MainMenu] Mods clicked");
         gregModConfigManager.Toggle(true);
+    }
+
+    private static void OnReportBugClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Report Bug clicked");
+        GameUIButtons.ClickReportBugButton();
+    }
+
+    private static void OnDiscordClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Discord clicked");
+        GameUIButtons.ClickDiscordButton();
+    }
+
+    private static void OnWishlistClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Wishlist clicked");
+        GameUIButtons.ClickWishlistButton();
+    }
+
+    private static void OnTwitterClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Twitter clicked");
+        GameUIButtons.ClickTwitterButton();
+    }
+
+    private static void OnStatsClicked()
+    {
+        MelonLogger.Msg("[MainMenu] Stats clicked");
+        GameUIButtons.ClickStatsButton();
     }
 
     private static void OnQuitClicked()

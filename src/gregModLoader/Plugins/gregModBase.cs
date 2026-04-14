@@ -19,7 +19,7 @@ public abstract class gregModBase : MelonMod
     /// Gets the list of optional assembly/DLL names (without extension).
     /// If missing, a warning is logged but the mod still initializes.
     /// </summary>
-    public virtual string[] OptionalDependencies => Array.Empty<string>();
+    public new virtual string[] OptionalDependencies => Array.Empty<string>();
 
     /// <summary>
     /// Indicates if the dependency check failed.

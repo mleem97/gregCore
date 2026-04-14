@@ -505,8 +505,15 @@ public class gregGameApiManager : IDisposable
     {
         try {
             string name = Marshal.PtrToStringAnsi(namePtr);
-            var canvas = GameObject.FindObjectsOfType<Canvas>(true).FirstOrDefault(c => c.name == name);
-            if (canvas != null) canvas.gameObject.SetActive(active != 0);
+            var canvases = GameObject.FindObjectsOfType<Canvas>(true);
+            foreach (var canvas in canvases)
+            {
+                if (canvas.name == name)
+                {
+                    canvas.gameObject.SetActive(active != 0);
+                    break;
+                }
+            }
         } catch {}
     }
 

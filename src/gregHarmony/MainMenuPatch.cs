@@ -14,14 +14,27 @@ public static class MainMenuController
 {
     private static GregMainMenuReplacement _menuInstance;
 
+    private static T AddComponentSafe<T>(GameObject go) where T : Component
+    {
+        try
+        {
+            var method = typeof(GameObject).GetMethod("AddComponent", new Type[] { typeof(Type) });
+            return method?.Invoke(go, new object[] { typeof(T) }) as T;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static void Initialize()
     {
         if (_menuInstance != null) return;
 
         var go = new GameObject("GregMainMenu_Root");
-        _menuInstance = go.AddComponent<GregMainMenuReplacement>();
+        _menuInstance = AddComponentSafe<GregMainMenuReplacement>(go);
 
-        _menuInstance.Configure(
+        _menuInstance?.Configure(
             onPlay: OnPlayClicked,
             onSettings: OnSettingsClicked,
             onMods: OnModsClicked,

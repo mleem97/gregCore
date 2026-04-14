@@ -29,14 +29,11 @@ namespace gregAssetExporter
         private readonly greg.Exporter.RuntimeHookService runtimeHookService = new greg.Exporter.RuntimeHookService();
         private readonly greg.Exporter.GameSignalSnapshotService gameSignalSnapshotService = new greg.Exporter.GameSignalSnapshotService();
 
-#if DEBUG
-        // private greg.Exporter.TestMods.FrameworkDependencyTestMod frameworkDependencyTestMod; // TODO: removed, class does not exist
         private Texture2D debugOverlayBackgroundTexture;
         private int debugHooksAvailable;
         private int debugHookEventsAvailable;
         private int debugNotYetImplemented;
         private bool debugOverlayStatsInitialized;
-#endif
 
         public override void OnInitializeMelon()
         {
@@ -176,7 +173,6 @@ namespace gregAssetExporter
                 MelonLogger.Warning($"Debug overlay stats update failed: {ex.Message}");
             }
         }
-#endif
 
 
         private void ExportAllGameSignalsOnStartup()

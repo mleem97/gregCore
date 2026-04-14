@@ -1571,6 +1571,24 @@ public class BillboardNameTag : MonoBehaviour
 {
     public BillboardNameTag(IntPtr ptr) : base(ptr) { }
 
+    public string text { 
+        get => _tmp?.text; 
+        set { if (_tmp != null) _tmp.text = value; } 
+    }
+    private Il2CppTMPro.TextMeshProUGUI _tmp;
+
+    void Awake()
+    {
+        var canvas = gameObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        
+        var tmpGo = new GameObject("Text");
+        tmpGo.transform.SetParent(transform, false);
+        _tmp = tmpGo.AddComponent<Il2CppTMPro.TextMeshProUGUI>();
+        _tmp.fontSize = 1;
+        _tmp.alignment = Il2CppTMPro.TextAlignmentOptions.Center;
+    }
+
     void LateUpdate()
     {
         var cam = Camera.main;

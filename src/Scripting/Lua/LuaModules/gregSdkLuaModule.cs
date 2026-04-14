@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using greg.Sdk.Services;
@@ -24,8 +25,6 @@ public sealed class gregSdkLuaModule : iGregLuaModule
             t["name"] = info.Name;
             t["distance"] = info.Distance;
             t["hit_point"] = new Table(vm) { ["x"] = info.HitPoint.x, ["y"] = info.HitPoint.y, ["z"] = info.HitPoint.z };
-            // We don't expose the native object directly to moonsharp unless wrapped, 
-            // but we can return the entity name or id if needed.
             return t;
         });
 
@@ -83,14 +82,20 @@ public sealed class gregSdkLuaModule : iGregLuaModule
         sdk["ui"] = ui;
 
         ui["hijack_canvas"] = (Action<string, bool>)((name, active) => {
-            var canvas = GameObject.FindObjectsOfType<Canvas>(true).FirstOrDefault(c => c.name == name);
-            if (canvas != null) canvas.gameObject.SetActive(active);
+            var canvases = GameObject.FindObjectsOfType<Canvas>(true);
+            foreach (var c in canvases)
+            {
+                if (c.name == name)
+                {
+                    c.gameObject.SetActive(active);
+                    break;
+                }
+            }
         });
 
-        ui["create_modern_canvas"] = (Func<string, int, UserData>)((name, sorting) => {
+        ui["create_modern_canvas"] = (Func<string, int, DynValue>)((name, sorting) => {
             var canvas = GregUiService.CreateCanvas(name, sorting);
             return UserData.Create(canvas);
         });
     }
 }
-

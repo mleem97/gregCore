@@ -156,6 +156,11 @@ public class gregCoreLoader : MelonMod
             GregUIManager.Init();
             CrashLog.Log("step: GregUIManager initialized");
 
+            // Register UI replacement types in IL2CPP
+            greg.Sdk.Registries.GregIl2CppRegistry.RegisterType<greg.Core.UI.Components.GregPauseMenuReplacement>();
+            greg.Sdk.Registries.GregIl2CppRegistry.RegisterType<greg.Core.UI.Components.GregShopReplacement>();
+            CrashLog.Log("step: UI Replacement types registered in IL2CPP");
+
             ModSaveCompatibilityService.Initialize();
 
             _modsPath = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "RustMods");

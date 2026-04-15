@@ -9,6 +9,7 @@ using greg.Core.UI.Components;
 
 namespace greg.Harmony;
 
+/*
 [HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.OnEnable))]
 public static class PauseMenuPatch
 {
@@ -100,4 +101,5 @@ public static class PauseMenuResumePatch
         UIRouter.SetMode(UIMode.Playing);
     }
 }
+*/
 

@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using greg.Core.UI;
 using greg.Core.UI.Components;
+using greg.Sdk.Services;
 
 namespace greg.Harmony;
 
@@ -144,38 +145,26 @@ public static class MainMenuPatch
 
     private static IEnumerator DisableOriginalMenuCoroutine(MainMenu menu)
     {
-        int retries = 0;
-        GameObject[] canvasesToDisable = null;
+        yield return new WaitForSeconds(0.3f);
 
-        while (retries < 20)
+        if (GregUxmlService.HasOverride("MainMenu"))
         {
+            MelonLogger.Msg("[gregCore] UXML override found for MainMenu. Suppressing original UI...");
+            
             var allCanvases = Resources.FindObjectsOfTypeAll<Canvas>();
-            if (allCanvases.Length > 0)
+            var gameObjects = new GameObject[allCanvases.Length];
+            for (int i = 0; i < allCanvases.Length; i++)
             {
-                canvasesToDisable = new GameObject[allCanvases.Length];
-                for (int i = 0; i < allCanvases.Length; i++)
-                {
-                    canvasesToDisable[i] = allCanvases[i].gameObject;
-                }
-                break;
+                gameObjects[i] = allCanvases[i].gameObject;
             }
+            DisableGameCanvases(gameObjects);
 
-            retries++;
-            yield return new WaitForSeconds(0.25f);
-        }
-
-        if (canvasesToDisable != null)
-        {
-            DisableGameCanvases(canvasesToDisable);
+            GregUxmlService.ShowOverride("MainMenu");
         }
         else
         {
-            MelonLogger.Warning("[gregCore] No canvases found.");
+            MelonLogger.Msg("[gregCore] No UXML override found for MainMenu. Using original game UI.");
         }
-
-        yield return new WaitForSeconds(0.3f);
-
-        InitializeGregMenu();
     }
 
     private static void DisableGameCanvases(GameObject[] allCanvases)
@@ -208,27 +197,10 @@ public static class MainMenuPatch
             if (!shouldKeep && !canvasGo.name.Contains("GregMainMenu"))
             {
                 canvasGo.SetActive(false);
-                MelonLogger.Msg($"[gregCore] Disabled canvas: {canvasName}");
+                MelonLogger.Msg($"[gregCore] Disabled original canvas: {canvasName}");
             }
         }
 
         _isOriginalMenuDisabled = true;
-        MelonLogger.Msg("[gregCore] Original game canvases disabled.");
-    }
-
-    private static void InitializeGregMenu()
-    {
-        try
-        {
-            UIRouter.Initialize();
-            MainMenuController.Initialize();
-            MainMenuController.Show();
-            MelonLogger.Msg("[gregCore] GregMainMenuReplacement initialized successfully.");
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[gregCore] Failed to initialize GregMenu: {ex.Message}");
-            greg.Core.CrashLog.LogException("MainMenuPatch.InitializeGregMenu", ex);
-        }
     }
 }

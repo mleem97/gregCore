@@ -22,7 +22,10 @@ public static class UIRouterHooks
 
         if (to == UIMode.MainMenu)
         {
-            GregMainMenuReplacement.Instance?.Show();
+            if (GregMainMenuReplacement.Instance != null)
+            {
+                GregMainMenuReplacement.Instance.Show();
+            }
         }
         else
         {

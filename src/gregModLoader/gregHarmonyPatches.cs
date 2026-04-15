@@ -277,11 +277,36 @@ internal static class Patch_CustomerBase_AreAllAppRequirementsMet
 {
     private static readonly HashSet<int> _satisfiedCustomers = new();
 
-    internal static void Postfix(CustomerBase __instance, bool __result)
+    internal static void Postfix(CustomerBase __instance, ref bool __result)
     {
         try
         {
             int id = __instance.customerBaseID;
+
+            float cur = __instance.currentSpeed;
+            float req = __instance.currentTotalAppSpeeRequirements * greg.Sdk.Services.GregCohousingService.DemandMultiplier;
+            
+            // Re-evaluate result if demand is boosted
+            if (greg.Sdk.Services.GregCohousingService.DemandMultiplier > 1.001f)
+            {
+                if (cur < req) 
+                {
+                    __result = false;
+                }
+            }
+
+            if (!__result && greg.Sdk.Services.GregCohousingService.IsCohousingEnabled)
+            {
+                float missing = req - cur;
+                if (missing > 0f)
+                {
+                    if (greg.Sdk.Services.GregCohousingService.TryAllocateExternal(id, missing))
+                    {
+                        __result = true;
+                    }
+                }
+            }
+
             if (__result)
             {
                 if (_satisfiedCustomers.Add(id))

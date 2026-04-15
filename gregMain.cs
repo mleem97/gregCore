@@ -65,6 +65,11 @@ namespace gregAssetExporter
         {
             MelonLogger.Msg($"[gregCore] Scene Loaded: {sceneName}. Triggering data export...");
             greg.Core.Exporter.DataExporter.RunFullExport();
+
+            if (sceneName == "MainMenu")
+            {
+                greg.Core.UI.UIRouter.SetMode(greg.Core.UI.UIMode.MainMenu);
+            }
         }
 
         public override void OnApplicationQuit()
@@ -75,6 +80,14 @@ namespace gregAssetExporter
         public override void OnUpdate()
         {
             greg.Exporter.ModFramework.Events.Publish(new greg.Exporter.ModTickEvent(Time.deltaTime, Time.frameCount));
+            
+            // Central Input Management
+            greg.Sdk.Services.GregInputManagerService.Update();
+
+            if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+            {
+                greg.Core.UI.gregModConfigManager.Toggle(!greg.Core.UI.gregModConfigManager.IsOpen);
+            }
 
 #if DEBUG
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
@@ -847,4 +860,3 @@ namespace gregAssetExporter
         }
     }
 }
-

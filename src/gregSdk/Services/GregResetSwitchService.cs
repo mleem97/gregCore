@@ -254,6 +254,61 @@ public static class GregResetSwitchService
         }
     }
 
+    public static void DeepRepairAll()
+    {
+        MelonLogger.Msg("[GregResetSwitchService] INITIATING DEEP REPAIR of all network components...");
+        try
+        {
+            // 1. Refresh all switches
+            var switches = UnityEngine.Object.FindObjectsOfType<NetworkSwitch>(true);
+            foreach (var sw in switches)
+            {
+                if (sw == null) continue;
+                if (!sw.isBroken && sw.isOn)
+                {
+                    sw.TurnOffCommonFunctions();
+                    sw.TurnOnCommonFunction();
+                    sw.UpdateScreenUI();
+                }
+            }
+
+            // 2. Refresh all servers
+            var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>(true);
+            foreach (var srv in servers)
+            {
+                if (srv == null) continue;
+                if (!srv.isBroken && srv.isOn)
+                {
+                    // Many servers share logic with switches or have similar 'TurnOn' methods
+                    TryInvokeFirst(srv, "TurnOff", "PowerOff", "ShutDown");
+                    TryInvokeFirst(srv, "TurnOn", "PowerOn", "Boot");
+                }
+            }
+
+            // 3. Validate all cable links
+            var cables = UnityEngine.Object.FindObjectsOfType<CableLink>(true);
+            foreach (var cable in cables)
+            {
+                if (cable == null) continue;
+                TryInvokeFirst(cable, "ValidateConnection", "Refresh", "UpdateState");
+            }
+
+            // 4. Force global map rebuild
+            if (NetworkMap.instance != null)
+            {
+                NetworkMap.instance.ClearMap();
+                // Wait a bit or call internal rebuild if found via reflection
+                TryInvokeFirst(NetworkMap.instance, "RebuildMap", "ValidateTopology", "RecalculateAllPaths");
+            }
+
+            MelonLogger.Msg("[GregResetSwitchService] Deep repair completed.");
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[GregResetSwitchService] Deep repair failed: {ex.Message}");
+        }
+    }
+
     private static bool IsNodeAService(string nodeId)
     {
         var servers = UnityEngine.Object.FindObjectsOfType<Server>(true);

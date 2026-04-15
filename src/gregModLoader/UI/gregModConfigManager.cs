@@ -46,6 +46,7 @@ public static class gregModConfigManager
             GregUiService.AddHorizontalLayout(tabBar, 20);
 
             GregUiService.CreateModernButton(tabBar.transform, "TabMods", "MODS", () => ShowTab("MODS"));
+            GregUiService.CreateModernButton(tabBar.transform, "TabHotkeys", "HOTKEYS", () => ShowTab("HOTKEYS"));
             GregUiService.CreateModernButton(tabBar.transform, "TabMaintenance", "MAINTENANCE", () => ShowTab("MAINTENANCE"));
             GregUiService.CreateModernButton(tabBar.transform, "TabUI", "UI TAKEOVER", () => ShowTab("UI"));
 
@@ -90,9 +91,9 @@ public static class gregModConfigManager
     {
         if (_contentRoot == null) return;
         
-        foreach (Transform child in _contentRoot)
+        for (int i = _contentRoot.childCount - 1; i >= 0; i--)
         {
-            UnityEngine.Object.Destroy(child.gameObject);
+            UnityEngine.Object.Destroy(_contentRoot.GetChild(i).gameObject);
         }
 
         if (tabId == "MODS")
@@ -101,6 +102,33 @@ public static class gregModConfigManager
             AddSettingToggle("gregCore", "Enable Verbose Logging", false);
             AddSettingHeader("HexViewer");
             AddSettingToggle("HexViewer", "Enabled", true);
+        }
+        else if (tabId == "HOTKEYS")
+        {
+            AddSettingHeader("Global Hotkey Management");
+            var hotkeys = GregInputManagerService.GetHotkeys();
+
+            if (hotkeys.Count == 0)
+            {
+                GregUiService.CreateLabel(_contentRoot, "NoHotkeys", "NO HOTKEYS REGISTERED YET.", 14);
+            }
+
+            foreach (var h in hotkeys)
+            {
+                var row = GregUiService.CreateModernPanel(_contentRoot, $"Hotkey_{h.ModId}_{h.ActionName}", new Vector2(800, 50));
+                row.GetComponent<Image>().color = new Color(0, 0, 0, 0.2f);
+                GregUiService.AddHorizontalLayout(row, 10);
+
+                GregUiService.CreateLabel(row.transform, "Mod", $"[{h.ModId}]", 12).color = Color.gray;
+                GregUiService.CreateLabel(row.transform, "Action", h.ActionName, 14);
+                GregUiService.CreateLabel(row.transform, "Key", h.KeyName, 14).color = new Color(0.38f, 0.96f, 0.85f);
+                
+                string btnText = h.IsEnabled ? "ENABLED" : "DISABLED";
+                GregUiService.CreateModernButton(row.transform, "Toggle", btnText, () => {
+                    GregInputManagerService.SetHotkeyEnabled(h.ModId, h.ActionName, !h.IsEnabled);
+                    ShowTab("HOTKEYS");
+                });
+            }
         }
         else if (tabId == "UI")
         {

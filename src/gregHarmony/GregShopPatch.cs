@@ -7,7 +7,8 @@ using greg.Core.UI.Components;
 
 namespace greg.Harmony;
 
-[HarmonyPatch(typeof(ComputerShop), "OnEnable")]
+/*
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.OnLoad))]
 public static class GregShopPatch
 {
     static void Postfix(ComputerShop __instance)
@@ -57,3 +58,4 @@ public static class GregShopPatch
         GameUIButtons.ClickButtonByName("ButtonCheckOut");
     }
 }
+*/

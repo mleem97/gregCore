@@ -351,9 +351,7 @@ public static class CustomEmployeeManager
             for (int i = contentGrid.childCount - 1; i >= 0; i--)
             {
                 var child = contentGrid.GetChild(i);
-                if (child.gameObject.activeSelf &&
-                    child.name.StartsWith("EmployeeCard") &&
-                    !child.name.StartsWith("CustomEmployee_"))
+                if (!child.name.StartsWith("CustomEmployee_") && child.name != "Viewport" && child.name != "Scrollbar")
                 {
                     templateCard = child;
                     break;
@@ -533,7 +531,7 @@ public static class CustomEmployeeManager
     {
         var hrSystems = UnityEngine.Object.FindObjectsOfType<HRSystem>();
         if (hrSystems == null) return;
-        for (int i = 0; i < hrSystems.Count; i++)
+        for (int i = 0; i < hrSystems.Length; i++)
         {
             var hr = hrSystems[i];
             if (hr == null || !hr.gameObject.activeInHierarchy) continue;
@@ -730,7 +728,7 @@ public static class CustomEmployeeManager
             var hrSystems = UnityEngine.Object.FindObjectsOfType<HRSystem>();
             if (hrSystems == null) return;
 
-            for (int h = 0; h < hrSystems.Count; h++)
+            for (int h = 0; h < hrSystems.Length; h++)
             {
                 var hr = hrSystems[h];
                 if (hr == null) continue;

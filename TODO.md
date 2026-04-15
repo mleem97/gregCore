@@ -30,6 +30,15 @@ Dieses Dokument ist der zentrale Masterplan für das Greg Framework. Es wird lau
 - [x] ~~9 System-Bridges (Shop, Time, Player etc.)~~
 - [x] ~~Pre-Release v1.0.0 veröffentlicht~~
 
+## ✅ Phase 4.5: gregUI Framework & Release v1.0.0.30-pre (Abgeschlossen)
+- [x] ~~gregUI Framework mit vollständiger UGUI-Manipulation~~
+- [x] ~~GregUIBuilder Fluent API~~
+- [x] ~~Luminescent Architect Design System~~
+- [x] ~~HexViewer Integration (F1, F2, F3 Developer Tools)~~
+- [x] ~~UI Hooks Kategorie (`greg.UI.*`)~~
+- [x] ~~v1.0.0.30-pre Release mit allen Dependencies~~
+- [x] ~~GitHub Release mit DLL-Downloads~~
+
 ## 🚧 Phase 5: Economy & Data (In Arbeit)
 - [ ] **SaveSystem & SaveData**: Abstraktion des Speichervorgangs. Ermöglicht Custom-Save-Daten für Mods.
 - [ ] **BalanceSheet & Finanzen**: Zugriff auf Einnahmen, Ausgaben und historische Daten.
@@ -58,4 +67,6 @@ Dieses Dokument ist der zentrale Masterplan für das Greg Framework. Es wird lau
 ## Technischer Status
 - **Aktuelle Coverage**: ~65% der IL2CPP-Kernlogik bridged.
 - **Letzter Snapshot-Abgleich**: 11. April 2026
+- **Aktuelle Release**: v1.0.0.30-pre (15. April 2026)
+- **GitHub**: https://github.com/mleem97/gregCore/releases/tag/v1.0.0.30-pre
 

@@ -8,9 +8,9 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-  
+
   <Import Project="../shared/gregFramework.props" />
-  
+
   <ItemGroup>
     <PackageReference Include="Jint" Version="4.1.0" />
   </ItemGroup>
@@ -21,5 +21,3 @@
     <None Remove="tests\**" />
   </ItemGroup>
 </Project>
-
-

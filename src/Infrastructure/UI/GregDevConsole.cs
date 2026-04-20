@@ -1,13 +1,13 @@
 /// <file-summary>
 /// Schicht:      Infrastructure
 /// Zweck:        In-Game DevConsole Overlay mittels Unity IMGUI.
-/// Maintainer:   Läuft im Unity Main Thread. Nutzt UnityEngine.GUI.
+/// Maintainer:   Läuft im Unity Main Thread. Nutzt UnityEngine.GUI & GUILayout.
 /// </file-summary>
 
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace gregCore.Infrastructure.Performance; // Integration in den Performance-Gedanken (Overlay-Last)
+namespace gregCore.Infrastructure.UI;
 
 internal sealed class GregDevConsole
 {
@@ -19,7 +19,6 @@ internal sealed class GregDevConsole
     private readonly List<string> _logs = new();
     private readonly Dictionary<string, Action<string[]>> _commands = new();
     private Vector2 _scroll;
-    private GUIStyle? _boxStyle;
 
     private GregDevConsole()
     {
@@ -41,7 +40,6 @@ internal sealed class GregDevConsole
         if (IsOpen)
         {
             _input = "";
-            // Cursor-Locking wird über Patches/Input blockiert
         }
     }
 
@@ -56,34 +54,26 @@ internal sealed class GregDevConsole
     {
         if (!IsOpen) return;
 
-        // Simple IMGUI Style
-        if (_boxStyle == null)
-        {
-            _boxStyle = new GUIStyle(GUI.skin.box);
-            _boxStyle.normal.background = MakeTex(2, 2, new Color(0, 0, 0, 0.8f));
-        }
-
         float width = Screen.width * 0.8f;
         float height = Screen.height * 0.4f;
         float x = (Screen.width - width) / 2;
 
-        GUI.Box(new Rect(x, 10, width, height), "<b>gregCore DevConsole</b>", _boxStyle);
+        GUILayout.BeginArea(new Rect(x, 10, width, height), GUI.skin.box);
         
-        // Logs
-        GUILayout.BeginArea(new Rect(x + 10, 40, width - 20, height - 80));
+        GUILayout.Label("<b>gregCore DevConsole</b>");
+        
         _scroll = GUILayout.BeginScrollView(_scroll);
         foreach (var log in _logs)
         {
             GUILayout.Label(log);
         }
         GUILayout.EndScrollView();
-        GUILayout.EndArea();
 
-        // Input
+        GUILayout.BeginHorizontal();
         GUI.SetNextControlName("GregConsoleInput");
-        _input = GUI.TextField(new Rect(x + 10, height - 30, width - 120, 25), _input);
+        _input = GUILayout.TextField(_input);
         
-        if (GUI.Button(new Rect(x + width - 100, height - 30, 90, 25), "Run") || 
+        if (GUILayout.Button("Run", GUILayout.Width(80)) || 
             (Event.current.isKey && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "GregConsoleInput"))
         {
             if (!string.IsNullOrWhiteSpace(_input))
@@ -93,37 +83,33 @@ internal sealed class GregDevConsole
             }
             GUI.FocusControl("GregConsoleInput");
         }
+        GUILayout.EndHorizontal();
 
-        GUI.FocusControl("GregConsoleInput");
+        GUILayout.EndArea();
+
+        if (GUI.GetNameOfFocusedControl() != "GregConsoleInput")
+        {
+            GUI.FocusControl("GregConsoleInput");
+        }
     }
 
     private void Execute(string input)
     {
         Log($"> {input}");
-        var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var parts = input.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 0) return;
 
         var cmd = parts[0].ToLower();
-        var args = parts.Length > 1 ? parts[1..] : Array.Empty<string>();
+        var args = parts.Length > 1 ? parts[1..] : System.Array.Empty<string>();
 
         if (_commands.TryGetValue(cmd, out var action))
         {
             try { action(args); }
-            catch (Exception ex) { Log($"<color=red>Fehler: {ex.Message}</color>"); }
+            catch (System.Exception ex) { Log($"<color=red>Fehler: {ex.Message}</color>"); }
         }
         else
         {
             Log($"<color=yellow>Unbekannter Befehl: {cmd}</color>");
         }
-    }
-
-    private Texture2D MakeTex(int width, int height, Color col)
-    {
-        Color[] pix = new Color[width * height];
-        for (int i = 0; i < pix.Length; ++i) pix[i] = col;
-        Texture2D result = new Texture2D(width, height);
-        result.SetPixels(pix);
-        result.Apply();
-        return result;
     }
 }

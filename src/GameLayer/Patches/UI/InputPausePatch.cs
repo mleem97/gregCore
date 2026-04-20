@@ -5,7 +5,7 @@
 /// </file-summary>
 
 using HarmonyLib;
-using gregCore.Infrastructure.Performance;
+using gregCore.Infrastructure.UI;
 
 namespace gregCore.GameLayer.Patches.UI;
 

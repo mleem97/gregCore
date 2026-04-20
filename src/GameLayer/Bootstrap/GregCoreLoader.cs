@@ -27,7 +27,7 @@ public sealed class GregCoreLoader : MelonMod
     {
         if (global::UnityEngine.Input.GetKeyDown(global::UnityEngine.KeyCode.P))
         {
-            global::gregCore.Infrastructure.Performance.GregDevConsole.Instance.Toggle();
+            global::gregCore.Infrastructure.UI.GregDevConsole.Instance.Toggle();
         }
 
         _container?.Get<gregCore.Infrastructure.Performance.GregPerformanceGovernor>()?.OnUpdate();
@@ -36,7 +36,7 @@ public sealed class GregCoreLoader : MelonMod
 
     public override void OnGUI()
     {
-        global::gregCore.Infrastructure.Performance.GregDevConsole.Instance.OnGUI();
+        global::gregCore.Infrastructure.UI.GregDevConsole.Instance.OnGUI();
     }
 
     public override void OnSceneWasLoaded(int buildIndex, string sceneName) =>

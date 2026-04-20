@@ -37,7 +37,7 @@ The framework is strictly layered (as detailed in `modding_core_architecture_sum
 1. `HarmonyPatches` intercept Unity methods (Prefix/Postfix).
 2. Data is extracted into primitive/struct DTOs.
 3. Dispatched via `GregEventBus` using canonical hook names: `greg.<Domain>.<Event>`.
-4. Mappings are defined in `assets/greg_hooks.json` and `NativeEventHooks.cs`.
+4. Mappings are defined in `assets/greg_hooks.json` and loaded dynamically via `GregHookRegistry` (`IGregHookRegistry`), providing stable hashed Event-IDs for the FFI.
 
 ## 4. Conventions and Rules
 

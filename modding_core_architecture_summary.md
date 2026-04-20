@@ -53,7 +53,7 @@
 5. Hook-Payload wird normalisiert (`BuildPayload(...)`) und an Bus/FFI weitergereicht.
 
 ### Canonical Hook-Namen
-- Mapping zentral in `src/gregSdk/gregNativeEventHooks.cs`.
+- Mapping erfolgt dynamisch via `GregHookRegistry` (`assets/greg_hooks.json`), was Hash-basierte Event-IDs für das FFI generiert.
 - Primärquelle für Namen: `greg_hooks.json` + framework-only Ergänzungen via `gregHookName.Create(...)`.
 - Fallback bei unbekannten IDs: `greg.SYSTEM.UnmappedNativeEvent`.
 

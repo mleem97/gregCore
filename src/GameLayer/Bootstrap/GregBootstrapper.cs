@@ -11,6 +11,7 @@ using gregCore.Infrastructure.Plugins;
 using gregCore.Infrastructure.Scripting.Lua;
 using gregCore.Infrastructure.Scripting.Js;
 using gregCore.GameLayer.Hooks;
+using gregCore.Core.Abstractions;
 
 namespace gregCore.GameLayer.Bootstrap;
 
@@ -28,6 +29,7 @@ internal static class GregBootstrapper
         container.Register<IGregEventBus>(bus);
         container.Register<IGregConfigService>(new GregConfigService(logger));
         container.Register<IGregPersistenceService>(new GregPersistenceService(logger));
+        container.Register<IGregHookRegistry>(new GregHookRegistry(logger));
 
         var apiContext = new global::gregCore.PublicApi.GregApiContext {
             Logger = logger,

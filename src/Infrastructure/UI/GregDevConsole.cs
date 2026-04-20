@@ -37,9 +37,23 @@ internal sealed class GregDevConsole
     public void Toggle()
     {
         IsOpen = !IsOpen;
+        
+        var mgm = global::Il2Cpp.MainGameManager.instance;
+
         if (IsOpen)
         {
             _input = "";
+            if (mgm != null) mgm.isPauseMenuDisallowed = true;
+            
+            global::UnityEngine.Cursor.visible = true;
+            global::UnityEngine.Cursor.lockState = global::UnityEngine.CursorLockMode.None;
+        }
+        else
+        {
+            if (mgm != null) mgm.isPauseMenuDisallowed = false;
+            
+            global::UnityEngine.Cursor.visible = false;
+            global::UnityEngine.Cursor.lockState = global::UnityEngine.CursorLockMode.Locked;
         }
     }
 

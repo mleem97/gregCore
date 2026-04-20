@@ -51,7 +51,7 @@ jobs:
           New-Item -ItemType Directory -Path $releaseDir -Force
           
           # gregCore
-          $coreDll = "gregCore/src/bin/Release/net8.0/gregCore.dll"
+          $coreDll = "gregCore/src/bin/Release/net6.0/gregCore.dll"
           if (Test-Path $coreDll) {
             Copy-Item $coreDll $releaseDir/
             Compress-Archive -Path $coreDll, "gregCore/README.md" -DestinationPath "$releaseDir/gregCore-v${{ env.VERSION }}.zip"

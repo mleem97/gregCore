@@ -20,6 +20,7 @@ pub struct GregCoreAPI {
     pub log_warning: extern "C" fn(*const c_char),
     pub log_error:   extern "C" fn(*const c_char),
     pub get_player_money: extern "C" fn() -> f64,
+    pub on_hook:          extern "C" fn(*const c_char, *const c_void),
     // ... restliche Felder
 }
 
@@ -37,17 +38,32 @@ pub extern "C" fn greg_mod_info() -> GregModInfo {
     }
 }
 
+// Example of a Rust hook subscription
+extern "C" fn on_hook_callback(hook_name: *const i8, trigger: *const i8, json_data: *const i8) {
+    let hook_name = unsafe { CStr::from_ptr(hook_name).to_string_lossy() };
+    let trigger = unsafe { CStr::from_ptr(trigger).to_string_lossy() };
+    let json_data = unsafe { CStr::from_ptr(json_data).to_string_lossy() };
+
+    println!("Rust Hook received: {} (Trigger: {}) - Data: {}", hook_name, trigger, json_data);
+}
+
 #[no_mangle]
 pub extern "C" fn greg_mod_init(api: *const GregCoreAPI) -> bool {
-    unsafe {
-        API = Some(&*api);
-        let msg = CString::new("Rust Mod Initialisiert!").unwrap();
-        ((*api).log_info)(msg.as_ptr());
-    }
+    let api = unsafe { &*api };
+    
+    // Subscribe to a hook
+    let hook_name = CString::new("greg.PLAYER.CoinChanged").unwrap();
+    (api.on_hook)(hook_name.as_ptr(), on_hook_callback as *const ());
+    
     true
 }
 
 #[no_mangle]
 pub extern "C" fn greg_mod_update(dt: f32) {
-    // Logik pro Frame
+    // Update logic
+}
+
+#[no_mangle]
+pub extern "C" fn greg_mod_shutdown() {
+    println!("Rust Example Mod shutdown.");
 }

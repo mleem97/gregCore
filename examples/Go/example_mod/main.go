@@ -1,3 +1,4 @@
+// example_mod/main.go
 package main
 
 /*
@@ -23,9 +24,10 @@ typedef struct {
 } GregModInfo;
 */
 import "C"
-import "unsafe"
-
-var api *C.GregCoreAPI
+import (
+    "fmt"
+    "unsafe"
+)
 
 //export greg_mod_info
 func greg_mod_info() C.GregModInfo {
@@ -39,19 +41,34 @@ func greg_mod_info() C.GregModInfo {
     }
 }
 
+//export onHookCallback
+func onHookCallback(hookName, trigger, jsonData *C.char) {
+    hookNameStr := C.GoString(hookName)
+    triggerStr := C.GoString(trigger)
+    jsonDataStr := C.GoString(jsonData)
+
+    fmt.Printf("Go Hook received: %s (Trigger: %s) - Data: %s\n", hookNameStr, triggerStr, jsonDataStr)
+}
+
 //export greg_mod_init
-func greg_mod_init(api_ptr *C.GregCoreAPI) bool {
-    api = api_ptr
-    msg := C.CString("Go Mod Initialized!")
-    defer C.free(unsafe.Pointer(msg))
-    C.bridge_log_info(api.log_info, msg)
+func greg_mod_init(api *GregCoreAPI) bool {
+    // Subscribe to a hook
+    hookName := C.CString("greg.PLAYER.CoinChanged")
+    defer C.free(unsafe.Pointer(hookName))
+    
+    api.OnHook(hookName, (unsafe.Pointer)(C.onHookCallback))
+    
     return true
 }
 
-// Helper to call C function pointers
-//go:uintptrescapes
-func callLog(fn unsafe.Pointer, msg *C.char) {
-    // This requires cgo bridge helpers usually
+//export greg_mod_update
+func greg_mod_update(dt float32) {
+    // Update logic
+}
+
+//export greg_mod_shutdown
+func greg_mod_shutdown() {
+    fmt.Println("Go Example Mod shutdown.")
 }
 
 func main() {}

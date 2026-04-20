@@ -1,17 +1,24 @@
+# example_mod/main.py
 def on_init():
     greg.log_info("Python Example Mod initialized!")
-    greg.show_notification("Python Mod Active")
+    
+    # Subscribe to coin changed hook
+    def on_coin_changed(payload):
+        amount = payload["data"]["Amount"]
+        total = payload["data"]["Total"]
+        greg.log_info(f"Python received money update: {amount} (Total: {total})")
+        
+        # Fire a custom hook back
+        greg.fire("greg.CUSTOM.PythonResponse", {
+            "msg": "Python heard that!",
+            "received_total": total
+        })
+
+    greg.on("greg.PLAYER.CoinChanged", on_coin_changed)
 
 def on_update(dt):
-    # dt is deltaTime
+    # Update logic
     pass
 
-def on_event(event_id, data):
-    if event_id == 100: # MoneyChanged
-        greg.log_info("Money changed! Current: " + str(greg.get_player_money()))
-
-def on_scene_loaded(name):
-    greg.log_info("Entered scene: " + name)
-
 def on_shutdown():
-    greg.log_info("Python Mod shutting down.")
+    greg.log_info("Python Example Mod shutdown.")

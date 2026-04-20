@@ -4,10 +4,10 @@ namespace gregCore.PublicApi;
 
 public static class greg
 {
-    internal static GregApiContext? _context;
+    public static GregApiContext? _context;
     private static GregApiContext Context => _context ?? throw new InvalidOperationException("gregCore nicht initialisiert.");
 
-    internal static gregCore.Infrastructure.Performance.GregPerformanceGovernor? _governor;
+    public static gregCore.Infrastructure.Performance.GregPerformanceGovernor? _governor;
 
     private static GregEconomyModule? _economy;
     private static GregNetworkModule? _network;

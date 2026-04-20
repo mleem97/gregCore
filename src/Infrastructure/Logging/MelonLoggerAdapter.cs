@@ -22,6 +22,7 @@ public sealed class MelonLoggerAdapter : IGregLogger
 
     public void Debug(string message) => _melonLogger.Msg(ConsoleColor.Gray, $"{_prefix}{message}");
     public void Info(string message) => _melonLogger.Msg(ConsoleColor.White, $"{_prefix}{message}");
+    public void Success(string message) => _melonLogger.Msg(ConsoleColor.Green, $"{_prefix}{message}");
     public void Warning(string message) => _melonLogger.Warning($"{_prefix}{message}");
     public void Error(string message, Exception? ex = null)
     {

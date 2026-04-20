@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using gregCore.Core.Models;
+
 namespace gregCore.PublicApi.Modules;
 
 public sealed class GregUIModule
@@ -7,9 +11,10 @@ public sealed class GregUIModule
 
     public void ShowToast(string message, float durationSeconds = 3f)
         => _ctx.EventBus.Publish("greg.ui.ShowToast", new EventPayload { 
+            HookName = "greg.ui.ShowToast",
             OccurredAtUtc = DateTime.UtcNow, 
             Data = new Dictionary<string, object> { ["message"] = message, ["duration"] = durationSeconds } 
         });
 
-    public void ShowError(string message) => ShowToast($"⚠ {message}", 5f);
+    public void ShowNotification(string message) => ShowToast(message, 5f);
 }

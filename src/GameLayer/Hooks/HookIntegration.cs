@@ -29,7 +29,26 @@ internal static class HookIntegration
 
     internal static void Emit(HookName hook, EventPayload payload)
     {
-        try { _bus.Publish(hook.Full, payload); }
+        try 
+        { 
+            _bus.Publish(hook.Full, payload); 
+            
+            // Legacy Support Trigger
+            if (hook.Domain == "economy" && hook.Event == "PlayerCoinUpdated")
+            {
+                if (payload.Data.TryGetValue("NewValue", out var val) && val is float f)
+                    global::greg.Sdk.gregNativeEventHooks.ByEventId.MoneyChanged(f);
+            }
+            else if (hook.Domain == "economy" && hook.Event == "PlayerReputationUpdated")
+            {
+                if (payload.Data.TryGetValue("NewValue", out var val) && val is float f)
+                    global::greg.Sdk.gregNativeEventHooks.ByEventId.ReputationChanged(f);
+            }
+            else if (hook.Domain == "system" && hook.Event == "GameLoaded")
+                global::greg.Sdk.gregNativeEventHooks.ByEventId.GameLoaded();
+            else if (hook.Domain == "system" && hook.Event == "GameSaved")
+                global::greg.Sdk.gregNativeEventHooks.ByEventId.GameSaved();
+        }
         catch (Exception ex)
         {
             _logger.Error($"Emit fehlgeschlagen für {hook.Full}", ex);

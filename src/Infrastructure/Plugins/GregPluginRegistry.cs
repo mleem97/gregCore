@@ -12,6 +12,7 @@ public sealed class GregPluginRegistry : IGregPluginRegistry
     private readonly IGregLogger _logger;
     private readonly IGregEventBus _eventBus;
     private readonly List<PluginInfo> _loadedPlugins = new();
+    private readonly Dictionary<string, ModMetadata> _registeredMods = new();
 
     public GregPluginRegistry(IAssemblyScanner scanner, IGregLogger logger, IGregEventBus eventBus)
     {
@@ -19,6 +20,26 @@ public sealed class GregPluginRegistry : IGregPluginRegistry
         _logger = logger.ForContext("PluginRegistry");
         _eventBus = eventBus;
     }
+
+    public void RegisterMod(ModMetadata metadata)
+    {
+        if (string.IsNullOrEmpty(metadata.ModId))
+        {
+            _logger.Error("Mod-Registrierung fehlgeschlagen: ModId ist leer.");
+            return;
+        }
+
+        _registeredMods[metadata.ModId] = metadata;
+        _logger.Info($"Mod registriert: {metadata.Name} ({metadata.Version}) [ID: {metadata.ModId}]");
+    }
+
+    public ModMetadata GetModMetadata(string modId)
+    {
+        _registeredMods.TryGetValue(modId, out var metadata);
+        return metadata;
+    }
+
+    public IEnumerable<ModMetadata> GetAllRegisteredMods() => _registeredMods.Values;
 
     public void LoadAll()
     {

@@ -12,17 +12,15 @@
 
     <!-- ── NuGet Identity ────────────────────────────────────────── -->
     <PackageId>gregCore</PackageId>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <Authors>mleem97</Authors>
-    <Company>mleem97</Company>
+    <Version>1.0.0.33-pre</Version>
+    <AssemblyVersion>1.0.0.33</AssemblyVersion>
+    <FileVersion>1.0.0.33</FileVersion>
+    <Authors>TeamGreg</Authors>
+    <Company>TeamGreg</Company>
     <Product>gregCore</Product>
     <Description>
-      Framework SDK for Data Center (Unity 6 IL2CPP) MelonLoader mods.
-      Provides GregHookBus, Services, Registries and Harmony-safe patch
-      infrastructure. Reference-only package — runtime DLL ships separately
-      via MelonLoader Mods folder.
+      gregCore Modding Framework für Data Center
+      Inkludiert C# Compatibility Layer für DataCenter-RustBridge.
     </Description>
     <PackageTags>melonloader;unity;il2cpp;modding;datacenter;gregcore</PackageTags>
     <PackageProjectUrl>https://github.com/mleem97/gregCore</PackageProjectUrl>
@@ -91,10 +89,13 @@
 
   <ItemGroup>
     <PackageReference Include="Jint" Version="4.1.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+    <PackageReference Include="pythonnet" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="tests\**" />
+    <Compile Remove="plugins\DataCenter-RustBridge\**" />
     <EmbeddedResource Remove="tests\**" />
     <None Remove="tests\**" />
   </ItemGroup>

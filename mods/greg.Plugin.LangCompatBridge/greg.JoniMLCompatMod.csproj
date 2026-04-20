@@ -1,0 +1,148 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>greg.JoniMLCompatMod</AssemblyName>
+    <RootNamespace>DataCenterModLoader</RootNamespace>
+    <Description>MelonLoader mod that provides a Rust FFI bridge for Data Center</Description>
+    <!-- Suppress warnings about version conflicts with Il2Cpp assemblies -->
+    <NoWarn>CS1701;CS1702</NoWarn>
+    <!-- Add both MelonLoader directories as assembly search paths for transitive dependency resolution -->
+    <ReferencePath>$(MelonLoaderDir)\net6;$(MelonLoaderDir)\Il2CppAssemblies</ReferencePath>
+    <AssemblySearchPaths>{CandidateAssemblyFiles};{HintPathFromItem};$(MelonLoaderDir)\net6;$(MelonLoaderDir)\Il2CppAssemblies;{TargetFrameworkDirectory};{RawFileName}</AssemblySearchPaths>
+  </PropertyGroup>
+
+  <!--
+    MelonLoader + Il2Cpp assemblies live under the game folder.
+    Override if your install path differs:
+      dotnet build -c Release -p:DataCenterGameRoot="C:\Program Files (x86)\Steam\steamapps\common\Data Center"
+    Or set DataCenterGameRoot in Directory.Build.props.
+  -->
+  <PropertyGroup>
+    <DataCenterGameRoot Condition="'$(DataCenterGameRoot)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Data Center</DataCenterGameRoot>
+    <MelonLoaderDir>$(DataCenterGameRoot)\MelonLoader</MelonLoaderDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- MelonLoader core -->
+    <Reference Include="MelonLoader">
+      <HintPath>$(MelonLoaderDir)\net6\MelonLoader.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- HarmonyX (shipped with MelonLoader, needed for [HarmonyPatch] attributes) -->
+    <Reference Include="0Harmony">
+      <HintPath>$(MelonLoaderDir)\net6\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Il2CppInterop runtime (needed for Il2Cpp type access) -->
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(MelonLoaderDir)\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Il2Cpp mscorlib (needed for Il2Cpp base types like Il2CppObjectBase) -->
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Il2CppSystem (needed for Il2Cpp collection types) -->
+    <Reference Include="Il2CppSystem">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Game assembly (contains PlayerManager, BalanceSheet, TimeController, etc.) -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Unity engine core (contains UnityEngine.Object, Time, MonoBehaviour, etc.) -->
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+
+
+    <!-- Unity UI module (needed for Button, Text, Image, LayoutGroup, etc.) -->
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- TextMeshPro (needed for TextMeshProUGUI text component access) -->
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- AI Module (needed for NavMeshAgent removal on remote player models) -->
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.AIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- UI Module (needed for Canvas, RenderMode on nametags) -->
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Input Legacy Module (needed for Input.GetKeyDown, KeyCode) -->
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Unity Input System (new Input System package, needed for Keyboard.current) -->
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Text Rendering Module (needed for FontStyle, TextAnchor in IMGUI styles) -->
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- IMGUI Module (needed for GUI/GUILayout in multiplayer panel) -->
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Unity Physics Module (needed for Collider/Rigidbody if used) -->
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Image Conversion Module (needed for ImageConversion.LoadImage to load PNG portraits) -->
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Animation Module (needed for Animator, AnimatorControllerParameterType on remote players) -->
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- UMA Core (needed for DynamicCharacterAvatar, UMAData, UMAGenerator on remote players) -->
+    <Reference Include="Il2CppUMA_Core">
+      <HintPath>$(MelonLoaderDir)\Il2CppAssemblies\Il2CppUMA_Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+  </ItemGroup>
+
+</Project>

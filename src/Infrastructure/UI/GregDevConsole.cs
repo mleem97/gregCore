@@ -1,140 +1,66 @@
-/// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        In-Game DevConsole Overlay mittels Unity IMGUI.
-/// Maintainer:   Läuft im Unity Main Thread. Nutzt UnityEngine.GUI & GUILayout.
-/// </file-summary>
-
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
+using MelonLoader;
 
 namespace gregCore.Infrastructure.UI;
 
-internal sealed class GregDevConsole
+public sealed class GregDevConsole
 {
-    private static GregDevConsole? _instance;
-    public static GregDevConsole Instance => _instance ??= new GregDevConsole();
+    private static readonly Lazy<GregDevConsole> _instance = new(() => new GregDevConsole());
+    public static GregDevConsole Instance => _instance.Value;
 
-    public bool IsOpen { get; private set; }
-    private string _input = "";
-    private readonly List<string> _logs = new();
-    private readonly Dictionary<string, Action<string[]>> _commands = new();
-    private Vector2 _scroll;
+    private bool _isOpen = false;
+    public bool IsOpen => _isOpen;
 
-    private GregDevConsole()
+    private Rect _windowRect = new Rect(20f, 20f, 600f, 400f);
+    private string _inputCommand = "";
+    private readonly List<LogEntry> _logs = new();
+    private Vector2 _scrollPosition;
+
+    public void Toggle() => _isOpen = !_isOpen;
+
+    public void AddLog(string message, LogType type)
     {
-        RegisterCommand("help", _ => Log("Verfügbare Befehle: " + string.Join(", ", _commands.Keys)));
-        RegisterCommand("clear", _ => _logs.Clear());
-        RegisterCommand("exit", _ => Toggle());
-        
-        Log("gregCore DevConsole initialisiert. Tippe 'help' für Befehle.");
-    }
-
-    public void RegisterCommand(string name, Action<string[]> action)
-    {
-        _commands[name.ToLower()] = action;
-    }
-
-    public void Toggle()
-    {
-        IsOpen = !IsOpen;
-        
-        var mgm = global::Il2Cpp.MainGameManager.instance;
-
-        if (IsOpen)
-        {
-            _input = "";
-            if (mgm != null) mgm.isPauseMenuDisallowed = true;
-            
-            global::UnityEngine.Cursor.visible = true;
-            global::UnityEngine.Cursor.lockState = global::UnityEngine.CursorLockMode.None;
-        }
-        else
-        {
-            if (mgm != null) mgm.isPauseMenuDisallowed = false;
-            
-            global::UnityEngine.Cursor.visible = false;
-            global::UnityEngine.Cursor.lockState = global::UnityEngine.CursorLockMode.Locked;
-        }
-    }
-
-    public void Log(string message)
-    {
-        _logs.Add($"[{DateTime.Now:HH:mm:ss}] {message}");
+        _logs.Add(new LogEntry { Message = message, Type = type, Time = DateTime.Now });
         if (_logs.Count > 100) _logs.RemoveAt(0);
-        _scroll.y = float.MaxValue; 
+        _scrollPosition.y = float.MaxValue; 
     }
 
     public void OnGUI()
     {
-        if (!IsOpen) return;
+        if (!_isOpen) return;
+        _windowRect = GUILayout.Window(1337, _windowRect, (Action<int>)DrawWindow, "gregCore DevConsole");
+    }
 
-        float width = Screen.width * 0.8f;
-        float height = Screen.height * 0.4f;
-        float x = (Screen.width - width) / 2;
-
-        GUILayout.BeginArea(new Rect(x, 10, width, height), GUI.skin.box);
-        
-        GUILayout.Label("<b>gregCore DevConsole</b>");
-        
-        _scroll = GUILayout.BeginScrollView(_scroll);
+    private void DrawWindow(int windowId)
+    {
+        _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
         foreach (var log in _logs)
         {
-            GUILayout.Label(log);
+            GUILayout.Label($"[{log.Time:HH:mm:ss}] {log.Message}");
         }
         GUILayout.EndScrollView();
 
         GUILayout.BeginHorizontal();
-        Rect inputRect = GUILayoutUtility.GetRect(200, 20, GUILayout.ExpandWidth(true));
-        GUI.Box(inputRect, _input + (Time.time % 1f < 0.5f ? "_" : ""));
-        
-        var e = Event.current;
-        if (e.isKey && e.type == EventType.KeyDown)
+        _inputCommand = GUILayout.TextField(_inputCommand);
+        if (GUILayout.Button("Send", GUILayout.Width(60f)))
         {
-            if (e.keyCode == KeyCode.Return)
+            if (!string.IsNullOrWhiteSpace(_inputCommand))
             {
-                // return handled below
-            }
-            else if (e.keyCode == KeyCode.Backspace)
-            {
-                if (_input.Length > 0) _input = _input.Substring(0, _input.Length - 1);
-            }
-            else if (e.character >= 32 && e.character <= 126)
-            {
-                _input += e.character;
-            }
-        }
-        
-        if (GUILayout.Button("Run", GUILayout.Width(80)) || 
-            (e.isKey && e.type == EventType.KeyDown && e.keyCode == KeyCode.Return))
-        {
-            if (!string.IsNullOrWhiteSpace(_input))
-            {
-                Execute(_input);
-                _input = "";
+                AddLog($"> {_inputCommand}", LogType.Log);
+                _inputCommand = "";
             }
         }
         GUILayout.EndHorizontal();
 
-        GUILayout.EndArea();
+        GUI.DragWindow();
     }
 
-    private void Execute(string input)
+    private struct LogEntry
     {
-        Log($"> {input}");
-        var parts = input.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 0) return;
-
-        var cmd = parts[0].ToLower();
-        var args = parts.Length > 1 ? parts[1..] : System.Array.Empty<string>();
-
-        if (_commands.TryGetValue(cmd, out var action))
-        {
-            try { action(args); }
-            catch (System.Exception ex) { Log($"<color=red>Fehler: {ex.Message}</color>"); }
-        }
-        else
-        {
-            Log($"<color=yellow>Unbekannter Befehl: {cmd}</color>");
-        }
+        public string Message;
+        public LogType Type;
+        public DateTime Time;
     }
 }

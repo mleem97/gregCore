@@ -2,7 +2,7 @@ using gregCore.PublicApi;
 
 namespace gregCore.Infrastructure.Performance;
 
-internal sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposable
+public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposable
 {
     private readonly GregFrameRateLimiter _fpsLimiter;
     private readonly GregRequestThrottler _throttler;

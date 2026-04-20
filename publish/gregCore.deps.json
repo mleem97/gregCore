@@ -1,0 +1,87 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "gregCore/1.0.0.33-pre": {
+        "dependencies": {
+          "Jint": "4.1.0",
+          "Mono.Cecil": "0.11.6"
+        },
+        "runtime": {
+          "gregCore.dll": {}
+        }
+      },
+      "Acornima/1.1.0": {
+        "runtime": {
+          "lib/net6.0/Acornima.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      },
+      "Jint/4.1.0": {
+        "dependencies": {
+          "Acornima": "1.1.0"
+        },
+        "runtime": {
+          "lib/net6.0/Jint.dll": {
+            "assemblyVersion": "4.1.0.0",
+            "fileVersion": "4.0.0.0"
+          }
+        }
+      },
+      "Mono.Cecil/0.11.6": {
+        "runtime": {
+          "lib/netstandard2.0/Mono.Cecil.Mdb.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.Pdb.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.Rocks.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          },
+          "lib/netstandard2.0/Mono.Cecil.dll": {
+            "assemblyVersion": "0.11.6.0",
+            "fileVersion": "0.11.6.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "gregCore/1.0.0.33-pre": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Acornima/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-MFK/GNp09PF8H6uSkAZght553TddOejD9P1InvKWlGw6ILhmZjI+Y2xiIjGoJ73sbkeZzxwnCWZioK5Wed/J2g==",
+      "path": "acornima/1.1.0",
+      "hashPath": "acornima.1.1.0.nupkg.sha512"
+    },
+    "Jint/4.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4PzK4dTMOkS7NarKpAGmj3TMdlAUJ+V7w03usuLA4+ETqZnM6lt/bFlZXTtrOhLn32tjqoO803SzTMIv27EgYw==",
+      "path": "jint/4.1.0",
+      "hashPath": "jint.4.1.0.nupkg.sha512"
+    },
+    "Mono.Cecil/0.11.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-f33RkDtZO8VlGXCtmQIviOtxgnUdym9xx/b1p9h91CRGOsJFxCFOFK1FDbVt1OCf1aWwYejUFa2MOQyFWTFjbA==",
+      "path": "mono.cecil/0.11.6",
+      "hashPath": "mono.cecil.0.11.6.nupkg.sha512"
+    }
+  }
+}

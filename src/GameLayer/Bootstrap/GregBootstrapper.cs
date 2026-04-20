@@ -1,4 +1,4 @@
-/// <file-summary>
+﻿/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Erstellt und konfiguriert den GregServiceContainer.
 /// Maintainer:   Einzige Stelle wo Implementierungen an Interfaces gebunden werden. Validiert den Startup.
@@ -12,6 +12,8 @@ using gregCore.Infrastructure.Scripting.Lua;
 using gregCore.Infrastructure.Scripting.Js;
 using gregCore.GameLayer.Hooks;
 using gregCore.Core.Abstractions;
+using gregCore.Infrastructure.Settings;
+using gregCore.Infrastructure.Settings.Services;
 
 namespace gregCore.GameLayer.Bootstrap;
 
@@ -20,20 +22,79 @@ internal static class GregBootstrapper
     public static GregServiceContainer Build(global::MelonLoader.MelonLogger.Instance melonLogger)
     {
         var container = new GregServiceContainer();
-        var logger = new MelonLoggerAdapter(melonLogger);
-        
+
+        // Initialize static Logger and CLI Config
+        GregLogger.Configure(new ConsoleConfig());
+        var logger = new ConsoleLogger(melonLogger);
+
         container.Register<IGregLogger>(logger);
-        logger.Info("gregCore v1.0.0 Bootstrap gestartet");
-        
+
+        GregLogger.Box(new[] {
+            "gregCore v1.0.0",
+            "MelonLoader Framework initialized",
+            "PRO-Edition Active"
+        });
+
         var bus = new GregEventBus(logger);
+        var hookBus = new GregHookBus(logger);
+        var catalog = new Sdk.Metadata.GregHookCatalog();
+        var catalogService = new Sdk.Services.GregHookCatalogService(logger, catalog);
+        catalogService.Initialize();
+
+        var validationService = new Core.Services.GregValidationService(logger);
+
         container.Register<IGregEventBus>(bus);
+        container.Register<GregHookBus>(hookBus);
+        container.Register<Sdk.Metadata.GregHookCatalog>(catalog);
+        container.Register<Sdk.Services.GregHookCatalogService>(catalogService);
+        container.Register<Core.Services.GregValidationService>(validationService);
         container.Register<IGregConfigService>(new GregConfigService(logger));
         container.Register<IGregPersistenceService>(new GregPersistenceService(logger));
         container.Register<IGregHookRegistry>(new GregHookRegistry(logger));
 
+        // --- Settings Subsystem ---
+        var keybindRegistry = new GregKeybindRegistry(logger);
+        var modSettingsService = new GregModSettingsService(logger);
+
+        var settingsPersistence = new GregSettingsPersistenceService(logger, keybindRegistry, modSettingsService, bus);
+        modSettingsService.SetPersistence(settingsPersistence); // Link back for lazy injection
+        settingsPersistence.Load();
+
+        var settingsConflict = new GregSettingsConflictService(logger, keybindRegistry, modSettingsService);
+        var inputBinding = new GregInputBindingService(logger, keybindRegistry);
+        inputBinding.SetPersistence(settingsPersistence);
+
+        var pluginRegistry = new GregPluginRegistry(new AssemblyScanner(), logger, bus);
+
+        var uiBridge = new GregSettingsUiBridge(logger, modSettingsService, keybindRegistry, inputBinding, pluginRegistry);
+        var hudService = new GregHudService(logger, keybindRegistry);
+        var notificationService = new GregNotificationService(logger);
+
+        var sdkApi = new Sdk.GregAPI(logger, hookBus, modSettingsService, keybindRegistry, pluginRegistry, notificationService, validationService);
+
+        container.Register<GregKeybindRegistry>(keybindRegistry);
+        container.Register<GregModSettingsService>(modSettingsService);
+        container.Register<GregSettingsPersistenceService>(settingsPersistence);
+        container.Register<GregSettingsConflictService>(settingsConflict);
+        container.Register<GregInputBindingService>(inputBinding);
+        container.Register<IGregPluginRegistry>(pluginRegistry);
+        container.Register<GregSettingsUiBridge>(uiBridge);
+        container.Register<GregHudService>(hudService);
+        container.Register<GregNotificationService>(notificationService);
+        container.Register<Sdk.IGregAPI>(sdkApi);
+
+        // --- Harmony Initialization ---
+        Hooks.GregNativeEventHooks.Install(logger, hookBus);
+
+        // Link globally for legacy/mod compatibility
+        gregCore.API.GregAPI._keybindReg = keybindRegistry;
+        gregCore.API.GregAPI._modSettingsService = modSettingsService;
+        // --------------------------
+
         var apiContext = new global::gregCore.PublicApi.GregApiContext {
             Logger = logger,
             EventBus = bus,
+            HookBus = hookBus,
             Config = container.GetRequired<IGregConfigService>(),
             Persist = container.GetRequired<IGregPersistenceService>()
         };
@@ -48,19 +109,18 @@ internal static class GregBootstrapper
         container.Register<IGregLanguageBridge>("js", new JsBridge(logger, bus));
 
         container.Register<IAssemblyScanner>(new AssemblyScanner());
-        container.Register<IGregPluginRegistry>(new GregPluginRegistry(container.GetRequired<IAssemblyScanner>(), logger, bus));
 
         HookIntegration.Install(bus, logger);
         global::gregCore.PublicApi.greg._context = apiContext;
         global::gregCore.PublicApi.greg._governor = governor;
 
         ValidateStartup(container);
-        
+
         logger.Info("Alle Services registriert");
 
         return container;
     }
-    
+
     private static void ValidateStartup(GregServiceContainer container)
     {
         container.GetRequired<IGregLogger>();

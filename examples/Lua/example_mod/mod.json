@@ -1,0 +1,7 @@
+{
+  "id": "example_mod",
+  "name": "Example Lua Mod",
+  "version": "1.0.0",
+  "author": "teamGreg",
+  "description": "Ein Beispiel-Mod für das gregCore Lua FFI."
+}

@@ -72,6 +72,11 @@
       <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

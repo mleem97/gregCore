@@ -25,7 +25,7 @@ public sealed class GregCoreLoader : MelonMod
 
     public override void OnUpdate()
     {
-        if (global::UnityEngine.Input.GetKeyDown(global::UnityEngine.KeyCode.P))
+        if (global::UnityEngine.InputSystem.Keyboard.current != null && global::UnityEngine.InputSystem.Keyboard.current.pKey.wasPressedThisFrame)
         {
             global::gregCore.Infrastructure.UI.GregDevConsole.Instance.Toggle();
         }

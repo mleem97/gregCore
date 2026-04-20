@@ -11,7 +11,7 @@ public class GregPauseMenuReplacement : MonoBehaviour
 {
     public static GregPauseMenuReplacement Instance { get; private set; }
 
-    private GameObject _root;
+    // private GameObject _root;
     private GregPanel _mainPanel;
     private bool _isVisible = false;
 

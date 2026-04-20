@@ -11,7 +11,7 @@ public class GregShopReplacement : MonoBehaviour
 {
     public static GregShopReplacement Instance { get; private set; }
 
-    private GameObject _root;
+    // private GameObject _root;
     private GregPanel _mainPanel;
     private bool _isVisible = false;
 

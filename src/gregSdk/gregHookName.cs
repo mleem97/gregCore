@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace greg.Sdk;
@@ -9,6 +10,7 @@ namespace greg.Sdk;
 public static class gregHookName
 {
     private const string Prefix = "greg";
+    private static readonly ConcurrentDictionary<(GregDomain Domain, string Action), string> NoSubjectCache = new();
 
     public static string Create(GregDomain domain, string action)
         => Create(domain, action, null);
@@ -18,12 +20,23 @@ public static class gregHookName
         if (string.IsNullOrWhiteSpace(action))
             throw new ArgumentException("Action is required.", nameof(action));
 
-        var domainPart = DomainToSegment(domain);
-        var sb = new StringBuilder(Prefix.Length + 1 + domainPart.Length + 1 + action.Length + 32);
-        sb.Append(Prefix).Append('.').Append(domainPart).Append('.').Append(action.Trim());
+        var normalizedAction = action.Trim();
 
-        if (!string.IsNullOrWhiteSpace(subject))
-            sb.Append('.').Append(subject.Trim());
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            return NoSubjectCache.GetOrAdd((domain, normalizedAction), static key =>
+            {
+                var domainPart = DomainToSegment(key.Domain);
+                var sb = new StringBuilder(Prefix.Length + 1 + domainPart.Length + 1 + key.Action.Length);
+                sb.Append(Prefix).Append('.').Append(domainPart).Append('.').Append(key.Action);
+                return sb.ToString();
+            });
+        }
+
+        var domainPart = DomainToSegment(domain);
+        var normalizedSubject = subject.Trim();
+        var sb = new StringBuilder(Prefix.Length + 1 + domainPart.Length + 1 + normalizedAction.Length + 1 + normalizedSubject.Length);
+        sb.Append(Prefix).Append('.').Append(domainPart).Append('.').Append(normalizedAction).Append('.').Append(normalizedSubject);
 
         return sb.ToString();
     }

@@ -516,6 +516,426 @@ internal static class Patch_ComputerShop_RemoveSpawnedItem
     }
 }
 
+[HarmonyPatch(typeof(StaticUIElements), nameof(StaticUIElements.CalculateRates))]
+internal static class Patch_StaticUIElements_CalculateRates
+{
+    internal static void Postfix(ref float moneyPerSec, ref float xpPerSec, ref float expensesPerSec)
+    {
+        try { EventDispatcher.FireRatesCalculated(moneyPerSec, xpPerSec, expensesPerSec); }
+        catch (Exception ex) { EventDispatcher.LogError($"CalculateRates: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.ButtonBalanceSheetScreen))]
+internal static class Patch_ComputerShop_ButtonBalanceSheetScreen
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetScreenOpened(); }
+        catch (Exception ex) { EventDispatcher.LogError($"ButtonBalanceSheetScreen: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.GetOrCreateRecord))]
+internal static class Patch_BalanceSheet_GetOrCreateRecord
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetRecordAccessed(); }
+        catch (Exception ex) { EventDispatcher.LogError($"GetOrCreateRecord: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.TrackFinances))]
+internal static class Patch_BalanceSheet_TrackFinances
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetTrackFinances(); }
+        catch (Exception ex) { EventDispatcher.LogError($"TrackFinances: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.FillInBalanceSheet))]
+internal static class Patch_BalanceSheet_FillInBalanceSheet
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetFilled(); }
+        catch (Exception ex) { EventDispatcher.LogError($"FillInBalanceSheet: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.AddTotalRow))]
+internal static class Patch_BalanceSheet_AddTotalRow
+{
+    internal static void Postfix(float __0, float __1, float __2)
+    {
+        try { EventDispatcher.FireBalanceSheetTotalRowAdded(__0, __1, __2); }
+        catch (Exception ex) { EventDispatcher.LogError($"AddTotalRow: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.RegisterSalary))]
+internal static class Patch_BalanceSheet_RegisterSalary
+{
+    internal static void Postfix(int __0)
+    {
+        try { EventDispatcher.FireBalanceSheetSalaryRegistered(__0); }
+        catch (Exception ex) { EventDispatcher.LogError($"RegisterSalary: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.RestoreRecord))]
+internal static class Patch_BalanceSheet_RestoreRecord
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetRecordRestored(); }
+        catch (Exception ex) { EventDispatcher.LogError($"RestoreRecord: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.GetSaveData))]
+internal static class Patch_BalanceSheet_GetSaveData
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetDataSaved(); }
+        catch (Exception ex) { EventDispatcher.LogError($"GetSaveData: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.LoadFromSave))]
+internal static class Patch_BalanceSheet_LoadFromSave
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetDataLoaded(); }
+        catch (Exception ex) { EventDispatcher.LogError($"LoadFromSave: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.GetLatestSnapshot))]
+internal static class Patch_BalanceSheet_GetLatestSnapshot
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireBalanceSheetLatestSnapshotRequested(); }
+        catch (Exception ex) { EventDispatcher.LogError($"GetLatestSnapshot: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.UpdateCartTotal))]
+internal static class Patch_ComputerShop_UpdateCartTotal
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireShopCartTotalUpdated(); }
+        catch (Exception ex) { EventDispatcher.LogError($"UpdateCartTotal: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.BuyNewItem))]
+internal static class Patch_ComputerShop_BuyNewItem
+{
+    internal static void Postfix(int __0, int __1, int __2)
+    {
+        try { EventDispatcher.FireShopNewItemPurchased(__0, __1, __2); }
+        catch (Exception ex) { EventDispatcher.LogError($"BuyNewItem: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.BuyAnotherItem))]
+internal static class Patch_ComputerShop_BuyAnotherItem
+{
+    internal static void Postfix(int __0, int __1, int __2)
+    {
+        try { EventDispatcher.FireShopAnotherItemPurchased(__0, __1, __2); }
+        catch (Exception ex) { EventDispatcher.LogError($"BuyAnotherItem: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(ComputerShop), nameof(ComputerShop.SpawnPhysicalItem))]
+internal static class Patch_ComputerShop_SpawnPhysicalItem
+{
+    internal static void Postfix(int __1, int __2)
+    {
+        try { EventDispatcher.FireShopPhysicalItemSpawned(__1, __2); }
+        catch (Exception ex) { EventDispatcher.LogError($"SpawnPhysicalItem: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.Awake))]
+internal static class Patch_CustomerBase_Awake
+{
+    internal static void Postfix(CustomerBase __instance)
+    {
+        try { EventDispatcher.FireCustomerComponentInitialized(__instance.customerBaseID); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.Awake: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.Start))]
+internal static class Patch_CustomerBase_Start
+{
+    internal static void Postfix(CustomerBase __instance)
+    {
+        try { EventDispatcher.FireCustomerComponentInitialized(__instance.customerBaseID); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.Start: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.UpdateCustomerServerCountAndSpeed))]
+internal static class Patch_CustomerBase_UpdateCustomerServerCountAndSpeed
+{
+    internal static void Postfix(int __0, float __1)
+    {
+        try { EventDispatcher.FireCustomerServerCountAndSpeedChanged(__0, __1); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.UpdateCustomerServerCountAndSpeed: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.AddAppPerformance))]
+internal static class Patch_CustomerBase_AddAppPerformance
+{
+    internal static void Postfix(int __0, float __1)
+    {
+        try { EventDispatcher.FireCustomerAppPerformanceAdded(__0, __1); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.AddAppPerformance: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.ResetAllAppSpeeds))]
+internal static class Patch_CustomerBase_ResetAllAppSpeeds
+{
+    internal static void Postfix(CustomerBase __instance)
+    {
+        try { EventDispatcher.FireCustomerAppSpeedsReset(__instance.customerBaseID); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.ResetAllAppSpeeds: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.SetUpBase))]
+internal static class Patch_CustomerBase_SetUpBase
+{
+    internal static void Postfix(CustomerBase __instance)
+    {
+        try { EventDispatcher.FireCustomerBaseSetup(__instance.customerBaseID); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.SetUpBase: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.SetUpApp))]
+internal static class Patch_CustomerBase_SetUpApp
+{
+    internal static void Postfix(int __0, int __1)
+    {
+        try { EventDispatcher.FireCustomerAppSetup(__0, __1); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.SetUpApp: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.UpdateSpeedOnCustomerBaseApp))]
+internal static class Patch_CustomerBase_UpdateSpeedOnCustomerBaseApp
+{
+    internal static void Postfix(int __0, float __1)
+    {
+        try { EventDispatcher.FireCustomerSpeedOnAppChanged(__0, __1); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.UpdateSpeedOnCustomerBaseApp: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.LoadData))]
+internal static class Patch_CustomerBase_LoadData
+{
+    internal static void Postfix(CustomerBase __instance)
+    {
+        try { EventDispatcher.FireCustomerDataLoaded(__instance.customerBaseID); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBase.LoadData: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.InteractOnClick))]
+internal static class Patch_CustomerBaseDoor_InteractOnClick
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorClicked(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.InteractOnClick: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.InteractOnHover))]
+internal static class Patch_CustomerBaseDoor_InteractOnHover
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorHovered(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.InteractOnHover: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.OpenDoorAndSetupBase))]
+internal static class Patch_CustomerBaseDoor_OpenDoorAndSetupBase
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorOpenedAndSetup(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.OpenDoorAndSetupBase: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.OpenDoor))]
+internal static class Patch_CustomerBaseDoor_OpenDoor
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorOpened(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.OpenDoor: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.OnLoad))]
+internal static class Patch_CustomerBaseDoor_OnLoad
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorLoaded(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.OnLoad: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerBaseDoor), nameof(CustomerBaseDoor.OnDestroy))]
+internal static class Patch_CustomerBaseDoor_OnDestroy
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerDoorDestroyed(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerBaseDoor.OnDestroy: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(CustomerCard), nameof(CustomerCard.SetCustomer))]
+internal static class Patch_CustomerCard_SetCustomer
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerCardSet(); }
+        catch (Exception ex) { EventDispatcher.LogError($"CustomerCard.SetCustomer: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.ButtonCancelCustomerChoice))]
+internal static class Patch_MainGameManager_ButtonCancelCustomerChoice
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerChoiceCanceled(); }
+        catch (Exception ex) { EventDispatcher.LogError($"MainGameManager.ButtonCancelCustomerChoice: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.ShowCustomerCardsCanvas))]
+internal static class Patch_MainGameManager_ShowCustomerCardsCanvas
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerCardsCanvasShown(); }
+        catch (Exception ex) { EventDispatcher.LogError($"MainGameManager.ShowCustomerCardsCanvas: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.CreateFallbackCustomer))]
+internal static class Patch_MainGameManager_CreateFallbackCustomer
+{
+    internal static void Postfix(int __1)
+    {
+        try { EventDispatcher.FireCustomerFallbackCreated(__1); }
+        catch (Exception ex) { EventDispatcher.LogError($"MainGameManager.CreateFallbackCustomer: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.GetCustomerTotalRequirement))]
+internal static class Patch_MainGameManager_GetCustomerTotalRequirement
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireCustomerTotalRequirementRequested(); }
+        catch (Exception ex) { EventDispatcher.LogError($"MainGameManager.GetCustomerTotalRequirement: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(MainGameManager), nameof(MainGameManager.IsCustomerSuitableForBase))]
+internal static class Patch_MainGameManager_IsCustomerSuitableForBase
+{
+    internal static void Postfix(ref bool __result)
+    {
+        try { EventDispatcher.FireCustomerSuitabilityChecked(__result); }
+        catch (Exception ex) { EventDispatcher.LogError($"MainGameManager.IsCustomerSuitableForBase: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(NetworkMap), nameof(NetworkMap.RegisterCustomerBase))]
+internal static class Patch_NetworkMap_RegisterCustomerBase
+{
+    internal static void Postfix(CustomerBase __0)
+    {
+        try { EventDispatcher.FireNetworkCustomerBaseRegistered(__0 != null ? __0.customerBaseID : -1); }
+        catch (Exception ex) { EventDispatcher.LogError($"NetworkMap.RegisterCustomerBase: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(NetworkMap), nameof(NetworkMap.GetCustomerBase))]
+internal static class Patch_NetworkMap_GetCustomerBase
+{
+    internal static void Postfix(int __0)
+    {
+        try { EventDispatcher.FireNetworkCustomerBaseRequested(__0); }
+        catch (Exception ex) { EventDispatcher.LogError($"NetworkMap.GetCustomerBase: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(NetworkMap), nameof(NetworkMap.UpdateDeviceCustomerID))]
+internal static class Patch_NetworkMap_UpdateDeviceCustomerID
+{
+    internal static void Postfix(int __1)
+    {
+        try { EventDispatcher.FireNetworkDeviceCustomerIdChanged(__1); }
+        catch (Exception ex) { EventDispatcher.LogError($"NetworkMap.UpdateDeviceCustomerID: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(Server), nameof(Server.ButtonClickChangeCustomer))]
+internal static class Patch_Server_ButtonClickChangeCustomer
+{
+    internal static void Postfix()
+    {
+        try { EventDispatcher.FireServerChangeCustomerClicked(); }
+        catch (Exception ex) { EventDispatcher.LogError($"Server.ButtonClickChangeCustomer: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(Server), nameof(Server.GetNextCustomerID))]
+internal static class Patch_Server_GetNextCustomerID
+{
+    internal static void Postfix(ref int __result)
+    {
+        try { EventDispatcher.FireServerNextCustomerIdRequested(__result); }
+        catch (Exception ex) { EventDispatcher.LogError($"Server.GetNextCustomerID: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(Server), nameof(Server.GetCustomerID))]
+internal static class Patch_Server_GetCustomerID
+{
+    internal static void Postfix(ref int __result)
+    {
+        try { EventDispatcher.FireServerCustomerIdRequested(__result); }
+        catch (Exception ex) { EventDispatcher.LogError($"Server.GetCustomerID: {ex.Message}"); }
+    }
+}
+
 
 
 

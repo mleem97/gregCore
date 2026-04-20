@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using MelonLoader;
 
@@ -99,25 +100,38 @@ public static class gregEventDispatcher
             // Notify global monitor
             greg.Core.Scripting.GregHookBus.NotifyAny(hookName, payload);
 
-            List<Subscription> snapshot;
+            Subscription[] snapshot;
+            int snapshotCount;
             lock (Sync)
             {
                 if (!Handlers.TryGetValue(hookName, out var list) || list.Count == 0)
                     return;
 
-                snapshot = new List<Subscription>(list);
+                snapshotCount = list.Count;
+                snapshot = ArrayPool<Subscription>.Shared.Rent(snapshotCount);
+                for (var i = 0; i < snapshotCount; i++)
+                    snapshot[i] = list[i];
             }
 
-            foreach (var sub in snapshot)
+            try
             {
-                try
+                for (var i = 0; i < snapshotCount; i++)
                 {
-                    sub.Handler?.Invoke(payload);
+                    var sub = snapshot[i];
+                    try
+                    {
+                        sub.Handler?.Invoke(payload);
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Warning($"[gregCore] Handler for '{hookName}' threw: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MelonLogger.Warning($"[gregCore] Handler for '{hookName}' threw: {ex.Message}");
-                }
+            }
+            finally
+            {
+                Array.Clear(snapshot, 0, snapshotCount);
+                ArrayPool<Subscription>.Shared.Return(snapshot);
             }
         }
         finally
@@ -169,26 +183,39 @@ public static class gregEventDispatcher
         if (string.IsNullOrWhiteSpace(hookName))
             return true;
 
-        List<CancelableSubscription> snapshot;
+        CancelableSubscription[] snapshot;
+        int snapshotCount;
         lock (Sync)
         {
             if (!CancelableHandlers.TryGetValue(hookName, out var list) || list.Count == 0)
                 return true;
 
-            snapshot = new List<CancelableSubscription>(list);
+            snapshotCount = list.Count;
+            snapshot = ArrayPool<CancelableSubscription>.Shared.Rent(snapshotCount);
+            for (var i = 0; i < snapshotCount; i++)
+                snapshot[i] = list[i];
         }
 
-        foreach (var sub in snapshot)
+        try
         {
-            try
+            for (var i = 0; i < snapshotCount; i++)
             {
-                if (sub.Handler != null && !sub.Handler(payload))
-                    return false;
+                var sub = snapshot[i];
+                try
+                {
+                    if (sub.Handler != null && !sub.Handler(payload))
+                        return false;
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[gregCore] Cancelable handler for '{hookName}' threw: {ex.Message}");
+                }
             }
-            catch (Exception ex)
-            {
-                MelonLogger.Warning($"[gregCore] Cancelable handler for '{hookName}' threw: {ex.Message}");
-            }
+        }
+        finally
+        {
+            Array.Clear(snapshot, 0, snapshotCount);
+            ArrayPool<CancelableSubscription>.Shared.Return(snapshot);
         }
 
         return true;

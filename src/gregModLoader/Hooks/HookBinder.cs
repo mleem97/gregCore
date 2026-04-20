@@ -18,11 +18,11 @@ public static class HookBinder
     private static readonly object SyncRoot = new();
 
     private static readonly Regex BracketFormatRegex = new(
-        "^runtimetrigger\\s+asm\\[Assembly-CSharp\\]\\s+type\\[(?<type>[^\\]]+)\\]\\s+method\\[(?<method>[^\\]]+)\\]$",
+        "^runtimetrigger\\s+asm\\[[^\\]]+\\]\\s+type\\[(?<type>[^\\]]+)\\]\\s+method\\[(?<method>[^\\]]+)\\]$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
     private static readonly Regex PipeFormatRegex = new(
-        "^runtime_trigger\\s*\\|\\s*asm=Assembly-CSharp\\s*\\|\\s*type=(?<type>[^|]+)\\|\\s*method=(?<method>.+)$",
+        "^runtime_trigger\\s*\\|\\s*asm=[^|]+\\s*\\|\\s*type=(?<type>[^|]+)\\|\\s*method=(?<method>.+)$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
     private static readonly Dictionary<string, string> AliasesByRawMethod = new(StringComparer.OrdinalIgnoreCase);

@@ -9,18 +9,18 @@ namespace greg.Sdk.Services
     /// </summary>
     public static class GregRouteEvaluationService
     {
-        private static readonly Dictionary<string, List<List<string>>> _routeCache = new();
+        private static readonly Dictionary<string, Il2CppSystem.Collections.Generic.List<Il2CppSystem.Collections.Generic.List<string>>> _routeCache = new();
         
         /// <summary>
         /// Attempts to get a cached route (Pointer-Swap optimization).
         /// </summary>
-        public static bool TryGetCachedRoute(string baseName, string serverName, out List<List<string>> routes)
+        public static bool TryGetCachedRoute(string baseName, string serverName, out Il2CppSystem.Collections.Generic.List<Il2CppSystem.Collections.Generic.List<string>> routes)
         {
             string key = $"{baseName}->{serverName}";
             return _routeCache.TryGetValue(key, out routes);
         }
 
-        public static void CacheRoute(string baseName, string serverName, List<List<string>> routes)
+        public static void CacheRoute(string baseName, string serverName, Il2CppSystem.Collections.Generic.List<Il2CppSystem.Collections.Generic.List<string>> routes)
         {
             string key = $"{baseName}->{serverName}";
             _routeCache[key] = routes;

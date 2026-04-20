@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <MELON_PATH Condition="'$(MELON_PATH)' == ''">
+      C:\Program Files (x86)\Steam\steamapps\common\Data Center\MelonLoader
+    </MELON_PATH>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Update="gregCore">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <PrivateAssets>none</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

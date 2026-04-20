@@ -38,6 +38,49 @@ public static class gregNativeEventHooks
 
     // —— Time / balance sheet ——
     public const string SystemSnapshotSaved = "greg.SYSTEM.SnapshotSaved";
+    public const string SystemCalculateRates = "greg.SYSTEM.CalculateRates";
+    public const string SystemButtonBalanceSheetScreen = "greg.SYSTEM.ButtonBalanceSheetScreen";
+    public const string UiGetOrCreateRecord = "greg.UI.GetOrCreateRecord";
+    public const string SystemTrackFinances = "greg.SYSTEM.TrackFinances";
+    public const string SystemFillInBalanceSheet = "greg.SYSTEM.FillInBalanceSheet";
+    public const string SystemTotalRowAdded = "greg.SYSTEM.TotalRowAdded";
+    public const string SystemRegisterSalary = "greg.SYSTEM.RegisterSalary";
+    public const string SystemRestoreRecord = "greg.SYSTEM.RestoreRecord";
+    public const string UiGetSaveData = "greg.UI.GetSaveData";
+    public const string UiFromSaveLoaded = "greg.UI.FromSaveLoaded";
+    public const string UiGetLatestSnapshot = "greg.UI.GetLatestSnapshot";
+    public const string SystemCartTotalChanged = "greg.SYSTEM.CartTotalChanged";
+    public const string SystemNewItemPurchased = "greg.SYSTEM.NewItemPurchased";
+    public const string SystemAnotherItemPurchased = "greg.SYSTEM.AnotherItemPurchased";
+    public const string SystemPhysicalItemSpawned = "greg.SYSTEM.PhysicalItemSpawned";
+
+    // —— Customer extensions ——
+    public const string CustomerComponentInitialized = "greg.CUSTOMER.ComponentInitialized";
+    public const string CustomerServerCountAndSpeedChanged = "greg.CUSTOMER.CustomerServerCountAndSpeedChanged";
+    public const string CustomerAppPerformanceAdded = "greg.CUSTOMER.AppPerformanceAdded";
+    public const string CustomerResetAllAppSpeeds = "greg.CUSTOMER.ResetAllAppSpeeds";
+    public const string CustomerUpBaseSet = "greg.CUSTOMER.UpBaseSet";
+    public const string CustomerUpAppSet = "greg.CUSTOMER.UpAppSet";
+    public const string CustomerSpeedOnCustomerBaseAppChanged = "greg.CUSTOMER.SpeedOnCustomerBaseAppChanged";
+    public const string CustomerDataLoaded = "greg.CUSTOMER.DataLoaded";
+    public const string CustomerInteractOnClick = "greg.CUSTOMER.InteractOnClick";
+    public const string CustomerInteractOnHover = "greg.CUSTOMER.InteractOnHover";
+    public const string CustomerOpenDoorAndSetupBase = "greg.CUSTOMER.OpenDoorAndSetupBase";
+    public const string CustomerOpenDoor = "greg.CUSTOMER.OpenDoor";
+    public const string CustomerOnLoad = "greg.CUSTOMER.OnLoad";
+    public const string CustomerOnDestroy = "greg.CUSTOMER.OnDestroy";
+    public const string CustomerSet = "greg.CUSTOMER.CustomerSet";
+    public const string SystemButtonCancelCustomerChoice = "greg.SYSTEM.ButtonCancelCustomerChoice";
+    public const string SystemShowCustomerCardsCanvas = "greg.SYSTEM.ShowCustomerCardsCanvas";
+    public const string SystemCreateFallbackCustomer = "greg.SYSTEM.CreateFallbackCustomer";
+    public const string SystemGetCustomerTotalRequirement = "greg.SYSTEM.GetCustomerTotalRequirement";
+    public const string SystemIsCustomerSuitableForBase = "greg.SYSTEM.IsCustomerSuitableForBase";
+    public const string NetworkRegisterCustomerBase = "greg.NETWORK.RegisterCustomerBase";
+    public const string NetworkGetCustomerBase = "greg.NETWORK.GetCustomerBase";
+    public const string NetworkDeviceCustomerIDChanged = "greg.NETWORK.DeviceCustomerIDChanged";
+    public const string ServerButtonClickChangeCustomer = "greg.SERVER.ButtonClickChangeCustomer";
+    public const string ServerGetNextCustomerID = "greg.SERVER.GetNextCustomerID";
+    public const string ServerGetCustomerID = "greg.SERVER.GetCustomerID";
 
     // —— MainGameManager / ComputerShop / HR (greg_hooks lists these under greg.SYSTEM.*) ——
     public const string SystemButtonCustomerChosen = "greg.SYSTEM.ButtonCustomerChosen";
@@ -106,6 +149,21 @@ public static class gregNativeEventHooks
     public const string EmployeeAnimationStateChanged = "greg.EMPLOYEE.AnimationStateChanged";
     public const string GameplayIncidentTriggered = "greg.GAMEPLAY.IncidentTriggered";
 
+    // —— Performance & Telemetry ——
+    public const string SYSTEM_GameStateChanged = "greg.SYSTEM.GameStateChanged";
+    public const string SYSTEM_FrameLimitChanged = "greg.SYSTEM.FrameLimitChanged";
+    public const string SYSTEM_RenderOptimizerApplied = "greg.SYSTEM.RenderOptimizerApplied";
+    public const string SYSTEM_TelemetryExported = "greg.SYSTEM.TelemetryExported";
+    public const string SYSTEM_PlayerAfkDetected = "greg.SYSTEM.PlayerAfkDetected";
+    public const string SYSTEM_PlayerAfkEnded = "greg.SYSTEM.PlayerAfkEnded";
+    public const string SYSTEM_FrameSpikeDetected = "greg.SYSTEM.FrameSpikeDetected";
+
+    // —— PerfCore Hooks ——
+    public const string SYSTEM_FrameCapApplied = "greg.SYSTEM.FrameCapApplied";
+    public const string SYSTEM_ThreadingConfigured = "greg.SYSTEM.ThreadingConfigured";
+    public const string SYSTEM_PostFxOptimized = "greg.SYSTEM.PostFxOptimized";
+    public const string SYSTEM_GcTriggered = "greg.SYSTEM.GcTriggered";
+
     // —— Framework-only (no matching entry in greg_hooks for this pipeline) ——
     public static readonly string SystemGameDayAdvanced = gregHookName.Create(GregDomain.System, "GameDayAdvanced");
     public static readonly string CustomerAppRequirementsSatisfied = gregHookName.Create(GregDomain.Customer, "AppRequirementsSatisfied");
@@ -150,6 +208,48 @@ public static class gregNativeEventHooks
 
             [EventIds.DayEnded] = SystemGameDayAdvanced,
             [EventIds.MonthEnded] = SystemSnapshotSaved,
+            [EventIds.RatesCalculated] = SystemCalculateRates,
+            [EventIds.BalanceSheetScreenOpened] = SystemButtonBalanceSheetScreen,
+            [EventIds.BalanceSheetRecordAccessed] = UiGetOrCreateRecord,
+            [EventIds.BalanceSheetTrackFinances] = SystemTrackFinances,
+            [EventIds.BalanceSheetFilled] = SystemFillInBalanceSheet,
+            [EventIds.BalanceSheetTotalRowAdded] = SystemTotalRowAdded,
+            [EventIds.BalanceSheetSalaryRegistered] = SystemRegisterSalary,
+            [EventIds.BalanceSheetRecordRestored] = SystemRestoreRecord,
+            [EventIds.BalanceSheetDataSaved] = UiGetSaveData,
+            [EventIds.BalanceSheetDataLoaded] = UiFromSaveLoaded,
+            [EventIds.BalanceSheetLatestSnapshotRequested] = UiGetLatestSnapshot,
+            [EventIds.ShopCartTotalUpdated] = SystemCartTotalChanged,
+            [EventIds.ShopNewItemPurchased] = SystemNewItemPurchased,
+            [EventIds.ShopAnotherItemPurchased] = SystemAnotherItemPurchased,
+            [EventIds.ShopPhysicalItemSpawned] = SystemPhysicalItemSpawned,
+
+            [EventIds.CustomerComponentInitialized] = CustomerComponentInitialized,
+            [EventIds.CustomerServerCountAndSpeedChanged] = CustomerServerCountAndSpeedChanged,
+            [EventIds.CustomerAppPerformanceAdded] = CustomerAppPerformanceAdded,
+            [EventIds.CustomerAppSpeedsReset] = CustomerResetAllAppSpeeds,
+            [EventIds.CustomerBaseSetup] = CustomerUpBaseSet,
+            [EventIds.CustomerAppSetup] = CustomerUpAppSet,
+            [EventIds.CustomerSpeedOnAppChanged] = CustomerSpeedOnCustomerBaseAppChanged,
+            [EventIds.CustomerDataLoaded] = CustomerDataLoaded,
+            [EventIds.CustomerDoorClicked] = CustomerInteractOnClick,
+            [EventIds.CustomerDoorHovered] = CustomerInteractOnHover,
+            [EventIds.CustomerDoorOpenedAndSetup] = CustomerOpenDoorAndSetupBase,
+            [EventIds.CustomerDoorOpened] = CustomerOpenDoor,
+            [EventIds.CustomerDoorLoaded] = CustomerOnLoad,
+            [EventIds.CustomerDoorDestroyed] = CustomerOnDestroy,
+            [EventIds.CustomerCardSet] = CustomerSet,
+            [EventIds.CustomerChoiceCanceled] = SystemButtonCancelCustomerChoice,
+            [EventIds.CustomerCardsCanvasShown] = SystemShowCustomerCardsCanvas,
+            [EventIds.CustomerFallbackCreated] = SystemCreateFallbackCustomer,
+            [EventIds.CustomerTotalRequirementRequested] = SystemGetCustomerTotalRequirement,
+            [EventIds.CustomerSuitabilityChecked] = SystemIsCustomerSuitableForBase,
+            [EventIds.NetworkCustomerBaseRegistered] = NetworkRegisterCustomerBase,
+            [EventIds.NetworkCustomerBaseRequested] = NetworkGetCustomerBase,
+            [EventIds.NetworkDeviceCustomerIdChanged] = NetworkDeviceCustomerIDChanged,
+            [EventIds.ServerChangeCustomerClicked] = ServerButtonClickChangeCustomer,
+            [EventIds.ServerNextCustomerIdRequested] = ServerGetNextCustomerID,
+            [EventIds.ServerCustomerIdRequested] = ServerGetCustomerID,
 
             [EventIds.CustomerAccepted] = SystemButtonCustomerChosen,
             [EventIds.CustomerSatisfied] = CustomerAppRequirementsSatisfied,

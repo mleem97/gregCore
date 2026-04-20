@@ -30,6 +30,48 @@ public static class GregSaveService
     private static string GetPath(string modId) => Path.Combine(BaseSavePath, $"{modId}.json");
 
     /// <summary>
+    /// Gets the native mod save data from the game's new SaveSystem if available.
+    /// </summary>
+    public static Il2Cpp.ModItemSaveData GetNativeModData(string modId)
+    {
+        var currentSave = Il2Cpp.SaveData._current;
+        if (currentSave == null || currentSave.modItemData == null) return null;
+
+        foreach (var data in currentSave.modItemData)
+        {
+            if (data.modFolderName == modId)
+                return data;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Creates or updates native save data for a mod.
+    /// </summary>
+    public static Il2Cpp.ModItemSaveData GetOrCreateNativeModData(string modId)
+    {
+        var currentSave = Il2Cpp.SaveData._current;
+        if (currentSave == null) return null;
+
+        if (currentSave.modItemData == null)
+            currentSave.modItemData = new Il2CppSystem.Collections.Generic.List<Il2Cpp.ModItemSaveData>();
+
+        var existing = GetNativeModData(modId);
+        if (existing != null) return existing;
+
+        var newData = new Il2Cpp.ModItemSaveData
+        {
+            modFolderName = modId,
+            saveValue = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<float>(0),
+            saveIntArray = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>(0),
+            saveIntArray2 = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>(0)
+        };
+
+        currentSave.modItemData.Add(newData);
+        return newData;
+    }
+
+    /// <summary>
     /// Implements Task 1.2 sub-goal: Initialization.
     /// </summary>
     public static void Init() 

@@ -39,10 +39,10 @@ namespace greg.Harmony
         }
     }
 
-    [HarmonyPatch(typeof(NetworkMap), nameof(NetworkMap.FindAllRoutes))]
+    [HarmonyPatch(typeof(NetworkMap), nameof(NetworkMap.FindAllRoutes), new Type[] { typeof(string), typeof(string) })]
     public static class Patch_NetworkMap_FindAllRoutes
     {
-        static bool Prefix(NetworkMap __instance, string baseName, string serverName, ref List<List<string>> __result)
+        static bool Prefix(NetworkMap __instance, string baseName, string serverName, ref Il2CppSystem.Collections.Generic.List<Il2CppSystem.Collections.Generic.List<string>> __result)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace greg.Harmony
             }
         }
 
-        static void Postfix(string baseName, string serverName, List<List<string>> __result)
+        static void Postfix(string baseName, string serverName, Il2CppSystem.Collections.Generic.List<Il2CppSystem.Collections.Generic.List<string>> __result)
         {
             try
             {

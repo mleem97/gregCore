@@ -3,18 +3,18 @@
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
-$il2cppDir = Join-Path $repoRoot 'gregReferences\il2cpp-unpack\Assembly-CSharp\Il2Cpp'
+$assemblyRoot = Join-Path $repoRoot 'gregReferences\Assembly-CSharp'
 $harmonyPatches = Join-Path $repoRoot 'gregCore\framework\ModLoader\HarmonyPatches.cs'
 $outJsonRoot = Join-Path $repoRoot 'greg_hooks.json'
 $outJsonFramework = Join-Path $repoRoot 'gregCore\framework\greg_hooks.json'
 $outHooksDir = Join-Path $repoRoot 'gregCore\framework\harmony'
 
-if (-not (Test-Path $il2cppDir)) { throw "Missing Il2Cpp sources: $il2cppDir" }
+if (-not (Test-Path $assemblyRoot)) { throw "Missing assembly source root: $assemblyRoot" }
 New-Item -ItemType Directory -Force -Path $outHooksDir | Out-Null
 
 function Get-HarmonyExclusions([string]$path) {
     $set = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    if (-not (Test-Path $path)) { return $set }
+    if (-not (Test-Path $path)) { return ,$set }
     $text = Get-Content $path -Raw
     foreach ($m in [regex]::Matches($text, 'typeof\((\w+)\)\s*,\s*nameof\(\w+\.(\w+)\)')) {
         [void]$set.Add("$($m.Groups[1].Value)|$($m.Groups[2].Value)")
@@ -22,20 +22,23 @@ function Get-HarmonyExclusions([string]$path) {
     foreach ($m in [regex]::Matches($text, 'typeof\((\w+)\)\s*,\s*"(\w+)"')) {
         [void]$set.Add("$($m.Groups[1].Value)|$($m.Groups[2].Value)")
     }
-    return $set
+    return ,$set
 }
 
 $excluded = Get-HarmonyExclusions $harmonyPatches
+[void]$excluded.Add('NetworkMap|RemapDeviceId')
+[void]$excluded.Add('NetworkMap|RemoveIsolatedDevice')
+[void]$excluded.Add('Technician|CacheDeviceBounds')
 
-# Curated game surface for stable compile (full Il2Cpp tree needs extra Unity/asm refs).
-$gameHookClasses = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+# Curated game surface for stable compile-time Harmony class generation.
+$harmonyEmitClasses = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 @(
     'Player', 'PlayerManager', 'PlayerHit', 'PlayerData',
     'Server', 'MainGameManager', 'ComputerShop', 'HRSystem', 'SaveSystem', 'CustomerBase',
     'CablePositions', 'CableLink', 'Rack', 'NetworkMap', 'BalanceSheet', 'MainMenu',
     'TimeController', 'TechnicianManager', 'Technician', 'Objectives',
     'PacketSpawnerSystem', 'NetworkSwitch', 'SFPModule', 'SFPBox', 'PatchPanel'
-) | ForEach-Object { [void]$gameHookClasses.Add($_) }
+) | ForEach-Object { [void]$harmonyEmitClasses.Add($_) }
 
 function Test-SkipTypeName([string]$n) {
     if ($n -match 'd__\d+$') { return $true }
@@ -120,6 +123,34 @@ function Test-SkipClass([string]$className, [string]$baseClause) {
     return $false
 }
 
+function Get-SourceDirectories([string]$rootPath) {
+    $dirs = [System.Collections.Generic.List[string]]::new()
+
+    $includePatterns = @('Il2Cpp*', 'Unity*', 'UnityEngine*')
+    foreach ($pattern in $includePatterns) {
+        foreach ($dir in (Get-ChildItem -Path $rootPath -Directory -Filter $pattern -ErrorAction SilentlyContinue)) {
+            [void]$dirs.Add($dir.FullName)
+        }
+    }
+
+    if ($dirs.Count -eq 0) {
+        throw "No source directories matched under $rootPath (expected Il2Cpp*/Unity*)."
+    }
+
+    return $dirs
+}
+
+function Get-AssemblyNameFromPath([string]$filePath, [string]$rootPath) {
+    $relative = [System.IO.Path]::GetRelativePath($rootPath, $filePath)
+    if ([string]::IsNullOrWhiteSpace($relative)) { return 'Assembly-CSharp' }
+
+    $parts = $relative -split '[\\/]'
+    $first = if ($parts.Length -gt 0) { $parts[0] } else { '' }
+    if ([string]::IsNullOrWhiteSpace($first)) { return 'Assembly-CSharp' }
+
+    return $first
+}
+
 function Test-SkipInteropSignature([string]$returnType, [string]$argList) {
     $blob = "$returnType $argList"
     if ($blob -match 'EntityCommandBuffer|SystemState|BlobArray|ComponentLookup|BufferLookup') { return $true }
@@ -185,14 +216,13 @@ function Get-Il2CppPatchSignature([string]$className, [string]$methodName, [stri
 
 function Split-MethodLine([string]$line, [ref]$isStatic) {
     $isStatic.Value = $false
-    $m = [regex]::Match($line, '^\t{2}public unsafe static (?<sig>.+?)\s*\((?<args>[^\)]*)\)\s*$')
-    if ($m.Success) { $isStatic.Value = $true }
-    else {
-        $m = [regex]::Match($line, '^\t{2}public unsafe (?<sig>.+?)\s*\((?<args>[^\)]*)\)\s*$')
-    }
+    $m = [regex]::Match($line, '^\s+(?:public|private|protected|internal)\s+(?<mods>(?:(?:static|unsafe|virtual|override|abstract|sealed|new|extern|partial)\s+)*)?(?<sig>.+?)\s*\((?<args>[^\)]*)\)\s*$')
     if (-not $m.Success) { return $null }
+
+    $mods = $m.Groups['mods'].Value
+    if ($mods -match '\bstatic\b') { $isStatic.Value = $true }
+
     $sig = $m.Groups['sig'].Value.Trim()
-    if ($sig.StartsWith('static ')) { $sig = $sig.Substring(7).Trim() }
     $argList = $m.Groups['args'].Value.Trim()
     $idx = $sig.LastIndexOf(' ')
     if ($idx -lt 0) { return $null }
@@ -235,22 +265,22 @@ function Build-EmitAnonymousBody([string]$className, [bool]$isStatic) {
 
 $hooks = [System.Collections.Generic.List[object]]::new()
 $byDomain = @{}
+$scanDirectories = Get-SourceDirectories $assemblyRoot
+$sourceFiles = $scanDirectories | ForEach-Object { Get-ChildItem -Path $_ -Filter '*.cs' -File -Recurse }
 
-Get-ChildItem $il2cppDir -Filter '*.cs' -File | ForEach-Object {
-    $lines = Get-Content $_.FullName
-    $overloadFirst = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($sourceFile in $sourceFiles) {
+    $assemblyName = Get-AssemblyNameFromPath $sourceFile.FullName $assemblyRoot
+    $lines = Get-Content $sourceFile.FullName
+    $harmonyOverloadFirst = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $currentClass = $null
     $currentBase = ''
-    $classRegex = [regex]'^\tpublic (sealed )?class (?<name>[A-Za-z0-9_]+)\s*:\s*(?<base>[^\r\n{]+)'
+    $classRegex = [regex]'^\s*(?:public|private|protected|internal)\s+(?:sealed\s+)?class\s+(?<name>[A-Za-z0-9_]+)(\s*:\s*(?<base>[^\r\n{]+))?'
 
     foreach ($line in $lines) {
         $cm = $classRegex.Match($line)
         if ($cm.Success) {
             $cn = $cm.Groups['name'].Value
             $cb = $cm.Groups['base'].Value.Trim()
-            if (Test-SkipTypeName $cn) { $currentClass = $null; $currentBase = ''; continue }
-            if (Test-SkipClass $cn $cb) { $currentClass = $null; $currentBase = ''; continue }
-            if (-not $gameHookClasses.Contains($cn)) { $currentClass = $null; $currentBase = ''; continue }
             $currentClass = $cn
             $currentBase = $cb
             continue
@@ -265,18 +295,9 @@ Get-ChildItem $il2cppDir -Filter '*.cs' -File | ForEach-Object {
         $mn = $parsed.Name
         $argList = $parsed.ArgList
 
-        if (-not (Test-ShouldEmitHook $mn $ret)) { continue }
-        if (Test-SkipInteropSignature $ret $argList) { continue }
-        if ($excluded.Contains("$currentClass|$mn")) { continue }
-
-        $ovKey = "$currentClass|$mn"
-        if ($overloadFirst.Contains($ovKey)) { continue }
-        [void]$overloadFirst.Add($ovKey)
-
         $domain = Get-GregDomain $currentClass
         $action = Get-SemanticAction $currentClass $mn
-        $strategy = Get-HookStrategy $mn $ret
-        if ($strategy -eq 'None') { continue }
+        $strategy = 'Postfix'
 
         $hookName = "greg.$($domain.ToUpperInvariant()).$action"
         $patchTarget = Get-Il2CppPatchSignature $currentClass $mn $argList
@@ -314,29 +335,41 @@ Get-ChildItem $il2cppDir -Filter '*.cs' -File | ForEach-Object {
                 name          = $hookName
                 legacy        = $null
                 patchTarget   = $patchTarget
+                assembly      = $assemblyName
                 strategy      = $(if ($strategy -eq 'PrefixPostfix') { 'Prefix+Postfix' } else { 'Postfix' })
-                description   = "Auto-generated from Il2Cpp unpack: $currentClass.$mn"
+                description   = "Auto-generated from IL2CPP sources: $assemblyName/$currentClass.$mn"
                 payloadSchema = $payload
             })
 
-        if (-not $byDomain.ContainsKey($domain)) { $byDomain[$domain] = [System.Collections.Generic.List[object]]::new() }
-        [void]$byDomain[$domain].Add([ordered]@{
-                Class     = $currentClass
-                Method    = $mn
-                Ret       = $ret
-                Args      = $argList
-                Action    = $action
-                Strategy  = $strategy
-                HookName  = $hookName
-                IsStatic  = $staticFlag
-            })
+        $harmonySignatureCompatible = $line -match '^\s+public unsafe(?:\s+static)?\s+'
+        $allowHarmonyEmit = $harmonyEmitClasses.Contains($currentClass) -and -not (Test-SkipTypeName $currentClass) -and -not (Test-SkipClass $currentClass $currentBase) -and $harmonySignatureCompatible
+        if ($allowHarmonyEmit -and (Test-ShouldEmitHook $mn $ret) -and -not (Test-SkipInteropSignature $ret $argList) -and -not $excluded.Contains("$currentClass|$mn")) {
+            $harmonyOvKey = "$currentClass|$mn"
+            if ($harmonyOverloadFirst.Contains($harmonyOvKey)) { continue }
+            [void]$harmonyOverloadFirst.Add($harmonyOvKey)
+
+            $harmonyStrategy = Get-HookStrategy $mn $ret
+            if ($harmonyStrategy -eq 'None') { continue }
+
+            if (-not $byDomain.ContainsKey($domain)) { $byDomain[$domain] = [System.Collections.Generic.List[object]]::new() }
+            [void]$byDomain[$domain].Add([ordered]@{
+                    Class     = $currentClass
+                    Method    = $mn
+                    Ret       = $ret
+                    Args      = $argList
+                    Action    = $action
+                    Strategy  = $harmonyStrategy
+                    HookName  = $hookName
+                    IsStatic  = $staticFlag
+                })
+        }
     }
 }
 
 $seen = @{}
 $unique = [System.Collections.Generic.List[object]]::new()
 foreach ($h in $hooks) {
-    $k = [string]$h.patchTarget
+    $k = "$($h.assembly)|$([string]$h.patchTarget)"
     if ($seen.ContainsKey($k)) { continue }
     $seen[$k] = $true
     [void]$unique.Add($h)
@@ -345,7 +378,7 @@ foreach ($h in $hooks) {
 $doc = [ordered]@{
     version        = 2
     description    = 'Canonical greg hook registry. Schema: greg.<DOMAIN>.<Action>. Generated from Il2Cpp C# unpack; regenerate with gregCore/scripts/Generate-GregHooksFromIl2CppDump.ps1 when MergedCode.md / interop changes.'
-    generatedFrom  = 'gregReferences/il2cpp-unpack/Assembly-CSharp/Il2Cpp/*.cs'
+    generatedFrom  = 'gregReferences/Assembly-CSharp/{Il2Cpp*,Unity*,UnityEngine*}/**/*.cs'
     legacyPrefixes = @()
     hooks          = $unique
 }
@@ -370,7 +403,8 @@ foreach ($kv in $byDomain.GetEnumerator()) {
     $sb = [System.Text.StringBuilder]::new()
     [void]$sb.AppendLine('using System;')
     [void]$sb.AppendLine('using HarmonyLib;')
-    [void]$sb.AppendLine('using gregFramework.Core;')
+            [void]$sb.AppendLine('using greg.Core;')
+        [void]$sb.AppendLine('using greg.Sdk;')
     [void]$sb.AppendLine('using Il2Cpp;')
     [void]$sb.AppendLine('using Il2CppSystem.Collections.Generic;')
     [void]$sb.AppendLine('using Il2CppInterop.Runtime.InteropTypes.Arrays;')
@@ -420,8 +454,8 @@ foreach ($kv in $byDomain.GetEnumerator()) {
         [void]$sb.AppendLine('    {')
         [void]$sb.AppendLine('        try')
         [void]$sb.AppendLine('        {')
-        [void]$sb.AppendLine('            GregEventDispatcher.Emit(')
-        [void]$sb.AppendLine("                GregHookName.Create(GregDomain.$gregDomain, `"$action`"),")
+        [void]$sb.AppendLine('            gregEventDispatcher.Emit(')
+        [void]$sb.AppendLine("                gregHookName.Create(GregDomain.$gregDomain, `"$action`"),")
         [void]$sb.AppendLine('                new')
         [void]$sb.AppendLine('                {')
         [void]$sb.AppendLine($emitBody)
@@ -460,4 +494,5 @@ internal static class GregPowerHooks
     [System.IO.File]::WriteAllText($powerFile, $stub, [System.Text.UTF8Encoding]::new($false))
     Write-Host "Wrote stub $powerFile"
 }
+
 

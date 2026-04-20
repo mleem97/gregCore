@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-04-18
+### Added
+- NuGet packaging baseline for `gregCore` with symbol package output (`.snupkg`).
+- Local + GitHub Packages feed configuration and package source mapping.
+- Downstream `build/gregCore.props` integration for reference-only package usage.
+
 ## [v1.0.0.7] - 2026-04-12
 ### Added
 - **gregUI**: Complete UI manipulation layer for UGUI (`src/UI/`).

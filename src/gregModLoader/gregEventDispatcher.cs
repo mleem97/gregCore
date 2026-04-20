@@ -60,6 +60,51 @@ public static class EventIds
     // hook bridge introspection (11xx) — keep in sync with dc_api / gregCore.EventIds history
     public const uint HookBridgeInstalled = 1100;
     public const uint HookBridgeTriggered = 1101;
+
+    // finance / balance sheet extensions (12xx)
+    public const uint RatesCalculated = 1200;
+    public const uint BalanceSheetScreenOpened = 1201;
+    public const uint BalanceSheetRecordAccessed = 1202;
+    public const uint BalanceSheetTrackFinances = 1203;
+    public const uint BalanceSheetFilled = 1204;
+    public const uint BalanceSheetTotalRowAdded = 1205;
+    public const uint BalanceSheetSalaryRegistered = 1206;
+    public const uint BalanceSheetRecordRestored = 1207;
+    public const uint BalanceSheetDataSaved = 1208;
+    public const uint BalanceSheetDataLoaded = 1209;
+    public const uint BalanceSheetLatestSnapshotRequested = 1210;
+    public const uint ShopCartTotalUpdated = 1211;
+    public const uint ShopNewItemPurchased = 1212;
+    public const uint ShopAnotherItemPurchased = 1213;
+    public const uint ShopPhysicalItemSpawned = 1214;
+
+    // customer extensions (13xx)
+    public const uint CustomerComponentInitialized = 1300;
+    public const uint CustomerServerCountAndSpeedChanged = 1301;
+    public const uint CustomerAppPerformanceAdded = 1302;
+    public const uint CustomerAppSpeedsReset = 1303;
+    public const uint CustomerBaseSetup = 1304;
+    public const uint CustomerAppSetup = 1305;
+    public const uint CustomerSpeedOnAppChanged = 1306;
+    public const uint CustomerDataLoaded = 1307;
+    public const uint CustomerDoorClicked = 1308;
+    public const uint CustomerDoorHovered = 1309;
+    public const uint CustomerDoorOpenedAndSetup = 1310;
+    public const uint CustomerDoorOpened = 1311;
+    public const uint CustomerDoorLoaded = 1312;
+    public const uint CustomerDoorDestroyed = 1313;
+    public const uint CustomerCardSet = 1314;
+    public const uint CustomerChoiceCanceled = 1315;
+    public const uint CustomerCardsCanvasShown = 1316;
+    public const uint CustomerFallbackCreated = 1317;
+    public const uint CustomerTotalRequirementRequested = 1318;
+    public const uint CustomerSuitabilityChecked = 1319;
+    public const uint NetworkCustomerBaseRegistered = 1320;
+    public const uint NetworkCustomerBaseRequested = 1321;
+    public const uint NetworkDeviceCustomerIdChanged = 1322;
+    public const uint ServerChangeCustomerClicked = 1323;
+    public const uint ServerNextCustomerIdRequested = 1324;
+    public const uint ServerCustomerIdRequested = 1325;
 }
 
 // must match rust repr(C) layouts
@@ -133,6 +178,61 @@ public struct NetWatchDispatchedData
 {
     public int DeviceType; // 0 = server, 1 = switch
     public int Reason;     // 0 = broken, 1 = eol_warning
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct RatesCalculatedData
+{
+    public double MoneyPerSec;
+    public double XpPerSec;
+    public double ExpensesPerSec;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BalanceSheetTotalRowData
+{
+    public double Revenue;
+    public double Penalties;
+    public double Total;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BalanceSheetSalaryRegisteredData
+{
+    public int MonthlySalary;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct CustomerBaseIdData
+{
+    public int CustomerBaseId;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct CustomerAppSpeedData
+{
+    public int AppId;
+    public float Speed;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct CustomerCountSpeedData
+{
+    public int Count;
+    public float Speed;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct CustomerAppSetupData
+{
+    public int AppId;
+    public int Difficulty;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct CustomerBoolResultData
+{
+    public int Value;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -399,6 +499,224 @@ public static class EventDispatcher
     {
         CrashLog.Log($"FireHookBridgeTriggered: method={methodKey}");
         FireSimple(EventIds.HookBridgeTriggered);
+    }
+
+    public static void FireRatesCalculated(double moneyPerSec, double xpPerSec, double expensesPerSec)
+    {
+        DispatchWithData(EventIds.RatesCalculated, new RatesCalculatedData
+        {
+            MoneyPerSec = moneyPerSec,
+            XpPerSec = xpPerSec,
+            ExpensesPerSec = expensesPerSec
+        }, moneyPerSec + xpPerSec * 31.0 + expensesPerSec * 97.0);
+    }
+
+    public static void FireBalanceSheetScreenOpened()
+    {
+        FireSimple(EventIds.BalanceSheetScreenOpened);
+    }
+
+    public static void FireBalanceSheetRecordAccessed()
+    {
+        FireSimple(EventIds.BalanceSheetRecordAccessed);
+    }
+
+    public static void FireBalanceSheetTrackFinances()
+    {
+        FireSimple(EventIds.BalanceSheetTrackFinances);
+    }
+
+    public static void FireBalanceSheetFilled()
+    {
+        FireSimple(EventIds.BalanceSheetFilled);
+    }
+
+    public static void FireBalanceSheetTotalRowAdded(double revenue, double penalties, double total)
+    {
+        DispatchWithData(EventIds.BalanceSheetTotalRowAdded, new BalanceSheetTotalRowData
+        {
+            Revenue = revenue,
+            Penalties = penalties,
+            Total = total,
+        }, revenue + penalties * 31.0 + total * 97.0);
+    }
+
+    public static void FireBalanceSheetSalaryRegistered(int monthlySalary)
+    {
+        DispatchWithData(EventIds.BalanceSheetSalaryRegistered, new BalanceSheetSalaryRegisteredData
+        {
+            MonthlySalary = monthlySalary,
+        }, monthlySalary);
+    }
+
+    public static void FireBalanceSheetRecordRestored()
+    {
+        FireSimple(EventIds.BalanceSheetRecordRestored);
+    }
+
+    public static void FireBalanceSheetDataSaved()
+    {
+        FireSimple(EventIds.BalanceSheetDataSaved);
+    }
+
+    public static void FireBalanceSheetDataLoaded()
+    {
+        FireSimple(EventIds.BalanceSheetDataLoaded);
+    }
+
+    public static void FireBalanceSheetLatestSnapshotRequested()
+    {
+        FireSimple(EventIds.BalanceSheetLatestSnapshotRequested);
+    }
+
+    public static void FireShopCartTotalUpdated()
+    {
+        FireSimple(EventIds.ShopCartTotalUpdated);
+    }
+
+    public static void FireShopNewItemPurchased(int itemId, int price, int itemType)
+    {
+        DispatchWithData(EventIds.ShopNewItemPurchased, new ShopItemAddedData { ItemId = itemId, Price = price, ItemType = itemType }, itemId * 1000.0 + price + itemType * 0.1);
+    }
+
+    public static void FireShopAnotherItemPurchased(int itemId, int price, int itemType)
+    {
+        DispatchWithData(EventIds.ShopAnotherItemPurchased, new ShopItemAddedData { ItemId = itemId, Price = price, ItemType = itemType }, itemId * 1000.0 + price + itemType * 0.1 + 0.5);
+    }
+
+    public static void FireShopPhysicalItemSpawned(int price, int itemType)
+    {
+        DispatchWithData(EventIds.ShopPhysicalItemSpawned, new ShopItemAddedData { ItemId = -1, Price = price, ItemType = itemType }, price + itemType * 0.1);
+    }
+
+    public static void FireCustomerComponentInitialized(int customerBaseId)
+    {
+        DispatchWithData(EventIds.CustomerComponentInitialized, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireCustomerServerCountAndSpeedChanged(int count, float speed)
+    {
+        DispatchWithData(EventIds.CustomerServerCountAndSpeedChanged, new CustomerCountSpeedData { Count = count, Speed = speed }, count + speed * 31.0);
+    }
+
+    public static void FireCustomerAppPerformanceAdded(int appId, float speed)
+    {
+        DispatchWithData(EventIds.CustomerAppPerformanceAdded, new CustomerAppSpeedData { AppId = appId, Speed = speed }, appId + speed * 31.0);
+    }
+
+    public static void FireCustomerAppSpeedsReset(int customerBaseId)
+    {
+        DispatchWithData(EventIds.CustomerAppSpeedsReset, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireCustomerBaseSetup(int customerBaseId)
+    {
+        DispatchWithData(EventIds.CustomerBaseSetup, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireCustomerAppSetup(int appId, int difficulty)
+    {
+        DispatchWithData(EventIds.CustomerAppSetup, new CustomerAppSetupData { AppId = appId, Difficulty = difficulty }, appId + difficulty * 31.0);
+    }
+
+    public static void FireCustomerSpeedOnAppChanged(int appId, float speed)
+    {
+        DispatchWithData(EventIds.CustomerSpeedOnAppChanged, new CustomerAppSpeedData { AppId = appId, Speed = speed }, appId + speed * 31.0);
+    }
+
+    public static void FireCustomerDataLoaded(int customerBaseId)
+    {
+        DispatchWithData(EventIds.CustomerDataLoaded, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireCustomerDoorClicked()
+    {
+        FireSimple(EventIds.CustomerDoorClicked);
+    }
+
+    public static void FireCustomerDoorHovered()
+    {
+        FireSimple(EventIds.CustomerDoorHovered);
+    }
+
+    public static void FireCustomerDoorOpenedAndSetup()
+    {
+        FireSimple(EventIds.CustomerDoorOpenedAndSetup);
+    }
+
+    public static void FireCustomerDoorOpened()
+    {
+        FireSimple(EventIds.CustomerDoorOpened);
+    }
+
+    public static void FireCustomerDoorLoaded()
+    {
+        FireSimple(EventIds.CustomerDoorLoaded);
+    }
+
+    public static void FireCustomerDoorDestroyed()
+    {
+        FireSimple(EventIds.CustomerDoorDestroyed);
+    }
+
+    public static void FireCustomerCardSet()
+    {
+        FireSimple(EventIds.CustomerCardSet);
+    }
+
+    public static void FireCustomerChoiceCanceled()
+    {
+        FireSimple(EventIds.CustomerChoiceCanceled);
+    }
+
+    public static void FireCustomerCardsCanvasShown()
+    {
+        FireSimple(EventIds.CustomerCardsCanvasShown);
+    }
+
+    public static void FireCustomerFallbackCreated(int customerId)
+    {
+        DispatchWithData(EventIds.CustomerFallbackCreated, new CustomerAcceptedData { CustomerId = customerId }, customerId);
+    }
+
+    public static void FireCustomerTotalRequirementRequested()
+    {
+        FireSimple(EventIds.CustomerTotalRequirementRequested);
+    }
+
+    public static void FireCustomerSuitabilityChecked(bool isSuitable)
+    {
+        DispatchWithData(EventIds.CustomerSuitabilityChecked, new CustomerBoolResultData { Value = isSuitable ? 1 : 0 }, isSuitable ? 1.0 : 0.0);
+    }
+
+    public static void FireNetworkCustomerBaseRegistered(int customerBaseId)
+    {
+        DispatchWithData(EventIds.NetworkCustomerBaseRegistered, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireNetworkCustomerBaseRequested(int customerBaseId)
+    {
+        DispatchWithData(EventIds.NetworkCustomerBaseRequested, new CustomerBaseIdData { CustomerBaseId = customerBaseId }, customerBaseId);
+    }
+
+    public static void FireNetworkDeviceCustomerIdChanged(int customerId)
+    {
+        DispatchWithData(EventIds.NetworkDeviceCustomerIdChanged, new CustomerAcceptedData { CustomerId = customerId }, customerId);
+    }
+
+    public static void FireServerChangeCustomerClicked()
+    {
+        FireSimple(EventIds.ServerChangeCustomerClicked);
+    }
+
+    public static void FireServerNextCustomerIdRequested(int customerId)
+    {
+        DispatchWithData(EventIds.ServerNextCustomerIdRequested, new CustomerAcceptedData { CustomerId = customerId }, customerId);
+    }
+
+    public static void FireServerCustomerIdRequested(int customerId)
+    {
+        DispatchWithData(EventIds.ServerCustomerIdRequested, new CustomerAcceptedData { CustomerId = customerId }, customerId);
     }
 }
 

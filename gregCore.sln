@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore", "gregCore.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gregFramework", "gregFramework", "{9A0CCAB9-4303-13B4-2371-F1B97FF5B728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "gregTests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

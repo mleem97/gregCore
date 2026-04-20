@@ -30,9 +30,13 @@ namespace greg.Exporter
         private static readonly ConcurrentDictionary<string, byte> PatchedMethods = new ConcurrentDictionary<string, byte>();
 
         private readonly string harmonyId = "greg.framework.runtimehooks";
-        private static readonly Regex CatalogLineRegex = new Regex(
-            "^runtime_trigger \\| asm=Assembly-CSharp \\| type=(?<type>[^|]+) \\| method=(?<method>.+)$",
-            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex CatalogPipeFormatRegex = new Regex(
+            "^runtime_trigger\\s*\\|\\s*asm=(?<asm>[^|]+?)\\s*\\|\\s*type=(?<type>[^|]+?)\\s*\\|\\s*method=(?<method>.+)$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        private static readonly Regex CatalogBracketFormatRegex = new Regex(
+            "^runtimetrigger\\s+asm\\[(?<asm>[^\\]]+)\\]\\s+type\\[(?<type>[^\\]]+)\\]\\s+method\\[(?<method>[^\\]]+)\\]$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         public HookScanResult ScanCandidates(int maxHooks)
         {
@@ -134,10 +138,17 @@ namespace greg.Exporter
 
             foreach (string line in File.ReadLines(catalogPath))
             {
-                if (!TryParseCatalogLine(line, out string typeName, out string methodName))
+                if (!TryParseCatalogLine(line, out string assemblyName, out string typeName, out string methodName))
                     continue;
 
-                if (!typeMap.TryGetValue(typeName, out Type type) || type == null)
+                string assemblyScopedTypeKey = BuildAssemblyTypeKey(assemblyName, typeName);
+
+                if (!typeMap.TryGetValue(assemblyScopedTypeKey, out Type type) || type == null)
+                {
+                    typeMap.TryGetValue(typeName, out type);
+                }
+
+                if (type == null)
                     continue;
 
                 MethodInfo[] methods;
@@ -194,26 +205,43 @@ namespace greg.Exporter
                         continue;
 
                     map[type.FullName] = type;
+                    map[BuildAssemblyTypeKey(asmName, type.FullName)] = type;
                 }
             }
 
             return map;
         }
 
-        private static bool TryParseCatalogLine(string line, out string typeName, out string methodName)
+        private static string BuildAssemblyTypeKey(string assemblyName, string typeName)
         {
+            return $"{assemblyName?.Trim() ?? string.Empty}::{typeName?.Trim() ?? string.Empty}";
+        }
+
+        private static bool TryParseCatalogLine(string line, out string assemblyName, out string typeName, out string methodName)
+        {
+            assemblyName = string.Empty;
             typeName = string.Empty;
             methodName = string.Empty;
 
             if (string.IsNullOrWhiteSpace(line))
                 return false;
 
-            Match match = CatalogLineRegex.Match(line);
-            if (!match.Success)
+            Match pipeMatch = CatalogPipeFormatRegex.Match(line.Trim());
+            if (pipeMatch.Success)
+            {
+                assemblyName = pipeMatch.Groups["asm"].Value.Trim();
+                typeName = pipeMatch.Groups["type"].Value.Trim();
+                methodName = pipeMatch.Groups["method"].Value.Trim();
+                return !string.IsNullOrWhiteSpace(typeName) && !string.IsNullOrWhiteSpace(methodName);
+            }
+
+            Match bracketMatch = CatalogBracketFormatRegex.Match(line.Trim());
+            if (!bracketMatch.Success)
                 return false;
 
-            typeName = match.Groups["type"].Value.Trim();
-            methodName = match.Groups["method"].Value.Trim();
+            assemblyName = bracketMatch.Groups["asm"].Value.Trim();
+            typeName = bracketMatch.Groups["type"].Value.Trim();
+            methodName = bracketMatch.Groups["method"].Value.Trim();
 
             return !string.IsNullOrWhiteSpace(typeName) && !string.IsNullOrWhiteSpace(methodName);
         }
@@ -296,7 +324,22 @@ namespace greg.Exporter
 
         private static bool IsRelevantAssembly(string assemblyName)
         {
-            return string.Equals(assemblyName, "Assembly-CSharp", StringComparison.OrdinalIgnoreCase);
+            if (string.IsNullOrWhiteSpace(assemblyName))
+                return false;
+
+            if (string.Equals(assemblyName, "Assembly-CSharp", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (assemblyName.StartsWith("Il2Cpp", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (assemblyName.StartsWith("Unity", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (assemblyName.StartsWith("UnityEngine", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
 
         private static bool IsHookCandidate(MethodInfo method)

@@ -23,6 +23,8 @@ internal static class HookIntegration
         // [GREG_SYNC_INSERT_PATCHES]
 
         SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateCoin), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnCoinUpdated));
+        SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateXP), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnXpUpdated));
+        SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateReputation), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnReputationUpdated));
     }
 
     internal static void Emit(HookName hook, EventPayload payload)

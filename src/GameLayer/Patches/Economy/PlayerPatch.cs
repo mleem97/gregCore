@@ -24,4 +24,30 @@ internal static class PlayerPatch
             HookIntegration.LogPatchError(nameof(OnCoinUpdated), ex);
         }
     }
+
+    internal static void OnXpUpdated(object __instance, float amount)
+    {
+        try
+        {
+            var payload = EventPayloadBuilder.ForValueChange("xp", 0f, amount);
+            HookIntegration.Emit(HookName.Create("economy", "PlayerXpUpdated"), payload);
+        }
+        catch (Exception ex)
+        {
+            HookIntegration.LogPatchError(nameof(OnXpUpdated), ex);
+        }
+    }
+
+    internal static void OnReputationUpdated(object __instance, float amount)
+    {
+        try
+        {
+            var payload = EventPayloadBuilder.ForValueChange("reputation", 0f, amount);
+            HookIntegration.Emit(HookName.Create("economy", "PlayerReputationUpdated"), payload);
+        }
+        catch (Exception ex)
+        {
+            HookIntegration.LogPatchError(nameof(OnReputationUpdated), ex);
+        }
+    }
 }

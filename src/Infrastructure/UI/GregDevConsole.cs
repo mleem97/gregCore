@@ -84,28 +84,38 @@ internal sealed class GregDevConsole
         GUILayout.EndScrollView();
 
         GUILayout.BeginHorizontal();
-        GUI.SetNextControlName("GregConsoleInput");
         Rect inputRect = GUILayoutUtility.GetRect(200, 20, GUILayout.ExpandWidth(true));
-        _input = GUI.TextField(inputRect, _input);
+        GUI.Box(inputRect, _input + (Time.time % 1f < 0.5f ? "_" : ""));
+        
+        var e = Event.current;
+        if (e.isKey && e.type == EventType.KeyDown)
+        {
+            if (e.keyCode == KeyCode.Return)
+            {
+                // return handled below
+            }
+            else if (e.keyCode == KeyCode.Backspace)
+            {
+                if (_input.Length > 0) _input = _input.Substring(0, _input.Length - 1);
+            }
+            else if (e.character >= 32 && e.character <= 126)
+            {
+                _input += e.character;
+            }
+        }
         
         if (GUILayout.Button("Run", GUILayout.Width(80)) || 
-            (Event.current.isKey && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "GregConsoleInput"))
+            (e.isKey && e.type == EventType.KeyDown && e.keyCode == KeyCode.Return))
         {
             if (!string.IsNullOrWhiteSpace(_input))
             {
                 Execute(_input);
                 _input = "";
             }
-            GUI.FocusControl("GregConsoleInput");
         }
         GUILayout.EndHorizontal();
 
         GUILayout.EndArea();
-
-        if (GUI.GetNameOfFocusedControl() != "GregConsoleInput")
-        {
-            GUI.FocusControl("GregConsoleInput");
-        }
     }
 
     private void Execute(string input)

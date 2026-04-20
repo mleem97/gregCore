@@ -19,21 +19,21 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore gregCore.csproj
+      run: dotnet restore src/gregCore.csproj
 
     - name: Build gregCore
-      run: dotnet build gregCore.csproj -c Release -p:CI=true
+      run: dotnet build src/gregCore.csproj -c Release -p:CI=true
 
     - name: Create Artifacts
       shell: pwsh
       run: |
         $outDir = "publish"
         New-Item -ItemType Directory -Path $outDir -Force
-        Copy-Item "bin/Release/net6.0/gregCore.dll" $outDir/
-        if (Test-Path "bin/Release/net6.0/gregCore.pdb") { Copy-Item "bin/Release/net6.0/gregCore.pdb" $outDir/ }
+        Copy-Item "src/bin/Release/net6.0/gregCore.dll" $outDir/
+        if (Test-Path "src/bin/Release/net6.0/gregCore.pdb") { Copy-Item "src/bin/Release/net6.0/gregCore.pdb" $outDir/ }
         # Zip it
         Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/gregCore-v1.0.0.30-pre.zip"
 

@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 6.0.x
 
       - name: Set Version
         shell: pwsh
@@ -34,16 +34,10 @@ jobs:
       # Hinweis: In CI müssen ggf. Stubs für MelonLoader/Il2Cpp vorhanden sein.
       - name: Build gregCore
         run: |
-          cd gregCore
           if (Test-Path "ci-stubs/create-stubs.sh") { bash ci-stubs/create-stubs.sh }
           dotnet build src/gregCore.csproj -c Release -p:Version=${{ env.VERSION }} -p:CI=true
 
-      # 2. Build gregExtractor
-      - name: Publish gregExtractor
-        run: |
-          dotnet publish gregExtractor/gregExtractor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.VERSION }} -o publish/extractor
-
-      # 3. Prepare Assets
+      # 2. Prepare Assets
       - name: Prepare Assets
         shell: pwsh
         run: |
@@ -51,17 +45,10 @@ jobs:
           New-Item -ItemType Directory -Path $releaseDir -Force
           
           # gregCore
-          $coreDll = "gregCore/src/bin/Release/net6.0/gregCore.dll"
+          $coreDll = "src/bin/Release/net6.0/gregCore.dll"
           if (Test-Path $coreDll) {
             Copy-Item $coreDll $releaseDir/
-            Compress-Archive -Path $coreDll, "gregCore/README.md" -DestinationPath "$releaseDir/gregCore-v${{ env.VERSION }}.zip"
-          }
-          
-          # gregExtractor
-          $extractorExe = "publish/extractor/gregExtractor.exe"
-          if (Test-Path $extractorExe) {
-            Copy-Item $extractorExe $releaseDir/
-            Compress-Archive -Path "publish/extractor/*" -DestinationPath "$releaseDir/gregExtractor-v${{ env.VERSION }}.zip"
+            Compress-Archive -Path $coreDll, "README.md" -DestinationPath "$releaseDir/gregCore-v${{ env.VERSION }}.zip"
           }
 
       - name: Create Release

@@ -25,8 +25,18 @@ public sealed class GregCoreLoader : MelonMod
 
     public override void OnUpdate()
     {
+        if (global::UnityEngine.Input.GetKeyDown(global::UnityEngine.KeyCode.P))
+        {
+            global::gregCore.Infrastructure.Performance.GregDevConsole.Instance.Toggle();
+        }
+
         _container?.Get<gregCore.Infrastructure.Performance.GregPerformanceGovernor>()?.OnUpdate();
         _container?.Get<GregEventBus>()?.FlushDeferredEvents();
+    }
+
+    public override void OnGUI()
+    {
+        global::gregCore.Infrastructure.Performance.GregDevConsole.Instance.OnGUI();
     }
 
     public override void OnSceneWasLoaded(int buildIndex, string sceneName) =>

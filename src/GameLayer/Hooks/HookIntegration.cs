@@ -21,6 +21,9 @@ internal static class HookIntegration
         var harmony = new HarmonyLib.Harmony("com.teamgreg.gregcore");
 
         SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateCoin), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnCoinUpdated));
+        
+        // Block Pause-Menu when Console is open
+        SafePatch(harmony, typeof(global::Il2Cpp.InputController.IUIActions), nameof(global::Il2Cpp.InputController.IUIActions.OnPause), typeof(gregCore.GameLayer.Patches.UI.InputPausePatch), nameof(gregCore.GameLayer.Patches.UI.InputPausePatch.Prefix));
     }
 
     internal static void Emit(HookName hook, EventPayload payload)

@@ -1,0 +1,78 @@
+name: gregFramework Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set Version
+        shell: pwsh
+        run: |
+          $buildNum = "${{ github.run_number }}"
+          $version = "1.0.0.$buildNum-pre"
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+          echo "Building gregFramework version $version"
+
+      # 1. Build gregCore
+      # Hinweis: In CI müssen ggf. Stubs für MelonLoader/Il2Cpp vorhanden sein.
+      - name: Build gregCore
+        run: |
+          cd gregCore
+          if (Test-Path "ci-stubs/create-stubs.sh") { bash ci-stubs/create-stubs.sh }
+          dotnet build src/gregCore.csproj -c Release -p:Version=${{ env.VERSION }} -p:CI=true
+
+      # 2. Build gregExtractor
+      - name: Publish gregExtractor
+        run: |
+          dotnet publish gregExtractor/gregExtractor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.VERSION }} -o publish/extractor
+
+      # 3. Prepare Assets
+      - name: Prepare Assets
+        shell: pwsh
+        run: |
+          $releaseDir = "release-assets"
+          New-Item -ItemType Directory -Path $releaseDir -Force
+          
+          # gregCore
+          $coreDll = "gregCore/src/bin/Release/net8.0/gregCore.dll"
+          if (Test-Path $coreDll) {
+            Copy-Item $coreDll $releaseDir/
+            Compress-Archive -Path $coreDll, "gregCore/README.md" -DestinationPath "$releaseDir/gregCore-v${{ env.VERSION }}.zip"
+          }
+          
+          # gregExtractor
+          $extractorExe = "publish/extractor/gregExtractor.exe"
+          if (Test-Path $extractorExe) {
+            Copy-Item $extractorExe $releaseDir/
+            Compress-Archive -Path "publish/extractor/*" -DestinationPath "$releaseDir/gregExtractor-v${{ env.VERSION }}.zip"
+          }
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: gregFramework v${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          prerelease: true
+          files: |
+            release-assets/*.dll
+            release-assets/*.exe
+            release-assets/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

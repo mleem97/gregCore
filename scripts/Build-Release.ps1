@@ -36,7 +36,7 @@ if (Test-Path $tmpDir) { Remove-Item -Recurse -Force $tmpDir }
 New-Item -ItemType Directory -Path $tmpDir | Out-Null
 Copy-Item $dllPath -Destination $tmpDir
 Copy-Item "$repoRoot\README.md" -Destination $tmpDir
-Copy-Item "$repoRoot\CHANGELOG.md" -Destination $tmpDir
+Copy-Item "C:\Users\marvi\source\repos\gregFramework\CHANGELOG.md" -Destination $tmpDir
 Copy-Item "$repoRoot\assets\greg_hooks.json" -Destination $tmpDir
 
 # Create zip

@@ -23,6 +23,12 @@ public sealed class GregCoreLoader : MelonMod
         _container.GetRequired<IGregPluginRegistry>().LoadAll();
     }
 
+    public override void OnUpdate()
+    {
+        _container?.Get<gregCore.Infrastructure.Performance.GregPerformanceGovernor>()?.OnUpdate();
+        _container?.Get<GregEventBus>()?.FlushDeferredEvents();
+    }
+
     public override void OnSceneWasLoaded(int buildIndex, string sceneName) =>
         _container?.GetRequired<IGregEventBus>()
                    .Publish(HookName.Create("lifecycle", "SceneLoaded").Full,

@@ -12,6 +12,8 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
     private readonly Dictionary<string, List<Action<EventPayload>>> _handlers = new();
     private readonly Dictionary<string, Action<EventPayload>[]> _cachedHandlers = new();
     private readonly ReaderWriterLockSlim _rwLock = new();
+    private readonly System.Collections.Concurrent.ConcurrentQueue<(string hookName, EventPayload payload)> _deferredEvents = new();
+    private IGregPerformanceGovernor? _governor;
     private bool _isDirty = true;
     private bool _disposed;
 
@@ -20,6 +22,8 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         ArgumentNullException.ThrowIfNull(logger);
         _logger = logger.ForContext("EventBus");
     }
+
+    public void SetGovernor(IGregPerformanceGovernor governor) => _governor = governor;
 
     public void Subscribe(string hookName, Action<EventPayload> handler)
     {
@@ -66,7 +70,27 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
     public bool Publish(string hookName, EventPayload payload)
     {
         ArgumentNullException.ThrowIfNull(hookName);
+
+        if (_governor != null && !_governor.CanDispatchEvent())
+        {
+            _deferredEvents.Enqueue((hookName, payload));
+            return false;
+        }
         
+        return PublishDirect(hookName, payload);
+    }
+
+    internal void FlushDeferredEvents()
+    {
+        while (_deferredEvents.TryDequeue(out var ev))
+        {
+            if (_governor != null && !_governor.CanDispatchEvent()) break;
+            PublishDirect(ev.hookName, ev.payload);
+        }
+    }
+
+    private bool PublishDirect(string hookName, EventPayload payload)
+    {
         Action<EventPayload>[]? handlersToInvoke = null;
 
         _rwLock.EnterReadLock();

@@ -11,8 +11,7 @@ public readonly record struct HookName
     public string Domain { get; init; }
     public string Event { get; init; }
 
-    private readonly string? _full;
-    public string Full => _full ?? $"greg.{Domain}.{Event}";
+    public string Full => $"greg.{Domain}.{Event}";
 
     public static HookName Parse(string full)
     {
@@ -20,7 +19,7 @@ public readonly record struct HookName
         var parts = full.Split('.');
         if (parts.Length >= 3 && parts[0] == "greg")
         {
-            return new HookName { Domain = parts[1], Event = parts[2], _full = full };
+            return new HookName { Domain = parts[1], Event = parts[2] };
         }
         throw new ArgumentException($"Invalid HookName format: {full}");
     }
@@ -29,7 +28,7 @@ public readonly record struct HookName
     {
         ArgumentNullException.ThrowIfNull(domain);
         ArgumentNullException.ThrowIfNull(eventName);
-        return new HookName { Domain = domain, Event = eventName, _full = $"greg.{domain}.{eventName}" };
+        return new HookName { Domain = domain, Event = eventName };
     }
 
     public override string ToString() => Full;

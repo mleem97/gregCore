@@ -9,7 +9,7 @@ namespace gregCore.Core.Models;
 // [GREG_SYNC_INSERT_DTOS]
 
 [StructLayout(LayoutKind.Sequential)]
-public record struct EventPayload
+public record EventPayload
 {
     public string HookName { get; init; }
     public DateTime OccurredAtUtc { get; init; }

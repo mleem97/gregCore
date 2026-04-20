@@ -15,10 +15,10 @@ New-Item -ItemType Directory -Path $publishDir | Out-Null
 
 # 2. Build
 Write-Host "Building gregCore (Release)..." -ForegroundColor Yellow
-dotnet build "$repoRoot\gregCore.csproj" -c Release
+dotnet build "$repoRoot\src\gregCore.csproj" -c Release -o "$buildDir"
 
 # 3. Check output
-$dllPath = "$repoRoot\bin\Release\net6.0\gregCore.dll"
+$dllPath = "$buildDir\gregCore.dll"
 if (-not (Test-Path $dllPath)) {
     Write-Error "Build failed: gregCore.dll not found at $dllPath"
 }
@@ -32,11 +32,12 @@ Write-Host "Packaging version $version into $zipName..." -ForegroundColor Yellow
 
 # Copy files to a temporary folder for zipping
 $tmpDir = "$publishDir\tmp"
+if (Test-Path $tmpDir) { Remove-Item -Recurse -Force $tmpDir }
 New-Item -ItemType Directory -Path $tmpDir | Out-Null
 Copy-Item $dllPath -Destination $tmpDir
 Copy-Item "$repoRoot\README.md" -Destination $tmpDir
 Copy-Item "$repoRoot\CHANGELOG.md" -Destination $tmpDir
-Copy-Item "$repoRoot\gregFramework\greg_hooks.json" -Destination $tmpDir
+Copy-Item "$repoRoot\assets\greg_hooks.json" -Destination $tmpDir
 
 # Create zip
 Compress-Archive -Path "$tmpDir\*" -DestinationPath $zipPath -Force

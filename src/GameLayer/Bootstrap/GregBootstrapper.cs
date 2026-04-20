@@ -4,7 +4,6 @@
 /// Maintainer:   Einzige Stelle wo Implementierungen an Interfaces gebunden werden. Validiert den Startup.
 /// </file-summary>
 
-using MelonLoader;
 using gregCore.Infrastructure.Logging;
 using gregCore.Infrastructure.Config;
 using gregCore.Infrastructure.Ffi;
@@ -17,7 +16,7 @@ namespace gregCore.GameLayer.Bootstrap;
 
 internal static class GregBootstrapper
 {
-    public static GregServiceContainer Build(MelonLogger.Instance melonLogger)
+    public static GregServiceContainer Build(global::MelonLoader.MelonLogger.Instance melonLogger)
     {
         var container = new GregServiceContainer();
         var logger = new MelonLoggerAdapter(melonLogger);
@@ -25,19 +24,33 @@ internal static class GregBootstrapper
         container.Register<IGregLogger>(logger);
         logger.Info("gregCore v1.0.0 Bootstrap gestartet");
         
-        container.Register<IGregEventBus>(new GregEventBus(logger));
+        var bus = new GregEventBus(logger);
+        container.Register<IGregEventBus>(bus);
         container.Register<IGregConfigService>(new GregConfigService(logger));
         container.Register<IGregPersistenceService>(new GregPersistenceService(logger));
 
-        container.Register<IGregFfiBridge>(new Win32FfiBridge(logger, container.GetRequired<IGregEventBus>()));
+        var apiContext = new global::gregCore.PublicApi.GregApiContext {
+            Logger = logger,
+            EventBus = bus,
+            Config = container.GetRequired<IGregConfigService>(),
+            Persist = container.GetRequired<IGregPersistenceService>()
+        };
 
-        container.Register<IGregLanguageBridge>("lua", new LuaBridge(logger, container.GetRequired<IGregEventBus>()));
-        container.Register<IGregLanguageBridge>("js", new JsBridge(logger, container.GetRequired<IGregEventBus>()));
+        var governor = new gregCore.Infrastructure.Performance.GregPerformanceGovernor(apiContext);
+        container.Register<gregCore.Infrastructure.Performance.GregPerformanceGovernor>(governor);
+        bus.SetGovernor(governor);
+
+        container.Register<IGregFfiBridge>(new Win32FfiBridge(logger, bus));
+
+        container.Register<IGregLanguageBridge>("lua", new LuaBridge(logger, bus));
+        container.Register<IGregLanguageBridge>("js", new JsBridge(logger, bus));
 
         container.Register<IAssemblyScanner>(new AssemblyScanner());
-        container.Register<IGregPluginRegistry>(new GregPluginRegistry(container.GetRequired<IAssemblyScanner>(), logger, container.GetRequired<IGregEventBus>()));
+        container.Register<IGregPluginRegistry>(new GregPluginRegistry(container.GetRequired<IAssemblyScanner>(), logger, bus));
 
-        HookIntegration.Install(container.GetRequired<IGregEventBus>(), logger);
+        HookIntegration.Install(bus, logger);
+        global::gregCore.PublicApi.greg._context = apiContext;
+        global::gregCore.PublicApi.greg._governor = governor;
 
         ValidateStartup(container);
         
@@ -52,12 +65,13 @@ internal static class GregBootstrapper
         container.GetRequired<IGregEventBus>();
         container.GetRequired<IGregFfiBridge>();
 
-        var melonVersion = MelonLoader.MelonLoader.Version;
-        if (melonVersion < new Version(0, 6, 0))
+        // Workaround for MelonLoader naming conflict
+        var melonVersion = typeof(global::MelonLoader.MelonLogger).Assembly.GetName().Version;
+        if (melonVersion != null && melonVersion < new Version(0, 6, 0))
             throw new GregInitException($"MelonLoader >= 0.6.0 erforderlich, gefunden: {melonVersion}");
 
-        var gameRoot = MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
-        if (string.IsNullOrEmpty(gameRoot)) return; // Could be null in tests
+        var gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
+        if (string.IsNullOrEmpty(gameRoot)) return;
 
         var gameAssembly = Path.Combine(gameRoot, "MelonLoader", "Il2CppAssemblies", "Assembly-CSharp.dll");
 

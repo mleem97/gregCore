@@ -8,7 +8,7 @@ using Mono.Cecil;
 
 namespace gregCore.Infrastructure.Plugins;
 
-internal sealed class AssemblyScanner : IAssemblyScanner
+public sealed class AssemblyScanner : IAssemblyScanner
 {
     public IReadOnlyList<PluginInfo> ScanDirectory(string path)
     {

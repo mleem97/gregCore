@@ -1,0 +1,35 @@
+namespace gregCore.Core.Models;
+
+public enum AutomationTask
+{
+    ProcessDeliveryZone,
+    PickupItem,
+    PlaceItemInRack,
+    PlaceItemOnFloor,
+    LayCable,
+    RemoveCable,
+    LayPowerCable,
+    LayNetworkCable,
+    BuildRack,
+    InstallServer,
+    InstallSwitch,
+    InstallPatchPanel,
+    PowerOnDevice,
+    PowerOffDevice,
+    AssignIP,
+    AssignVlan,
+    ConfigureRouting,
+    SetupNetworkSegment,
+    RepairDevice,
+    RepairAll,
+    ReplaceHardware,
+    CheckDeviceHealth,
+    AssignEmployee,
+    UnassignEmployee,
+    HireEmployee,
+    FireEmployee,
+    UnlockRoom,
+    PlaceFurniture,
+    RemoveFurniture,
+    ExpandRack
+}

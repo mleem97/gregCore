@@ -85,7 +85,8 @@ internal sealed class GregDevConsole
 
         GUILayout.BeginHorizontal();
         GUI.SetNextControlName("GregConsoleInput");
-        _input = GUILayout.TextField(_input);
+        Rect inputRect = GUILayoutUtility.GetRect(200, 20, GUILayout.ExpandWidth(true));
+        _input = GUI.TextField(inputRect, _input);
         
         if (GUILayout.Button("Run", GUILayout.Width(80)) || 
             (Event.current.isKey && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "GregConsoleInput"))

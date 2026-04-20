@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
+    <RepoRoot>$(MSBuildProjectDirectory)\..</RepoRoot>
     <AssemblyName>gregCore</AssemblyName>
     <RootNamespace>gregCore</RootNamespace>
     <Version>1.0.0.33-pre</Version>
@@ -20,48 +21,55 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MelonLoader" Condition="'$(CI)' != 'true'">
-      <HintPath>$(MELON_BASE_DIR)\net6\MelonLoader.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MelonLoader" Condition="'$(CI)' == 'true'">
-      <HintPath>$(RepoRoot)\ci-stubs\MelonLoader.dll</HintPath>
+    <!-- Common References with CI Fallback -->
+    <Reference Include="MelonLoader">
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\net6\MelonLoader.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\MelonLoader.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>$(MELON_BASE_DIR)\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\Il2CppInterop.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2CppInterop.Common">
-      <HintPath>$(MELON_BASE_DIR)\net6\Il2CppInterop.Common.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\net6\Il2CppInterop.Common.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\Il2CppInterop.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="0Harmony">
-      <HintPath>$(MELON_BASE_DIR)\net6\0Harmony.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\net6\0Harmony.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' != 'true'">$(MELON_BASE_DIR)\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath Condition="'$(CI)' == 'true'">$(RepoRoot)\ci-stubs\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

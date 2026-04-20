@@ -1,27 +1,25 @@
--- gregCore Lua Example Mod
-
+-- example_mod/main.lua
 function on_init()
-    greg.log_info("Lua Example Mod geladen!")
-    greg.show_notification("Lua Mod Initialisiert")
+    greg.log_info("Lua Example Mod initialized!")
     
-    -- Event abonnieren
-    greg.subscribe_event(100, function(data)
-        greg.log_info("Geld hat sich geändert! Neuer Stand: " .. greg.get_player_money())
+    -- Subscribe to coin changed hook
+    greg.on("greg.PLAYER.CoinChanged", function(payload)
+        local amount = payload.data["Amount"]
+        local total = payload.data["Total"]
+        greg.log_info("Lua received money update: " .. tostring(amount) .. " (Total: " .. tostring(total) .. ")")
+        
+        -- Fire a custom hook back
+        greg.fire("greg.CUSTOM.LuaResponse", {
+            msg = "Lua heard that!",
+            received_total = total
+        })
     end)
 end
 
 function on_update(dt)
-    -- Wird jeden Frame aufgerufen
-end
-
-function on_event(event_id, data)
-    -- Generischer Event-Handler
-end
-
-function on_scene_loaded(name)
-    greg.log_info("Szene geladen: " .. name)
+    -- Update logic
 end
 
 function on_shutdown()
-    greg.log_info("Lua Mod wird beendet.")
+    greg.log_info("Lua Example Mod shutdown.")
 end

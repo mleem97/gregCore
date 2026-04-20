@@ -110,6 +110,7 @@ function New-WorkshopProject {
 
 #region Package framework
 $fwDll = Join-Path $RepoRoot "framework\bin\$Configuration\$tfm\gregCore.dll"
+$hooksJson = Join-Path $RepoRoot "assets\greg_hooks.json"
 if (-not (Test-Path -LiteralPath $fwDll)) { throw "Missing: $fwDll" }
 New-WorkshopProject `
     -Name 'gregCore' `
@@ -118,6 +119,11 @@ New-WorkshopProject `
     -Title 'gregCore' `
     -Description 'Core modding framework for Data Center. Required by all greg-based mods and plugins.' `
     -Tags @('modded', 'melonloader', 'framework', 'greg')
+
+$fwProjDir = Join-Path $WorkshopRoot 'gregCore'
+$fwContentDir = Join-Path $fwProjDir 'content\Mods'
+Copy-Item -LiteralPath $hooksJson -Destination (Join-Path $fwContentDir 'greg_hooks.json') -Force
+Write-Host "[workshop] Copied greg_hooks.json to $fwContentDir"
 #endregion
 
 #region Package plugins

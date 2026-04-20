@@ -12,11 +12,11 @@ namespace gregCore.GameLayer.Patches.Economy;
 
 internal static class PlayerPatch
 {
-    internal static void OnCoinUpdated(object instance, float coinChangeAmount)
+    internal static void OnCoinUpdated(object __instance, float _coinChhangeAmount)
     {
         try
         {
-            var payload = EventPayloadBuilder.ForValueChange("money", 0f, coinChangeAmount);
+            var payload = EventPayloadBuilder.ForValueChange("money", 0f, _coinChhangeAmount);
             HookIntegration.Emit(HookName.Create("economy", "PlayerCoinUpdated"), payload);
         }
         catch (Exception ex)

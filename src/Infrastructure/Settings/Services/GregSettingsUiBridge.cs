@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using gregCore.Infrastructure.Settings.Models;
+using gregCore.Infrastructure.Plugins;
 using gregCore.Core.Abstractions;
 using Il2CppTMPro;
 
@@ -22,8 +23,8 @@ public class GregSettingsUiBridge
     private Transform _contentContainer;
 
     public GregSettingsUiBridge(
-        IGregLogger logger, 
-        GregModSettingsService settingsService, 
+        IGregLogger logger,
+        GregModSettingsService settingsService,
         GregKeybindRegistry keybindRegistry,
         GregInputBindingService inputBindingService,
         GregPluginRegistry pluginRegistry)
@@ -44,23 +45,27 @@ public class GregSettingsUiBridge
         var scrollObj = new GameObject("ModSettingsScrollView");
         scrollObj.transform.SetParent(panel.transform, false);
         var scrollRect = scrollObj.AddComponent<ScrollRect>();
-        
+
         var viewport = new GameObject("Viewport");
         viewport.transform.SetParent(scrollObj.transform, false);
         viewport.AddComponent<Image>().color = new Color(0, 0, 0, 0.5f);
         viewport.AddComponent<Mask>().showMaskGraphic = false;
-        
+
         var content = new GameObject("Content");
         content.transform.SetParent(viewport.transform, false);
         _contentContainer = content.transform;
-        
+
         var vlg = content.AddComponent<VerticalLayoutGroup>();
         vlg.childControlHeight = true;
         vlg.childControlWidth = true;
         vlg.childForceExpandHeight = false;
         vlg.spacing = 10;
-        vlg.padding = new RectOffset(20, 20, 20, 20);
-        
+        vlg.padding = new RectOffset();
+        vlg.padding.left = 20;
+        vlg.padding.right = 20;
+        vlg.padding.top = 20;
+        vlg.padding.bottom = 20;
+
         var csf = content.AddComponent<ContentSizeFitter>();
         csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
@@ -80,14 +85,14 @@ public class GregSettingsUiBridge
         searchObj.transform.SetParent(parent, false);
         _searchInput = searchObj.AddComponent<InputField>();
         _searchInput.onValueChanged.AddListener(new Action<string>(query => RefreshUi(query)));
-        
+
         var placeholderObj = new GameObject("Placeholder");
         placeholderObj.transform.SetParent(searchObj.transform, false);
         var placeholderText = placeholderObj.AddComponent<Text>();
         placeholderText.text = "Suche nach Mods oder Keybinds...";
         placeholderText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         placeholderText.color = Color.gray;
-        
+
         _searchInput.placeholder = placeholderText;
     }
 
@@ -109,7 +114,7 @@ public class GregSettingsUiBridge
                 continue;
 
             AddModHeader(mod);
-            
+
             // Add Settings
             var settings = _settingsService.GetByMod(mod.ModId);
             foreach (var setting in settings)

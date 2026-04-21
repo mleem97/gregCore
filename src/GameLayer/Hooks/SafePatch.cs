@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using HarmonyLib;
 using gregCore.Core.Abstractions;
 
@@ -27,14 +27,27 @@ public abstract class SafePatch
         try
         {
             if (_hookBus == null) return;
-            
-            var payload = new Sdk.Models.GregPayload(hookName, "NativePatch");
+
+            var payloadData = new Dictionary<string, object>
+            {
+                ["Trigger"] = "NativePatch"
+            };
+
             for (int i = 0; i < data.Length; i += 2)
             {
                 if (i + 1 < data.Length)
-                    payload.Data[data[i].ToString()!] = data[i + 1];
+                    payloadData[data[i].ToString()!] = data[i + 1];
             }
-            
+
+            var payload = new Core.Models.EventPayload
+            {
+                HookName = hookName,
+                OccurredAtUtc = DateTime.UtcNow,
+                Data = payloadData,
+                IsCancelable = false,
+                IsCancelled = false
+            };
+
             _hookBus.Dispatch(hookName, payload);
         }
         catch (Exception ex)

@@ -1,6 +1,8 @@
-using gregCore.Infrastructure.Settings.Services;
+﻿using gregCore.Infrastructure.Settings.Services;
 using gregCore.Core.Abstractions;
 using gregCore.GameLayer.Bootstrap;
+using HarmonyLib;
+using UnityEngine;
 
 namespace gregCore.GameLayer.Patches.UI;
 
@@ -48,12 +50,12 @@ internal static class SettingsUiBridgePatch
                     }
 
                     var newTabButton = newTabObj.GetComponent<global::Il2Cpp.PauseMenu_TabButton>();
-                    
+
                     // We need a corresponding panel object to swap to
                     var sourcePanel = tabGroup.objectsToSwap[0];
                     var newPanelObj = new GameObject("ModSettingsPanel");
                     newPanelObj.transform.SetParent(sourcePanel.transform.parent, false);
-                    
+
                     // Setup UI (we will build this via code or a separate prefab)
                     GetBridge()?.BuildModSettingsPanel(newPanelObj);
 
@@ -82,7 +84,7 @@ internal static class SettingsUiBridgePatch
             API.GregAPI.FireEvent(0); // We will define a real event ID later, or string based
             // Reload and check conflicts
             gregCore.PublicApi.greg._context?.EventBus.Publish("greg.SYSTEM.SettingsOpened", new Core.Models.EventPayload());
-            
+
             // Trigger Refresh
             GetBridge()?.RefreshUi();
         }

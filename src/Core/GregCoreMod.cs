@@ -1,11 +1,13 @@
-using System;
+﻿using System;
 using MelonLoader;
 using gregCore.Core.Abstractions;
 using gregCore.GameLayer.Bootstrap;
 using gregCore.Infrastructure.Logging;
+using gregCore.Sdk.Language;
 
 [assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.1.0", "TeamGreg")]
 [assembly: MelonGame("", "Data Center")]
+[assembly: MelonOptionalDependencies("Python.Runtime", "RustBridge", "JS.Runtime.Binding")]
 
 namespace gregCore.Core;
 
@@ -32,6 +34,10 @@ public sealed class GregCoreMod : MelonMod
         // 3. Plugin Loading
         _container.GetRequired<IGregPluginRegistry>().LoadAll();
 
+        // 4. Script Host Scan + Activation (on-demand)
+        string scriptsDir = Path.Combine(global::MelonLoader.Utils.MelonEnvironment.ModsDirectory, "Scripts");
+        GregLanguageRegistry.ScanAndActivate(scriptsDir);
+
         _logger.Success("gregCore v1.1.0 (Production-Grade) erfolgreich geladen.");
     }
 
@@ -40,23 +46,20 @@ public sealed class GregCoreMod : MelonMod
         float dt = UnityEngine.Time.deltaTime;
         
         // Update core services
-        _container?.Get<Infrastructure.Performance.GregPerformanceGovernor>()?.OnUpdate();
-        _container?.Get<Core.Events.GregEventBus>()?.FlushDeferredEvents();
-        _container?.Get<Infrastructure.Settings.Services.GregInputBindingService>()?.OnUpdate();
-        
-        // Update language bridges
-        gregCore.Bridge.RustFFI.RustFFIBridge.OnUpdate(dt);
-        gregCore.Bridge.LuaFFI.LuaFFIBridge.OnUpdate(dt);
-        gregCore.Bridge.GoFFI.GoFFIBridge.OnUpdate(dt);
-        gregCore.Bridge.PythonFFI.PythonFFIBridge.OnUpdate(dt);
+        GregServiceContainer.Get<Infrastructure.Performance.GregPerformanceGovernor>()?.OnUpdate();
+        GregServiceContainer.Get<Core.Events.GregEventBus>()?.FlushDeferredEvents();
+        GregServiceContainer.Get<Infrastructure.Settings.Services.GregInputBindingService>()?.OnUpdate();
+
+        // Update only active language hosts
+        GregLanguageRegistry.OnUpdate(dt);
     }
 
     public override void OnGUI()
     {
         // Debug Console & HUDs
         Infrastructure.UI.GregDevConsole.Instance.OnGUI();
-        _container?.Get<Infrastructure.Settings.Services.GregHudService>()?.OnGUI();
-        _container?.Get<Infrastructure.Settings.Services.GregNotificationService>()?.OnGUI();
+        GregServiceContainer.Get<Infrastructure.Settings.Services.GregHudService>()?.OnGUI();
+        GregServiceContainer.Get<Infrastructure.Settings.Services.GregNotificationService>()?.OnGUI();
     }
 
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -67,6 +70,8 @@ public sealed class GregCoreMod : MelonMod
         _container?.GetRequired<IGregEventBus>()
                    .Publish("greg.lifecycle.SceneLoaded", 
                             Core.Events.EventPayloadBuilder.ForScene(buildIndex, sceneName));
+
+        GregLanguageRegistry.OnSceneLoaded(sceneName);
                             
         gregCore.API.GregAPI.FireEvent(gregCore.API.GregEventId.GameLoaded);
     }
@@ -74,6 +79,7 @@ public sealed class GregCoreMod : MelonMod
     public override void OnApplicationQuit()
     {
         _logger?.Info("gregCore wird beendet...");
+        GregLanguageRegistry.Shutdown();
         _container?.Dispose();
     }
 }

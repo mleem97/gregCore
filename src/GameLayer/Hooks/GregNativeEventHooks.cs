@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using HarmonyLib;
 using gregCore.Core.Abstractions;
 using gregCore.Core.Events;
@@ -28,7 +28,7 @@ public sealed class GregNativeEventHooks : SafePatch
     [HarmonyPostfix]
     public static void Postfix_PlayerCoinChanged(global::Il2Cpp.Player __instance, float _amount)
     {
-        TriggerHook("greg.PLAYER.CoinChanged", "Amount", _amount, "Total", __instance.coin);
+        TriggerHook("greg.PLAYER.CoinChanged", "Amount", _amount, "Total", _amount);
     }
 
     // --- Domäne: Persistence ---

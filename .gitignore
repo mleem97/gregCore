@@ -5,6 +5,8 @@ node_modules/
 .idea/
 *.user
 *.suo
+MISSING.md
+**/MISSING.md
 
 # Specifically allow reference DLLs for CI
 !gregLib/references/

@@ -14,7 +14,7 @@
     <Description>gregCore Modding Framework für Data Center</Description>
 
     <OutputPath Condition="'$(MELON_MODS_DIR)' != ''">$(MELON_MODS_DIR)</OutputPath>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
     <NoWarn>CS1591;CS0436</NoWarn>
@@ -80,8 +80,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Jint" Version="4.8.0" />
+    <PackageReference Include="LiteDB" Version="5.0.21" />
     <PackageReference Include="Mono.Cecil" Version="0.11.5" />
     <PackageReference Include="MoonSharp" Version="2.0.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="pythonnet" Version="3.0.5" />
   </ItemGroup>
+
+  <Target Name="ILRepack" AfterTargets="Build">
+    <ItemGroup>
+      <InputAssemblies Include="$(OutputPath)\$(AssemblyName).dll" />
+      <InputAssemblies Include="$(OutputPath)\MoonSharp.Interpreter.dll" />
+      <InputAssemblies Include="$(OutputPath)\Newtonsoft.Json.dll" />
+      <InputAssemblies Include="$(OutputPath)\Mono.Cecil.dll" />
+      <InputAssemblies Include="$(OutputPath)\Jint.dll" />
+      <InputAssemblies Include="$(OutputPath)\Acornima.dll" />
+      <InputAssemblies Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
+      <InputAssemblies Include="$(OutputPath)\Python.Runtime.dll" />
+      <InputAssemblies Include="$(OutputPath)\LiteDB.dll" />
+    </ItemGroup>
+    <ILRepack Parallel="true" Internalize="true" InputAssemblies="@(InputAssemblies)" OutputFile="$(OutputPath)\$(AssemblyName).dll" TargetKind="Dll" LibraryPath="$(OutputPath)" />
+  </Target>
 </Project>

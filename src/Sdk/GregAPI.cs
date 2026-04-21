@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using gregCore.Sdk.Models;
 using gregCore.Core.Abstractions;
 using gregCore.Core.Events;
@@ -50,8 +52,12 @@ public sealed class GregAPI : IGregAPI
 
         _hookBus.On(hookName, (payload) => {
             // Umwandlung in SDK-Payload für saubere Abstraktion
-            var sdkPayload = new GregPayload(payload.HookName, payload.Trigger) {
-                Data = payload.Data
+            var trigger = payload.Data.TryGetValue("Trigger", out var triggerObj)
+                ? triggerObj?.ToString() ?? "unknown"
+                : "unknown";
+
+            var sdkPayload = new GregPayload(payload.HookName, trigger) {
+                Data = payload.Data.ToDictionary(kv => kv.Key, kv => kv.Value)
             };
             handler(sdkPayload);
         });
@@ -59,10 +65,17 @@ public sealed class GregAPI : IGregAPI
 
     public void Fire(string hookName, GregPayload payload)
     {
+        var data = new Dictionary<string, object>(payload.Data)
+        {
+            ["Trigger"] = payload.Trigger
+        };
+
         var corePayload = new Core.Models.EventPayload {
-            HookName = payload.HookName,
-            Trigger = payload.Trigger,
-            Data = payload.Data
+            HookName = hookName,
+            OccurredAtUtc = DateTime.UtcNow,
+            Data = data,
+            IsCancelable = false,
+            IsCancelled = false
         };
         _hookBus.Dispatch(hookName, corePayload);
     }

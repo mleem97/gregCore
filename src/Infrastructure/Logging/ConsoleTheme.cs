@@ -21,6 +21,17 @@ public static class ConsoleTheme
     public const char BoxBottomLeft = '╚';
     public const char BoxBottomRight = '╝';
 
+    public static readonly string[] BannerLogo = new[]
+    {
+        @"  ____ ____  _____  ____  ____ ___  ____  _____ ",
+        @" / ___|  _ \| ____|/ ___|/ ___/ _ \|  _ \| ____|",
+        @"| |  _| |_) |  _| | |  _| |  | | | | |_) |  _|  ",
+        @"| |_| |  _ <| |___| |_| | |__| |_| |  _ <| |___ ",
+        @" \____|_| \_\_____|\____|\____\___/|_| \_\_____|",
+        @"                                               ",
+        @"  >> THE ULTIMATE MODDING FRAMEWORK <<         "
+    };
+
     public static string GetLevelPrefix(string level) => level.ToLower() switch
     {
         "info" => "INFO",

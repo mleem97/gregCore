@@ -23,17 +23,22 @@ internal static class GregBootstrapper
     {
         var container = new GregServiceContainer();
 
-        // Initialize static Logger and CLI Config
-        GregLogger.Configure(new ConsoleConfig());
+        // Initialize static Logger
         var logger = new ConsoleLogger(melonLogger);
 
         container.Register<IGregLogger>(logger);
 
-        GregLogger.Box(new[] {
-            "gregCore v1.0.0",
+        greg.Logging.GregLogger.Initialize(melonLogger);
+        greg.Logging.GregLogger.Msg("Bootstrapper starting...", "BOOT");
+
+        // Note: The banner is printed in GregCoreMod.cs now as requested
+        /*
+        greg.Logging.GregLogger.Box(new[] {
+            "gregCore v1.1.0 (Production-Grade)",
             "MelonLoader Framework initialized",
             "PRO-Edition Active"
         });
+        */
 
         var bus = new GregEventBus(logger);
         var hookBus = new GregHookBus(logger);

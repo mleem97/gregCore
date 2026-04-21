@@ -4,10 +4,10 @@ namespace gregCore.Infrastructure.Plugins;
 
 public class ModMetadata
 {
-    public string ModId { get; set; }
-    public string Name { get; set; }
-    public string Version { get; set; }
-    public object ApiObject { get; set; }
+    public string ModId { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Version { get; set; } = null!;
+    public object ApiObject { get; set; } = null!;
     public bool HasSettings { get; set; }
     public bool HasKeybinds { get; set; }
     public List<string> CustomTabs { get; set; } = new();

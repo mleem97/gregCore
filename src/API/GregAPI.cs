@@ -50,8 +50,8 @@ public static class GregAPI
     }
 
     // internal DI container hooks for new services
-    internal static gregCore.Infrastructure.Settings.GregKeybindRegistry _keybindReg;
-    internal static gregCore.Infrastructure.Settings.GregModSettingsService _modSettingsService;
+    internal static gregCore.Infrastructure.Settings.GregKeybindRegistry _keybindReg = null!;
+    internal static gregCore.Infrastructure.Settings.GregModSettingsService _modSettingsService = null!;
     private static gregCore.Sdk.IGregAPI? _sdkApi;
 
     public static gregCore.Sdk.IGregAPI GetSdkApi()
@@ -63,19 +63,19 @@ public static class GregAPI
         return _sdkApi ?? throw new Exception("SDK API not initialized");
     }
 
-    public static void RegisterMod(string modId, string name, string version, object apiObject = null)
+    public static void RegisterMod(string modId, string name, string version, object? apiObject = null)
     {
         GetSdkApi().RegisterMod(modId, name, version, apiObject);
     }
 
     public static class Settings
     {
-        public static void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool> onChanged = null, string category = "General", string description = "")
+        public static void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "")
         {
             GetSdkApi().RegisterToggle(modId, settingId, displayName, defaultValue, onChanged, category, description);
         }
 
-        public static void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float> onChanged = null, string category = "General", string description = "")
+        public static void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged = null, string category = "General", string description = "")
         {
             GetSdkApi().RegisterSlider(modId, settingId, displayName, defaultValue, onChanged, category, description);
         }
@@ -120,8 +120,8 @@ public static class GregAPI
     // --- Technicians ---
     public static uint GetFreeTechnicianCount() => (uint)gregCore.PublicApi.greg.Npc.GetFreeTechnicianCount();
     public static uint GetTotalTechnicianCount() => (uint)gregCore.PublicApi.greg.Npc.GetTotalTechnicianCount();
-    public static int DispatchRepairServer() => gregCore.PublicApi.greg.Npc.DispatchRepairServer(null!) ? 0 : -1;
-    public static int DispatchRepairSwitch() => gregCore.PublicApi.greg.Npc.DispatchRepairSwitch(null!) ? 0 : -1;
+    public static int DispatchRepairServer() => gregCore.PublicApi.greg.Npc.DispatchRepairServer(null) ? 0 : -1;
+    public static int DispatchRepairSwitch() => gregCore.PublicApi.greg.Npc.DispatchRepairSwitch(null) ? 0 : -1;
 
     // --- Time ---
     public static float GetTimeOfDay() => gregCore.PublicApi.greg.Time.GetTimeOfDay();
@@ -149,19 +149,19 @@ public static class GregAPI
     // --- UI / Logging ---
     public static void ShowNotification(string message) => gregCore.PublicApi.greg.UI.ShowNotification(message);
     public static void LogInfo(string message) {
-        gregCore.Infrastructure.Logging.GregLogger.Info("API", message);
+        greg.Logging.GregLogger.Msg(message, "API");
         gregCore.Infrastructure.UI.GregDevConsole.Instance.AddLog(message, LogType.Log);
     }
     public static void LogWarning(string message) {
-        gregCore.Infrastructure.Logging.GregLogger.Warning("API", message);
+        greg.Logging.GregLogger.Warn(message, "API");
         gregCore.Infrastructure.UI.GregDevConsole.Instance.AddLog(message, LogType.Warning);
     }
     public static void LogError(string message) {
-        gregCore.Infrastructure.Logging.GregLogger.Error("API", message);
+        greg.Logging.GregLogger.Error(message, null, "API");
         gregCore.Infrastructure.UI.GregDevConsole.Instance.AddLog(message, LogType.Error);
     }
     public static void LogSuccess(string message) {
-        gregCore.Infrastructure.Logging.GregLogger.Success("API", message);
+        greg.Logging.GregLogger.Msg(message, "API");
         gregCore.Infrastructure.UI.GregDevConsole.Instance.AddLog(message, LogType.Log);
     }
 

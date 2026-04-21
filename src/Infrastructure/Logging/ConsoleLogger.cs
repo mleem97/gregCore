@@ -19,17 +19,16 @@ public sealed class ConsoleLogger : IGregLogger
         _context = context;
     }
 
-    public void Info(string message) => GregLogger.Info(_context, message);
-    public void Warning(string message) => GregLogger.Warning(_context, message);
+    public void Info(string message) => greg.Logging.GregLogger.Msg(message, _context);
+    public void Warning(string message) => greg.Logging.GregLogger.Warn(message, _context);
     public void Error(string message, Exception? ex = null) 
     {
-        string fullMessage = ex != null ? $"{message}\n{ex}" : message;
-        GregLogger.Error(_context, fullMessage);
+        greg.Logging.GregLogger.Error(message, ex, _context);
     }
-    public void Debug(string message) => GregLogger.Debug(_context, message);
-    public void Success(string message) => GregLogger.Success(_context, message);
+    public void Debug(string message) => greg.Logging.GregLogger.Debug(message, _context);
+    public void Success(string message) => greg.Logging.GregLogger.Msg(message, _context);
     
-    public void Bridge(string bridgeName, string message) => GregLogger.BridgeInfo(bridgeName, message);
+    public void Bridge(string bridgeName, string message) => greg.Logging.GregLogger.Msg(message, bridgeName);
 
     public IGregLogger ForContext(string context)
     {

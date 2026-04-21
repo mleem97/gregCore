@@ -13,6 +13,7 @@ internal static class HookIntegration
     private static IGregEventBus _bus = null!;
     private static IGregLogger _logger = null!;
 
+
     internal static void Install(IGregEventBus bus, IGregLogger logger)
     {
         _bus = bus;

@@ -52,7 +52,7 @@ public abstract class SafePatch
         }
         catch (Exception ex)
         {
-            _logger?.Error($"Fehler beim Auslösen von Hook {hookName}: {ex.Message}");
+            _logger?.Error($"Fehler beim Auslösen von Hook {hookName}", ex);
         }
     }
 }

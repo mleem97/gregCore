@@ -34,4 +34,13 @@ public static class EventPayloadBuilder
             },
             IsCancelable = true
         };
+
+    public static EventPayload ForGeneric(string hookName, object data) =>
+        new EventPayload
+        {
+            HookName = hookName,
+            OccurredAtUtc = DateTime.UtcNow,
+            Data = data as Dictionary<string, object> ?? new Dictionary<string, object> { { "Data", data } },
+            IsCancelable = false
+        };
 }

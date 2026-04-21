@@ -7,7 +7,7 @@ namespace greg.GridPlacement
 {
     public class GregGridManager
     {
-        public static GregGridManager Instance { get; private set; }
+        public static GregGridManager Instance { get; private set; } = null!;
 
         private readonly Dictionary<Vector2Int, GregGridCell> _cells = new();
         public float CellSizeX { get; private set; } = 2.0f;

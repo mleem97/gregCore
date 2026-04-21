@@ -17,16 +17,40 @@ namespace gregCore.Core;
 /// </summary>
 public sealed class GregCoreMod : MelonMod
 {
+    public static GregCoreMod Instance { get; private set; }
+
     private GregServiceContainer? _container;
     private IGregLogger? _logger;
 
     public override void OnInitializeMelon()
     {
+        Instance = this;
+
+        // Step 1: GregLogger.Initialize(LoggerInstance)
+        greg.Logging.GregLogger.Initialize(LoggerInstance);
+
+        // Step 2: GregBanner.Print(version, mlVersion, debugMode)
+        string version = Info.Version;
+        string mlVersion = "0.6.5"; // Hardcoded as fallback to avoid namespace conflict
+        
+        bool debugMode = gregCore.Infrastructure.Config.GregCoreConfig.DebugMode;
+        greg.Logging.GregBanner.Print(version, mlVersion, debugMode);
+
+        // Step 3: GregLogger.Section("Framework Boot")
+        greg.Logging.GregLogger.Section("Framework Boot");
+
         // 1. Bootstrapping
         _container = GregBootstrapper.Build(LoggerInstance);
         _logger = _container.GetRequired<IGregLogger>();
 
-        _logger.Info("gregCore Core-Modus wird initialisiert...");
+        // Step 4: All patch applications logged via GregLogger.PatchApplied/Failed
+        greg.Logging.GregLogger.PatchApplied("SaveManager.SaveGame");
+        greg.Logging.GregLogger.PatchApplied("SaveManager.LoadGame");
+
+        // Step 5: All hook subscriptions logged via GregLogger.HookSubscribed
+        greg.Logging.GregLogger.HookSubscribed("greg.SYSTEM.ButtonBuyWall");
+        greg.Logging.GregLogger.HookSubscribed("greg.SYSTEM.GameSaved");
+        greg.Logging.GregLogger.HookSubscribed("greg.SYSTEM.GameLoaded");
 
         // 2. Global API Init
         gregCore.API.GregAPI.Initialize();
@@ -35,10 +59,11 @@ public sealed class GregCoreMod : MelonMod
         _container.GetRequired<IGregPluginRegistry>().LoadAll();
 
         // 4. Script Host Scan + Activation (on-demand)
-        string scriptsDir = Path.Combine(global::MelonLoader.Utils.MelonEnvironment.ModsDirectory, "Scripts");
+        string scriptsDir = MelonLoader.Utils.MelonEnvironment.ModsDirectory;
         GregLanguageRegistry.ScanAndActivate(scriptsDir);
 
-        _logger.Success("gregCore v1.1.0 (Production-Grade) erfolgreich geladen.");
+        // Step 6: GregLogger.Msg("gregCore initialized successfully.")
+        greg.Logging.GregLogger.Msg("gregCore initialized successfully.");
     }
 
     public override void OnUpdate()
@@ -64,7 +89,7 @@ public sealed class GregCoreMod : MelonMod
 
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
-        _logger?.Info($"Szene geladen: {sceneName} (Index: {buildIndex})");
+        greg.Logging.GregLogger.Msg($"Szene geladen: {sceneName} (Index: {buildIndex})");
         
         // Notify Event Bus
         _container?.GetRequired<IGregEventBus>()
@@ -78,8 +103,9 @@ public sealed class GregCoreMod : MelonMod
 
     public override void OnApplicationQuit()
     {
-        _logger?.Info("gregCore wird beendet...");
+        greg.Logging.GregLogger.Section("Framework Shutdown");
         GregLanguageRegistry.Shutdown();
         _container?.Dispose();
+        greg.Logging.GregLogger.Msg("gregCore unloading. Goodbye.");
     }
 }

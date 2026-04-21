@@ -11,7 +11,7 @@ public class GregModSettingsService
 {
     private readonly Dictionary<string, BaseSettingEntry> _settings = new();
     private readonly IGregLogger _logger;
-    private GregSettingsPersistenceService _persistence;
+    private GregSettingsPersistenceService? _persistence;
 
     public GregModSettingsService(IGregLogger logger)
     {
@@ -39,7 +39,7 @@ public class GregModSettingsService
         {
             _settings[id] = entry;
             // First time registration, so value is default
-            if (EqualityComparer<T>.Default.Equals(entry.Value, default(T)))
+            if (EqualityComparer<T>.Default.Equals(entry.Value, default(T)!))
             {
                 entry.Value = entry.DefaultValue;
             }
@@ -50,7 +50,7 @@ public class GregModSettingsService
         _logger.Info($"Setting registriert: {entry.DisplayName} [Mod: {entry.ModId}, Wert: {entry.Value}]");
     }
 
-    public SettingEntry<T> Get<T>(string modId, string settingId)
+    public SettingEntry<T>? Get<T>(string modId, string settingId)
     {
         if (_settings.TryGetValue($"{modId}.{settingId}", out var entry) && entry is SettingEntry<T> typedEntry)
         {

@@ -18,9 +18,9 @@ public class GregSettingsUiBridge
     private readonly GregInputBindingService _inputBindingService;
     private readonly GregPluginRegistry _pluginRegistry;
 
-    private GameObject _mainPanel;
-    private InputField _searchInput;
-    private Transform _contentContainer;
+    private GameObject _mainPanel = null!;
+    private InputField _searchInput = null!;
+    private Transform _contentContainer = null!;
 
     public GregSettingsUiBridge(
         IGregLogger logger,
@@ -39,7 +39,7 @@ public class GregSettingsUiBridge
     public void BuildModSettingsPanel(GameObject panel)
     {
         _mainPanel = panel;
-        _logger.Info("Baue Mod-Settings UI...");
+        greg.Logging.GregLogger.Msg("Baue Mod-Settings UI...", "SettingsUiBridge");
 
         // 1. Setup ScrollView
         var scrollObj = new GameObject("ModSettingsScrollView");
@@ -90,7 +90,7 @@ public class GregSettingsUiBridge
         placeholderObj.transform.SetParent(searchObj.transform, false);
         var placeholderText = placeholderObj.AddComponent<Text>();
         placeholderText.text = "Suche nach Mods oder Keybinds...";
-        placeholderText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        placeholderText.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
         placeholderText.color = Color.gray;
 
         _searchInput.placeholder = placeholderText;
@@ -137,9 +137,9 @@ public class GregSettingsUiBridge
         headerObj.transform.SetParent(_contentContainer, false);
         var text = headerObj.AddComponent<Text>();
         text.text = $"{mod.Name} (v{mod.Version})";
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
         text.fontSize = 24;
-        text.fontStyle = FontStyle.Bold;
+        text.fontStyle = UnityEngine.FontStyle.Bold;
         text.color = Color.white;
     }
 
@@ -149,7 +149,7 @@ public class GregSettingsUiBridge
         entryObj.transform.SetParent(_contentContainer, false);
         var text = entryObj.AddComponent<Text>();
         text.text = $"  {setting.DisplayName}: {GetValue(setting)}";
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
         text.fontSize = 18;
         text.color = Color.cyan;
     }
@@ -161,7 +161,7 @@ public class GregSettingsUiBridge
         var text = entryObj.AddComponent<Text>();
         var conflictText = keybind.HasConflict ? " <color=red>[KONFLIKT]</color>" : "";
         text.text = $"  {keybind.DisplayName}: {keybind.CurrentKey}{conflictText}";
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
         text.fontSize = 18;
         text.color = keybind.HasConflict ? Color.red : Color.yellow;
         text.supportRichText = true;

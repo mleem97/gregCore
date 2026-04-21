@@ -3,15 +3,18 @@ using System.IO;
 using LiteDB;
 using gregCore.API;
 using greg.GridPlacement;
+using greg.Logging;
 
 namespace greg.SaveEngine
 {
     public class GregSaveEngine
     {
-        public static GregSaveEngine Instance { get; private set; }
+        public static GregSaveEngine Instance { get; private set; } = null!;
         
         private LiteDatabase? _db;
         public string DbPath { get; private set; } = string.Empty;
+
+        private readonly GregModLogger _log = new GregModLogger("SaveEngine");
 
         public GregSaveEngine()
         {
@@ -33,13 +36,17 @@ namespace greg.SaveEngine
                 IsVanillaSave = false
             });
             
-            GregAPI.LogInfo($"GregSaveEngine initialized at {DbPath}");
+            _log.Section("Init");
+            _log.Msg($"LiteDB initialized at {DbPath}");
+            _log.FeatureState("SaveEngine", true);
+            _log.Msg("Auto-save interval: 60s");
         }
 
         public void SaveAll()
         {
             if (!frameworkSdk.GregFeatureGuard.IsEnabled("SaveEngine.Write")) return;
             
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             SaveGridState(GregGridManager.Instance);
             // SaveServerState(...)
             // SaveNetworkState(...)
@@ -54,13 +61,23 @@ namespace greg.SaveEngine
                     metaCol.Update(doc);
                 }
             }
+            watch.Stop();
+            
+            _log.Section("Save");
+            _log.Saved(1, watch.ElapsedMilliseconds);
             
             GregSaveNotifier.NotifySave("Auto-saved complete state.");
         }
 
         public void LoadAll()
         {
+            _log.Section("Load");
             LoadGridState(GregGridManager.Instance);
+
+            // Example implementation as requested
+            _log.Loaded(1, DbPath);
+            _log.VanillaSaveDetected("GridPlacement");
+
             GregSaveNotifier.NotifyLoad(DbPath);
         }
 

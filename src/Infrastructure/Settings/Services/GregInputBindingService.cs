@@ -68,7 +68,7 @@ public class GregInputBindingService
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // _logger.Error("Error checking keybinds", ex); // Too spammy for Update loop
         }

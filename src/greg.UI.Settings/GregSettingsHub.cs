@@ -50,15 +50,15 @@ namespace greg.UI.Settings
 
     public class GregSettingsHub : MonoBehaviour
     {
-        private static GregSettingsHub _instance;
+        private static GregSettingsHub? _instance;
         private bool _isVisible = false;
         private int _selectedTab = 0;
         
         private class TabData
         {
-            public string Id;
-            public string Label;
-            public Action<GregUIBuilder> BuildFn;
+            public string Id = string.Empty;
+            public string Label = string.Empty;
+            public Action<GregUIBuilder>? BuildFn;
         }
         
         private static readonly List<TabData> _tabs = new();
@@ -189,15 +189,11 @@ namespace greg.UI.Settings
 
             if (_windowStyle == null)
             {
-                _windowStyle = new GUIStyle(GUI.skin.window);
-                _windowStyle.normal.background = MakeTex(2, 2, new Color(0.00f, 0.07f, 0.07f, 0.93f));
-                _windowStyle.normal.textColor = new Color(0.75f, 0.99f, 0.97f, 1f);
-
-                _tabStyle = new GUIStyle(GUI.skin.button);
-                _tabStyle.normal.textColor = new Color(0.38f, 0.96f, 0.85f, 1f); // Accent
+                _windowStyle = GUI.skin.window;
+                _tabStyle = GUI.skin.button;
             }
 
-            GUI.Window(999, new Rect((Screen.width - 480) / 2, 100, 480, 500), DrawWindow, "gregCore Settings Hub", _windowStyle);
+            GUI.Window(999, new Rect((Screen.width - 480) / 2, 100, 480, 500), (GUI.WindowFunction)DrawWindow, "gregCore Settings Hub");
         }
 
         private void DrawWindow(int id)

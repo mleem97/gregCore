@@ -26,4 +26,19 @@ public sealed class GregPayload
             return typedValue;
         return default;
     }
+
+    public static T Get<T>(object payload, string fieldName, T fallback)
+    {
+        if (payload is GregPayload p)
+        {
+            return p.GetValue<T>(fieldName) ?? fallback;
+        }
+        
+        if (payload is gregCore.Core.Models.EventPayload ep && ep.Data.TryGetValue(fieldName, out var val))
+        {
+            try { return (T)System.Convert.ChangeType(val, typeof(T)); } catch { }
+        }
+
+        return fallback;
+    }
 }

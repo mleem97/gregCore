@@ -44,10 +44,22 @@ public sealed class GregNativeEventHooks : SafePatch
     [HarmonyPostfix]
     public static void Postfix_PauseMenuOpened()
     {
+        greg.Logging.GregLogger.Msg("Pause Menu Opened", "NativeHooks");
         TriggerHook("greg.UI.PauseMenu.Opened", "InstanceId", 1);
     }
 
+    // --- WallRack Hooks ---
+    public const string WorldWallRegistered    = "greg.WORLD.WallRegistered";
+    public const string WorldWallRemoved       = "greg.WORLD.WallRemoved";
+    public const string WorldWallPlaced        = "greg.WORLD.WallPlaced";
+    public const string WorldWallDeviceMounted  = "greg.WORLD.WallDeviceMounted";
+    public const string WorldWallDeviceUnmounted = "greg.WORLD.WallDeviceUnmounted";
+    public const string WorldWallDeviceSwapped   = "greg.WORLD.WallDeviceSwapped";
+    public const string WorldWallDeviceLabelSet  = "greg.WORLD.WallDeviceLabelSet";
+    public const string SystemButtonBuyWall      = "greg.SYSTEM.ButtonBuyWall";
+
     // --- Generisches Hooking für die restlichen 1771 Hooks (Platzhalter) ---
+
     // In einer vollwertigen Produktion würde hier ein Generator-Tool (z.B. Source Generator) 
     // alle 1771 Harmony-Methoden basierend auf game_hooks.json generieren.
 }

@@ -17,20 +17,20 @@ public sealed class GregNpcModule
     }
     public int GetTotalTechnicianCount() => UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Technician>().Length;
     
-    public bool DispatchRepairServer(global::Il2Cpp.Server server) {
+    public bool DispatchRepairServer(global::Il2Cpp.Server? server) {
         try {
             var tm = global::Il2Cpp.TechnicianManager.instance;
-            if (tm == null) return false;
+            if (tm == null || server == null) return false;
             // Use reflection if direct call fails
             tm.GetType().GetMethod("DispatchRepairServer")?.Invoke(tm, new object[] { server });
             return true;
         } catch { return false; }
     }
 
-    public bool DispatchRepairSwitch(global::Il2Cpp.NetworkSwitch sw) {
+    public bool DispatchRepairSwitch(global::Il2Cpp.NetworkSwitch? sw) {
         try {
             var tm = global::Il2Cpp.TechnicianManager.instance;
-            if (tm == null) return false;
+            if (tm == null || sw == null) return false;
             tm.GetType().GetMethod("DispatchRepairSwitch")?.Invoke(tm, new object[] { sw });
             return true;
         } catch { return false; }

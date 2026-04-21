@@ -21,7 +21,7 @@ public class GregSettingsPersistenceService
         IGregLogger logger, 
         GregKeybindRegistry keybindRegistry, 
         GregModSettingsService modSettingsService,
-        IGregEventBus eventBus = null)
+        IGregEventBus? eventBus = null)
     {
         _logger = logger.ForContext("SettingsPersistence");
         _keybindRegistry = keybindRegistry;
@@ -90,7 +90,7 @@ public class GregSettingsPersistenceService
         }
     }
 
-    private object GetValueObject(BaseSettingEntry entry)
+    private object? GetValueObject(BaseSettingEntry entry)
     {
         var type = entry.GetType();
         var prop = type.GetProperty("Value");

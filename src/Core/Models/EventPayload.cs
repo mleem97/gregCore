@@ -4,6 +4,10 @@
 /// Maintainer:   Blittable struct wo möglich. IsCancelled ist das einzige mutable Feld.
 /// </file-summary>
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 namespace gregCore.Core.Models;
 
 // [GREG_SYNC_INSERT_DTOS]
@@ -11,9 +15,9 @@ namespace gregCore.Core.Models;
 [StructLayout(LayoutKind.Sequential)]
 public record EventPayload
 {
-    public string HookName { get; init; }
+    public string HookName { get; init; } = null!;
     public DateTime OccurredAtUtc { get; init; }
-    public IReadOnlyDictionary<string, object> Data { get; init; }
+    public IReadOnlyDictionary<string, object> Data { get; init; } = null!;
     public bool IsCancelable { get; init; }
     public bool IsCancelled { get; set; }
 }

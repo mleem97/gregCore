@@ -53,7 +53,7 @@ public class GregKeybindRegistry
         }
     }
 
-    public KeybindEntry Get(string modId, string actionId)
+    public KeybindEntry? Get(string modId, string actionId)
     {
         _keybinds.TryGetValue($"{modId}.{actionId}", out var entry);
         return entry;

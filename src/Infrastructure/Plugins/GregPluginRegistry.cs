@@ -33,7 +33,7 @@ public sealed class GregPluginRegistry : IGregPluginRegistry
         _logger.Info($"Mod registriert: {metadata.Name} ({metadata.Version}) [ID: {metadata.ModId}]");
     }
 
-    public ModMetadata GetModMetadata(string modId)
+    public ModMetadata? GetModMetadata(string modId)
     {
         _registeredMods.TryGetValue(modId, out var metadata);
         return metadata;

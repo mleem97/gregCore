@@ -34,10 +34,10 @@ namespace greg.GridPlacement
             _previewRack = new GregPlaceableRack { RackId = "preview", UnityGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube) };
             if (_previewRack.UnityGameObject != null)
             {
-                var col = _previewRack.UnityGameObject.GetComponent<Collider>();
-                if (col != null) Destroy(col);
+                var col = _previewRack.UnityGameObject.GetComponent<UnityEngine.Collider>();
+                if (col != null) UnityEngine.Object.Destroy(col);
                 
-                var renderer = _previewRack.UnityGameObject.GetComponent<Renderer>();
+                var renderer = _previewRack.UnityGameObject.GetComponent<UnityEngine.Renderer>();
                 if (renderer != null)
                 {
                     renderer.material.color = new Color(0.38f, 0.96f, 0.85f, 0.4f); // 61F4D8 40% alpha
@@ -68,7 +68,7 @@ namespace greg.GridPlacement
             if (!BuildModeActive || _previewRack?.UnityGameObject == null) return;
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (UnityEngine.Physics.Raycast(ray, out UnityEngine.RaycastHit hit))
             {
                 Vector3 snapPos = _grid.SnapToGrid(hit.point);
                 _previewRack.UnityGameObject.transform.position = snapPos;

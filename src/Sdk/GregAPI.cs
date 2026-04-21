@@ -52,12 +52,14 @@ public sealed class GregAPI : IGregAPI
 
         _hookBus.On(hookName, (payload) => {
             // Umwandlung in SDK-Payload für saubere Abstraktion
-            var trigger = payload.Data.TryGetValue("Trigger", out var triggerObj)
-                ? triggerObj?.ToString() ?? "unknown"
-                : "unknown";
+            var trigger = "unknown";
+            if (payload.Data != null && payload.Data.TryGetValue("Trigger", out var triggerObj))
+            {
+                trigger = triggerObj?.ToString() ?? "unknown";
+            }
 
-            var sdkPayload = new GregPayload(payload.HookName, trigger) {
-                Data = payload.Data.ToDictionary(kv => kv.Key, kv => kv.Value)
+            var sdkPayload = new GregPayload(payload.HookName ?? hookName, trigger) {
+                Data = payload.Data?.ToDictionary(kv => kv.Key, kv => kv.Value) ?? new Dictionary<string, object>()
             };
             handler(sdkPayload);
         });

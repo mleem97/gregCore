@@ -14,17 +14,20 @@ public static class ConsoleFormatters
         
         if (showTimestamp)
         {
-            sb.Append($"[{DateTime.Now:HH:mm:ss}]");
+            sb.Append($"{DateTime.Now:HH:mm:ss} ");
         }
 
-        sb.Append("[gregCore]");
+        sb.Append("» ");
+        sb.Append(ConsoleTheme.GetLevelPrefix(level).PadRight(5));
         
         if (!string.IsNullOrEmpty(component))
         {
-            sb.Append($"[{component}]");
+            sb.Append($" | {component.ToUpper()} |");
         }
-
-        sb.Append($"[{ConsoleTheme.GetLevelPrefix(level)}]");
+        else
+        {
+            sb.Append(" | gregCore |");
+        }
         
         return sb.ToString();
     }

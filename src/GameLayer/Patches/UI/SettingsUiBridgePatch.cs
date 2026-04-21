@@ -10,7 +10,7 @@ namespace gregCore.GameLayer.Patches.UI;
 internal static class SettingsUiBridgePatch
 {
     private static bool _tabInjected = false;
-    private static GregSettingsUiBridge _uiBridge;
+    private static GregSettingsUiBridge _uiBridge = null!;
 
     private static GregSettingsUiBridge GetBridge()
     {
@@ -43,11 +43,11 @@ internal static class SettingsUiBridgePatch
                     newTabObj.name = "ModSettingsTab";
 
                     // The tab button has a Text / TextMeshPro component
-                    var tmp = newTabObj.GetComponentInChildren<global::Il2CppTMPro.TextMeshProUGUI>();
-                    if (tmp != null)
-                    {
-                        tmp.text = "Mods";
-                    }
+                    // var tmp = newTabObj.GetComponentInChildren<global::Il2CppTMPro.TextMeshProUGUI>();
+                    // if (tmp != null)
+                    // {
+                    //     tmp.text = "Mods";
+                    // }
 
                     var newTabButton = newTabObj.GetComponent<global::Il2Cpp.PauseMenu_TabButton>();
 
@@ -63,14 +63,14 @@ internal static class SettingsUiBridgePatch
                     tabGroup.tabButtons.Add(newTabButton);
                     tabGroup.objectsToSwap.Add(newPanelObj);
 
-                    gregCore.Infrastructure.Logging.GregLogger.Success("UIBridge", "Injected 'Mods' Tab into Settings Menu");
+                    greg.Logging.GregLogger.Msg("Injected 'Mods' Tab into Settings Menu", "UIBridge");
                     _tabInjected = true;
                 }
             }
         }
         catch (Exception ex)
         {
-            gregCore.Infrastructure.Logging.GregLogger.Error("UIBridge", $"Failed to inject Mod Settings UI: {ex.Message}");
+            greg.Logging.GregLogger.Error("Failed to inject Mod Settings UI", ex, "UIBridge");
         }
     }
 
@@ -90,7 +90,7 @@ internal static class SettingsUiBridgePatch
         }
         catch (Exception ex)
         {
-            gregCore.Infrastructure.Logging.GregLogger.Error("UIBridge", $"Error on open: {ex.Message}");
+            greg.Logging.GregLogger.Error("Error on open", ex, "UIBridge");
         }
     }
 
@@ -105,7 +105,7 @@ internal static class SettingsUiBridgePatch
         }
         catch (Exception ex)
         {
-            gregCore.Infrastructure.Logging.GregLogger.Error("UIBridge", $"Error on close: {ex.Message}");
+            greg.Logging.GregLogger.Error("Error on close", ex, "UIBridge");
         }
     }
 }

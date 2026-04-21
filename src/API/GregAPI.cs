@@ -168,7 +168,7 @@ public static class GregAPI
     // --- Events ---
     public static void FireEvent(GregEventId eventId, ulong data = 0)
     {
-        if (gregCore.PublicApi.greg.IsInitialized && _eventIdToHook.TryGetValue(eventId, out string hookName))
+        if (gregCore.PublicApi.greg.IsInitialized && _eventIdToHook.TryGetValue(eventId, out string? hookName) && hookName != null)
         {
             var ctx = gregCore.PublicApi.greg._context;
             ctx?.EventBus.Publish(hookName, new EventPayload
@@ -195,13 +195,16 @@ public static class GregAPI
 
         _subscriptions[eventId].Add(handler);
 
-        if (gregCore.PublicApi.greg.IsInitialized && _eventIdToHook.TryGetValue(eventId, out string hookName))
+        if (gregCore.PublicApi.greg.IsInitialized && _eventIdToHook.TryGetValue(eventId, out string? hookName) && hookName != null)
         {
             var ctx = gregCore.PublicApi.greg._context;
             ctx?.EventBus.Subscribe(hookName, payload => {
                 ulong data = 0;
-                if (payload.Data.TryGetValue("raw_data", out var d)) data = Convert.ToUInt64(d);
-                else if (payload.Data.TryGetValue("NewValue", out var nv)) data = Convert.ToUInt64(nv);
+                if (payload.Data != null)
+                {
+                    if (payload.Data.TryGetValue("raw_data", out var d)) data = Convert.ToUInt64(d);
+                    else if (payload.Data.TryGetValue("NewValue", out var nv)) data = Convert.ToUInt64(nv);
+                }
                 handler(data);
             });
         }

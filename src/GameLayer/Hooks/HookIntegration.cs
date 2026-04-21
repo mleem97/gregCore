@@ -26,6 +26,9 @@ internal static class HookIntegration
         SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateCoin), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnCoinUpdated));
         SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateXP), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnXpUpdated));
         SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateReputation), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnReputationUpdated));
+
+        SafePatch(harmony, typeof(Il2Cpp.ComputerShop), nameof(Il2Cpp.ComputerShop.ButtonCheckOut), typeof(gregCore.GameLayer.Patches.Economy.ShopPatch), nameof(gregCore.GameLayer.Patches.Economy.ShopPatch.OnCheckOut));
+        SafePatch(harmony, typeof(Il2Cpp.TimeController), "Update", typeof(gregCore.GameLayer.Patches.Lifecycle.TimePatch), nameof(gregCore.GameLayer.Patches.Lifecycle.TimePatch.OnUpdate));
     }
 
     internal static void Emit(HookName hook, EventPayload payload)

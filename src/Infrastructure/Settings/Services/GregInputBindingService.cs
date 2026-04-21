@@ -9,7 +9,7 @@ public class GregInputBindingService
 {
     private readonly IGregLogger _logger;
     private readonly GregKeybindRegistry _keybindRegistry;
-    private GregSettingsPersistenceService _persistence;
+    private GregSettingsPersistenceService _persistence = null!;
 
     public GregInputBindingService(IGregLogger logger, GregKeybindRegistry keybindRegistry)
     {

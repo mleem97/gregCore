@@ -59,7 +59,7 @@ public sealed class GregAPI : IGregAPI
             }
 
             var sdkPayload = new GregPayload(payload.HookName ?? hookName, trigger) {
-                Data = payload.Data?.ToDictionary(kv => kv.Key, kv => kv.Value) ?? new Dictionary<string, object>()
+                Data = payload.Data?.ToDictionary(kv => kv.Key, kv => kv.Value!) ?? new Dictionary<string, object>()
             };
             handler(sdkPayload);
         });
@@ -67,7 +67,7 @@ public sealed class GregAPI : IGregAPI
 
     public void Fire(string hookName, GregPayload payload)
     {
-        var data = new Dictionary<string, object>(payload.Data)
+        var data = new Dictionary<string, object>(payload.Data ?? new Dictionary<string, object>())
         {
             ["Trigger"] = payload.Trigger
         };
@@ -88,7 +88,7 @@ public sealed class GregAPI : IGregAPI
         if (!_validationService.ValidateModId(modId)) return;
 
         _pluginRegistry.RegisterMod(new ModMetadata {
-            ModId = modId, Name = name, Version = version, ApiObject = apiObject
+            ModId = modId, Name = name, Version = version, ApiObject = apiObject!
         });
     }
 
@@ -96,7 +96,7 @@ public sealed class GregAPI : IGregAPI
     public void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "")
     {
         var entry = new Infrastructure.Settings.Models.SettingEntry<bool> {
-            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged, Category = category, Description = description
+            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged!, Category = category, Description = description
         };
         _settingsService.Register(entry);
     }
@@ -104,7 +104,7 @@ public sealed class GregAPI : IGregAPI
     public void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged = null, string category = "General", string description = "")
     {
         var entry = new Infrastructure.Settings.Models.SettingEntry<float> {
-            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged, Category = category, Description = description
+            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged!, Category = category, Description = description
         };
         _settingsService.Register(entry);
     }

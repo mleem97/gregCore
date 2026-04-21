@@ -12,11 +12,11 @@ internal static class SettingsUiBridgePatch
     private static bool _tabInjected = false;
     private static GregSettingsUiBridge _uiBridge = null!;
 
-    private static GregSettingsUiBridge GetBridge()
+    private static GregSettingsUiBridge? GetBridge()
     {
         if (_uiBridge == null)
         {
-            _uiBridge = GregServiceContainer.Get<GregSettingsUiBridge>();
+            _uiBridge = GregServiceContainer.Get<GregSettingsUiBridge>()!;
         }
         return _uiBridge;
     }

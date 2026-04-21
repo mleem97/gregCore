@@ -27,9 +27,9 @@ namespace greg.WallRack.Integration
         {
             if (!frameworkSdk.GregFeatureGuard.IsEnabled("WallRack")) return;
 
-            string? wallId = GregPayload.Get<string>(payload, "wallId", null);
-            string? wallPosStr = GregPayload.Get<string>(payload, "wallPos", null);
-            string? wallNormStr = GregPayload.Get<string>(payload, "wallNormal", null);
+            string? wallId = GregPayload.Get<string?>(payload, "wallId", null);
+            string? wallPosStr = GregPayload.Get<string?>(payload, "wallPos", null);
+            string? wallNormStr = GregPayload.Get<string?>(payload, "wallNormal", null);
 
             if (string.IsNullOrEmpty(wallId))
             {

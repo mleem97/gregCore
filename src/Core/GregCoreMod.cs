@@ -5,7 +5,7 @@ using gregCore.GameLayer.Bootstrap;
 using gregCore.Infrastructure.Logging;
 using gregCore.Sdk.Language;
 
-[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.1.0", "TeamGreg")]
+[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.0.0.35-pre", "TeamGreg")]
 [assembly: MelonGame("", "Data Center")]
 [assembly: MelonOptionalDependencies("Python.Runtime", "RustBridge", "JS.Runtime.Binding")]
 
@@ -17,7 +17,7 @@ namespace gregCore.Core;
 /// </summary>
 public sealed class GregCoreMod : MelonMod
 {
-    public static GregCoreMod Instance { get; private set; }
+    public static GregCoreMod Instance { get; private set; } = null!;
 
     private GregServiceContainer? _container;
     private IGregLogger? _logger;

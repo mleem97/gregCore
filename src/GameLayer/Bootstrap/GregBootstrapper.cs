@@ -4,6 +4,9 @@
 /// Maintainer:   Einzige Stelle wo Implementierungen an Interfaces gebunden werden. Validiert den Startup.
 /// </file-summary>
 
+using System;
+using System.IO;
+using System.Reflection;
 using gregCore.Infrastructure.Logging;
 using gregCore.Infrastructure.Config;
 using gregCore.Infrastructure.Ffi;
@@ -21,6 +24,20 @@ internal static class GregBootstrapper
 {
     public static GregServiceContainer Build(global::MelonLoader.MelonLogger.Instance melonLogger)
     {
+        // Initialize Assembly Resolver for subfolder dependencies
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
+            try {
+                var name = new AssemblyName(args.Name).Name;
+                var depDir = Path.Combine(global::MelonLoader.Utils.MelonEnvironment.ModsDirectory, "gregDependencies");
+                var targetPath = Path.Combine(depDir, name + ".dll");
+                
+                if (File.Exists(targetPath)) {
+                    return Assembly.LoadFrom(targetPath);
+                }
+            } catch { }
+            return null;
+        };
+
         var container = new GregServiceContainer();
 
         // Initialize static Logger

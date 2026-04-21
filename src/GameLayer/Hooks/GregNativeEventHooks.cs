@@ -26,9 +26,9 @@ public sealed class GregNativeEventHooks : SafePatch
     // --- Domäne: Economy ---
     [HarmonyPatch(typeof(global::Il2Cpp.Player), nameof(global::Il2Cpp.Player.UpdateCoin))]
     [HarmonyPostfix]
-    public static void Postfix_PlayerCoinChanged(global::Il2Cpp.Player __instance, float _amount)
+    public static void Postfix_PlayerCoinChanged(global::Il2Cpp.Player __instance, float _coinChhangeAmount)
     {
-        TriggerHook("greg.PLAYER.CoinChanged", "Amount", _amount, "Total", _amount);
+        TriggerHook("greg.PLAYER.CoinChanged", "Amount", _coinChhangeAmount, "Total", _coinChhangeAmount);
     }
 
     // --- Domäne: Persistence ---

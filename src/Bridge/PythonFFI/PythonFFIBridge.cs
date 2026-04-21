@@ -199,7 +199,12 @@ public class GregPythonApi
             var dict = new PyDict(dataDict);
             foreach (var key in dict.Keys())
             {
-                payload.Data[key.ToString()] = dict.GetItem(key).AsManagedObject(typeof(object));
+                var k = key.ToString();
+                var v = dict.GetItem(key)?.AsManagedObject(typeof(object));
+                if (k != null && v != null)
+                {
+                    payload.Data[k] = v;
+                }
             }
         }
         GregAPI.Hooks.Fire(hookName, payload);

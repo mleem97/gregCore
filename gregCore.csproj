@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- ── Build ──────────────────────────────────────────────────── -->
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,19 +8,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>gregCore</AssemblyName>
     <NoWarn>CS1701;CS1702;MSB3243;MSB3245</NoWarn>
-
-    <!-- ── NuGet Identity ────────────────────────────────────────── -->
-    <PackageId>gregCore</PackageId>
-    <Version>1.1.0</Version>
-    <Authors>TeamGreg</Authors>
-    <Company>TeamGreg</Company>
-    <Product>gregCore</Product>
-
-    <!-- ── Assembly Generation ────────────────────────────────────── -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    
-    <!-- ── Item Inclusions ───────────────────────────────────────── -->
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
@@ -33,77 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Core Dependencies (Direct references to avoid conflicts) -->
-    <Reference Include="MelonLoader">
-      <HintPath>lib\references\MelonLoader\net6\MelonLoader.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>lib\references\MelonLoader\net6\0Harmony.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>lib\references\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    
-    <!-- IL2CPP Base Libraries -->
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppSystem">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppSystem.Core">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-
-    <!-- Game Assemblies -->
-    <Reference Include="Assembly-CSharp">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    
-    <!-- UnityEngine Core & Modules -->
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppTMPro">
-      <HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppTMPro.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <Reference Include="MelonLoader"><HintPath>lib\references\MelonLoader\net6\MelonLoader.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>lib\references\MelonLoader\net6\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>lib\references\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppSystem"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppSystem.Core"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppTMPro"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppTMPro.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -114,6 +47,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="pythonnet" Version="3.0.5" />
   </ItemGroup>
+
+  <!-- Automatic ILRepack disabled due to IL2CPP reference conflicts. Use deploy/unify-core.ps1 instead. -->
+  <Target Name="CleanupAfterBuild" AfterTargets="Build">
+    <Delete Files="$(OutputPath)Acornima.dll;$(OutputPath)Python.Runtime.dll" />
+  </Target>
 
   <ItemGroup>
     <Compile Remove="tests\**" />

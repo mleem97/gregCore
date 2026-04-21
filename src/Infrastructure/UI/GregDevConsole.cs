@@ -30,11 +30,12 @@ public sealed class GregDevConsole
     public void OnGUI()
     {
         if (!_isOpen) return;
-        _windowRect = GUILayout.Window(1337, _windowRect, (Action<int>)DrawWindow, "gregCore DevConsole");
+        _windowRect = GUI.Window(1337, _windowRect, (UnityEngine.GUI.WindowFunction)DrawWindow, "gregCore DevConsole");
     }
 
     private void DrawWindow(int windowId)
     {
+        GUILayout.BeginVertical();
         _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
         foreach (var log in _logs)
         {
@@ -53,6 +54,7 @@ public sealed class GregDevConsole
             }
         }
         GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
 
         GUI.DragWindow();
     }

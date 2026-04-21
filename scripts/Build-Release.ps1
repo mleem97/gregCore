@@ -27,7 +27,7 @@ if (-not (Test-Path $dllPath)) {
 & "$PSScriptRoot\Package-SdkAssets.ps1"
 
 # 5. Package release
-$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($dllPath).FileVersion
+$version = (Get-Content "$repoRoot\VERSION").Trim()
 $zipName = "gregCore-v$version.zip"
 $zipPath = "$publishDir\$zipName"
 

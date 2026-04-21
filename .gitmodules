@@ -1,3 +1,0 @@
-[submodule "plugins/DataCenter-RustBridge"]
-	path = plugins/DataCenter-RustBridge
-	url = https://github.com/mleem97/DataCenter-RustBridge.git

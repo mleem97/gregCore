@@ -1,19 +1,16 @@
+﻿using System;
+using System.IO;
+using System.Linq;
+using HarmonyLib;
 using MelonLoader;
 using MelonLoader.Utils;
-using System;
-using System.IO;
-using HarmonyLib;
 using UnityEngine;
-
-[assembly: MelonInfo(typeof(DataCenterModLoader.Core), "gregCore", "1.0.0", "TeamGreg")]
-[assembly: MelonGame("", "Data Center")]
 
 namespace DataCenterModLoader;
 
-// file-based crash logger, never throws
 public static class CrashLog
 {
-    private static string _logPath;
+    private static string? _logPath;
     private static readonly object _lock = new();
 
     public static void Init(string gameRoot)
@@ -27,28 +24,40 @@ public static class CrashLog
                 $"========================================={Environment.NewLine}";
             File.WriteAllText(_logPath, header);
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     public static void Log(string msg)
     {
         try
         {
-            if (_logPath == null) return;
+            if (_logPath == null)
+            {
+                return;
+            }
+
             lock (_lock)
             {
                 File.AppendAllText(_logPath,
                     $"[{DateTime.Now:HH:mm:ss.fff}] {msg}{Environment.NewLine}");
             }
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     public static void LogException(string context, Exception ex)
     {
         try
         {
-            if (_logPath == null) return;
+            if (_logPath == null)
+            {
+                return;
+            }
+
             lock (_lock)
             {
                 File.AppendAllText(_logPath,
@@ -63,31 +72,43 @@ public static class CrashLog
                     Environment.NewLine);
             }
         }
-        catch { }
+        catch
+        {
+        }
     }
 }
 
-public class Core : MelonMod
+public class Core
 {
-    public static Core Instance { get; private set; }
+    public static Core? Instance { get; private set; }
 
-    private FFIBridge _ffiBridge;
-    private MultiplayerBridge _mpBridge;
-    private string _modsPath;
+    public MelonLogger.Instance LoggerInstance { get; }
 
-    public override void OnInitializeMelon()
+    private FFIBridge? _ffiBridge;
+    private MultiplayerBridge? _mpBridge;
+    private string _modsPath = string.Empty;
+    private HarmonyLib.Harmony? _harmony;
+
+    private float _queueDrainTimer;
+    private const float QueueDrainInterval = 2f;
+
+    public Core(MelonLogger.Instance loggerInstance)
+    {
+        LoggerInstance = loggerInstance;
+        Instance = this;
+    }
+
+    public void Initialize()
     {
         try
         {
-            Instance = this;
-
             CrashLog.Init(MelonEnvironment.GameRootDirectory);
             CrashLog.Log("step: CrashLog initialized");
 
             _modsPath = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "native");
 
             LoggerInstance.Msg("╔══════════════════════════════════════════╗");
-            LoggerInstance.Msg("║   Rust Bridge v0.1.0                     ║");
+            LoggerInstance.Msg("║   Rust Bridge (Integrated)               ║");
             LoggerInstance.Msg("║   Rust FFI Bridge Active                 ║");
             LoggerInstance.Msg("╚══════════════════════════════════════════╝");
 
@@ -104,37 +125,13 @@ public class Core : MelonMod
             EventDispatcher.Initialize(_ffiBridge, LoggerInstance);
 
             CrashLog.Log("step: applying Harmony patches");
-            try
-            {
-                HarmonyInstance.PatchAll(typeof(Core).Assembly);
-                LoggerInstance.Msg("Harmony patches applied.");
-                CrashLog.Log("step: Harmony patches applied successfully");
-            }
-            catch (Exception ex)
-            {
-                LoggerInstance.Error($"Failed to apply Harmony patches: {ex.Message}");
-                LoggerInstance.Msg("Continuing without full event support.");
-                CrashLog.LogException("Harmony patching", ex);
-            }
+            ApplyDataCenterHarmonyPatches();
 
             CrashLog.Log("step: initializing ModConfigSystem");
             ModConfigSystem.Initialize(LoggerInstance);
 
             CrashLog.Log("step: loading all mods");
             _ffiBridge.LoadAllMods();
-            
-            if (!_ffiBridge.IsRustAvailable)
-            {
-                LoggerInstance.Warning("═══════════════════════════════════════════════════════════");
-                LoggerInstance.Warning("⚠ Rust Bridge: Running in C# Compatibility Mode Only");
-                LoggerInstance.Warning($"  → {_ffiBridge.RustStatusMessage}");
-                LoggerInstance.Warning("═══════════════════════════════════════════════════════════");
-            }
-            else
-            {
-                LoggerInstance.Msg($"✓ {_ffiBridge.RustStatusMessage}");
-            }
-
 
             var mpDllPath = Path.Combine(_modsPath, "dc_multiplayer.dll");
             if (File.Exists(mpDllPath))
@@ -142,17 +139,17 @@ public class Core : MelonMod
                 _mpBridge = new MultiplayerBridge(LoggerInstance);
             }
 
-            LoggerInstance.Msg("Modloader initialization complete.");
-            CrashLog.Log("step: OnInitializeMelon complete");
+            LoggerInstance.Msg("Integrated Rust bridge initialization complete.");
+            CrashLog.Log("step: Initialize complete");
         }
         catch (Exception ex)
         {
-            CrashLog.LogException("OnInitializeMelon", ex);
+            CrashLog.LogException("Initialize", ex);
             throw;
         }
     }
 
-    public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+    public void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
         try
         {
@@ -167,13 +164,7 @@ public class Core : MelonMod
         }
     }
 
-    // Drain the TechnicianManager.pendingDispatches queue periodically so that jobs
-    // queued by the game's own "Add all broken devices" button (or restored from a
-    // save) are assigned to free technicians even when no CommandCenterOperator is hired.
-    private float _queueDrainTimer = 0f;
-    private const float QUEUE_DRAIN_INTERVAL = 2f;
-
-    public override void OnUpdate()
+    public void OnUpdate()
     {
         try
         {
@@ -184,31 +175,30 @@ public class Core : MelonMod
             EntityManager.Update();
             CarryStateMonitor.Update();
 
-            // Periodically force-process any pending dispatch queue entries that
-            // the game's ProcessDispatchQueue coroutine would normally handle only
-            // when a CommandCenterOperator is hired.
             _queueDrainTimer += Time.deltaTime;
-            if (_queueDrainTimer >= QUEUE_DRAIN_INTERVAL)
+            if (_queueDrainTimer >= QueueDrainInterval)
             {
                 _queueDrainTimer = 0f;
                 try
                 {
-                    var tm = Il2Cpp.TechnicianManager.instance;
-                    if (tm != null)
-                        GameHooks.ForceProcessPendingQueue(tm);
+                    var technicianManager = Il2Cpp.TechnicianManager.instance;
+                    if (technicianManager != null)
+                    {
+                        GameHooks.ForceProcessPendingQueue(technicianManager);
+                    }
                 }
-                catch { }
+                catch
+                {
+                }
             }
         }
         catch (Exception ex)
         {
             CrashLog.LogException("OnUpdate", ex);
         }
-
-
     }
 
-    public override void OnFixedUpdate()
+    public void OnFixedUpdate()
     {
         try
         {
@@ -220,21 +210,12 @@ public class Core : MelonMod
         }
     }
 
-    public override void OnGUI()
+    public void OnGUI()
     {
         try
         {
             _mpBridge?.DrawGUI();
             ModConfigSystem.DrawGUI();
-            
-            // Show Rust Bridge status in top-left corner
-            if (_ffiBridge != null && !_ffiBridge.IsRustAvailable)
-            {
-                var oldColor = GUI.color;
-                GUI.color = new Color(1f, 0.6f, 0f, 0.8f);
-                GUI.Label(new Rect(10, 10, 400, 20), $"[RustBridge] C# Compatibility Mode");
-                GUI.color = oldColor;
-            }
         }
         catch (Exception ex)
         {
@@ -242,22 +223,50 @@ public class Core : MelonMod
         }
     }
 
-    public override void OnApplicationQuit()
+    public void OnApplicationQuit()
     {
         try
         {
-            LoggerInstance.Msg("Shutting down modloader...");
+            LoggerInstance.Msg("Shutting down integrated Rust bridge...");
             CrashLog.Log("step: OnApplicationQuit starting");
             EntityManager.DestroyAll();
             _mpBridge?.Shutdown();
             ModConfigSystem.Shutdown();
             _ffiBridge?.Shutdown();
             _ffiBridge?.Dispose();
+            _harmony?.UnpatchSelf();
             CrashLog.Log("step: OnApplicationQuit complete");
         }
         catch (Exception ex)
         {
             CrashLog.LogException("OnApplicationQuit", ex);
+        }
+    }
+
+    private void ApplyDataCenterHarmonyPatches()
+    {
+        try
+        {
+            _harmony = new HarmonyLib.Harmony("gregcore.compat.datacenter");
+            var patchTypes = typeof(Core).Assembly
+                .GetTypes()
+                .Where(type => type.Namespace == "DataCenterModLoader")
+                .Where(type => type.GetCustomAttributes(typeof(HarmonyPatch), inherit: false).Length > 0)
+                .ToArray();
+
+            foreach (var patchType in patchTypes)
+            {
+                _harmony.CreateClassProcessor(patchType).Patch();
+            }
+
+            LoggerInstance.Msg($"DataCenter Harmony patches applied: {patchTypes.Length}");
+            CrashLog.Log("step: Harmony patches applied successfully");
+        }
+        catch (Exception ex)
+        {
+            LoggerInstance.Error($"Failed to apply DataCenter Harmony patches: {ex.Message}");
+            LoggerInstance.Msg("Continuing without full DataCenter patch support.");
+            CrashLog.LogException("Harmony patching", ex);
         }
     }
 }

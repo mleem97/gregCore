@@ -51,15 +51,12 @@ Write-Host "[workshop] WorkshopRoot = $WorkshopRoot"
 #region Build all projects
 $AllProjects = @(
     'framework\gregCore.csproj',
-    'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
-    'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
     'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
     'plugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj',
     'plugins\greg.Plugin.PlayerModels\greg.Plugin.PlayerModels.csproj',
     'mods\greg.ConsoleInputGuard\greg.ConsoleInputGuard.csproj',
     'mods\greg.Mod.GregifyEmployees\greg.GregifyEmployees.csproj',
-    'mods\greg.Mod.HexLabelMod\greg.HexLabelMod.csproj',
-    'mods\greg.Plugin.LangCompatBridge\greg.JoniMLCompatMod.csproj'
+    'mods\greg.Mod.HexLabelMod\greg.HexLabelMod.csproj'
 )
 
 foreach ($rel in $AllProjects) {
@@ -128,8 +125,6 @@ Write-Host "[workshop] Copied greg_hooks.json to $fwContentDir"
 
 #region Package plugins
 $plugins = @(
-    @{ Id = 'greg.Plugin.Multiplayer';    Folder = 'plugins\greg.Plugin.Multiplayer';    Desc = 'Multiplayer support plugin for gregCore.' },
-    @{ Id = 'greg.Plugin.Sysadmin';       Folder = 'plugins\greg.Plugin.Sysadmin';       Desc = 'Sysadmin tools and server management plugin.' },
     @{ Id = 'greg.Plugin.AssetExporter';  Folder = 'plugins\greg.Plugin.AssetExporter';  Desc = 'Asset export utilities for Data Center modding.' },
     @{ Id = 'greg.Plugin.WebUIBridge';    Folder = 'plugins\greg.Plugin.WebUIBridge';    Desc = 'Web UI bridge plugin for in-game browser-based interfaces.' },
     @{ Id = 'greg.Plugin.PlayerModels';   Folder = 'plugins\greg.Plugin.PlayerModels';   Desc = 'Custom player models plugin for Data Center.' }
@@ -152,8 +147,7 @@ foreach ($p in $plugins) {
 $mods = @(
     @{ Name = 'greg.ConsoleInputGuard';  Folder = 'mods\greg.ConsoleInputGuard';           Assembly = 'greg.ConsoleInputGuard';  Desc = 'Console input guard mod for Data Center.' },
     @{ Name = 'greg.GregifyEmployees';   Folder = 'mods\greg.Mod.GregifyEmployees';        Assembly = 'greg.GregifyEmployees';   Desc = 'Gregify Employees gameplay mod.' },
-    @{ Name = 'greg.HexLabelMod';        Folder = 'mods\greg.Mod.HexLabelMod';             Assembly = 'greg.HexLabelMod';        Desc = 'Hex label display mod for Data Center.' },
-    @{ Name = 'greg.JoniMLCompatMod';    Folder = 'mods\greg.Plugin.LangCompatBridge';      Assembly = 'greg.JoniMLCompatMod';    Desc = 'Language compatibility bridge mod.' }
+    @{ Name = 'greg.HexLabelMod';        Folder = 'mods\greg.Mod.HexLabelMod';             Assembly = 'greg.HexLabelMod';        Desc = 'Hex label display mod for Data Center.' }
 )
 
 foreach ($m in $mods) {

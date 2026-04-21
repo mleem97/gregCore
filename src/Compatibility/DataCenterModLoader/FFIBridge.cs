@@ -12,11 +12,6 @@ public class FFIBridge : IDisposable
     private readonly string _modsPath;
     private readonly GameAPIManager _apiManager;
     private readonly List<RustMod> _loadedMods = new();
-    private bool _rustAvailable = false;
-    private string _rustStatusMessage = "";
-
-    public bool IsRustAvailable => _rustAvailable;
-    public string RustStatusMessage => _rustStatusMessage;
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern IntPtr LoadLibrary(string lpFileName);
@@ -83,61 +78,26 @@ public class FFIBridge : IDisposable
     {
         if (!Directory.Exists(_modsPath))
         {
-            _logger.Warning("Mods/native/ directory not found. Creating...");
-            try { Directory.CreateDirectory(_modsPath); }
-            catch (Exception ex) {
-                _rustStatusMessage = $"Failed to create Mods/native/: {ex.Message}";
-                _logger.Error(_rustStatusMessage);
-                return;
-            }
-        }
-
-        var dllFiles = Directory.GetFiles(_modsPath, "*.dll", SearchOption.AllDirectories);
-        
-        if (dllFiles.Length == 0)
-        {
-            _rustStatusMessage = "No Rust mod DLLs found. Running in C#-only compatibility mode.";
-            _logger.Warning(_rustStatusMessage);
-            _logger.Warning("  → Native Rust mods require Rust toolchain to build.");
-            _logger.Warning("  → C# mods (gregCore) are fully supported.");
-            _rustAvailable = false;
+            _logger.Msg("No Mods/native/ directory found.");
             return;
         }
 
-        int loadedCount = 0;
-        int failedCount = 0;
+        var dllFiles = Directory.GetFiles(_modsPath, "*.dll", SearchOption.AllDirectories);
+        if (dllFiles.Length == 0)
+        {
+            _logger.Msg("No native mod DLLs found in Mods/native/.");
+            return;
+        }
 
-        _logger.Msg($"Found {dllFiles.Length} potential Rust mod DLL(s). Attempting to load...");
+        _logger.Msg($"Found {dllFiles.Length} Rust mod DLL(s).");
 
         foreach (var dllPath in dllFiles)
         {
-            try { 
-                LoadMod(dllPath); 
-                loadedCount++;
-            }
-            catch (Exception ex) { 
-                failedCount++;
-                _logger.Error($"Failed to load '{Path.GetFileName(dllPath)}': {ex.Message}");
-            }
+            try { LoadMod(dllPath); }
+            catch (Exception ex) { _logger.Error($"Failed to load '{Path.GetFileName(dllPath)}': {ex.Message}"); }
         }
 
-        if (loadedCount > 0)
-        {
-            _rustAvailable = true;
-            _rustStatusMessage = $"Rust Bridge active: {loadedCount} mod(s) loaded.";
-            _logger.Msg($"✓ {_loadedMods.Count} Rust mod(s) loaded successfully.");
-        }
-        else
-        {
-            _rustStatusMessage = $"Failed to load all {dllFiles.Length} Rust DLLs. Running in compatibility fallback mode.";
-            _logger.Warning(_rustStatusMessage);
-            _logger.Warning("  → This usually means:");
-            _logger.Warning("    - DLL was built for wrong architecture (x64 vs x86)");
-            _logger.Warning("    - Missing Visual C++ runtime");
-            _logger.Warning("    - Rust DLL exports are incompatible");
-            _logger.Warning("  → gregCore C# mods work independently.");
-            _rustAvailable = false;
-        }
+        _logger.Msg($"{_loadedMods.Count} Rust mod(s) loaded successfully.");
     }
 
     private void LoadMod(string dllPath)

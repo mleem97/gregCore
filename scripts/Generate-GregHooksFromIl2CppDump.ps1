@@ -37,7 +37,19 @@ $harmonyEmitClasses = [System.Collections.Generic.HashSet[string]]::new([StringC
     'Server', 'MainGameManager', 'ComputerShop', 'HRSystem', 'SaveSystem', 'CustomerBase',
     'CablePositions', 'CableLink', 'Rack', 'NetworkMap', 'BalanceSheet', 'MainMenu',
     'TimeController', 'TechnicianManager', 'Technician', 'Objectives',
-    'PacketSpawnerSystem', 'NetworkSwitch', 'SFPModule', 'SFPBox', 'PatchPanel'
+    'PacketSpawnerSystem', 'NetworkSwitch', 'SFPModule', 'SFPBox', 'PatchPanel',
+    'AutoDisable', 'Benchmark01', 'Benchmark02', 'Benchmark03', 'Benchmark04',
+    'GetCurrentVersion', 'LocalisedText', 'MouseLook', 'ObjectSpin', 'PositionIndicator',
+    'RayLookAt', 'SimpleScript', 'TextConsoleSimulator', 'TextMeshProFloatingText', 'TextMeshSpawner',
+    'VertexJitter', 'VertexShakeA', 'VertexShakeB', 'VertexZoom', 'WarpTextExample',
+    'AICharacterControl', 'AICharacterExpressions', 'CameraController', 'CarController',
+    'CheckIfTouchingWall', 'FirstPersonController', 'InputManager', 'ObjImporter',
+    'GODMOD', 'RackMount', 'AssetManagement', 'AssetManagementDeviceLine', 'AudioManager',
+    'FootSteps', 'OSK_Keyboard', 'OSK_KeySounds', 'SettingsVolume', 'ThirdPersonCharacter',
+    'OSK_AccentConsole', 'OSK_GamepadHelper', 'OSK_UI_InputReceiver', 'OSK_UI_Keyboard',
+    'SettingsControls', 'SettingsGraphics', 'ShopCartItem', 'SkewTextExample', 'StaticUIElements',
+    'TerrainDetector', 'UsableObject', 'viperInput', 'WaypointInitializationSystem',
+    '_PrivateImplementationDetails_', 'ModLoader', 'CommandCenter'
 ) | ForEach-Object { [void]$harmonyEmitClasses.Add($_) }
 
 function Test-SkipTypeName([string]$n) {

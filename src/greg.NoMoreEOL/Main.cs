@@ -18,6 +18,7 @@ namespace greg.NoMoreEOL
         private bool _autoRepairBrokenServers = true;
         private bool _disableSwitchesEOL = true;
         private bool _disableServersEOL = true;
+        internal static bool WarningsVisible = true;
 
         // Internal State
         private bool _readyToRun;
@@ -56,6 +57,26 @@ namespace greg.NoMoreEOL
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "auto_repair_servers", "Auto Repair Servers", true, val => _autoRepairBrokenServers = val, "Maintenance", "Automatically repairs broken servers.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_switches_eol", "Disable Switches EOL", true, val => _disableSwitchesEOL = val, "Maintenance", "Prevents switches from reaching End-Of-Life.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_servers_eol", "Disable Servers EOL", true, val => _disableServersEOL = val, "Maintenance", "Prevents servers from reaching End-Of-Life.");
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "show_warning_signs", "Show Warning Signs", true, val => 
+            {
+                WarningsVisible = val;
+                UpdateWarningSignsVisibility();
+            }, "Maintenance", "Show or hide EOL and error warning triangles above devices.");
+        }
+
+        private void UpdateWarningSignsVisibility()
+        {
+            var indicators = UnityEngine.Object.FindObjectsOfType<PositionIndicator>();
+            if (indicators != null)
+            {
+                foreach (var indicator in indicators)
+                {
+                    if (indicator != null && indicator.gameObject != null)
+                    {
+                        indicator.gameObject.SetActive(WarningsVisible);
+                    }
+                }
+            }
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)

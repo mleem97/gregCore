@@ -11,33 +11,22 @@ namespace greg.Sdk
     public static class gregNativeEventHooks
     {
         // Legacy support for older mods expecting static actions.
-        public static Action? SystemGameLoaded;
-        public static Action? SystemGameSaved;
-        public static Action<float>? PlayerCoinChanged;
-        public static Action<float>? PlayerReputationChanged;
-        public static Action<float>? PlayerXpChanged;
-        public static Action<int>? DayEnded;
-        public static Action<int>? MonthEnded;
-        public static Action<object>? CustomerAccepted;
-        public static Action<object>? ServerInstalled;
-        public static Action<object>? ServerBroken;
-        public static Action<object>? ServerRepaired;
-        public static Action<float>? ShopCheckout;
+        public static Action SystemGameLoaded = delegate { };
+        public static Action SystemGameSaved = delegate { };
+        public static Action<float> PlayerCoinChanged = _ => { };
+        public static Action<float> PlayerReputationChanged = _ => { };
+        public static Action<float> PlayerXpChanged = _ => { };
+        public static Action<int> DayEnded = _ => { };
+        public static Action<int> MonthEnded = _ => { };
+        public static Action<object> CustomerAccepted = _ => { };
+        public static Action<object> ServerInstalled = _ => { };
+        public static Action<object> ServerBroken = _ => { };
+        public static Action<object> ServerRepaired = _ => { };
+        public static Action<float> ShopCheckout = _ => { };
 
         static gregNativeEventHooks()
         {
-            SystemGameLoaded = delegate { };
-            SystemGameSaved = delegate { };
-            PlayerCoinChanged = delegate { };
-            PlayerReputationChanged = delegate { };
-            PlayerXpChanged = delegate { };
-            DayEnded = delegate { };
-            MonthEnded = delegate { };
-            CustomerAccepted = delegate { };
-            ServerInstalled = delegate { };
-            ServerBroken = delegate { };
-            ServerRepaired = delegate { };
-            ShopCheckout = delegate { };
+            // Initialized above for field-level safety
         }
 
         public static class ByEventId
@@ -53,9 +42,9 @@ namespace greg.Sdk
         }
 
         // --- Hilfsmethoden für Legacy-Mods ---
-        public static float GetPlayerMoney() => 0f;
+        public static float GetPlayerMoney() => (float)(Il2Cpp.SaveData.instance?.playerData?.coins ?? 0f);
         public static int GetTimeOfDay() => (int)(Il2Cpp.TimeController.instance?.currentTimeOfDay ?? 0f);
-        public static int GetDay() => 1;
+        public static int GetDay() => 1; // Todo: Find real day field if needed
         public static Transform? GetPlayerCamera() => Camera.main?.transform;
     }
 }

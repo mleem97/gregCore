@@ -13,7 +13,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-    <Version>1.0.0.35-pre</Version>
+    <Version>1.0.0.35</Version>
     <FileVersion>1.0.0.35</FileVersion>
     <AssemblyVersion>1.0.0.35</AssemblyVersion>
   </PropertyGroup>

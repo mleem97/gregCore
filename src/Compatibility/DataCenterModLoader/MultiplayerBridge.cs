@@ -2121,7 +2121,7 @@ public class MultiplayerBridge
         _statusStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, normal = { textColor = new Color(0.0f, 0.9f, 0.6f) } };
 
         _buttonStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { background = _buttonBg, textColor = Color.white }, hover = { background = _buttonHoverBg, textColor = Color.white } };
-        _stopHostButtonStyle = new GUIStyle(_buttonStyle) { normal = { background = _stopBtnBg }, hover = { background = _stopBtnHoverBg } };
+        _stopHostButtonStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { background = _stopBtnBg, textColor = Color.white }, hover = { background = _stopBtnHoverBg, textColor = Color.white } };
 
         _stylesInitialized = true;
     }

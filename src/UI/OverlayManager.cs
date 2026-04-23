@@ -32,7 +32,7 @@ public static class OverlayManager
         }
 
         // Apply raycast blocker state based on global visibility
-        UiRaycastBlocker.SetBlocking(IsAnyOverlayVisible);
+        // UiRaycastBlocker.SetBlocking(IsAnyOverlayVisible);
     }
 
     /// <summary>
@@ -41,6 +41,6 @@ public static class OverlayManager
     public static void HideAll()
     {
         _visibleOverlays.Clear();
-        UiRaycastBlocker.SetBlocking(false);
+        // UiRaycastBlocker.SetBlocking(false);
     }
 }

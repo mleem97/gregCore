@@ -4,13 +4,13 @@
 - Prevents servers & switches from reaching end-of-life
 - Automatically repairs broken devices
 - Runs continuously during gameplay
-- Includes an in-game config menu (via RustBridge)
+- Includes an in-game config menu (via gregCore Settings API)
 
 ## Why I made it
 I wanted to remove the repetitive maintenance part of the game and focus more on building and optimizing the network.
 
 ## Details
-This module is fully integrated into the `gregCore` framework. It utilizes the new Settings API to expose configuration toggles directly in the F8 Settings Hub.
+This module is fully integrated into the `gregCore` framework. It utilizes the native Settings API (accessible via the SDK and RustAPI) to expose configuration toggles directly in the F8 Settings Hub.
 
 ### Configuration Options
 - **Auto Repair Switches**: Automatically repairs broken network switches.

@@ -17,46 +17,52 @@ public sealed class GregDevConsole
     private string _inputCommand = "";
     private readonly List<LogEntry> _logs = new();
     private Vector2 _scrollPosition;
+    private GameObject _uiPanel;
 
-    public void Toggle() => _isOpen = !_isOpen;
+    public void Toggle() 
+    {
+        _isOpen = !_isOpen;
+        if (_isOpen && _uiPanel == null)
+        {
+            BuildUI();
+        }
+        gregCore.UI.GregUIManager.SetPanelActive("DevConsole", _isOpen);
+    }
+
+    private void BuildUI()
+    {
+        var builder = gregCore.UI.GregUIBuilder.Create("DevConsole")
+            .SetSize(600, 400);
+
+        _uiPanel = builder.Build();
+        // Note: Full log list and scrolling would need more UGUI components like ScrollRect
+        // For now, we initialize the panel and we can add labels dynamically
+        RefreshLogs();
+    }
+
+    private void RefreshLogs()
+    {
+        if (_uiPanel == null) return;
+        // In a real UGUI implementation, we'd update a Text component or instantiate labels in a content container
+    }
 
     public void AddLog(string message, LogType type)
     {
         _logs.Add(new LogEntry { Message = message, Type = type, Time = DateTime.Now });
         if (_logs.Count > 100) _logs.RemoveAt(0);
         _scrollPosition.y = float.MaxValue; 
+        RefreshLogs();
     }
 
     public void OnGUI()
     {
-        if (!_isOpen) return;
-        _windowRect = GUI.Window(1337, _windowRect, (UnityEngine.GUI.WindowFunction)DrawWindow, "gregCore DevConsole");
+        // IMGUI OnGUI is now disabled to prevent stripping crashes.
+        // The UI is handled via BuildUI and UGUI.
     }
 
     private void DrawWindow(int windowId)
     {
-        GUILayout.BeginVertical();
-        _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
-        foreach (var log in _logs)
-        {
-            GUILayout.Label($"[{log.Time:HH:mm:ss}] {log.Message}");
-        }
-        GUILayout.EndScrollView();
-
-        GUILayout.BeginHorizontal();
-        _inputCommand = GUILayout.TextField(_inputCommand);
-        if (GUILayout.Button("Send", GUILayout.Width(60f)))
-        {
-            if (!string.IsNullOrWhiteSpace(_inputCommand))
-            {
-                AddLog($"> {_inputCommand}", LogType.Log);
-                _inputCommand = "";
-            }
-        }
-        GUILayout.EndHorizontal();
-        GUILayout.EndVertical();
-
-        GUI.DragWindow();
+        // Legacy IMGUI method - no longer called
     }
 
     private struct LogEntry

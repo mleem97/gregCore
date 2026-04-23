@@ -2,69 +2,25 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using gregCore.API;
+using gregCore.UI;
 
 namespace greg.UI.Settings
 {
-    public class GregUIBuilder
-    {
-        public GregUIBuilder AddLabel(string text)
-        {
-            GUILayout.Label(text);
-            return this;
-        }
-
-        public GregUIBuilder AddToggle(string label, bool currentValue, Action<bool> onChanged)
-        {
-            bool newValue = GUILayout.Toggle(currentValue, label);
-            if (newValue != currentValue)
-            {
-                onChanged?.Invoke(newValue);
-            }
-            return this;
-        }
-
-        public GregUIBuilder AddSlider(string label, float min, float max, float currentValue, Action<float> onChanged)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.Width(150));
-            float newValue = GUILayout.HorizontalSlider(currentValue, min, max);
-            GUILayout.Label(newValue.ToString("F1"), GUILayout.Width(40));
-            GUILayout.EndHorizontal();
-            
-            if (Math.Abs(newValue - currentValue) > 0.01f)
-            {
-                onChanged?.Invoke(newValue);
-            }
-            return this;
-        }
-
-        public GregUIBuilder AddButton(string label, Action onClick)
-        {
-            if (GUILayout.Button(label))
-            {
-                onClick?.Invoke();
-            }
-            return this;
-        }
-    }
-
     public class GregSettingsHub : MonoBehaviour
     {
         private static GregSettingsHub? _instance;
         private bool _isVisible = false;
         private int _selectedTab = 0;
+        private GameObject? _uiPanel;
         
         private class TabData
         {
             public string Id = string.Empty;
             public string Label = string.Empty;
-            public Action<GregUIBuilder>? BuildFn;
+            public Action<gregCore.UI.GregUIBuilder>? BuildFn;
         }
         
         private static readonly List<TabData> _tabs = new();
-        private GUIStyle? _windowStyle;
-        private GUIStyle? _tabStyle;
-        private GregUIBuilder _builder = new GregUIBuilder();
 
         public static void Initialize()
         {
@@ -78,7 +34,7 @@ namespace greg.UI.Settings
             }
         }
 
-        public static void RegisterTab(string tabId, string label, Action<GregUIBuilder> buildFn)
+        public static void RegisterTab(string tabId, string label, Action<gregCore.UI.GregUIBuilder> buildFn)
         {
             if (!_tabs.Exists(t => t.Id == tabId))
             {
@@ -95,7 +51,7 @@ namespace greg.UI.Settings
         {
             RegisterTab("greg.core", "Framework", builder =>
             {
-                builder.AddLabel("gregCore v1.0.0.35-pre")
+                builder.AddLabel("gregCore v1.0.0.35")
                        .AddLabel("MelonLoader v0.6+")
                        .AddLabel($"Save Mode: {(frameworkSdk.GregFeatureGuard.IsVanillaSave ? "Vanilla" : "Greg")}")
                        .AddToggle("Verbose Startup Log", false, v => { })
@@ -122,8 +78,6 @@ namespace greg.UI.Settings
                     builder.AddToggle("Show Grid Lines", grid.ShowGridLines, v => grid.ShowGridLines = v)
                            .AddToggle("Show Sub-Grid", grid.ShowSubGrid, v => grid.ShowSubGrid = v)
                            .AddSlider("Sub-Grid Zoom Threshold", 1.0f, 10.0f, 5.0f, v => { })
-                           .AddToggle("Build Mode Key: B", true, v => { })
-                           .AddLabel($"Placed Racks: [unknown]")
                            .AddLabel($"Grid Size: 50x50")
                            .AddButton("Clear All Greg Racks", () => grid.ClearAll());
                 }
@@ -142,32 +96,12 @@ namespace greg.UI.Settings
                 });
                 
                 builder.AddSlider("Auto-Save Interval (seconds)", 10f, 300f, greg.SaveEngine.GregSaveScheduler.AutoSaveIntervalSeconds, v => greg.SaveEngine.GregSaveScheduler.AutoSaveIntervalSeconds = v)
-                       .AddToggle("Disable Vanilla Save (expert!)", false, v => { })
                        .AddToggle("Save Grid State", true, v => { })
-                       .AddToggle("Save Server State", true, v => { })
-                       .AddToggle("Save Network State", true, v => { })
-                       .AddToggle("Save Cable State", true, v => { });
+                       .AddToggle("Save Server State", true, v => { });
                        
                 var engine = greg.SaveEngine.GregSaveEngine.Instance;
-                builder.AddLabel($"Last Save: [unknown]")
-                       .AddLabel($"DB File: {(engine != null ? engine.DbPath : "None")}")
-                       .AddButton("Save Now", () => engine?.SaveAll())
-                       .AddButton("Open Save Folder", () => {
-                           if (engine != null && !string.IsNullOrEmpty(engine.DbPath))
-                           {
-                               System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{engine.DbPath}\"");
-                           }
-                       });
-            });
-
-            RegisterTab("greg.lang", "Languages", builder =>
-            {
-                builder.AddLabel("Languages Registry (Lua, JS, Python, Go, Rust)");
-            });
-
-            RegisterTab("greg.debug", "Debug", builder =>
-            {
-                builder.AddLabel("Debug & Diagnose");
+                builder.AddLabel($"DB File: {(engine != null ? engine.DbPath : "None")}")
+                       .AddButton("Save Now", () => engine?.SaveAll());
             });
         }
 
@@ -175,60 +109,42 @@ namespace greg.UI.Settings
         {
             if (Input.GetKeyDown(KeyCode.F8))
             {
-                _isVisible = !_isVisible;
+                Toggle();
             }
             if (_isVisible && Input.GetKeyDown(KeyCode.Escape))
             {
-                _isVisible = false;
+                Toggle();
             }
         }
 
-        private void OnGUI()
+        public void Toggle()
         {
-            if (!_isVisible) return;
-
-            if (_windowStyle == null)
+            _isVisible = !_isVisible;
+            if (_isVisible && _uiPanel == null)
             {
-                _windowStyle = GUI.skin.window;
-                _tabStyle = GUI.skin.button;
+                BuildUI();
             }
-
-            GUI.Window(999, new Rect((Screen.width - 480) / 2, 100, 480, 500), (GUI.WindowFunction)DrawWindow, "gregCore Settings Hub");
+            GregUIManager.SetPanelActive("SettingsHub", _isVisible);
         }
 
-        private void DrawWindow(int id)
+        private void BuildUI()
         {
-            if (_tabs.Count == 0) return;
+            var builder = GregUIBuilder.Create("SettingsHub")
+                .SetSize(480, 500);
 
-            GUILayout.BeginHorizontal();
-            for (int i = 0; i < _tabs.Count; i++)
+            // In a real UGUI tab system, we'd create tab buttons and content areas
+            // For now, we build the first tab
+            if (_tabs.Count > 0)
             {
-                if (GUILayout.Toggle(_selectedTab == i, _tabs[i].Label, _tabStyle))
-                {
-                    _selectedTab = i;
-                }
+                _tabs[_selectedTab].BuildFn?.Invoke(builder);
             }
-            GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
-            
-            if (_selectedTab >= 0 && _selectedTab < _tabs.Count)
-            {
-                _tabs[_selectedTab].BuildFn?.Invoke(_builder);
-            }
+            _uiPanel = builder.Build();
         }
 
-        private Texture2D MakeTex(int width, int height, Color col)
+        public void OnGUI()
         {
-            Color[] pix = new Color[width * height];
-            for (int i = 0; i < pix.Length; ++i)
-            {
-                pix[i] = col;
-            }
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-            return result;
+            // IMGUI disabled
         }
     }
 }

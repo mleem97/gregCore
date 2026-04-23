@@ -83,6 +83,14 @@ public sealed class GregCoreMod : MelonMod
         // 2. Global API Init
         gregCore.API.GregAPI.Initialize();
 
+        // 2.1 UI Init (Safe UGUI)
+        try {
+            Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<gregCore.UI.GregUIDragHandler>();
+            gregCore.UI.GregUIManager.Initialize();
+        } catch (Exception ex) {
+            greg.Logging.GregLogger.Error("Failed to initialize GregUI Framework", ex);
+        }
+
         // 3. Plugin Loading
         _container.GetRequired<IGregPluginRegistry>().LoadAll();
 

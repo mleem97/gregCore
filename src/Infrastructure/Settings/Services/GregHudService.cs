@@ -17,22 +17,40 @@ public class GregHudService
         _keybindRegistry = keybindRegistry;
     }
 
-    public void Toggle() => _showHud = !_showHud;
+    private GameObject? _hudPanel;
+
+    public void Toggle() 
+    {
+        _showHud = !_showHud;
+        if (_showHud && _hudPanel == null)
+        {
+            BuildUI();
+        }
+        gregCore.UI.GregUIManager.SetPanelActive("HUD", _showHud);
+    }
+
+    private void BuildUI()
+    {
+        var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
+        var builder = gregCore.UI.GregUIBuilder.Create("HUD")
+            .SetSize(300, 40 + (conflicts.Count * 20));
+            
+        builder.AddLabel("gregCore: Keybind-Konflikte!");
+        foreach (var conflict in conflicts)
+        {
+            builder.AddLabel($"{conflict.DisplayName} ({conflict.CurrentKey})");
+        }
+        
+        _hudPanel = builder.Build();
+        var rt = _hudPanel.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0, 1);
+        rt.anchorMax = new Vector2(0, 1);
+        rt.pivot = new Vector2(0, 1);
+        rt.anchoredPosition = new Vector2(10, -10);
+    }
 
     public void OnGUI()
     {
-        if (!_showHud) return;
-
-        var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
-        if (conflicts.Count == 0) return;
-
-        GUI.Box(new Rect(10, 10, 300, 40 + (conflicts.Count * 20)), "gregCore: Keybind-Konflikte!");
-        
-        int y = 40;
-        foreach (var conflict in conflicts)
-        {
-            GUI.Label(new Rect(20, y, 280, 20), $"<color=red>{conflict.DisplayName} ({conflict.CurrentKey})</color>");
-            y += 20;
-        }
+        // IMGUI disabled
     }
 }

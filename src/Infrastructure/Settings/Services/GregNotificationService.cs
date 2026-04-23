@@ -19,22 +19,27 @@ public class GregNotificationService
     {
         _activeNotifications.Add(new Notification { Title = title, Message = message, Expiration = Time.time + duration });
         _logger.Info($"Notification: {title} - {message}");
+        
+        // Build UGUI Notification
+        var builder = gregCore.UI.GregUIBuilder.Create($"Notify_{Guid.NewGuid()}")
+            .SetSize(300, 60);
+        builder.AddLabel($"{title}\n{message}");
+        var obj = builder.Build();
+        
+        // Position at bottom-right
+        var rt = obj.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(1, 0);
+        rt.anchorMax = new Vector2(1, 0);
+        rt.pivot = new Vector2(1, 0);
+        rt.anchoredPosition = new Vector2(-20, 20 + (_activeNotifications.Count * 70));
+        
+        // Auto-destroy after duration
+        UnityEngine.Object.Destroy(obj, duration);
     }
 
     public void OnGUI()
     {
-        int y = Screen.height - 100;
-        foreach (var notification in _activeNotifications.ToArray())
-        {
-            if (Time.time > notification.Expiration)
-            {
-                _activeNotifications.Remove(notification);
-                continue;
-            }
-
-            GUI.Box(new Rect(Screen.width - 320, y, 300, 60), $"{notification.Title}\n{notification.Message}");
-            y -= 70;
-        }
+        // IMGUI disabled
     }
 
     private class Notification

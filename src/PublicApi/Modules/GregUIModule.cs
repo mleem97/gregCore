@@ -1,20 +1,19 @@
-using System;
-using System.Collections.Generic;
-using gregCore.Core.Models;
+using gregCore.UI;
+using UnityEngine;
 
-namespace gregCore.PublicApi.Modules;
-
-public sealed class GregUIModule
+namespace gregCore.PublicApi.Modules
 {
-    private readonly GregApiContext _ctx;
-    internal GregUIModule(GregApiContext ctx) => _ctx = ctx;
+    public sealed class GregUIModule
+    {
+        private readonly GregApiContext _ctx;
+        internal GregUIModule(GregApiContext ctx) => _ctx = ctx;
 
-    public void ShowToast(string message, float durationSeconds = 3f)
-        => _ctx.EventBus.Publish("greg.ui.ShowToast", new EventPayload { 
-            HookName = "greg.ui.ShowToast",
-            OccurredAtUtc = DateTime.UtcNow, 
-            Data = new Dictionary<string, object> { ["message"] = message, ["duration"] = durationSeconds } 
-        });
+        public GregUIBuilder CreateBuilder(string title) => GregUIBuilder.Create(title);
 
-    public void ShowNotification(string message) => ShowToast(message, 5f);
+        public void ShowNotification(string message, float duration = 3f)
+        {
+            // Integration with notification service
+            // GregServiceContainer.Get<Infrastructure.Settings.Services.GregNotificationService>()?.Show(message, duration);
+        }
+    }
 }

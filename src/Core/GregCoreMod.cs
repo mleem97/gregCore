@@ -86,7 +86,12 @@ public sealed class GregCoreMod : MelonMod
         // 2.1 UI Init (Safe UGUI)
         try {
             Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<gregCore.UI.GregUIDragHandler>();
+            Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<greg.Furniture.FurniturePlacer>();
+            
             gregCore.UI.GregUIManager.Initialize();
+            greg.Mods.HexViewer.HexViewerWidget.Initialize();
+            greg.Furniture.PlacementWidget.Initialize();
+            greg.Mods.AutoBuilder.GregAutoBuilderModule.Initialize();
         } catch (Exception ex) {
             greg.Logging.GregLogger.Error("Failed to initialize GregUI Framework", ex);
         }
@@ -137,6 +142,11 @@ public sealed class GregCoreMod : MelonMod
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
         greg.Logging.GregLogger.Msg($"Szene geladen: {sceneName} (Index: {buildIndex})");
+
+        if (sceneName != "MainMenu")
+        {
+            gregCore.UI.GregUIOverrideManager.HideVanillaUI();
+        }
 
         // Notify Event Bus
         _container?.GetRequired<IGregEventBus>()

@@ -137,8 +137,20 @@ namespace greg.WallRack
             var slot = grid.GetSlotAtWorldPos(worldPos);
             if (slot == null || !slot.isOccupied) return;
 
-            // Open context menu (OnGUI driven)
-            _log.Msg("Opened interaction context menu for device.");
+            // Open context menu Widget
+            var builder = gregCore.UI.GregUIBuilder.CreateWidget($"Rack_{slot.coord}", Input.mousePosition.x, Screen.height - Input.mousePosition.y)
+                .SetSize(250, 150)
+                .AddHeadline("Device Context")
+                .AddLabel($"ID: {slot.mountedDevice?.deviceId}")
+                .AddPrimaryButton("UNMOUNT", () => {
+                    TryUnmount(worldPos);
+                    gregCore.UI.GregUIManager.SetPanelActive($"Rack_{slot.coord}", false);
+                })
+                .AddSecondaryButton("CLOSE", () => {
+                    gregCore.UI.GregUIManager.SetPanelActive($"Rack_{slot.coord}", false);
+                });
+            
+            builder.Build();
         }
     }
 }

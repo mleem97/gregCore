@@ -22,6 +22,8 @@ namespace greg.CableRemoval
         private NetworkSwitch? _chargeSwitch;
         private PatchPanel? _chargePanel;
         private float _worldPurgeElapsed;
+        private GameObject? _hintPanel;
+        private UnityEngine.UI.Text? _hintText;
 
         public override void OnInitializeMelon()
         {
@@ -37,6 +39,25 @@ namespace greg.CableRemoval
             _log.Msg("Initialization complete.");
         }
 
+        private void BuildUI()
+        {
+            if (_hintPanel != null) return;
+
+            var builder = gregCore.UI.GregUIBuilder.Create("CableRemovalHint")
+                .SetSize(600, 80);
+            
+            _hintPanel = builder.Build();
+            _hintText = _hintPanel.GetComponentInChildren<UnityEngine.UI.Text>();
+
+            var rt = _hintPanel.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0);
+            rt.anchorMax = new Vector2(0.5f, 0);
+            rt.pivot = new Vector2(0.5f, 0);
+            rt.anchoredPosition = new Vector2(0, 50);
+
+            _hintPanel.SetActive(false);
+        }
+
         private void RegisterSettings()
         {
             string modId = "cable_removal";
@@ -47,6 +68,7 @@ namespace greg.CableRemoval
         public override void OnUpdate()
         {
             if (!_enabled) return;
+            if (_hintPanel == null) BuildUI();
 
             _showMassRemoveHint = false;
             _showWorldPurgeHint = false;
@@ -58,6 +80,7 @@ namespace greg.CableRemoval
             {
                 CancelCharge();
                 CancelWorldPurge();
+                UpdateHintUI();
                 return;
             }
 
@@ -69,6 +92,7 @@ namespace greg.CableRemoval
             {
                 CancelCharge();
                 CancelWorldPurge();
+                UpdateHintUI();
                 return;
             }
 
@@ -76,6 +100,7 @@ namespace greg.CableRemoval
             {
                 CancelWorldPurge();
                 UpdateDeviceChargeFlow(isChargePressed, chargePressedThisFrame, sw, panel);
+                UpdateHintUI();
                 return;
             }
 
@@ -83,6 +108,7 @@ namespace greg.CableRemoval
             if (!isChargePressed)
             {
                 CancelWorldPurge();
+                UpdateHintUI();
                 return;
             }
 
@@ -90,10 +116,34 @@ namespace greg.CableRemoval
             _showWorldPurgeHint = true;
 
             if (_worldPurgeElapsed < WorldPurgeHoldSeconds)
+            {
+                UpdateHintUI();
                 return;
+            }
 
             TryDisconnectAllInWorld();
             CancelWorldPurge();
+            UpdateHintUI();
+        }
+
+        private void UpdateHintUI()
+        {
+            if (_hintPanel == null || _hintText == null) return;
+
+            if (_showWorldPurgeHint)
+            {
+                _hintText.text = $"L-ALT: WORLD purge — NOT looking at a device.\nKeep holding L-CLICK for {WorldPurgeHoldSeconds - _worldPurgeElapsed:0}s to remove ALL cables everywhere.";
+                _hintPanel.SetActive(true);
+            }
+            else if (_showMassRemoveHint)
+            {
+                _hintText.text = _charging ? $"L-ALT: Removing ALL cables — keep holding L-CLICK." : $"L-ALT: Hold L-CLICK to remove ALL cables from this device.";
+                _hintPanel.SetActive(true);
+            }
+            else
+            {
+                _hintPanel.SetActive(false);
+            }
         }
 
         private void UpdateDeviceChargeFlow(bool isChargePressed, bool chargePressedThisFrame, NetworkSwitch? sw, PatchPanel? panel)
@@ -154,29 +204,7 @@ namespace greg.CableRemoval
 
         public override void OnGUI()
         {
-            if (!_enabled) return;
-
-            if (_showWorldPurgeHint)
-            {
-                const float w = 680f;
-                const float h = 96f;
-                var x = (Screen.width - w) * 0.5f;
-                var y = Screen.height - 140f;
-                GUI.Box(new Rect(x, y, w, h), GUIContent.none);
-                var msg = $"L-ALT: WORLD purge — NOT looking at a device.\nKeep holding L-CLICK for {WorldPurgeHoldSeconds:0}s to remove ALL cables everywhere.";
-                GUI.Label(new Rect(x + 12f, y + 8f, w - 24f, h - 12f), msg);
-                return;
-            }
-
-            if (!_showMassRemoveHint) return;
-
-            const float w2 = 620f;
-            const float h2 = 72f;
-            var x2 = (Screen.width - w2) * 0.5f;
-            var y2 = Screen.height - 130f;
-            GUI.Box(new Rect(x2, y2, w2, h2), GUIContent.none);
-            var msg2 = _charging ? $"L-ALT: Removing ALL cables — keep holding L-CLICK." : $"L-ALT: Hold L-CLICK to remove ALL cables from this device.";
-            GUI.Label(new Rect(x2 + 12f, y2 + 10f, w2 - 24f, h2 - 16f), msg2);
+            // IMGUI disabled
         }
 
         private bool TryGetLookedAtCableDevice(out NetworkSwitch? sw, out PatchPanel? panel)

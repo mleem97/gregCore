@@ -35,4 +35,20 @@ public static class greg
 
     public static string Version => typeof(greg).Assembly.GetName().Version?.ToString() ?? "1.0.0";
     public static bool IsInitialized => _context != null;
+
+    internal static void Shutdown()
+    {
+        _context = null;
+        _economy = null;
+        _network = null;
+        _player = null;
+        _time = null;
+        _server = null;
+        _facility = null;
+        _ui = null;
+        _save = null;
+        _automation = null;
+        _npc = null;
+        _performance = null;
+    }
 }

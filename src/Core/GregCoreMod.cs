@@ -59,7 +59,7 @@ public sealed class GregCoreMod : MelonMod
 
         // Step 2: GregBanner.Print(version, mlVersion, debugMode)
         string version = Info.Version;
-        string mlVersion = "0.6.5"; // Hardcoded as fallback to avoid namespace conflict
+        string mlVersion = "0.7.2"; // Fallback directly for now to avoid interop issues in build
 
         bool debugMode = gregCore.Infrastructure.Config.GregCoreConfig.DebugMode;
         greg.Logging.GregBanner.Print(version, mlVersion, debugMode);
@@ -146,6 +146,7 @@ public sealed class GregCoreMod : MelonMod
         greg.Logging.GregLogger.Section("Framework Shutdown");
         _legacyDataCenterBridge?.OnApplicationQuit();
         GregLanguageRegistry.Shutdown();
+        gregCore.PublicApi.greg.Shutdown();
         _container?.Dispose();
         greg.Logging.GregLogger.Msg("gregCore unloading. Goodbye.");
     }

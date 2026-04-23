@@ -27,6 +27,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
 
     public void Subscribe(string hookName, Action<EventPayload> handler)
     {
+        if (_disposed) return;
         ArgumentNullException.ThrowIfNull(hookName);
         ArgumentNullException.ThrowIfNull(handler);
         
@@ -49,6 +50,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
 
     public void Unsubscribe(string hookName, Action<EventPayload> handler)
     {
+        if (_disposed) return;
         ArgumentNullException.ThrowIfNull(hookName);
         ArgumentNullException.ThrowIfNull(handler);
         
@@ -69,6 +71,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
 
     public bool Publish(string hookName, EventPayload payload)
     {
+        if (_disposed) return true;
         ArgumentNullException.ThrowIfNull(hookName);
 
         if (_governor != null && !_governor.CanDispatchEvent())
@@ -82,6 +85,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
 
     internal void FlushDeferredEvents()
     {
+        if (_disposed) return;
         while (_deferredEvents.TryDequeue(out var ev))
         {
             if (_governor != null && !_governor.CanDispatchEvent()) break;
@@ -91,6 +95,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
 
     private bool PublishDirect(string hookName, EventPayload payload)
     {
+        if (_disposed) return true;
         Action<EventPayload>[]? handlersToInvoke = null;
 
         _rwLock.EnterReadLock();
@@ -160,6 +165,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (_disposed) return;
         if (disposing)
         {
+            _disposed = true; // Set flag BEFORE disposing lock
             _rwLock.Dispose();
         }
         _disposed = true;

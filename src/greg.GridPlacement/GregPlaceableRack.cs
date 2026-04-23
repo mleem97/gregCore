@@ -5,6 +5,7 @@ namespace greg.GridPlacement
     public class GregPlaceableRack
     {
         public string RackId { get; set; } = string.Empty;
+        public string PersistentId { get; set; } = string.Empty;
         public Vector2Int GridCoord { get; set; }
         public GameObject? UnityGameObject { get; set; }
         // public Il2CppObjectBase? VanillaRackRef { get; set; } // Omitted because Il2Cpp types cannot be imported safely without specific Il2CppInterop assemblies

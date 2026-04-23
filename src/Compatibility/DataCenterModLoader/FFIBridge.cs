@@ -60,11 +60,11 @@ public class FFIBridge : IDisposable
         public string Version = "0.0.0";
         public string Author = "Unknown";
         public IntPtr Handle;
-        public ModUpdateDelegate Update;
-        public ModUpdateDelegate FixedUpdate;
-        public ModOnSceneLoadedDelegate OnSceneLoaded;
-        public ModShutdownDelegate Shutdown;
-        public ModOnEventDelegate OnEvent;
+        public ModUpdateDelegate? Update;
+        public ModUpdateDelegate? FixedUpdate;
+        public ModOnSceneLoadedDelegate? OnSceneLoaded;
+        public ModShutdownDelegate? Shutdown;
+        public ModOnEventDelegate? OnEvent;
     }
 
     public FFIBridge(MelonLogger.Instance logger, string modsPath)
@@ -259,6 +259,18 @@ public class FFIBridge : IDisposable
             try { mod.OnEvent.Invoke(eventId, eventData, dataSize); }
             catch (Exception ex) { _logger.Error($"[{mod.Name}] mod_on_event(id={eventId}) crashed: {ex.Message}"); }
         }
+    }
+
+    public void OnEvent(uint eventId, string payload)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(payload);
+        var ptr = Marshal.AllocHGlobal(bytes.Length);
+        try
+        {
+            Marshal.Copy(bytes, 0, ptr, bytes.Length);
+            DispatchEvent(eventId, ptr, (uint)bytes.Length);
+        }
+        finally { Marshal.FreeHGlobal(ptr); }
     }
 
     public void Shutdown()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MelonLoader;
@@ -168,6 +168,18 @@ public static class GregAPI
     // --- Events ---
     public static void FireEvent(GregEventId eventId, ulong data = 0)
     {
+        // Trigger legacy hooks
+        switch (eventId)
+        {
+            case GregEventId.GameLoaded: greg.Sdk.gregNativeEventHooks.ByEventId.GameLoaded(); break;
+            case GregEventId.GameSaved: greg.Sdk.gregNativeEventHooks.ByEventId.GameSaved(); break;
+            case GregEventId.MoneyChanged: greg.Sdk.gregNativeEventHooks.ByEventId.MoneyChanged((float)data); break;
+            case GregEventId.XpChanged: greg.Sdk.gregNativeEventHooks.ByEventId.XpChanged((float)data); break;
+            case GregEventId.ReputationChanged: greg.Sdk.gregNativeEventHooks.ByEventId.ReputationChanged((float)data); break;
+            case GregEventId.DayEnded: greg.Sdk.gregNativeEventHooks.ByEventId.DayEnded((int)data); break;
+            case GregEventId.MonthEnded: greg.Sdk.gregNativeEventHooks.ByEventId.MonthEnded((int)data); break;
+        }
+
         if (gregCore.PublicApi.greg.IsInitialized && _eventIdToHook.TryGetValue(eventId, out string? hookName) && hookName != null)
         {
             var ctx = gregCore.PublicApi.greg._context;

@@ -1774,7 +1774,8 @@ public partial class GameAPIManager : IDisposable
                         sd.rotation = rackPos.transform.rotation;
                         try { sd.isOn = sw.isOn; } catch { sd.isOn = false; }
                         try { sd.isBroken = sw.isBroken; } catch { sd.isBroken = false; }
-                        try { sd.label = sw.label ?? ""; } catch { sd.label = ""; }
+                        // sd.label = sw.label; // Label seems removed in Unity 6 version of NetworkSwitch
+                        sd.label = ""; 
 
                         sw.SwitchInsertedInRack(sd);
                     }

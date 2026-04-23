@@ -10,14 +10,31 @@ using Il2CppTMPro;
 
 namespace DataCenterModLoader;
 
+public class BillboardNameTag : MonoBehaviour
+{
+    public Transform followTarget = null!;
+    public float offsetY = 1.85f;
+
+    void Update()
+    {
+        if (followTarget == null) return;
+        transform.position = followTarget.position + new Vector3(0, offsetY, 0);
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            transform.LookAt(transform.position + cam.transform.rotation * Vector3.forward, cam.transform.rotation * Vector3.up);
+        }
+    }
+}
+
 public static class EntityManager
 {
     private class ManagedEntity
     {
         public uint Id;
-        public GameObject GO;
-        public Animator Animator;
-        public NavMeshAgent NavAgent;
+        public GameObject GO = null!;
+        public Animator? Animator;
+        public NavMeshAgent? NavAgent;
         public bool WaitingForUMA;
         public float UMAWaitStart;
         public int SpeedParamHash;
@@ -31,10 +48,10 @@ public static class EntityManager
         public bool HasCrouchParam;
         public bool HasSittingParam;
         public bool HasCarryingParam;
-        public GameObject NameTagGO;
+        public GameObject? NameTagGO;
         public Vector3 LastPos;
-        public GameObject CarryProxyGO;
-        public Transform HandBone;
+        public GameObject? CarryProxyGO;
+        public Transform? HandBone;
         public bool HandBoneSearched;
         public bool ColliderAdded;
     }
@@ -47,7 +64,7 @@ public static class EntityManager
     {
         try
         {
-            GameObject go = null;
+            GameObject? go = null;
             var mgr = MainGameManager.instance;
             if (mgr != null && mgr.techniciansPrefabs != null && mgr.techniciansPrefabs.Length > 0)
             {
@@ -79,6 +96,8 @@ public static class EntityManager
                 CrashLog.Log($"[EntityManager] Spawned capsule fallback entity {capsuleId} '{name}'");
                 return capsuleId;
             }
+
+            if (go == null) return 0;
 
             go.SetActive(false);
 
@@ -115,7 +134,7 @@ public static class EntityManager
 
             go.SetActive(true);
 
-            Animator animator = go.GetComponentInChildren<Animator>();
+            Animator? animator = go.GetComponentInChildren<Animator>();
             if (animator != null)
                 animator.applyRootMotion = false;
 
@@ -226,13 +245,13 @@ public static class EntityManager
             }
 
             // Try real game prefab first, fall back to primitive
-            GameObject proxy = TryCreateFromGamePrefab(objectInHandType);
+            GameObject? proxy = TryCreateFromGamePrefab(objectInHandType);
             if (proxy == null)
                 proxy = CreateFallbackProxy(objectInHandType);
 
             if (proxy != null)
             {
-                Transform parent = entity.GO?.transform;
+                Transform? parent = entity.GO.transform;
                 if (parent != null)
                 {
                     proxy.transform.SetParent(parent, false);
@@ -351,7 +370,7 @@ public static class EntityManager
     }
 
     /// <summary>Find the right hand bone in a humanoid UMA rig</summary>
-    private static Transform FindHandBone(Transform root)
+    private static Transform? FindHandBone(Transform root)
     {
         // UMA humanoid rigs use standard naming; search for right hand
         string[] handNames = { "Right Hand", "RightHand", "Hand_R", "hand_r", "R_Hand", "Bip01 R Hand" };
@@ -369,7 +388,7 @@ public static class EntityManager
         });
     }
 
-    private static Transform FindChildRecursive(Transform parent, string name)
+    private static Transform? FindChildRecursive(Transform parent, string name)
     {
         if (parent.name == name) return parent;
         for (int i = 0; i < parent.childCount; i++)
@@ -380,7 +399,7 @@ public static class EntityManager
         return null;
     }
 
-    private static Transform FindChildByPattern(Transform parent, Func<Transform, bool> predicate)
+    private static Transform? FindChildByPattern(Transform parent, Func<Transform, bool> predicate)
     {
         if (predicate(parent)) return parent;
         for (int i = 0; i < parent.childCount; i++)
@@ -393,11 +412,10 @@ public static class EntityManager
 
 
     /// <summary>Cached prefab templates per ObjectInHand type (stripped visual clones)</summary>
-    private static readonly Dictionary<uint, GameObject> _carryPrefabCache = new();
-    private static bool _prefabCacheAttempted = false;
+    private static readonly Dictionary<uint, GameObject?> _carryPrefabCache = new();
 
     /// <summary>Try to clone a real game prefab for the carried item type</summary>
-    private static GameObject TryCreateFromGamePrefab(uint objectInHandType)
+    private static GameObject? TryCreateFromGamePrefab(uint objectInHandType)
     {
         try
         {
@@ -489,7 +507,7 @@ public static class EntityManager
     }
 
     /// <summary>Create a primitive fallback when real prefab isn't available</summary>
-    private static GameObject CreateFallbackProxy(uint objectInHandType)
+    private static GameObject? CreateFallbackProxy(uint objectInHandType)
     {
         try
         {
@@ -774,10 +792,13 @@ public static class EntityManager
             bgImage.color = new Color(0f, 0f, 0f, 0.45f);
 
             var bgRect = bgGO.GetComponent<RectTransform>();
-            bgRect.anchorMin = new Vector2(0f, 0f);
-            bgRect.anchorMax = new Vector2(1f, 1f);
-            bgRect.offsetMin = Vector2.zero;
-            bgRect.offsetMax = Vector2.zero;
+            if (bgRect != null)
+            {
+                bgRect.anchorMin = new Vector2(0f, 0f);
+                bgRect.anchorMax = new Vector2(1f, 1f);
+                bgRect.offsetMin = Vector2.zero;
+                bgRect.offsetMax = Vector2.zero;
+            }
 
             var textGO = new GameObject("Text");
             textGO.transform.SetParent(canvasGO.transform, false);
@@ -793,10 +814,13 @@ public static class EntityManager
             tmp.outlineColor = new Color32(0, 0, 0, 200);
 
             var rect = textGO.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 0f);
-            rect.anchorMax = new Vector2(1f, 1f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0f, 0f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+            }
 
             var bb = canvasGO.AddComponent<BillboardNameTag>();
             bb.followTarget = parent.transform;

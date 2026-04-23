@@ -97,32 +97,32 @@ public class MultiplayerBridge
     private delegate void MpSetJoinStateDelegate(uint state);
 
     private readonly MelonLogger.Instance _logger;
-    private MpIsConnectedDelegate _isConnected;
-    private MpIsRelayActiveDelegate _isRelayActive;
-    private MpGetPlayerCountDelegate _getPlayerCount;
-    private MpGetMySteamIdDelegate _getMySteamId;
-    private MpHostDelegate _host;
-    private MpConnectDelegate _connect;
-    private MpDisconnectDelegate _disconnect;
-    private MpGetRoomCodeDelegate _getRoomCode;
-    private MpShouldSendSaveDelegate _shouldSendSave;
-    private MpSendSaveDataDelegate _sendSaveData;
-    private MpHasPendingSaveDelegate _hasPendingSave;
-    private MpGetSaveDataSizeDelegate _getSaveDataSize;
-    private MpGetSaveDataDelegate _getSaveData;
-    private MpSaveLoadCompleteDelegate _saveLoadComplete;
-    private MpSkipNextSaveRequestDelegate _skipNextSaveRequest;
-    private MpSetLocalSaveHashDelegate _setLocalSaveHash;
-    private MpGetSaveTransferProgressDelegate _getSaveTransferProgress;
-    private MpGetSaveTransferTotalBytesDelegate _getSaveTransferTotalBytes;
-    private MpIsSaveUpToDateDelegate _isSaveUpToDate;
-    private MpGetJoinStateDelegate _getJoinState;
-    private MpSetJoinStateDelegate _setJoinState;
+    private MpIsConnectedDelegate _isConnected = null!;
+    private MpIsRelayActiveDelegate? _isRelayActive;
+    private MpGetPlayerCountDelegate? _getPlayerCount;
+    private MpGetMySteamIdDelegate? _getMySteamId;
+    private MpHostDelegate? _host;
+    private MpConnectDelegate? _connect;
+    private MpDisconnectDelegate? _disconnect;
+    private MpGetRoomCodeDelegate? _getRoomCode;
+    private MpShouldSendSaveDelegate? _shouldSendSave;
+    private MpSendSaveDataDelegate? _sendSaveData;
+    private MpHasPendingSaveDelegate? _hasPendingSave;
+    private MpGetSaveDataSizeDelegate? _getSaveDataSize;
+    private MpGetSaveDataDelegate? _getSaveData;
+    private MpSaveLoadCompleteDelegate? _saveLoadComplete;
+    private MpSkipNextSaveRequestDelegate? _skipNextSaveRequest;
+    private MpSetLocalSaveHashDelegate? _setLocalSaveHash;
+    private MpGetSaveTransferProgressDelegate? _getSaveTransferProgress;
+    private MpGetSaveTransferTotalBytesDelegate? _getSaveTransferTotalBytes;
+    private MpIsSaveUpToDateDelegate? _isSaveUpToDate;
+    private MpGetJoinStateDelegate? _getJoinState;
+    private MpSetJoinStateDelegate? _setJoinState;
     private bool _initialized = false;
     private float _initTimer = 0f;
     private bool _isHosting = false;
     private bool _isConnectedState = false;
-    private string _discoveredSavePath = null;
+    private string? _discoveredSavePath = null;
 
     // Join state constants (must match Rust dc_multiplayer JOIN_* constants)
     private const uint JOIN_IDLE = 0;
@@ -132,17 +132,17 @@ public class MultiplayerBridge
     private const uint JOIN_LOADING_SCENE = 4;
     private const uint JOIN_LOADED = 5;
     private string _currentSceneName = "";
-    private byte[] _pendingSaveBytes = null;
-    private string _pendingSaveName = null;     // save name (without extension) written to disk
-    private string _pendingSaveFullPath = null;  // full path to the written save file
+    private byte[]? _pendingSaveBytes = null;
+    private string? _pendingSaveName = null;     // save name (without extension) written to disk
+    private string? _pendingSaveFullPath = null;  // full path to the written save file
     private float _deferredLoadDelay = 0f;       // small delay after scene load before triggering Load()
-    private string _reconnectRoomCode = null;    // room code to auto-reconnect after scene transition
+    private string? _reconnectRoomCode = null;    // room code to auto-reconnect after scene transition
     private bool _skipSaveOnReconnect = false;   // skip save processing when reconnecting after load
     private float _reconnectCooldown = 0f;       // cooldown to prevent rapid-fire reconnect attempts
     private bool _gameHandledSaveLoad = false;   // true when MainMenu.Continue() handles the load
 
     // Host: cached save bytes so multiple client joins don't re-trigger SaveGame()
-    private byte[] _cachedSaveData = null;
+    private byte[]? _cachedSaveData = null;
     private float _cachedSaveAge = 0f;
     private const float SAVE_CACHE_LIFETIME = 30f; // seconds before cache expires
 
@@ -154,17 +154,15 @@ public class MultiplayerBridge
     private string _displayRoomCode = "";  // room code received after hosting
 
     private bool _showPanel;
-    private UnityEngine.EventSystems.EventSystem _mpDisabledEventSystem;
+    private UnityEngine.EventSystems.EventSystem? _mpDisabledEventSystem;
     private int _mpReenableCountdown;
     private bool _pendingMenuInjection;
     private float _menuInjectionTimer;
-    private GameObject _menuButton;
+    private GameObject? _menuButton;
     private Rect _panelRect;
     private bool _stylesInitialized;
-    private GUIStyle _windowStyle, _buttonStyle, _labelStyle, _textFieldStyle, _titleStyle, _statusStyle, _stopHostButtonStyle, _fieldFocusedStyle;
-    private Texture2D _windowBg, _buttonBg, _buttonHoverBg, _fieldBg, _stopBtnBg, _stopBtnHoverBg, _fieldActiveBg;
-    private Texture2D _overlayBg;
-    private GUIStyle _overlayTextStyle;
+    private GUIStyle _windowStyle = null!, _buttonStyle = null!, _labelStyle = null!, _textFieldStyle = null!, _titleStyle = null!, _statusStyle = null!, _stopHostButtonStyle = null!, _fieldFocusedStyle = null!;
+    private Texture2D _windowBg = null!, _buttonBg = null!, _buttonHoverBg = null!, _fieldBg = null!, _stopBtnBg = null!, _stopBtnHoverBg = null!, _fieldActiveBg = null!;
 
     // Custom text field state (GUI.TextField doesn't work with new Input System)
     private bool _roomCodeFieldFocused;
@@ -345,10 +343,10 @@ public class MultiplayerBridge
                 IntPtr codePtr = _getRoomCode();
                 if (codePtr != IntPtr.Zero)
                 {
-                    _displayRoomCode = Marshal.PtrToStringAnsi(codePtr);
-                    if (!string.IsNullOrEmpty(_displayRoomCode))
-
+                    string? code = Marshal.PtrToStringAnsi(codePtr);
+                    if (!string.IsNullOrEmpty(code))
                     {
+                        _displayRoomCode = code;
                         CrashLog.Log($"[MP Bridge] Room code: {_displayRoomCode}");
                         _logger.Msg($"[MP Bridge] Room code: {_displayRoomCode}");
                         try
@@ -458,7 +456,7 @@ public class MultiplayerBridge
                             CrashLog.Log("[MP Join] Save is up to date — no download needed!");
                             try { var ui = StaticUIElements.instance; if (ui != null) ui.AddMeesageInField("Multiplayer: Save is up to date!"); } catch { }
 
-                            string savePath = DiscoverSaveFile();
+                            string? savePath = DiscoverSaveFile();
                             if (savePath != null)
                             {
                                 _pendingSaveName = Path.GetFileNameWithoutExtension(savePath);
@@ -811,7 +809,7 @@ public class MultiplayerBridge
         {
             try
             {
-                string savePath = DiscoverSaveFile();
+                string? savePath = DiscoverSaveFile();
                 if (savePath != null && File.Exists(savePath))
                 {
                     byte[] localSave = File.ReadAllBytes(savePath);
@@ -933,7 +931,7 @@ public class MultiplayerBridge
         {
             CrashLog.Log("[MP Save] Host: sending save to clients...");
 
-            byte[] saveData;
+            byte[]? saveData;
 
             // Check if we have a recent cached save (avoids re-saving when multiple clients join)
             if (_cachedSaveData != null && _cachedSaveAge < SAVE_CACHE_LIFETIME)
@@ -962,11 +960,11 @@ public class MultiplayerBridge
                 System.Threading.Thread.Sleep(300);
 
                 // Try to find the temp save file first; fall back to newest save
-                string saveDirPath = null;
+                string? saveDirPath = null;
                 try { saveDirPath = SaveSystem.saveDirPath; }
                 catch { }
 
-                string savePath = null;
+                string? savePath = null;
                 bool isTempFile = false;
 
                 if (!string.IsNullOrEmpty(saveDirPath))
@@ -1011,22 +1009,25 @@ public class MultiplayerBridge
             }
 
             // Pass to Rust for chunked transfer
-            IntPtr ptr = Marshal.AllocHGlobal(saveData.Length);
-            try
+            if (_sendSaveData != null)
             {
-                Marshal.Copy(saveData, 0, ptr, saveData.Length);
-                int result = _sendSaveData(ptr, (uint)saveData.Length);
-                CrashLog.Log($"[MP Save] mp_send_save_data returned {result}");
-
-                if (result == 1)
+                IntPtr ptr = Marshal.AllocHGlobal(saveData.Length);
+                try
                 {
-                    _logger.Msg("[MP Save] Save data queued for transfer.");
-                    try { var ui = StaticUIElements.instance; if (ui != null) ui.AddMeesageInField("Multiplayer: Sending save to client..."); } catch { }
+                    Marshal.Copy(saveData, 0, ptr, saveData.Length);
+                    int result = _sendSaveData(ptr, (uint)saveData.Length);
+                    CrashLog.Log($"[MP Save] mp_send_save_data returned {result}");
+
+                    if (result == 1)
+                    {
+                        _logger.Msg("[MP Save] Save data queued for transfer.");
+                        try { var ui = StaticUIElements.instance; if (ui != null) ui.AddMeesageInField("Multiplayer: Sending save to client..."); } catch { }
+                    }
                 }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
+                finally
+                {
+                    Marshal.FreeHGlobal(ptr);
+                }
             }
         }
         catch (Exception ex)
@@ -1052,7 +1053,7 @@ public class MultiplayerBridge
     /// Restores original saves from backups so the player's own world is intact after disconnect.
     private void CleanupMpSaveFiles()
     {
-        string saveDir = DiscoverSaveDirectory();
+        string? saveDir = DiscoverSaveDirectory();
         if (saveDir == null)
         {
             CrashLog.Log("[MP Cleanup] No save directory found — skipping cleanup");
@@ -1143,7 +1144,7 @@ public class MultiplayerBridge
             IntPtr ptr = Marshal.AllocHGlobal((int)size);
             try
             {
-                uint copied = _getSaveData(ptr, size);
+                uint copied = _getSaveData != null ? _getSaveData(ptr, size) : 0;
                 Marshal.Copy(ptr, saveData, 0, (int)copied);
                 CrashLog.Log($"[MP Join] Got {copied} bytes");
             }
@@ -1212,7 +1213,9 @@ public class MultiplayerBridge
     {
         DumpSaveSystemMethods();
 
-        string saveDir = DiscoverSaveDirectory();
+        if (_pendingSaveBytes == null) return;
+
+        string? saveDir = DiscoverSaveDirectory();
         if (saveDir == null)
         {
             CrashLog.Log("[MP Join] ERROR: Could not find save directory!");
@@ -1222,8 +1225,8 @@ public class MultiplayerBridge
         }
 
         // ── Scan existing saves ──
-        string existingSaveName = null;
-        string existingSavePath = null;
+        string? existingSaveName = null;
+        string? existingSavePath = null;
         string ext = ".save";
 
         try
@@ -1308,7 +1311,7 @@ public class MultiplayerBridge
                 IntPtr codePtr = _getRoomCode != null ? _getRoomCode() : IntPtr.Zero;
                 if (codePtr != IntPtr.Zero)
                 {
-                    string code = Marshal.PtrToStringAnsi(codePtr);
+                    string? code = Marshal.PtrToStringAnsi(codePtr);
                     if (!string.IsNullOrEmpty(code)) _reconnectRoomCode = code;
                 }
             }
@@ -1386,7 +1389,7 @@ public class MultiplayerBridge
         {
             int sceneCount = SceneManager.sceneCountInBuildSettings;
             CrashLog.Log($"[MP Join] Build has {sceneCount} scenes:");
-            string gameSceneName = null;
+            string? gameSceneName = null;
             int gameSceneIndex = -1;
 
             for (int i = 0; i < sceneCount; i++)
@@ -1440,8 +1443,7 @@ public class MultiplayerBridge
     }
 
     /// <summary>
-    /// Called after the game scene has loaded (from WaitingForGameScene state).
-    /// Applies the save via SaveSystem.Load() — now the onLoadingData callbacks ARE registered.
+    /// Applies the save via SaveSystem.Load().
     /// Then triggers auto-reconnect to the relay.
     /// </summary>
     private void AttemptSaveLoad()
@@ -1456,8 +1458,7 @@ public class MultiplayerBridge
         bool loaded = false;
         CrashLog.Log($"[MP Join] AttemptSaveLoad: name=\"{_pendingSaveName}\", scene=\"{_currentSceneName}\"");
 
-        // Reset isQuitting flag — the game sets this when quitting to MainMenu
-        // and never resets it, which causes crashes during save load
+        // Reset isQuitting flag
         try
         {
             bool wasQuitting = SaveSystem.isQuitting;
@@ -1527,7 +1528,7 @@ public class MultiplayerBridge
                 if (loadGame != null)
                 {
                     CrashLog.Log($"[MP Join] Found LoadGame(string), invoking with \"{_pendingSaveName}\"...");
-                    loadGame.Invoke(null, new object[] { _pendingSaveName });
+                    loadGame.Invoke(null, new object?[] { _pendingSaveName });
                     CrashLog.Log("[MP Join] Approach D (LoadGame) returned OK — now calling LoadGameData()...");
                     try { SaveSystem.LoadGameData(); CrashLog.Log("[MP Join] LoadGameData() OK"); }
                     catch (Exception ex3) { CrashLog.Log($"[MP Join] LoadGameData() threw: {ex3.Message}"); }
@@ -1638,8 +1639,6 @@ public class MultiplayerBridge
         _skipSaveOnReconnect = false;
         _reconnectCooldown = 0f;
         _gameHandledSaveLoad = false;
-        // Note: _reconnectRoomCode is intentionally NOT cleared here
-        // so auto-reconnect can still work after scene transitions.
     }
 
     private void DumpSaveSystemMethods()
@@ -1702,12 +1701,12 @@ public class MultiplayerBridge
         }
     }
 
-    private string DiscoverSaveDirectory()
+    private string? DiscoverSaveDirectory()
     {
         if (_discoveredSavePath != null)
         {
-            string dir = Path.GetDirectoryName(_discoveredSavePath);
-            if (Directory.Exists(dir)) return dir;
+            string? dir = Path.GetDirectoryName(_discoveredSavePath);
+            if (dir != null && Directory.Exists(dir)) return dir;
         }
 
         string basePath = Application.persistentDataPath;
@@ -1739,7 +1738,7 @@ public class MultiplayerBridge
         return basePath;
     }
 
-    private string DiscoverSaveFile()
+    private string? DiscoverSaveFile()
     {
         if (_discoveredSavePath != null && File.Exists(_discoveredSavePath))
             return _discoveredSavePath;
@@ -1755,7 +1754,7 @@ public class MultiplayerBridge
         catch (Exception ex) { CrashLog.Log($"[MP Save] Error listing dir: {ex.Message}"); }
 
         // Strategy: find the most recently modified save file
-        string bestFile = null;
+        string? bestFile = null;
         DateTime bestTime = DateTime.MinValue;
 
         string[] searchDirs = { basePath };
@@ -1847,7 +1846,7 @@ public class MultiplayerBridge
                 return;
             }
 
-            Transform templateButton = ModConfigSystem.SettingsButtonTransform;
+            Transform? templateButton = ModConfigSystem.SettingsButtonTransform;
 
 
             if (templateButton == null)
@@ -1893,9 +1892,6 @@ public class MultiplayerBridge
             clone.name = "MultiplayerButton";
 
             // ── Step 1: Destroy LocalisedText components ──
-            // The game has a custom localisation system (LocalisedText MonoBehaviour)
-            // that auto-overrides .text with the localised string every frame/language change.
-            // We must destroy it so our "Multiplayer" text sticks.
             var locTexts = clone.GetComponentsInChildren<LocalisedText>(true);
             if (locTexts != null)
             {
@@ -1920,10 +1916,6 @@ public class MultiplayerBridge
             _logger.Msg($"[MP Bridge] Found {(cloneTexts != null ? cloneTexts.Count : 0)} TMP component(s) in cloned button.");
 
             // ── Step 3: Rewire onClick ──
-            // The game uses ButtonExtended (extends Selectable), NOT Unity's Button.
-            // ButtonExtended has a public onClick property (ButtonClickedEvent) with a setter.
-            // The cloned button has a persistent listener pointing to MainMenu.Settings().
-            // We replace the entire event to discard it.
             var btnExt = clone.GetComponent<ButtonExtended>();
             if (btnExt != null)
             {
@@ -1996,522 +1988,163 @@ public class MultiplayerBridge
             _mpReenableCountdown = 2;
     }
 
-    /// <summary>
-    /// Called from Core.OnGUI(). Draws the multiplayer panel if toggled on.
-    /// </summary>
     public void DrawGUI()
     {
-        // Show join progress overlay even when panel is hidden
-        uint drawJoinState = GetJoinState();
-        if (drawJoinState != JOIN_IDLE && drawJoinState != JOIN_LOADED)
+        try
         {
-            DrawJoinOverlay();
-        }
+            if (!_showPanel) return;
 
-        if (!_showPanel) return;
+            if (!_stylesInitialized)
+                InitStyles();
 
-        if (!_stylesInitialized)
-            InitStyles();
+            _panelRect = new Rect((Screen.width - 400) / 2, (Screen.height - 400) / 2, 400, 420);
+            GUI.DrawTexture(_panelRect, _windowBg);
 
-        // All absolute positioning — GUILayout.* does not work in this IL2CPP context,
-        // but GUI.Button / GUI.Label / GUI.TextField with explicit Rect DO work
-        // (proven by the X button rendering correctly).
+            // Title bar dragging (simplified for brevity)
+            GUI.Label(new Rect(_panelRect.x + 20, _panelRect.y + 15, 300, 30), "MULTIPLAYER", _titleStyle);
 
-        float w = 400f, h = 560f;
-        float px = (Screen.width - w) / 2f;   // panel x
-        float py = (Screen.height - h) / 2f;  // panel y
-        _panelRect = new Rect(px, py, w, h);
+            if (GUI.Button(new Rect(_panelRect.x + _panelRect.width - 35, _panelRect.y + 10, 25, 25), "X", _buttonStyle))
+                HideMultiplayerPanel();
 
-        float pad = 20f;       // inner padding
-        float cw = w - pad * 2; // content width
-        float cx = px + pad;    // content x
-        float y = py + pad;     // running y cursor
+            float contentY = _panelRect.y + 60;
+            float margin = 25;
+            float innerW = _panelRect.width - (margin * 2);
 
-        // ── Dark background ──
-        GUI.DrawTexture(_panelRect, _windowBg);
+            bool connected = _isConnected() != 0;
 
-        // ── X close button (top-right) ──
-        if (GUI.Button(new Rect(px + w - 35f, py + 5f, 30f, 30f), "X", _buttonStyle))
-            HideMultiplayerPanel();
-
-        // ── Title ──
-        GUI.Label(new Rect(cx, y, cw, 30f), "MULTIPLAYER", _titleStyle);
-        y += 40f;
-
-        // ── Steam ID + Copy ──
-        ulong myId = (_initialized && _getMySteamId != null) ? _getMySteamId() : 0;
-        float copyW = 60f;
-        GUI.Label(new Rect(cx, y, cw - copyW - 5f, 24f), $"Your Steam ID: {myId}", _labelStyle);
-        if (GUI.Button(new Rect(cx + cw - copyW, y, copyW, 24f), "Copy", _buttonStyle))
-        {
-            GUIUtility.systemCopyBuffer = myId.ToString();
-            _logger.Msg($"[MP Bridge] Steam ID {myId} copied to clipboard.");
-        }
-        y += 32f;
-
-        // ── Status ──
-        string statusText;
-        Color statusColor;
-        uint playerCount = (_initialized && _getPlayerCount != null) ? _getPlayerCount() : 0;
-
-        if (_isHosting && _isConnectedState)
-        {
-            statusText = $"Status: HOSTING  ({playerCount} player(s) connected)";
-            statusColor = new Color(0f, 1f, 0f); // green — active session
-        }
-        else if (_isHosting)
-        {
-            statusText = "Status: HOSTING  (waiting for players...)";
-            statusColor = new Color(1f, 1f, 0f); // yellow — hosting but nobody joined
-        }
-        else if (_isConnectedState)
-        {
-            statusText = "Status: CONNECTED";
-            statusColor = new Color(0f, 1f, 0f); // green
-        }
-        else
-        {
-            statusText = "Status: Not Connected";
-            statusColor = new Color(1f, 0.3f, 0.3f); // red
-        }
-        var savedColor = _statusStyle.normal.textColor;
-        _statusStyle.normal.textColor = statusColor;
-        GUI.Label(new Rect(cx, y, cw, 24f), statusText, _statusStyle);
-        _statusStyle.normal.textColor = savedColor;
-        y += 30f;
-
-        // ── Connected peer info (shown when connected) ──
-        if (_isConnectedState && playerCount > 0)
-        {
-            _labelStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
-            GUI.Label(new Rect(cx, y, cw, 20f), $"  Players in session: {playerCount}", _labelStyle);
-            _labelStyle.normal.textColor = Color.white;
-            y += 24f;
-        }
-        y += 8f;
-
-        // ── Separator: HOST GAME ──
-        DrawSectionSeparator(cx, ref y, cw, "HOST GAME");
-
-        // Host / Stop Hosting button
-        if (!_initialized) GUI.enabled = false;
-        if (_isHosting)
-        {
-            if (GUI.Button(new Rect(cx, y, cw, 40f), "STOP HOSTING", _stopHostButtonStyle))
-                DoStopHosting();
-        }
-        else
-        {
-            string hostLabel = _initialized ? "HOST GAME" : "HOST GAME  (waiting...)";
-            if (GUI.Button(new Rect(cx, y, cw, 40f), hostLabel, _buttonStyle))
-                DoHost();
-        }
-        GUI.enabled = true;
-        y += 48f;
-
-        // Room code display (shown only when hosting and room code available)
-        if (_isHosting && !string.IsNullOrEmpty(_displayRoomCode))
-        {
-            float roomCopyW = 60f;
-            GUI.Label(new Rect(cx, y, cw - roomCopyW - 5f, 24f), $"Room Code: {_displayRoomCode}", _labelStyle);
-            if (GUI.Button(new Rect(cx + cw - roomCopyW, y, roomCopyW, 24f), "Copy", _buttonStyle))
+            if (!connected)
             {
-                GUIUtility.systemCopyBuffer = _displayRoomCode;
-                _logger.Msg($"[MP Bridge] Room code {_displayRoomCode} copied to clipboard.");
-            }
-            y += 32f;
-        }
+                // Join / Host screen
+                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), "ROOM CODE (UPPERCASE)", _labelStyle);
+                contentY += 30;
 
-        // ── Separator: JOIN GAME ──
-        DrawSectionSeparator(cx, ref y, cw, "JOIN GAME");
-
-        // Room code label
-        GUI.Label(new Rect(cx, y, cw, 22f), "Room Code:", _labelStyle);
-        y += 26f;
-
-        // Room code text field + paste button
-        {
-            Rect fieldRect = new Rect(cx, y, cw - 65f, 30f);
-            Rect pasteRect = new Rect(cx + cw - 60f, y, 60f, 30f);
-
-            // Toggle focus on click
-            if (Event.current.type == EventType.MouseDown)
-            {
-                if (fieldRect.Contains(Event.current.mousePosition))
+                // Handle room code field
+                Rect fieldRect = new Rect(_panelRect.x + margin, contentY, innerW, 40);
+                if (Event.current.type == EventType.MouseDown && fieldRect.Contains(Event.current.mousePosition))
                 {
                     _roomCodeFieldFocused = true;
+                    Event.current.Use();
                 }
-                else if (!pasteRect.Contains(Event.current.mousePosition) && !fieldRect.Contains(Event.current.mousePosition))
+
+                GUI.DrawTexture(fieldRect, _fieldBg);
+                if (_roomCodeFieldFocused)
+                {
+                    GUI.DrawTexture(fieldRect, _fieldActiveBg);
+                }
+
+                string displayText = _roomCode ?? "";
+                if (_roomCodeFieldFocused)
+                {
+                    _cursorBlinkTimer += Time.deltaTime;
+                    if (_cursorBlinkTimer >= 0.5f)
+                    {
+                        _cursorVisible = !_cursorVisible;
+                        _cursorBlinkTimer = 0f;
+                    }
+                    if (_cursorVisible) displayText += "|";
+                }
+
+                var prevAlign = _labelStyle.alignment;
+                _labelStyle.alignment = TextAnchor.MiddleCenter;
+                GUI.Label(fieldRect, displayText, _labelStyle);
+                _labelStyle.alignment = prevAlign;
+
+                contentY += 60;
+
+                if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "JOIN GAME", _buttonStyle))
                 {
                     _roomCodeFieldFocused = false;
+                    DoConnect();
                 }
-            }
 
-            var fieldStyle = _roomCodeFieldFocused ? _fieldFocusedStyle : _textFieldStyle;
-            string displayText = _roomCode ?? "";
+                contentY += 70;
+                GUI.DrawTexture(new Rect(_panelRect.x + margin, contentY, innerW, 1), _fieldBg);
+                contentY += 20;
 
-            if (_roomCodeFieldFocused)
-            {
-                _cursorBlinkTimer += Time.deltaTime;
-                if (_cursorBlinkTimer >= 0.5f)
+                if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "HOST GAME", _buttonStyle))
                 {
-                    _cursorVisible = !_cursorVisible;
-                    _cursorBlinkTimer = 0f;
+                    _roomCodeFieldFocused = false;
+                    DoHost();
                 }
-                if (_cursorVisible)
-                    displayText += "|";
-            }
-
-            if (string.IsNullOrEmpty(_roomCode) && !_roomCodeFieldFocused)
-                displayText = "Enter room code...";
-
-            GUI.Label(fieldRect, displayText, fieldStyle);
-
-            // Paste button
-            if (GUI.Button(pasteRect, "Paste", _buttonStyle))
-            {
-                string clip = GUIUtility.systemCopyBuffer;
-                if (!string.IsNullOrEmpty(clip))
-                {
-                    var filtered = new System.Text.StringBuilder();
-                    foreach (char c in clip)
-                    {
-                        if (char.IsLetterOrDigit(c)) filtered.Append(char.ToUpper(c));
-                    }
-                    if (filtered.Length > 0)
-                    {
-                        _roomCode = filtered.ToString();
-                        if (_roomCode.Length > 16) _roomCode = _roomCode.Substring(0, 16);
-                        _logger.Msg($"[MP Bridge] Pasted room code: {_roomCode}");
-                    }
-                }
-                _roomCodeFieldFocused = true;
-            }
-        }
-        y += 38f;
-
-        uint guiJoinState = GetJoinState();
-        bool joinBlocked = !_initialized || (guiJoinState != JOIN_IDLE && guiJoinState != JOIN_LOADED);
-        if (joinBlocked) GUI.enabled = false;
-        string joinLabel;
-        if (!_initialized)
-            joinLabel = "JOIN GAME  (waiting...)";
-        else if (guiJoinState == JOIN_WAITING_FOR_SAVE)
-            joinLabel = "JOINING...  (receiving save)";
-        else if (guiJoinState == JOIN_SAVE_READY || guiJoinState == JOIN_LOADING_SCENE)
-            joinLabel = "JOINING...  (loading game)";
-        else
-            joinLabel = "JOIN GAME";
-        if (GUI.Button(new Rect(cx, y, cw, 40f), joinLabel, _buttonStyle))
-            DoConnect();
-        GUI.enabled = true;
-        y += 52f;
-
-        // ── Disconnect (only when connected or hosting) ──
-        if (_isHosting || _isConnectedState)
-        {
-            if (GUI.Button(new Rect(cx, y, cw, 36f), "DISCONNECT", _buttonStyle))
-                DoDisconnect();
-            y += 44f;
-        }
-
-        // ── Unfocus fields when clicking on empty panel area ──
-        if (Event.current.type == EventType.MouseDown)
-        {
-            if (_panelRect.Contains(Event.current.mousePosition))
-            {
-                // If click is not handled by any field rect above, unfocus all
-                // (The field rects set focus above; this catches clicks on the panel background)
-                // We use a small trick: schedule unfocus, but the field handlers above already ran
-                // so this only fires for non-field clicks
             }
             else
             {
-                _roomCodeFieldFocused = false;
+                // Session details
+                string status = _isHosting ? "HOSTING SESSION" : "CONNECTED TO SESSION";
+                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), status, _statusStyle);
+                contentY += 35;
+
+                string codeToDisplay = _isHosting ? _displayRoomCode : _roomCode;
+                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 35), $"ROOM: {codeToDisplay}", _labelStyle);
+                contentY += 45;
+
+                uint players = _getPlayerCount != null ? _getPlayerCount() : 1;
+                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), $"Players: {players}", _labelStyle);
+                contentY += 40;
+
+                if (_isHosting)
+                {
+                    if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "STOP HOSTING", _stopHostButtonStyle))
+                        DoStopHosting();
+                }
+                else
+                {
+                    if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "DISCONNECT", _stopHostButtonStyle))
+                        DoDisconnect();
+                }
             }
-        }
 
-        // ── Close at bottom ──
-        float closeY = py + h - pad - 32f;
-        if (GUI.Button(new Rect(cx, closeY, cw, 32f), "Close", _buttonStyle))
-            HideMultiplayerPanel();
-    }
-
-    private void DrawJoinOverlay()
-    {
-        if (!_stylesInitialized) InitStyles();
-
-        // Semi-transparent dark background strip
-        float stripH = 60f;
-        float stripY = Screen.height * 0.4f;
-
-        if (_overlayBg == null)
-            _overlayBg = MakeTex(1, 1, new Color(0f, 0f, 0f, 0.75f));
-
-        GUI.DrawTexture(new Rect(0, stripY, Screen.width, stripH), _overlayBg);
-
-        // Build progress text
-        string text;
-        float progress = _getSaveTransferProgress != null ? _getSaveTransferProgress() : -1f;
-        uint totalBytes = _getSaveTransferTotalBytes != null ? _getSaveTransferTotalBytes() : 0;
-
-        uint overlayJoinState = GetJoinState();
-        if (overlayJoinState == JOIN_WAITING_FOR_SAVE)
-        {
-            if (progress >= 0f && totalBytes >= 1_000_000)
+            // Close when clicking outside
+            if (Event.current.type == EventType.MouseDown && !_panelRect.Contains(Event.current.mousePosition))
             {
-                int pct = (int)(progress * 100f);
-                text = $"Loading Game {pct}%";
-            }
-            else if (progress >= 0f)
-            {
-                text = "Loading Game...";
-            }
-            else
-            {
-                text = "Connecting...";
+                HideMultiplayerPanel();
             }
         }
-        else if (overlayJoinState == JOIN_SAVE_READY)
+        catch (Exception ex)
         {
-            text = "Processing save...";
+            CrashLog.LogException("MultiplayerBridge.DrawGUI", ex);
         }
-        else
-        {
-            text = "Loading Game...";
-        }
-
-        GUI.Label(new Rect(0, stripY, Screen.width, stripH), text, _overlayTextStyle);
     }
-
-    /// <summary>
-    /// Draws a labeled section separator line: ─── LABEL ───
-    /// </summary>
-    private void DrawSectionSeparator(float cx, ref float y, float cw, string label)
-    {
-        float lineH = 1f;
-        float labelW = label.Length * 9f + 16f; // approximate label width
-        float lineW = (cw - labelW) / 2f - 4f;
-
-        if (lineW > 0)
-        {
-            GUI.DrawTexture(new Rect(cx, y + 10f, lineW, lineH), _fieldBg);
-            GUI.DrawTexture(new Rect(cx + cw - lineW, y + 10f, lineW, lineH), _fieldBg);
-        }
-
-        _labelStyle.alignment = TextAnchor.MiddleCenter;
-        _labelStyle.normal.textColor = new Color(0.6f, 0.6f, 0.6f);
-        GUI.Label(new Rect(cx, y, cw, 22f), label, _labelStyle);
-        _labelStyle.alignment = TextAnchor.UpperLeft;
-        _labelStyle.normal.textColor = Color.white;
-        y += 28f;
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  IMGUI Style Initialization
-    // ═══════════════════════════════════════════════════════════════════════
 
     private void InitStyles()
     {
-        // Grab the default font from GUI.skin — without this, new GUIStyle() has NO font
-        // and all text is invisible!
-        var defaultFont = GUI.skin.font;
+        _windowBg = MakeTex(1, 1, new Color(0.12f, 0.12f, 0.15f, 0.95f));
+        _buttonBg = MakeTex(1, 1, new Color(0.0f, 0.6f, 0.7f, 1f));
+        _buttonHoverBg = MakeTex(1, 1, new Color(0.0f, 0.8f, 0.9f, 1f));
+        _fieldBg = MakeTex(1, 1, new Color(0.2f, 0.2f, 0.25f, 1f));
+        _fieldActiveBg = MakeTex(1, 1, new Color(0.25f, 0.25f, 0.35f, 1f));
+        _stopBtnBg = MakeTex(1, 1, new Color(0.7f, 0.2f, 0.2f, 1f));
+        _stopBtnHoverBg = MakeTex(1, 1, new Color(0.9f, 0.3f, 0.3f, 1f));
 
-        // Create solid-color textures for backgrounds
-        _windowBg = MakeTex(1, 1, new Color(40f / 255f, 40f / 255f, 40f / 255f, 240f / 255f));
-        _buttonBg = MakeTex(1, 1, new Color(0f, 180f / 255f, 180f / 255f, 1f));
-        _buttonHoverBg = MakeTex(1, 1, new Color(0f, 210f / 255f, 210f / 255f, 1f));
-        _fieldBg = MakeTex(1, 1, new Color(60f / 255f, 60f / 255f, 60f / 255f, 1f));
-        _fieldActiveBg = MakeTex(1, 1, new Color(80f / 255f, 80f / 255f, 80f / 255f, 1f));
-        _stopBtnBg = MakeTex(1, 1, new Color(200f / 255f, 50f / 255f, 50f / 255f, 1f));
-        _stopBtnHoverBg = MakeTex(1, 1, new Color(230f / 255f, 70f / 255f, 70f / 255f, 1f));
+        _titleStyle = new GUIStyle { fontSize = 22, fontStyle = FontStyle.Bold, normal = { textColor = Color.white } };
+        _labelStyle = new GUIStyle { fontSize = 16, normal = { textColor = new Color(0.8f, 0.8f, 0.8f) } };
+        _statusStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, normal = { textColor = new Color(0.0f, 0.9f, 0.6f) } };
 
-        _windowStyle = new GUIStyle();
-        _windowStyle.normal.background = _windowBg;
-
-        _titleStyle = new GUIStyle();
-        _titleStyle.font = defaultFont;
-        _titleStyle.fontSize = 20;
-        _titleStyle.fontStyle = FontStyle.Bold;
-        _titleStyle.normal.textColor = Color.white;
-        _titleStyle.alignment = TextAnchor.MiddleCenter;
-        _titleStyle.margin = new RectOffset();
-        _titleStyle.margin.bottom = 10;
-
-        _labelStyle = new GUIStyle();
-        _labelStyle.font = defaultFont;
-        _labelStyle.fontSize = 14;
-        _labelStyle.normal.textColor = Color.white;
-        _labelStyle.wordWrap = true;
-        _labelStyle.padding = new RectOffset();
-        _labelStyle.padding.left = 2; _labelStyle.padding.right = 2;
-
-        _statusStyle = new GUIStyle();
-        _statusStyle.font = defaultFont;
-        _statusStyle.fontSize = 14;
-        _statusStyle.fontStyle = FontStyle.Bold;
-        _statusStyle.normal.textColor = Color.white;
-        _statusStyle.padding = new RectOffset();
-        _statusStyle.padding.left = 2; _statusStyle.padding.right = 2;
-
-        _buttonStyle = new GUIStyle();
-        _buttonStyle.font = defaultFont;
-        _buttonStyle.fontSize = 14;
-        _buttonStyle.fontStyle = FontStyle.Bold;
-        _buttonStyle.normal.background = _buttonBg;
-        _buttonStyle.normal.textColor = Color.white;
-        _buttonStyle.hover.background = _buttonHoverBg;
-        _buttonStyle.hover.textColor = Color.white;
-        _buttonStyle.active.background = _buttonHoverBg;
-        _buttonStyle.active.textColor = Color.white;
-        _buttonStyle.focused.background = _buttonBg;
-        _buttonStyle.focused.textColor = Color.white;
-        _buttonStyle.alignment = TextAnchor.MiddleCenter;
-        _buttonStyle.border = new RectOffset();
-        _buttonStyle.margin = new RectOffset();
-        _buttonStyle.padding = new RectOffset();
-        _buttonStyle.border.left = 4; _buttonStyle.border.right = 4;
-        _buttonStyle.border.top = 4; _buttonStyle.border.bottom = 4;
-        _buttonStyle.margin.left = 2; _buttonStyle.margin.right = 2;
-        _buttonStyle.margin.top = 2; _buttonStyle.margin.bottom = 2;
-        _buttonStyle.padding.left = 8; _buttonStyle.padding.right = 8;
-        _buttonStyle.padding.top = 4; _buttonStyle.padding.bottom = 4;
-
-        // Focused text field style — slightly brighter bg + cyan border feel
-        _fieldFocusedStyle = new GUIStyle();
-        _fieldFocusedStyle.font = defaultFont;
-        _fieldFocusedStyle.fontSize = 14;
-        _fieldFocusedStyle.normal.background = _fieldActiveBg;
-        _fieldFocusedStyle.normal.textColor = Color.white;
-        _fieldFocusedStyle.padding = new RectOffset();
-        _fieldFocusedStyle.padding.left = 8; _fieldFocusedStyle.padding.right = 8;
-        _fieldFocusedStyle.padding.top = 6; _fieldFocusedStyle.padding.bottom = 6;
-        _fieldFocusedStyle.clipping = TextClipping.Clip;
-
-        // Stop hosting button — red background
-        _stopHostButtonStyle = new GUIStyle();
-        _stopHostButtonStyle.font = defaultFont;
-        _stopHostButtonStyle.fontSize = 14;
-        _stopHostButtonStyle.fontStyle = FontStyle.Bold;
-        _stopHostButtonStyle.normal.background = _stopBtnBg;
-        _stopHostButtonStyle.normal.textColor = Color.white;
-        _stopHostButtonStyle.hover.background = _stopBtnHoverBg;
-        _stopHostButtonStyle.hover.textColor = Color.white;
-        _stopHostButtonStyle.active.background = _stopBtnHoverBg;
-        _stopHostButtonStyle.active.textColor = Color.white;
-        _stopHostButtonStyle.focused.background = _stopBtnBg;
-        _stopHostButtonStyle.focused.textColor = Color.white;
-        _stopHostButtonStyle.alignment = TextAnchor.MiddleCenter;
-        _stopHostButtonStyle.border = new RectOffset();
-        _stopHostButtonStyle.margin = new RectOffset();
-        _stopHostButtonStyle.padding = new RectOffset();
-        _stopHostButtonStyle.border.left = 4; _stopHostButtonStyle.border.right = 4;
-        _stopHostButtonStyle.border.top = 4; _stopHostButtonStyle.border.bottom = 4;
-        _stopHostButtonStyle.margin.left = 2; _stopHostButtonStyle.margin.right = 2;
-        _stopHostButtonStyle.margin.top = 2; _stopHostButtonStyle.margin.bottom = 2;
-        _stopHostButtonStyle.padding.left = 8; _stopHostButtonStyle.padding.right = 8;
-        _stopHostButtonStyle.padding.top = 4; _stopHostButtonStyle.padding.bottom = 4;
-
-        // Text field: custom drawn since GUI.TextField doesn't work with new Input System
-        _textFieldStyle = new GUIStyle();
-        _textFieldStyle.font = defaultFont;
-        _textFieldStyle.fontSize = 14;
-        _textFieldStyle.normal.background = _fieldBg;
-        _textFieldStyle.normal.textColor = Color.white;
-        _textFieldStyle.focused.background = _fieldBg;
-        _textFieldStyle.focused.textColor = Color.white;
-        _textFieldStyle.hover.background = _fieldBg;
-        _textFieldStyle.hover.textColor = Color.white;
-        _textFieldStyle.active.background = _fieldBg;
-        _textFieldStyle.active.textColor = Color.white;
-        _textFieldStyle.padding = new RectOffset();
-        _textFieldStyle.padding.left = 8; _textFieldStyle.padding.right = 8;
-        _textFieldStyle.padding.top = 6; _textFieldStyle.padding.bottom = 6;
-        _textFieldStyle.clipping = TextClipping.Clip;
-
-        _overlayTextStyle = new GUIStyle();
-        _overlayTextStyle.font = defaultFont;
-        _overlayTextStyle.fontSize = 24;
-        _overlayTextStyle.fontStyle = FontStyle.Bold;
-        _overlayTextStyle.alignment = TextAnchor.MiddleCenter;
-        _overlayTextStyle.normal.textColor = Color.white;
+        _buttonStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { background = _buttonBg, textColor = Color.white }, hover = { background = _buttonHoverBg, textColor = Color.white } };
+        _stopHostButtonStyle = new GUIStyle(_buttonStyle) { normal = { background = _stopBtnBg }, hover = { background = _stopBtnHoverBg } };
 
         _stylesInitialized = true;
     }
 
-    private static Texture2D MakeTex(int w, int h, Color col)
+    private Texture2D MakeTex(int w, int h, Color col)
     {
         var tex = new Texture2D(w, h);
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
-                tex.SetPixel(x, y, col);
+        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) tex.SetPixel(x, y, col);
         tex.Apply();
-        tex.hideFlags = HideFlags.HideAndDontSave;
         return tex;
     }
 
-
-
-    private static void CleanupAll()
+    private void CleanupAll()
     {
-
-        EntityManager.DestroyAll();
+        _isHosting = false;
+        _displayRoomCode = "";
+        _discoveredSavePath = null;
+        _cachedSaveData = null;
     }
 
     public void Shutdown()
     {
-        if (_initialized && _disconnect != null)
-        {
-            try { _disconnect(); }
-            catch { }
-        }
-
-        CleanupMpSaveFiles();
+        DoDisconnect();
         CleanupAll();
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  BillboardNameTag — always faces the main camera
-// ═══════════════════════════════════════════════════════════════════════════
-
-[RegisterTypeInIl2Cpp]
-public class BillboardNameTag : MonoBehaviour
-{
-    public BillboardNameTag(IntPtr ptr) : base(ptr) { }
-
-    public Transform followTarget;
-    public float offsetY = 2.05f;
-    private float _smoothY = float.NaN;
-
-    void LateUpdate()
-    {
-
-        // Follow the target (remote player GO) — nametag is NOT parented to avoid scale inheritance
-        // XZ follows instantly; Y is heavily smoothed to prevent micro-jitter that
-        // causes motion-blur fuzz on the text.
-        if (followTarget != null)
-        {
-            float desiredY = followTarget.position.y + offsetY;
-            if (float.IsNaN(_smoothY))
-                _smoothY = desiredY;                   // first frame: snap
-            else
-                _smoothY = Mathf.Lerp(_smoothY, desiredY, Time.deltaTime * 3f); // slow follow
-
-            transform.position = new Vector3(
-                followTarget.position.x,
-                _smoothY,
-                followTarget.position.z);
-        }
-        else
-        {
-            CrashLog.Log($"[MP Billboard] followTarget is NULL — destroying nametag '{gameObject.name}'");
-            UnityEngine.Object.Destroy(gameObject);
-            return;
-        }
-
-        var cam = Camera.main;
-        if (cam == null) return;
-        transform.LookAt(transform.position + cam.transform.forward);
     }
 }

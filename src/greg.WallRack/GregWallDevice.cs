@@ -7,6 +7,7 @@ namespace greg.WallRack
     public class GregWallDevice
     {
         public string deviceId = string.Empty;
+        public string persistentId = string.Empty;
         public GregWallSlotType deviceType;
         public Vector2Int mountedAt;
         public string wallId = string.Empty;

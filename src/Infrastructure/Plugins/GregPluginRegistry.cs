@@ -4,6 +4,12 @@
 /// Maintainer:   Verantwortlich für Lifecycle (Load, Initialize, Unload).
 /// </file-summary>
 
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using gregCore.Core.Abstractions;
+using gregCore.Core.Models;
+
 namespace gregCore.Infrastructure.Plugins;
 
 public sealed class GregPluginRegistry : IGregPluginRegistry
@@ -29,8 +35,15 @@ public sealed class GregPluginRegistry : IGregPluginRegistry
             return;
         }
 
+        if (string.IsNullOrEmpty(metadata.PersistentId))
+        {
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(metadata.ModId));
+            metadata.PersistentId = new Guid(hash).ToString();
+        }
+
         _registeredMods[metadata.ModId] = metadata;
-        _logger.Info($"Mod registriert: {metadata.Name} ({metadata.Version}) [ID: {metadata.ModId}]");
+        _logger.Info($"Mod registriert: {metadata.Name} ({metadata.Version}) [ID: {metadata.ModId}, PersistentID: {metadata.PersistentId}]");
     }
 
     public ModMetadata? GetModMetadata(string modId)

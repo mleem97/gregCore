@@ -13,9 +13,9 @@ namespace DataCenterModLoader;
 
 public class CustomEmployeeEntry
 {
-    public string EmployeeId;
-    public string Name;
-    public string Description;
+    public string EmployeeId = null!;
+    public string Name = null!;
+    public string Description = null!;
     public float SalaryPerHour;
     public float RequiredReputation;
     public bool IsHired;
@@ -31,7 +31,7 @@ public static class CustomEmployeeManager
     private static readonly string _statePath =
         Path.Combine(MelonEnvironment.UserDataDirectory, "custom_employees_hired.txt");
 
-    private static string _pendingEmployeeId;
+    private static string? _pendingEmployeeId;
     private static bool _pendingIsHire;
     private static bool _salariesNeedReregistration;
 
@@ -154,7 +154,7 @@ public static class CustomEmployeeManager
 
 #pragma warning disable CS0414
     private static bool _scrollViewInjected = false;
-    private static Transform _injectedContent = null;
+    private static Transform? _injectedContent = null;
 #pragma warning restore CS0414
 
     private static Transform EnsureScrollView(Transform hrTransform, Transform grid)
@@ -306,7 +306,7 @@ public static class CustomEmployeeManager
             LogHierarchy(hrTransform, 0);
 
 
-            Transform contentGrid;
+            Transform? contentGrid;
             if (_injectedContent != null)
             {
                 contentGrid = _injectedContent;
@@ -314,7 +314,7 @@ public static class CustomEmployeeManager
             }
             else
             {
-                Transform grid = hrTransform.Find("Grid");
+                Transform? grid = hrTransform.Find("Grid");
                 if (grid != null)
                     CrashLog.Log("CustomEmployee: Found container via legacy 'Grid' child");
 
@@ -323,8 +323,8 @@ public static class CustomEmployeeManager
                     var hireButtons = hrSystem.buttonsHireEmployees;
                     var fireButtons = hrSystem.buttonsFireEmployees;
 
-                    Transform btn0 = hireButtons?.Length > 0 ? hireButtons[0]?.transform : null;
-                    Transform btn1 = hireButtons?.Length > 1 ? hireButtons[1]?.transform
+                    Transform? btn0 = hireButtons?.Length > 0 ? hireButtons[0]?.transform : null;
+                    Transform? btn1 = hireButtons?.Length > 1 ? hireButtons[1]?.transform
                                    : fireButtons?.Length > 0 ? fireButtons[0]?.transform : null;
 
                     if (btn0 != null && btn1 != null)
@@ -363,11 +363,13 @@ public static class CustomEmployeeManager
                 contentGrid = EnsureScrollView(hrTransform, grid);
             }
 
+            if (contentGrid == null) return;
+
             CrashLog.Log($"CustomEmployee: Using content grid '{contentGrid.name}' with {contentGrid.childCount} children");
 
             // Prefer cards that start with "EmployeeCard" but fall back to any active
             // non-custom child, since the new game version may use different card names
-            Transform templateCard = null;
+            Transform? templateCard = null;
             for (int i = contentGrid.childCount - 1; i >= 0; i--)
             {
                 var child = contentGrid.GetChild(i);
@@ -426,7 +428,7 @@ public static class CustomEmployeeManager
         CrashLog.Log("CustomEmployee: injection state reset");
     }
 
-    private static Transform FindLowestCommonAncestor(Transform a, Transform b)
+    private static Transform? FindLowestCommonAncestor(Transform a, Transform b)
     {
         if (a == null || b == null) return null;
         var ancestors = new HashSet<Transform>();
@@ -620,7 +622,7 @@ public static class CustomEmployeeManager
     /// 2. Any direct or deep child whose name contains <paramref name="nameHint"/>
     /// 3. Returns null if nothing matched.
     /// </summary>
-    private static Transform FindButton(Transform card, string exactPath, string nameHint)
+    private static Transform? FindButton(Transform card, string exactPath, string nameHint)
     {
         // 1. exact path
         var t = card.Find(exactPath);
@@ -630,7 +632,7 @@ public static class CustomEmployeeManager
         return FindChildContaining(card, nameHint);
     }
 
-    private static Transform FindChildContaining(Transform parent, string nameHint)
+    private static Transform? FindChildContaining(Transform parent, string nameHint)
     {
         for (int i = 0; i < parent.childCount; i++)
         {
@@ -647,8 +649,8 @@ public static class CustomEmployeeManager
     {
         // Try legacy exact paths first, then fall back to name-hint search,
         // then fall back to ButtonExtended components in card order.
-        Transform buttonHireT = FindButton(card, "VL/ButtonHire", "Hire");
-        Transform buttonFireT = FindButton(card, "VL/ButtonFire", "Fire");
+        Transform? buttonHireT = FindButton(card, "VL/ButtonHire", "Hire");
+        Transform? buttonFireT = FindButton(card, "VL/ButtonFire", "Fire");
 
         if (buttonHireT == null || buttonFireT == null)
         {
@@ -728,7 +730,7 @@ public static class CustomEmployeeManager
     {
         var hrSystems = UnityEngine.Object.FindObjectsOfType<HRSystem>();
         if (hrSystems == null) return;
-        for (int i = 0; i < hrSystems.Count; i++)
+        for (int i = 0; i < hrSystems.Length; i++)
         {
             var hr = hrSystems[i];
             if (hr == null || !hr.gameObject.activeInHierarchy) continue;
@@ -831,7 +833,7 @@ public static class CustomEmployeeManager
     }
 
     // ButtonExtended is a Selectable subclass with its own onClick; falls back to standard Button.
-    private static void WireButtonExtendedClick(Transform buttonTransform, System.Action callback)
+    private static void WireButtonExtendedClick(Transform? buttonTransform, System.Action callback)
     {
         if (buttonTransform == null) return;
 
@@ -885,7 +887,7 @@ public static class CustomEmployeeManager
             if (portraitTransform == null) return;
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
-            string imagePath = null;
+            string? imagePath = null;
             foreach (var ext in new[] { ".jpg", ".png" })
             {
                 string candidate = Path.Combine(assetsDir, employeeId + ext);
@@ -964,13 +966,13 @@ public static class CustomEmployeeManager
             var hrSystems = UnityEngine.Object.FindObjectsOfType<HRSystem>();
             if (hrSystems == null) return;
 
-            for (int h = 0; h < hrSystems.Count; h++)
+            for (int h = 0; h < hrSystems.Length; h++)
             {
                 var hr = hrSystems[h];
                 if (hr == null) continue;
 
                 // Try scroll view content first, fall back to Grid
-                Transform contentGrid = null;
+                Transform? contentGrid = null;
                 var scrollView = hr.transform.Find("ModScrollView");
                 if (scrollView != null)
                     contentGrid = scrollView.Find("Viewport/Content");

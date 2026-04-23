@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MelonLoader;
+using UnityEngine;
 
 namespace DataCenterModLoader;
 
-// must match dc_api/src/events.rs
 public static class EventIds
 {
     public const uint MoneyChanged = 100;
@@ -54,446 +55,130 @@ public static class EventIds
     public const uint CustomEmployeeFired = 1001;
 }
 
-// must match rust repr(C) layouts
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ValueChangedData
+public class EventDispatcher
 {
-    public double OldValue;
-    public double NewValue;
-    public double Delta;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ServerPoweredData
-{
-    public uint PoweredOn; // 1 = on, 0 = off
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct DayEndedData
-{
-    public uint Day;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct CustomerAcceptedData
-{
-    public int CustomerId;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct CustomerSatisfiedData
-{
-    public int CustomerBaseId;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ServerCustomerChangedData
-{
-    public int NewCustomerId;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ServerAppChangedData
-{
-    public int NewAppId;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct MonthEndedData
-{
-    public int Month;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ShopItemAddedData
-{
-    public int ItemId;
-    public int Price;
-    public int ItemType;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ShopItemRemovedData
-{
-    public int Uid;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct NetWatchDispatchedData
-{
-    public int DeviceType; // 0 = server, 1 = switch
-    public int Reason;     // 0 = broken, 1 = eol_warning
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct CustomEmployeeEventData
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-    public byte[] EmployeeId;
-
-    public static CustomEmployeeEventData Create(string employeeId)
-    {
-        var data = new CustomEmployeeEventData { EmployeeId = new byte[64] };
-        if (!string.IsNullOrEmpty(employeeId))
-        {
-            var bytes = System.Text.Encoding.ASCII.GetBytes(employeeId);
-            Array.Copy(bytes, data.EmployeeId, Math.Min(bytes.Length, 63));
-        }
-        return data;
-    }
-}
-
-/// Payload for ServerInstalled events. Must match Rust's ServerInstalledData layout.
-[StructLayout(LayoutKind.Sequential)]
-public struct ServerInstalledData
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-    public byte[] ServerId;
-    public byte ObjectType;
-    public int RackPositionUid;
-
-    public static ServerInstalledData Create(string serverId, byte objectType, int rackPositionUid)
-    {
-        var data = new ServerInstalledData
-        {
-            ServerId = new byte[64],
-            ObjectType = objectType,
-            RackPositionUid = rackPositionUid
-        };
-        if (!string.IsNullOrEmpty(serverId))
-        {
-            var bytes = System.Text.Encoding.ASCII.GetBytes(serverId);
-            Array.Copy(bytes, data.ServerId, Math.Min(bytes.Length, 63));
-        }
-        return data;
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ObjectSpawnedData
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-    public byte[] ObjectId;
-    public byte ObjectType;
-    public int PrefabId;
-    public float PosX;
-    public float PosY;
-    public float PosZ;
-    public float RotX;
-    public float RotY;
-    public float RotZ;
-    public float RotW;
-
-    public static ObjectSpawnedData Create(string objectId, byte objectType, int prefabId,
-        float px, float py, float pz, float rx, float ry, float rz, float rw)
-    {
-        var data = new ObjectSpawnedData
-        {
-            ObjectId = new byte[64],
-            ObjectType = objectType,
-            PrefabId = prefabId,
-            PosX = px,
-            PosY = py,
-            PosZ = pz,
-            RotX = rx,
-            RotY = ry,
-            RotZ = rz,
-            RotW = rw
-        };
-        if (!string.IsNullOrEmpty(objectId))
-        {
-            var bytes = System.Text.Encoding.ASCII.GetBytes(objectId);
-            Array.Copy(bytes, data.ObjectId, Math.Min(bytes.Length, 63));
-        }
-        return data;
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ObjectPickedUpData
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-    public byte[] ObjectId;
-    public byte ObjectType;
-
-    public static ObjectPickedUpData Create(string objectId, byte objectType)
-    {
-        var data = new ObjectPickedUpData
-        {
-            ObjectId = new byte[64],
-            ObjectType = objectType
-        };
-        if (!string.IsNullOrEmpty(objectId))
-        {
-            var bytes = System.Text.Encoding.ASCII.GetBytes(objectId);
-            Array.Copy(bytes, data.ObjectId, Math.Min(bytes.Length, 63));
-        }
-        return data;
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct ObjectDroppedData
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-    public byte[] ObjectId;
-    public byte ObjectType;
-    public float PosX;
-    public float PosY;
-    public float PosZ;
-    public float RotX;
-    public float RotY;
-    public float RotZ;
-    public float RotW;
-
-    public static ObjectDroppedData Create(string objectId, byte objectType,
-        float px, float py, float pz, float rx, float ry, float rz, float rw)
-    {
-        var data = new ObjectDroppedData
-        {
-            ObjectId = new byte[64],
-            ObjectType = objectType,
-            PosX = px,
-            PosY = py,
-            PosZ = pz,
-            RotX = rx,
-            RotY = ry,
-            RotZ = rz,
-            RotW = rw
-        };
-        if (!string.IsNullOrEmpty(objectId))
-        {
-            var bytes = System.Text.Encoding.ASCII.GetBytes(objectId);
-            Array.Copy(bytes, data.ObjectId, Math.Min(bytes.Length, 63));
-        }
-        return data;
-    }
-}
-
-public static class EventDispatcher
-{
-    private static FFIBridge _bridge;
-    private static MelonLogger.Instance _logger;
-
-    // dedup: harmony + il2cpp can double-fire patches
-    private static uint _lastEventId;
-    private static long _lastEventTick;
-    private static double _lastEventPayloadHash;
+    private static FFIBridge? _ffiBridge;
+    private static MelonLogger.Instance? _logger;
 
     public static void Initialize(FFIBridge bridge, MelonLogger.Instance logger)
     {
-        _bridge = bridge;
+        _ffiBridge = bridge;
         _logger = logger;
     }
 
-    private static bool IsDuplicate(uint eventId, double payloadHash = 0.0)
+    public static void FireValueChanged(uint eventId, float oldValue, float newValue, float delta)
     {
-        long now = System.Diagnostics.Stopwatch.GetTimestamp();
-        long elapsed = now - _lastEventTick;
-        long threshold = System.Diagnostics.Stopwatch.Frequency / 20; // ~50ms window
-
-        bool isDup = (eventId == _lastEventId)
-                     && (elapsed < threshold)
-                     && (Math.Abs(payloadHash - _lastEventPayloadHash) < 0.0001);
-
-        _lastEventId = eventId;
-        _lastEventTick = now;
-        _lastEventPayloadHash = payloadHash;
-
-        return isDup;
-    }
-
-    private static void DispatchWithData<T>(uint eventId, T data, double payloadHash = 0.0) where T : struct
-    {
-        if (_bridge == null) return;
-        if (IsDuplicate(eventId, payloadHash)) return;
-
-        int size = Marshal.SizeOf<T>();
-        IntPtr ptr = Marshal.AllocHGlobal(size);
-        try
-        {
-            Marshal.StructureToPtr(data, ptr, false);
-            _bridge.DispatchEvent(eventId, ptr, (uint)size);
-        }
-        catch (Exception ex)
-        {
-            _logger?.Error($"Failed to dispatch event {eventId}: {ex.Message}");
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(ptr);
-        }
+        _ffiBridge?.OnEvent(eventId, $"{oldValue}|{newValue}|{delta}");
     }
 
     public static void FireSimple(uint eventId)
     {
-        if (_bridge == null) return;
-        if (IsDuplicate(eventId)) return;
-        try
-        {
-            _bridge.DispatchEvent(eventId, IntPtr.Zero, 0);
-        }
-        catch (Exception ex) { _logger?.Error($"Failed to dispatch event {eventId}: {ex.Message}"); }
+        _ffiBridge?.OnEvent(eventId, "");
     }
 
-    public static void LogError(string message)
+    public static void FireServerPowered(bool isOn)
     {
-        _logger?.Error("[Events] " + message);
-    }
-
-    public static void FireValueChanged(uint eventId, double oldValue, double newValue, double delta)
-    {
-        DispatchWithData(eventId, new ValueChangedData
-        {
-            OldValue = oldValue,
-            NewValue = newValue,
-            Delta = delta,
-        }, oldValue + newValue * 31.0);
-    }
-
-    public static void FireServerPowered(bool poweredOn)
-    {
-        DispatchWithData(EventIds.ServerPowered, new ServerPoweredData
-        {
-            PoweredOn = poweredOn ? 1u : 0u,
-        }, poweredOn ? 1.0 : 0.0);
-    }
-
-    public static void FireDayEnded(uint day)
-    {
-        DispatchWithData(EventIds.DayEnded, new DayEndedData { Day = day }, day);
-    }
-
-    public static void FireCustomerAccepted(int customerId)
-    {
-        DispatchWithData(EventIds.CustomerAccepted, new CustomerAcceptedData { CustomerId = customerId }, customerId);
-    }
-
-    public static void FireCustomerSatisfied(int customerBaseId)
-    {
-        DispatchWithData(EventIds.CustomerSatisfied, new CustomerSatisfiedData { CustomerBaseId = customerBaseId }, customerBaseId);
-    }
-
-    public static void FireCustomerUnsatisfied(int customerBaseId)
-    {
-        DispatchWithData(EventIds.CustomerUnsatisfied, new CustomerSatisfiedData { CustomerBaseId = customerBaseId }, customerBaseId + 0.5);
-    }
-
-    public static void FireCableConnected()
-    {
-        FireSimple(EventIds.CableConnected);
-    }
-
-    public static void FireCableDisconnected()
-    {
-        FireSimple(EventIds.CableDisconnected);
-    }
-
-    public static void FireServerCustomerChanged(int newCustomerId)
-    {
-        DispatchWithData(EventIds.ServerCustomerChanged, new ServerCustomerChangedData { NewCustomerId = newCustomerId }, newCustomerId);
-    }
-
-    public static void FireServerAppChanged(int newAppId)
-    {
-        DispatchWithData(EventIds.ServerAppChanged, new ServerAppChangedData { NewAppId = newAppId }, newAppId);
-    }
-
-    public static void FireServerInstalled(string serverId, byte objectType, int rackPositionUid)
-    {
-        DispatchWithData(EventIds.ServerInstalled,
-            ServerInstalledData.Create(serverId, objectType, rackPositionUid),
-            serverId?.GetHashCode() ?? 0 + rackPositionUid * 31.0);
-    }
-
-    public static void FireObjectSpawned(string objectId, byte objectType, int prefabId,
-        UnityEngine.Vector3 pos, UnityEngine.Quaternion rot)
-    {
-        DispatchWithData(EventIds.ObjectSpawned,
-            ObjectSpawnedData.Create(objectId, objectType, prefabId,
-                pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w),
-            (objectId?.GetHashCode() ?? 0) + prefabId * 31.0);
-    }
-
-    public static void FireObjectPickedUp(string objectId, byte objectType)
-    {
-        DispatchWithData(EventIds.ObjectPickedUp,
-            ObjectPickedUpData.Create(objectId, objectType),
-            (objectId?.GetHashCode() ?? 0) + objectType * 31.0);
-    }
-
-    public static void FireObjectDropped(string objectId, byte objectType,
-        UnityEngine.Vector3 pos, UnityEngine.Quaternion rot)
-    {
-        DispatchWithData(EventIds.ObjectDropped,
-            ObjectDroppedData.Create(objectId, objectType,
-                pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w),
-            (objectId?.GetHashCode() ?? 0) + objectType * 31.0 + pos.x);
-    }
-
-    public static void FireRackUnmounted()
-    {
-        FireSimple(EventIds.RackUnmounted);
-    }
-
-    public static void FireSwitchBroken()
-    {
-        FireSimple(EventIds.SwitchBroken);
-    }
-
-    public static void FireSwitchRepaired()
-    {
-        FireSimple(EventIds.SwitchRepaired);
-    }
-
-    public static void FireMonthEnded(int month)
-    {
-        DispatchWithData(EventIds.MonthEnded, new MonthEndedData { Month = month }, month);
-    }
-
-    public static void FireShopItemAdded(int itemId, int price, int itemType)
-    {
-        DispatchWithData(EventIds.ShopItemAdded, new ShopItemAddedData { ItemId = itemId, Price = price, ItemType = itemType }, itemId * 1000.0 + price + itemType * 0.1);
-    }
-
-    public static void FireShopItemRemoved(int uid)
-    {
-        DispatchWithData(EventIds.ShopItemRemoved, new ShopItemRemovedData { Uid = uid }, uid);
-    }
-
-    public static void FireShopCartCleared()
-    {
-        FireSimple(EventIds.ShopCartCleared);
-    }
-
-    public static void FireGameAutoSaved()
-    {
-        FireSimple(EventIds.GameAutoSaved);
-    }
-
-    public static void FireWallPurchased()
-    {
-        FireSimple(EventIds.WallPurchased);
-    }
-
-    public static void FireNetWatchDispatched(int deviceType, int reason)
-    {
-        DispatchWithData(EventIds.NetWatchDispatched, new NetWatchDispatchedData
-        {
-            DeviceType = deviceType,
-            Reason = reason
-        }, deviceType * 10.0 + reason);
+        _ffiBridge?.OnEvent(EventIds.ServerPowered, isOn ? "1" : "0");
     }
 
     public static void FireCustomEmployeeHired(string employeeId)
     {
-        DispatchWithData(EventIds.CustomEmployeeHired, CustomEmployeeEventData.Create(employeeId), employeeId.GetHashCode());
+        _ffiBridge?.OnEvent(EventIds.CustomEmployeeHired, employeeId);
     }
 
     public static void FireCustomEmployeeFired(string employeeId)
     {
-        DispatchWithData(EventIds.CustomEmployeeFired, CustomEmployeeEventData.Create(employeeId), employeeId.GetHashCode() + 0.5);
+        _ffiBridge?.OnEvent(EventIds.CustomEmployeeFired, employeeId);
+    }
+
+    public static void FireDayEnded(uint day)
+    {
+        _ffiBridge?.OnEvent(EventIds.DayEnded, day.ToString());
+    }
+
+    public static void FireMonthEnded(int month)
+    {
+        _ffiBridge?.OnEvent(EventIds.MonthEnded, month.ToString());
+    }
+
+    public static void FireCustomerAccepted(int customerId)
+    {
+        _ffiBridge?.OnEvent(EventIds.CustomerAccepted, customerId.ToString());
+    }
+
+    public static void FireObjectSpawned(string objectId, byte objectType, int prefabId, Vector3 pos, Quaternion rot)
+    {
+        _ffiBridge?.OnEvent(EventIds.ObjectSpawned, $"{objectId}|{objectType}|{prefabId}|{pos.x:F3}|{pos.y:F3}|{pos.z:F3}|{rot.x:F4}|{rot.y:F4}|{rot.z:F4}|{rot.w:F4}");
+    }
+
+    public static void FireServerInstalled(string serverId, byte objectType, int rackUid)
+    {
+        _ffiBridge?.OnEvent(EventIds.ServerInstalled, $"{serverId}|{objectType}|{rackUid}");
+    }
+
+    public static void FireCustomerSatisfied(int customerId)
+    {
+        _ffiBridge?.OnEvent(EventIds.CustomerSatisfied, customerId.ToString());
+    }
+
+    public static void FireCustomerUnsatisfied(int customerId)
+    {
+        _ffiBridge?.OnEvent(EventIds.CustomerUnsatisfied, customerId.ToString());
+    }
+
+    public static void FireCableConnected()
+    {
+        _ffiBridge?.OnEvent(EventIds.CableConnected, "");
+    }
+
+    public static void FireCableDisconnected()
+    {
+        _ffiBridge?.OnEvent(EventIds.CableDisconnected, "");
+    }
+
+    public static void FireServerCustomerChanged(int customerId)
+    {
+        _ffiBridge?.OnEvent(EventIds.ServerCustomerChanged, customerId.ToString());
+    }
+
+    public static void FireServerAppChanged(int appId)
+    {
+        _ffiBridge?.OnEvent(EventIds.ServerAppChanged, appId.ToString());
+    }
+
+    public static void FireRackUnmounted()
+    {
+        _ffiBridge?.OnEvent(EventIds.RackUnmounted, "");
+    }
+
+    public static void FireSwitchBroken()
+    {
+        _ffiBridge?.OnEvent(EventIds.SwitchBroken, "");
+    }
+
+    public static void FireSwitchRepaired()
+    {
+        _ffiBridge?.OnEvent(EventIds.SwitchRepaired, "");
+    }
+
+    public static void FireShopItemAdded(int item0, int item1, int item2)
+    {
+        _ffiBridge?.OnEvent(EventIds.ShopItemAdded, $"{item0}|{item1}|{item2}");
+    }
+
+    public static void FireWallPurchased()
+    {
+        _ffiBridge?.OnEvent(EventIds.WallPurchased, "");
+    }
+
+    public static void FireGameAutoSaved()
+    {
+        _ffiBridge?.OnEvent(EventIds.GameAutoSaved, "");
+    }
+
+    public static void LogError(string message)
+    {
+        _logger?.Error(message);
+        CrashLog.Log("ERROR: " + message);
     }
 }

@@ -1,0 +1,192 @@
+using System;
+using System.Collections.Generic;
+using MelonLoader;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Il2Cpp;
+using Il2CppSystem.Linq;
+using greg.Logging;
+
+namespace greg.NoMoreEOL
+{
+    public class Main : MelonMod
+    {
+        private GregModLogger _log = null!;
+
+        // Options
+        private bool _autoRepairBrokenSwitches = true;
+        private bool _autoRepairBrokenServers = true;
+        private bool _disableSwitchesEOL = true;
+        private bool _disableServersEOL = true;
+
+        // Internal State
+        private bool _readyToRun;
+        private NetworkMap? _networkMap;
+        private MainGameManager? _gameManager;
+
+        private Dictionary<int, int> _switchTypeDefaultEOL = new Dictionary<int, int>();
+        private Dictionary<int, int> _serverTypeDefaultEOL = new Dictionary<int, int>();
+        private const int DefaultEOL = 14401;
+
+        public override void OnInitializeMelon()
+        {
+            if (gregCore.Core.GregCoreMod.Instance == null)
+            {
+                LoggerInstance.Warning("[gC-NoMoreEOL] gregCore not ready.");
+                return;
+            }
+
+            _log = new GregModLogger("NoMoreEOL");
+            _log.Section("Init");
+            _log.Msg("Starting initialization.");
+
+            RegisterSettings();
+
+            _log.FeatureState("NoMoreEOL", true);
+            _log.Msg("Initialization complete.");
+        }
+
+        private void RegisterSettings()
+        {
+            string modId = "nomore_eol";
+
+            gregCore.API.GregAPI.RegisterMod(modId, "NoMoreEOL", "1.0.0");
+
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "auto_repair_switches", "Auto Repair Switches", true, val => _autoRepairBrokenSwitches = val, "Maintenance", "Automatically repairs broken network switches.");
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "auto_repair_servers", "Auto Repair Servers", true, val => _autoRepairBrokenServers = val, "Maintenance", "Automatically repairs broken servers.");
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_switches_eol", "Disable Switches EOL", true, val => _disableSwitchesEOL = val, "Maintenance", "Prevents switches from reaching End-Of-Life.");
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_servers_eol", "Disable Servers EOL", true, val => _disableServersEOL = val, "Maintenance", "Prevents servers from reaching End-Of-Life.");
+        }
+
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        {
+            // Main Menu is 0, Base Scene is 1
+            if (buildIndex == 0)
+            {
+                _readyToRun = false;
+                _gameManager = null;
+                _networkMap = null;
+            }
+        }
+
+        public override void OnUpdate()
+        {
+            if (_readyToRun && _networkMap != null)
+            {
+                RepairSwitches();
+                RepairServers();
+                HandleSwitchesEOL();
+                HandleServersEOL();
+            }
+            else
+            {
+                if (SceneManager.GetActiveScene().buildIndex != 1) return;
+
+                try
+                {
+                    var map = NetworkMap.instance;
+                    var gm = MainGameManager.instance;
+                    
+                    if (map == null || gm == null) return;
+
+                    _networkMap = map;
+                    _gameManager = gm;
+                    _readyToRun = true;
+                    _log.Msg("Attached to active game instance.");
+                }
+                catch (Exception ex)
+                {
+                    _log.Error($"OnUpdate Attach Error: {ex.Message}");
+                }
+            }
+        }
+
+        private void RepairSwitches()
+        {
+            if (!_autoRepairBrokenSwitches || _networkMap == null) return;
+
+            var broken = _networkMap.GetAllBrokenSwitches();
+            if (broken != null)
+            {
+                foreach (var sw in broken.ToArray<NetworkSwitch>())
+                {
+                    if (sw != null) sw.RepairDevice();
+                }
+            }
+        }
+
+        private void RepairServers()
+        {
+            if (!_autoRepairBrokenServers || _networkMap == null) return;
+
+            var broken = _networkMap.GetAllBrokenServers();
+            if (broken != null)
+            {
+                foreach (var srv in broken.ToArray<Server>())
+                {
+                    if (srv != null) srv.RepairDevice();
+                }
+            }
+        }
+
+        private void HandleSwitchesEOL()
+        {
+            if (!_disableSwitchesEOL || _networkMap == null) return;
+
+            foreach (var kvp in _networkMap.switches)
+            {
+                var sw = kvp.Value;
+                if (sw != null)
+                {
+                    sw.eolTime = GetEOLDeviceDefaultEOL(true, sw.switchType);
+                }
+            }
+        }
+
+        private void HandleServersEOL()
+        {
+            if (!_disableServersEOL || _networkMap == null) return;
+
+            foreach (var kvp in _networkMap.servers)
+            {
+                var srv = kvp.Value;
+                if (srv != null)
+                {
+                    srv.eolTime = GetEOLDeviceDefaultEOL(false, srv.serverType);
+                }
+            }
+        }
+
+        private int GetEOLDeviceDefaultEOL(bool isSwitch, int type)
+        {
+            var dict = isSwitch ? _switchTypeDefaultEOL : _serverTypeDefaultEOL;
+
+            if (dict.TryGetValue(type, out int defaultEol))
+                return defaultEol;
+
+            if (!_readyToRun || _gameManager == null)
+                return DefaultEOL;
+
+            GameObject prefab = isSwitch ? _gameManager.GetSwitchPrefab(type) : _gameManager.GetServerPrefab(type);
+            if (prefab == null) return DefaultEOL;
+
+            int deviceDefaultEol = DefaultEOL;
+            if (isSwitch)
+            {
+                var comp = prefab.GetComponent<NetworkSwitch>();
+                if (comp != null) deviceDefaultEol = comp.eolTime;
+            }
+            else
+            {
+                var comp = prefab.GetComponent<Server>();
+                if (comp != null) deviceDefaultEol = comp.eolTime;
+            }
+
+            if (deviceDefaultEol < int.MaxValue)
+                deviceDefaultEol++;
+
+            dict[type] = deviceDefaultEol;
+            return deviceDefaultEol;
+        }
+    }
+}

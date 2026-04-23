@@ -24,9 +24,9 @@ public static class ModConfigSystem
     private class ConfigEntry
     {
         public ConfigEntryType Type;
-        public string Key;
-        public string DisplayName;
-        public string Description;
+        public string Key = null!;
+        public string DisplayName = null!;
+        public string Description = null!;
 
         // Bool
         public bool BoolValue;
@@ -47,21 +47,21 @@ public static class ModConfigSystem
 
     private class ModConfig
     {
-        public string ModId;
+        public string ModId = null!;
         public string Author = "";
         public string Version = "";
         public Dictionary<string, ConfigEntry> Entries = new();
         public List<string> EntryOrder = new();
     }
 
-    private static MelonLogger.Instance _logger;
-    private static string _configDir;
+    private static MelonLogger.Instance _logger = null!;
+    private static string _configDir = null!;
     private static readonly Dictionary<string, ModConfig> _mods = new();
     private static readonly List<string> _modOrder = new();
     private static bool _initialized;
 
     private static bool _showPanel;
-    private static string _selectedModId;
+    private static string? _selectedModId;
     private static float _scrollOffset;
     private static bool _stylesInitialized;
 
@@ -70,13 +70,13 @@ public static class ModConfigSystem
     private static float _panelX = -1f;
     private static float _panelY = -1f;
 
-    private static UnityEngine.EventSystems.EventSystem _disabledEventSystem;
+    private static UnityEngine.EventSystems.EventSystem? _disabledEventSystem;
     private static int _reenableEventSystemCountdown;
 
     private static bool _showSettingsChoice;
-    private static Il2Cpp.MainMenu _mainMenuRef;
+    private static Il2Cpp.MainMenu? _mainMenuRef;
 
-    public static Transform SettingsButtonTransform { get; private set; }
+    public static Transform? SettingsButtonTransform { get; private set; }
 
     private static bool _pendingSettingsIntercept;
     private static float _settingsInterceptTimer;
@@ -84,35 +84,35 @@ public static class ModConfigSystem
 
     private static bool _pendingPauseMenuInject;
     private static float _pauseMenuInjectTimer;
-    private static GameObject _pauseMenuModButton;
+    private static GameObject? _pauseMenuModButton;
 
 
-    private static GUIStyle _windowStyle;
-    private static GUIStyle _titleStyle;
-    private static GUIStyle _labelStyle;
-    private static GUIStyle _descriptionStyle;
-    private static GUIStyle _buttonStyle;
-    private static GUIStyle _smallButtonStyle;
-    private static GUIStyle _modListButtonStyle;
-    private static GUIStyle _modListSelectedStyle;
-    private static GUIStyle _toggleOnStyle;
-    private static GUIStyle _toggleOffStyle;
-    private static GUIStyle _valueStyle;
-    private static GUIStyle _rangeLabelStyle;
-    private static GUIStyle _closeButtonStyle;
+    private static GUIStyle _windowStyle = null!;
+    private static GUIStyle _titleStyle = null!;
+    private static GUIStyle _labelStyle = null!;
+    private static GUIStyle _descriptionStyle = null!;
+    private static GUIStyle _buttonStyle = null!;
+    private static GUIStyle _smallButtonStyle = null!;
+    private static GUIStyle _modListButtonStyle = null!;
+    private static GUIStyle _modListSelectedStyle = null!;
+    private static GUIStyle _toggleOnStyle = null!;
+    private static GUIStyle _toggleOffStyle = null!;
+    private static GUIStyle _valueStyle = null!;
+    private static GUIStyle _rangeLabelStyle = null!;
+    private static GUIStyle _closeButtonStyle = null!;
 
-    private static Texture2D _windowBg;
-    private static Texture2D _buttonBg;
-    private static Texture2D _buttonHoverBg;
-    private static Texture2D _fieldBg;
-    private static Texture2D _toggleOnBg;
-    private static Texture2D _toggleOnHoverBg;
-    private static Texture2D _toggleOffBg;
-    private static Texture2D _toggleOffHoverBg;
-    private static Texture2D _modListBg;
-    private static Texture2D _modListHoverBg;
-    private static Texture2D _modListSelectedBg;
-    private static Texture2D _sidebarBg;
+    private static Texture2D _windowBg = null!;
+    private static Texture2D _buttonBg = null!;
+    private static Texture2D _buttonHoverBg = null!;
+    private static Texture2D _fieldBg = null!;
+    private static Texture2D _toggleOnBg = null!;
+    private static Texture2D _toggleOnHoverBg = null!;
+    private static Texture2D _toggleOffBg = null!;
+    private static Texture2D _toggleOffHoverBg = null!;
+    private static Texture2D _modListBg = null!;
+    private static Texture2D _modListHoverBg = null!;
+    private static Texture2D _modListSelectedBg = null!;
+    private static Texture2D _sidebarBg = null!;
 
     public static bool IsPanelVisible => _showPanel;
 
@@ -363,7 +363,7 @@ public static class ModConfigSystem
         {
 
             var allButtons = Resources.FindObjectsOfTypeAll<ButtonExtended>();
-            Transform settingsBtn = null;
+            Transform? settingsBtn = null;
 
             if (allButtons != null)
             {
@@ -487,8 +487,8 @@ public static class ModConfigSystem
                 return;
             }
 
-            Transform templateBtn = null;
-            Transform buttonPanel = null;
+            Transform? templateBtn = null;
+            Transform? buttonPanel = null;
 
             foreach (var be in actionButtons)
             {
@@ -1014,8 +1014,8 @@ public static class ModConfigSystem
             sb.AppendLine("}");
 
             string path = GetConfigPath(mod.ModId);
-            string dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
+            string? dir = Path.GetDirectoryName(path);
+            if (dir != null && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
             File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
@@ -1027,7 +1027,7 @@ public static class ModConfigSystem
         }
     }
 
-    private static ConfigEntry LoadPersistedValue(string modId, string key)
+    private static ConfigEntry? LoadPersistedValue(string modId, string key)
     {
         try
         {
@@ -1091,7 +1091,7 @@ public static class ModConfigSystem
                 string entryBody = entriesBlock.Substring(entryBraceStart + 1, entryBraceEnd - entryBraceStart - 1);
 
                 // Parse type
-                string type = ExtractJsonStringValue(entryBody, "type");
+                string? type = ExtractJsonStringValue(entryBody, "type");
                 if (type == null)
                 {
                     pos = entryBraceEnd + 1;
@@ -1099,7 +1099,7 @@ public static class ModConfigSystem
                 }
 
                 // Parse value
-                string valueStr = ExtractJsonRawValue(entryBody, "value");
+                string? valueStr = ExtractJsonRawValue(entryBody, "value");
                 if (valueStr == null)
                 {
                     pos = entryBraceEnd + 1;
@@ -1156,7 +1156,7 @@ public static class ModConfigSystem
         return -1;
     }
 
-    private static string ExtractJsonStringValue(string body, string key)
+    private static string? ExtractJsonStringValue(string body, string key)
     {
         string pattern = "\"" + key + "\"";
         int idx = body.IndexOf(pattern, StringComparison.Ordinal);
@@ -1175,7 +1175,7 @@ public static class ModConfigSystem
         return body.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
     }
 
-    private static string ExtractJsonRawValue(string body, string key)
+    private static string? ExtractJsonRawValue(string body, string key)
     {
         string pattern = "\"" + key + "\"";
         int idx = body.IndexOf(pattern, StringComparison.Ordinal);
@@ -1208,14 +1208,14 @@ public static class ModConfigSystem
         return body.Substring(start, end - start).Trim();
     }
 
-    private static string EscapeJsonString(string s)
+    private static string EscapeJsonString(string? s)
     {
         if (s == null) return "";
         return s.Replace("\\", "\\\\").Replace("\"", "\\\"")
                 .Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t");
     }
 
-    private static string UnescapeJsonString(string s)
+    private static string UnescapeJsonString(string? s)
     {
         if (s == null) return "";
         return s.Replace("\\\"", "\"").Replace("\\\\", "\\")

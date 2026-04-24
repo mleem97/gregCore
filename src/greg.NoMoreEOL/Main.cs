@@ -25,6 +25,7 @@ namespace greg.NoMoreEOL
         private bool _readyToRun;
         private NetworkMap? _networkMap;
         private MainGameManager? _gameManager;
+        private float _maintenanceTimer;
 
         private Dictionary<int, int> _switchTypeDefaultEOL = new Dictionary<int, int>();
         private Dictionary<int, int> _serverTypeDefaultEOL = new Dictionary<int, int>();
@@ -94,10 +95,15 @@ namespace greg.NoMoreEOL
         {
             if (_readyToRun && _networkMap != null)
             {
-                RepairSwitches();
-                RepairServers();
-                HandleSwitchesEOL();
-                HandleServersEOL();
+                _maintenanceTimer += Time.deltaTime;
+                if (_maintenanceTimer >= 1.0f)
+                {
+                    _maintenanceTimer = 0f;
+                    RepairSwitches();
+                    RepairServers();
+                    HandleSwitchesEOL();
+                    HandleServersEOL();
+                }
             }
             else
             {

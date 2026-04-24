@@ -4,6 +4,7 @@ using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
 using UnityEngine;
+using gregCore.API;
 
 namespace DataCenterModLoader;
 

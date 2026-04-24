@@ -51,22 +51,7 @@ namespace greg.WallRack
 
         public void OnGUI()
         {
-            if (!wallBuildModeActive && !showGridOverlay) return;
-
-            foreach (var grid in GregWallRegistry.Instance.GetAllGrids())
-            {
-                if (showGridOverlay)
-                {
-                    grid.DrawDebugGrid();
-                }
-
-                // If wallBuildModeActive, draw slot highlights
-                if (wallBuildModeActive && grid == targetGrid && hoveredSlot != null)
-                {
-                    // Draw highlight
-                    // Vector3 wPos = grid.SlotToWorldPos(hoveredSlot.coord);
-                }
-            }
+            // IMGUI disabled
         }
 
         public void TryMount(Vector3 worldPos)

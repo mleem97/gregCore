@@ -121,30 +121,7 @@ namespace greg.GridPlacement
 
         public void OnGUI()
         {
-            if (!BuildModeActive || !_grid.ShowGridLines) return;
-            
-            // Note: GL lines must be drawn from OnRenderObject or OnPostRender, but prompt specifies OnGUI. 
-            // In Unity, GL lines in OnGUI are drawn in screen space usually unless using GL.PushMatrix/LoadPixelMatrix properly or Camera.main setup. 
-            // The prompt says "GL.Lines in OnGUI (nicht OnRenderObject — IL2CPP-safe)".
-            
-            if (Event.current.type == EventType.Repaint)
-            {
-                CreateLineMaterial();
-                _gridMaterial?.SetPass(0);
-                
-                // Due to standard limitation, GL drawing in world space during OnGUI is problematic without setting projection matrix to camera.
-                // Assuming Camera.main setup is handled or pseudo-rendering here:
-                /* 
-                GL.PushMatrix();
-                GL.LoadProjectionMatrix(Camera.main.projectionMatrix);
-                GL.modelview = Camera.main.worldToCameraMatrix;
-                GL.Begin(GL.LINES);
-                GL.Color(new Color(0.75f, 0.99f, 0.97f, 0.2f));
-                // Draw grid
-                GL.End();
-                GL.PopMatrix();
-                */
-            }
+            // IMGUI disabled
         }
     }
 }

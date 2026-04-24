@@ -1,0 +1,3 @@
+## 2025-05-20 - Expensive OnUpdate Polling (FindObjectsOfType)
+**Learning:** Found a major performance anti-pattern in `src/greg.QoL/Main.cs`: polling `FindObjectsOfType<T>()` on every frame inside `OnUpdate` while waiting for an object (like a UI element) to spawn. `FindObjectsOfType` is O(N) over all loaded objects and blocks the main thread, wasting immense CPU cycles before the condition is ever met.
+**Action:** Throttle such condition checks using `Time.deltaTime` to run e.g. once per second (1Hz) instead of 60-144 times per second, or refactor to event-driven initialization.

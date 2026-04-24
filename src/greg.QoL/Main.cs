@@ -17,6 +17,8 @@ namespace greg.QoL
         private bool _deleteHeldItemEnabled = true;
         private bool _trashCleanerEnabled = true;
         private float _cableSpoolLengthThreshold = 1.5f;
+        private float _shopGridCheckTimer = ShopGridCheckInterval;
+        private const float ShopGridCheckInterval = 1.0f;
 
         public override void OnInitializeMelon()
         {
@@ -48,13 +50,18 @@ namespace greg.QoL
         {
             if (_shopGridFixEnabled && !_hasFixedLayout)
             {
-                foreach (HorizontalLayoutGroup hGroup in UnityEngine.Object.FindObjectsOfType<HorizontalLayoutGroup>())
+                _shopGridCheckTimer += Time.deltaTime;
+                if (_shopGridCheckTimer >= ShopGridCheckInterval)
                 {
-                    if (hGroup.gameObject.name == "HL Mods")
+                    _shopGridCheckTimer = 0f;
+                    foreach (HorizontalLayoutGroup hGroup in UnityEngine.Object.FindObjectsOfType<HorizontalLayoutGroup>())
                     {
-                        _log.Msg($"Found HL Mods with {hGroup.transform.childCount} children - applying grid fix...");
-                        ConvertToGrid(hGroup);
-                        break;
+                        if (hGroup.gameObject.name == "HL Mods")
+                        {
+                            _log.Msg($"Found HL Mods with {hGroup.transform.childCount} children - applying grid fix...");
+                            ConvertToGrid(hGroup);
+                            break;
+                        }
                     }
                 }
             }

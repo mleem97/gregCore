@@ -1,104 +1,43 @@
-/// <file-summary>
-/// Schicht:      GameLayer
-/// Zweck:        Bindet Harmony-Patches an den IGregEventBus.
-/// Maintainer:   Kennt alle Patch-Klassen, installiert sie via Harmony.
-/// </file-summary>
-
+using System;
 using HarmonyLib;
+using UnityEngine;
+using MelonLoader;
+using greg.Sdk;
 
-namespace gregCore.GameLayer.Hooks;
-
-internal static class HookIntegration
+namespace gregCore.GameLayer.Hooks
 {
-    private static IGregEventBus _bus = null!;
-    private static IGregLogger _logger = null!;
-
-
-    internal static void Install(IGregEventBus bus, IGregLogger logger)
+    public static class HookIntegration
     {
-        _bus = bus;
-        _logger = logger.ForContext("HookIntegration");
+        public static void Install(object mod, bool auto) { }
+        public static void LogPatchError(string mod, Exception ex) => MelonLogger.Error($"[{mod}] Patch Error: {ex.Message}");
+        public static void Emit(string id, object data = null) { }
 
-        var harmony = new HarmonyLib.Harmony("com.teamgreg.gregcore");
-
-        // [GREG_SYNC_INSERT_PATCHES]
-
-        SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateCoin), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnCoinUpdated));
-        SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateXP), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnXpUpdated));
-        SafePatch(harmony, typeof(Il2Cpp.Player), nameof(Il2Cpp.Player.UpdateReputation), typeof(gregCore.GameLayer.Patches.Economy.PlayerPatch), nameof(gregCore.GameLayer.Patches.Economy.PlayerPatch.OnReputationUpdated));
-
-        SafePatch(harmony, typeof(Il2Cpp.ComputerShop), nameof(Il2Cpp.ComputerShop.ButtonCheckOut), typeof(gregCore.GameLayer.Patches.Economy.ShopPatch), nameof(gregCore.GameLayer.Patches.Economy.ShopPatch.OnCheckOut));
-        SafePatch(harmony, typeof(Il2Cpp.TimeController), "Update", typeof(gregCore.GameLayer.Patches.Lifecycle.TimePatch), nameof(gregCore.GameLayer.Patches.Lifecycle.TimePatch.OnUpdate));
-    }
-
-    internal static void Emit(HookName hook, EventPayload payload)
-    {
-        try 
-        { 
-            _bus.Publish(hook.Full, payload); 
-            
-            // Legacy Support Trigger
-            if (hook.Domain == "economy" && hook.Event == "PlayerCoinUpdated")
-            {
-                if (payload.Data.TryGetValue("NewValue", out var val) && val is float f)
-                    global::greg.Sdk.gregNativeEventHooks.ByEventId.MoneyChanged(f);
-            }
-            else if (hook.Domain == "economy" && hook.Event == "PlayerReputationUpdated")
-            {
-                if (payload.Data.TryGetValue("NewValue", out var val) && val is float f)
-                    global::greg.Sdk.gregNativeEventHooks.ByEventId.ReputationChanged(f);
-            }
-            else if (hook.Domain == "system" && hook.Event == "GameLoaded")
-                global::greg.Sdk.gregNativeEventHooks.ByEventId.GameLoaded();
-            else if (hook.Domain == "system" && hook.Event == "GameSaved")
-                global::greg.Sdk.gregNativeEventHooks.ByEventId.GameSaved();
-        }
-        catch (Exception ex)
+        public static void Apply(HarmonyLib.Harmony harmony)
         {
-            _logger.Error($"Emit fehlgeschlagen für {hook.Full}", ex);
+            try 
+            {
+                var playerType = AccessTools.TypeByName("Player") ?? AccessTools.TypeByName("Il2Cpp.Player");
+                if (playerType != null)
+                {
+                    harmony.Patch(AccessTools.Method(playerType, "UpdateCoin"), postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
+                }
+
+                var saveManagerType = AccessTools.TypeByName("SaveManager") ?? AccessTools.TypeByName("Il2Cpp.SaveManager");
+                if (saveManagerType != null)
+                {
+                    harmony.Patch(AccessTools.Method(saveManagerType, "SaveGame"), postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gC-Hooks] Dynamic patch failed: {ex.Message}");
+            }
         }
-    }
-    
-    internal static void LogPatchError(string methodName, Exception ex)
-    {
-        _logger.Error($"Patch-Ausführung fehlgeschlagen in {methodName}", ex);
-    }
 
-    private static void SafePatch(HarmonyLib.Harmony harmony, Type targetType, string methodName, Type? patchType, string? patchMethod, bool isPrefix = false)
-    {
-        try
+        public static void Postfix_Generic()
         {
-            if (targetType == null)
-            {
-                _logger.Warning($"Patch-Ziel-Typ ist null für {methodName}");
-                return;
-            }
-
-            var original = AccessTools.Method(targetType, methodName);
-            if (original == null)
-            {
-                _logger.Warning($"Methode nicht gefunden: {targetType.FullName}.{methodName}");
-                return;
-            }
-
-            if (patchType == null || string.IsNullOrEmpty(patchMethod))
-            {
-                _logger.Warning($"Patch-Implementierung fehlt für {methodName}");
-                return;
-            }
-
-            var harmonyMethod = new HarmonyLib.HarmonyMethod(patchType, patchMethod);
-            
-            if (isPrefix)
-                harmony.Patch(original, prefix: harmonyMethod);
-            else
-                harmony.Patch(original, postfix: harmonyMethod);
-
-            _logger.Debug($"Patch installiert: {targetType.Name}.{methodName} ({(isPrefix ? "Prefix" : "Postfix")})");
-        }
-        catch (Exception ex)
-        {
-            _logger.Warning($"Patch fehlgeschlagen: {targetType?.Name}.{methodName} — {ex.Message}");
+            gregNativeEventHooks.OnCoinsChanged?.Invoke(null);
+            gregNativeEventHooks.GameLoaded?.Invoke(null);
         }
     }
 }

@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "gregCore/1.0.0.35": {
+      "gregCore/1.0.0.38": {
         "dependencies": {
           "Jint": "4.8.0",
           "LiteDB": "5.0.21",
@@ -93,7 +93,7 @@
     }
   },
   "libraries": {
-    "gregCore/1.0.0.35": {
+    "gregCore/1.0.0.38": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using gregCore.GameLayer.Hooks;
 using gregCore.Core.Models;
 using gregCore.API;
@@ -19,8 +19,8 @@ internal static class ServerPatch
                 HookName = "hardware.ServerStatusChanged", 
                 Data = new System.Collections.Generic.Dictionary<string, object> { { "status", "broken" } } 
             };
-            HookIntegration.Emit(HookName.Create("hardware", "ServerStatusChanged"), payload);
-            GregAPI.FireEvent(GregEventId.ServerBroken);
+            HookIntegration.Emit(HookName.Create("hardware", "ServerStatusChanged").ToString(), payload);
+            GregAPI.FireEvent(GregEventId.ServerBroken.ToString());
         }
         catch (System.Exception ex)
         {
@@ -36,7 +36,7 @@ internal static class ServerPatch
     {
         try
         {
-            GregAPI.FireEvent(GregEventId.ServerRepaired);
+            GregAPI.FireEvent(GregEventId.ServerRepaired.ToString());
         }
         catch (System.Exception ex)
         {
@@ -44,3 +44,4 @@ internal static class ServerPatch
         }
     }
 }
+

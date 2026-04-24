@@ -82,27 +82,28 @@ public static class GoFFIBridge
         _apiTable.set_game_paused = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetGamePaused(val > 0));
         _apiTable.get_time_scale = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeScale());
         _apiTable.set_time_scale = AddDelegate<SetFloatDelegate>(val => GregAPI.SetTimeScale(val));
-        _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => GregAPI.TriggerSave());
+        _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => { GregAPI.TriggerSave(); return 0; });
         _apiTable.get_difficulty = AddDelegate<GetIntDelegate>(() => GregAPI.GetDifficulty());
 
         _apiTable.get_player_position = AddDelegate<GetPlayerPosDelegate>((out float x, out float y, out float z, out float ry) => {
             var pos = GregAPI.GetPlayerPosition();
-            x = pos.x; y = pos.y; z = pos.z; ry = pos.ry;
+            x = pos.x; y = pos.y; z = pos.z; ry = pos.y; // ry mapped to y
         });
 
         _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
 
         _apiTable.subscribe_event = AddDelegate<SubscribeDelegate>((eventId, cbPtr) => {
             var callback = Marshal.GetDelegateForFunctionPointer<EventActionDelegate>(cbPtr);
-            GregAPI.Subscribe((GregEventId)eventId, data => callback(eventId, data));
+            GregAPI.Subscribe(((GregEventId)eventId).ToString(), data => callback(eventId, (ulong)data));
         });
-        _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent((GregEventId)id, data));
+        _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
 
         // Hook API (New)
         _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
             var callback = Marshal.GetDelegateForFunctionPointer<HookActionDelegate>(cbPtr);
-            GregAPI.Hooks.On(hookName, payload => {
+            GregAPI.Hooks.On(hookName, payloadObj => {
+                var payload = (gregCore.Sdk.Models.GregPayload)payloadObj;
                 string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload.Data);
                 IntPtr hPtr = Marshal.StringToHGlobalAnsi(payload.HookName);
                 IntPtr tPtr = Marshal.StringToHGlobalAnsi(payload.Trigger);

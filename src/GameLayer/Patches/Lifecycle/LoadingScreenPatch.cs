@@ -1,4 +1,4 @@
-/// <file-summary>
+﻿/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Extrahiert Lade-Screen Events.
 /// Maintainer:   Kein Business-Logic, reines Dispatch.
@@ -11,3 +11,4 @@ namespace gregCore.GameLayer.Patches.Lifecycle;
 internal static class LoadingScreenPatch
 {
 }
+

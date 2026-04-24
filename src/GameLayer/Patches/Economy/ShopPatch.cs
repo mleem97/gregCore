@@ -1,4 +1,4 @@
-using gregCore.GameLayer.Hooks;
+﻿using gregCore.GameLayer.Hooks;
 
 namespace gregCore.GameLayer.Patches.Economy;
 
@@ -12,7 +12,7 @@ internal static class ShopPatch
             {
                 { "Timestamp", DateTime.UtcNow }
             });
-            HookIntegration.Emit(HookName.Create("system", "ButtonCheckOut"), payload);
+            HookIntegration.Emit(HookName.Create("system", "ButtonCheckOut").ToString(), payload);
         }
         catch (Exception ex)
         {
@@ -20,3 +20,4 @@ internal static class ShopPatch
         }
     }
 }
+

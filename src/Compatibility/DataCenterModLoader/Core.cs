@@ -212,15 +212,7 @@ public class Core
 
     public void OnGUI()
     {
-        try
-        {
-            _mpBridge?.DrawGUI();
-            ModConfigSystem.DrawGUI();
-        }
-        catch (Exception ex)
-        {
-            CrashLog.LogException("OnGUI", ex);
-        }
+        // IMGUI Drawing disabled globally for Unity 6 stability.
     }
 
     public void OnApplicationQuit()

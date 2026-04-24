@@ -41,7 +41,7 @@ namespace greg.QoL
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "shop_grid_fix", "Shop Grid Fix", true, val => _shopGridFixEnabled = val, "QoL", "Fixes the mod shop layout by converting it to a grid.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "delete_held_item", "Delete Held Item (E at Dumpster)", true, val => _deleteHeldItemEnabled = val, "QoL", "Allows deleting modded items in your hand by pressing E while looking at the dumpster.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "trash_cleaner", "Enable Trash Cleaner (F9)", true, val => _trashCleanerEnabled = val, "QoL", "Allows cleaning empty boxes and short cable spools manually by pressing F9.");
-            gregCore.API.GregAPI.Settings.RegisterSlider(modId, "trash_cleaner_spool_threshold", "Cable Spool Length Threshold", 1.5f, val => _cableSpoolLengthThreshold = val, "QoL", "Max length of cable spools to consider as trash.");
+            gregCore.API.GregAPI.Settings.RegisterSlider(modId, "trash_cleaner_spool_threshold", "Cable Spool Length Threshold", 0f, 10f, 1.5f, val => _cableSpoolLengthThreshold = val, "QoL", "Max length of cable spools to consider as trash.");
         }
 
         public override void OnUpdate()

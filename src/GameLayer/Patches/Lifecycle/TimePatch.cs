@@ -1,4 +1,4 @@
-using gregCore.GameLayer.Hooks;
+﻿using gregCore.GameLayer.Hooks;
 
 namespace gregCore.GameLayer.Patches.Lifecycle;
 
@@ -20,8 +20,8 @@ internal static class TimePatch
                 });
                 
                 // Emit for both canonical and legacy
-                HookIntegration.Emit(HookName.Create("lifecycle", "DayEnded"), payload);
-                HookIntegration.Emit(HookName.Create("system", "GameDayAdvanced"), payload);
+                HookIntegration.Emit(HookName.Create("lifecycle", "DayEnded").ToString(), payload);
+                HookIntegration.Emit(HookName.Create("system", "GameDayAdvanced").ToString(), payload);
             }
             _lastDay = currentDay;
         }
@@ -31,3 +31,4 @@ internal static class TimePatch
         }
     }
 }
+

@@ -129,14 +129,14 @@ namespace greg.UI.Settings
 
         private void BuildUI()
         {
-            var builder = GregUIBuilder.Create("SettingsHub")
-                .SetSize(480, 500);
+            var builder = GregUIBuilder.CreateTablet("Settings Hub")
+                .SetSize(500, 600)
+                .AddHeadline("GREGCORE SETTINGS");
 
-            // In a real UGUI tab system, we'd create tab buttons and content areas
-            // For now, we build the first tab
-            if (_tabs.Count > 0)
+            // Build UI for each registered mod
+            foreach (var category in gregCore.Core.Config.ModMenu.Categories)
             {
-                _tabs[_selectedTab].BuildFn?.Invoke(builder);
+                category.BuildUI(builder);
             }
 
             _uiPanel = builder.Build();

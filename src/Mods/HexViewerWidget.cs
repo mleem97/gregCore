@@ -13,8 +13,11 @@ namespace greg.Mods.HexViewer
         public static void Initialize()
         {
             var go = new GameObject("greg_HexViewer");
-            go.AddComponent<HexViewerWidget>();
             UnityEngine.Object.DontDestroyOnLoad(go);
+            
+            // Safer IL2CPP initialization
+            Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<HexViewerWidget>();
+            go.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<HexViewerWidget>());
         }
 
         private void Update()

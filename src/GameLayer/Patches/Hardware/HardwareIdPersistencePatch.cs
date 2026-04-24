@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2Cpp;
 using Il2CppSystem.Collections.Generic;
 using System;
@@ -298,3 +298,4 @@ public static class MapDataHealing
         }
     }
 }
+

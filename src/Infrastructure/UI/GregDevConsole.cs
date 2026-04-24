@@ -1,74 +1,59 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using MelonLoader;
+using UnityEngine.UI;
+using gregCore.UI;
 
-namespace gregCore.Infrastructure.UI;
-
-public sealed class GregDevConsole
+namespace gregCore.Infrastructure.UI
 {
-    private static readonly Lazy<GregDevConsole> _instance = new(() => new GregDevConsole());
-    public static GregDevConsole Instance => _instance.Value;
-
-    private bool _isOpen = false;
-    public bool IsOpen => _isOpen;
-
-    private Rect _windowRect = new Rect(20f, 20f, 600f, 400f);
-    private string _inputCommand = "";
-    private readonly List<LogEntry> _logs = new();
-    private Vector2 _scrollPosition;
-    private GameObject _uiPanel;
-
-    public void Toggle() 
+    public class GregDevConsole : MonoBehaviour
     {
-        _isOpen = !_isOpen;
-        if (_isOpen && _uiPanel == null)
+        public GregDevConsole(IntPtr ptr) : base(ptr) { }
+
+        public static GregDevConsole Instance { get; private set; } = null!;
+
+        private GameObject _uiPanel = null!;
+        private InputField _inputField = null!;
+        private Text _logDisplay = null!;
+        private bool _isVisible = false;
+
+        public static void Initialize()
         {
-            BuildUI();
+            var go = new GameObject("greg_DevConsole_Host");
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            
+            Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<GregDevConsole>();
+            Instance = go.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<GregDevConsole>()).Cast<GregDevConsole>();
         }
-        gregCore.UI.GregUIManager.SetPanelActive("DevConsole", _isOpen);
-    }
 
-    private void BuildUI()
-    {
-        var builder = gregCore.UI.GregUIBuilder.Create("DevConsole")
-            .SetSize(600, 400);
+        public bool IsOpen => _isVisible;
 
-        _uiPanel = builder.Build();
-        // Note: Full log list and scrolling would need more UGUI components like ScrollRect
-        // For now, we initialize the panel and we can add labels dynamically
-        RefreshLogs();
-    }
+        public void AddLog(string msg, object type = null)
+        {
+            string typeStr = type?.ToString() ?? "INFO";
+            MelonLoader.MelonLogger.Msg($"[{typeStr}] {msg}");
+        }
 
-    private void RefreshLogs()
-    {
-        if (_uiPanel == null) return;
-        // In a real UGUI implementation, we'd update a Text component or instantiate labels in a content container
-    }
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.BackQuote) || Input.GetKeyDown(KeyCode.F12))
+            {
+                _isVisible = !_isVisible;
+                if (_isVisible && _uiPanel == null) BuildUI();
+                GregUIManager.SetPanelActive("DevConsole", _isVisible);
+            }
+        }
 
-    public void AddLog(string message, LogType type)
-    {
-        _logs.Add(new LogEntry { Message = message, Type = type, Time = DateTime.Now });
-        if (_logs.Count > 100) _logs.RemoveAt(0);
-        _scrollPosition.y = float.MaxValue; 
-        RefreshLogs();
-    }
-
-    public void OnGUI()
-    {
-        // IMGUI OnGUI is now disabled to prevent stripping crashes.
-        // The UI is handled via BuildUI and UGUI.
-    }
-
-    private void DrawWindow(int windowId)
-    {
-        // Legacy IMGUI method - no longer called
-    }
-
-    private struct LogEntry
-    {
-        public string Message;
-        public LogType Type;
-        public DateTime Time;
+        private void BuildUI()
+        {
+            var builder = GregUIBuilder.CreateWidget("DevConsole", 50, Screen.height - 450)
+                .SetSize(600, 400)
+                .AddHeadline("Developer Console")
+                .AddLabel("gregCore v1.0.0.38-pre (Unity 6 / IL2CPP)");
+            
+            _uiPanel = builder.Build();
+            
+            // Note: Full console implementation with input field/log would go here
+            // For now, it's a functional "Tablet" widget as a proof of concept.
+        }
     }
 }

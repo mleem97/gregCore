@@ -9,10 +9,11 @@ namespace gregCore.UI
 {
     public static class GregUIManager
     {
-        private static GameObject _rootObject;
-        private static Canvas _canvas;
-        private static CanvasScaler _scaler;
-        private static GraphicRaycaster _raycaster;
+        private static GameObject _rootObject = null!;
+        private static Canvas _canvas = null!;
+        private static CanvasScaler _scaler = null!;
+        private static GraphicRaycaster _raycaster = null!;
+        private static CanvasGroup _canvasGroup = null!;
         private static readonly Dictionary<string, GameObject> _panels = new();
 
         public static Canvas RootCanvas => _canvas;
@@ -36,14 +37,34 @@ namespace gregCore.UI
             _scaler.referenceResolution = new Vector2(1920, 1080);
 
             _raycaster = _rootObject.AddComponent<GraphicRaycaster>();
-
+            _canvasGroup = _rootObject.AddComponent<CanvasGroup>();
+            
+            UpdateInputState();
             EnsureEventSystem();
+        }
+
+        private static void UpdateInputState()
+        {
+            if (_canvasGroup == null) return;
+            
+            bool anyActive = false;
+            foreach (var panel in _panels.Values)
+            {
+                if (panel != null && panel.activeSelf)
+                {
+                    anyActive = true;
+                    break;
+                }
+            }
+            
+            _canvasGroup.blocksRaycasts = anyActive;
+            _canvasGroup.interactable = anyActive;
         }
 
         private static void GenerateAssets()
         {
             int size = 64;
-            float radius = 24f; // Moderate roundedness
+            float radius = 24f; 
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             var colors = new Color[size * size];
 
@@ -63,22 +84,31 @@ namespace gregCore.UI
             tex.SetPixels(colors);
             tex.Apply();
             
-            // Create 9-sliced sprite
             GregUITheme.RoundedSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new Vector4(radius, radius, radius, radius));
         }
 
-        public static void RegisterPanel(string name, GameObject panel) => _panels[name] = panel;
+        public static void RegisterPanel(string name, GameObject panel) 
+        {
+            _panels[name] = panel;
+            UpdateInputState();
+        }
 
         public static void SetPanelActive(string name, bool active)
         {
             if (_panels.TryGetValue(name, out var panel) && panel != null)
+            {
                 panel.SetActive(active);
+                UpdateInputState();
+            }
         }
 
         public static void TogglePanel(string name)
         {
             if (_panels.TryGetValue(name, out var panel) && panel != null)
+            {
                 panel.SetActive(!panel.activeSelf);
+                UpdateInputState();
+            }
         }
 
         private static void EnsureEventSystem()

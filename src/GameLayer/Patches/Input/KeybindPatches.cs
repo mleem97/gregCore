@@ -1,10 +1,10 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace gregCore.GameLayer.Patches.Input;
 
 /// <summary>
-/// Patches für Input-Handling. 
+/// Patches fÃ¼r Input-Handling. 
 /// Vormals genutzte Console-Blocking-Logik wurde entfernt, 
 /// da der Fokus nun auf dem MelonLoader-Terminal liegt.
 /// </summary>

@@ -1,4 +1,4 @@
-/// <file-summary>
+﻿/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Extrahiert Daten aus dem IL2CPP Player-Objekt.
 /// Maintainer:   EINZIGE Verantwortung: Daten extrahieren + dispatchen. Kein Business-Logic.
@@ -17,7 +17,7 @@ internal static class PlayerPatch
         try
         {
             var payload = EventPayloadBuilder.ForValueChange("money", 0f, _coinChhangeAmount);
-            HookIntegration.Emit(HookName.Create("economy", "PlayerCoinUpdated"), payload);
+            HookIntegration.Emit(HookName.Create("economy", "PlayerCoinUpdated").ToString(), payload);
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ internal static class PlayerPatch
         try
         {
             var payload = EventPayloadBuilder.ForValueChange("xp", 0f, amount);
-            HookIntegration.Emit(HookName.Create("economy", "PlayerXpUpdated"), payload);
+            HookIntegration.Emit(HookName.Create("economy", "PlayerXpUpdated").ToString(), payload);
         }
         catch (Exception ex)
         {
@@ -43,7 +43,7 @@ internal static class PlayerPatch
         try
         {
             var payload = EventPayloadBuilder.ForValueChange("reputation", 0f, amount);
-            HookIntegration.Emit(HookName.Create("economy", "PlayerReputationUpdated"), payload);
+            HookIntegration.Emit(HookName.Create("economy", "PlayerReputationUpdated").ToString(), payload);
         }
         catch (Exception ex)
         {
@@ -51,3 +51,4 @@ internal static class PlayerPatch
         }
     }
 }
+

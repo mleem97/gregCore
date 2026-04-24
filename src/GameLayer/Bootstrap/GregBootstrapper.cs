@@ -132,7 +132,7 @@ internal static class GregBootstrapper
 
         container.Register<IAssemblyScanner>(new AssemblyScanner());
 
-        HookIntegration.Install(bus, logger);
+        HookIntegration.Install(bus, true);
         global::gregCore.PublicApi.greg._context = apiContext;
         global::gregCore.PublicApi.greg._governor = governor;
 

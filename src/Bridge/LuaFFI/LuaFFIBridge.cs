@@ -110,7 +110,7 @@ public static class LuaFFIBridge
         greg["get_player_position"] = (Func<Table>)(() => {
             var p = GregAPI.GetPlayerPosition();
             var t = new Table(script);
-            t["x"] = p.Item1; t["y"] = p.Item2; t["z"] = p.Item3; t["ry"] = p.Item4;
+            t["x"] = p.x; t["y"] = p.y; t["z"] = p.z; t["ry"] = p.y;
             return t;
         });
 
@@ -119,13 +119,14 @@ public static class LuaFFIBridge
 
         // Events
         greg["subscribe_event"] = (Action<uint, Closure>)((id, callback) => {
-            GregAPI.Subscribe((GregEventId)id, data => callback.Call(data));
+            GregAPI.Subscribe(((GregEventId)id).ToString(), data => callback.Call(data));
         });
-        greg["fire_event"] = (Action<uint, ulong>)((id, data) => GregAPI.FireEvent((GregEventId)id, data));
+        greg["fire_event"] = (Action<uint, ulong>)((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
 
         // Hook API (New)
         greg["on"] = (Action<string, Closure>)((hookName, callback) => {
-            GregAPI.Hooks.On(hookName, payload => {
+            GregAPI.Hooks.On(hookName, payloadObj => {
+                var payload = (gregCore.Sdk.Models.GregPayload)payloadObj;
                 var table = new Table(script);
                 table["hook_name"] = payload.HookName;
                 table["trigger"] = payload.Trigger;

@@ -37,13 +37,14 @@ namespace gregCore.UI
             builder._activePanel.GetComponent<Image>().color = GregUITheme.NeutralBorder;
             return builder;
         }
+private static GregUIBuilder CreateBase(string title, bool isTablet)
+{
+    var builder = new GregUIBuilder();
+    builder._activePanel = GregUIManager.CreateUIObject($"Panel_{title}");
+    builder._activePanel.SetActive(false); // Zuerst verstecken!
 
-        private static GregUIBuilder CreateBase(string title, bool isTablet)
-        {
-            var builder = new GregUIBuilder();
-            builder._activePanel = GregUIManager.CreateUIObject($"Panel_{title}");
-            
-            var border = builder._activePanel.AddComponent<Image>();
+    // Outer Border
+    var border = builder._activePanel.AddComponent<Image>();
             border.sprite = GregUITheme.RoundedSprite;
             border.type = Image.Type.Sliced;
 

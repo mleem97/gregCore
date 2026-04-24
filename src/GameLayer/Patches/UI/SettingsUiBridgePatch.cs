@@ -81,7 +81,7 @@ internal static class SettingsUiBridgePatch
         try
         {
             // Publish Event
-            API.GregAPI.FireEvent(0); // We will define a real event ID later, or string based
+            API.GregAPI.FireEvent("0"); // We will define a real event ID later, or string based
             // Reload and check conflicts
             gregCore.PublicApi.greg._context?.EventBus.Publish("greg.SYSTEM.SettingsOpened", new Core.Models.EventPayload());
 
@@ -109,3 +109,4 @@ internal static class SettingsUiBridgePatch
         }
     }
 }
+

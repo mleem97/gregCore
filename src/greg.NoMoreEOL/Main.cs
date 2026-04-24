@@ -21,6 +21,7 @@ namespace greg.NoMoreEOL
         internal static bool WarningsVisible = true;
 
         // Internal State
+        internal static readonly HashSet<PositionIndicator> Indicators = new();
         private bool _readyToRun;
         private NetworkMap? _networkMap;
         private MainGameManager? _gameManager;
@@ -66,15 +67,13 @@ namespace greg.NoMoreEOL
 
         private void UpdateWarningSignsVisibility()
         {
-            var indicators = UnityEngine.Object.FindObjectsOfType<PositionIndicator>();
-            if (indicators != null)
+            Indicators.RemoveWhere(indicator => indicator == null || indicator.Pointer == IntPtr.Zero);
+
+            foreach (var indicator in Indicators)
             {
-                foreach (var indicator in indicators)
+                if (indicator.gameObject != null)
                 {
-                    if (indicator != null && indicator.gameObject != null)
-                    {
-                        indicator.gameObject.SetActive(WarningsVisible);
-                    }
+                    indicator.gameObject.SetActive(WarningsVisible);
                 }
             }
         }
@@ -87,6 +86,7 @@ namespace greg.NoMoreEOL
                 _readyToRun = false;
                 _gameManager = null;
                 _networkMap = null;
+                Indicators.Clear();
             }
         }
 

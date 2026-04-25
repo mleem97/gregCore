@@ -1,0 +1,30 @@
+# greg.Multiplayer – FishBait Relay
+# Usage: docker compose up -d
+# Requires: Docker Desktop or Docker Engine 24+
+
+version: "3.9"
+
+services:
+  fishbait-relay:
+    image: firstgeargames/fishbait:latest   # official FishBait image
+    container_name: greg_relay
+    restart: unless-stopped
+    ports:
+      - "7778:7778/udp"   # Relay UDP (clients connect here)
+      - "7779:7779/tcp"   # Relay admin / health endpoint
+    environment:
+      RELAY_MAX_ROOMS: "20"
+      RELAY_MAX_PLAYERS_PER_ROOM: "8"
+      RELAY_PASSWORD: ""               # leave empty for open relay
+      # Optional: set a pre-shared key for encrypted sessions
+      # RELAY_SECRET_KEY: "change-me-in-production"
+    volumes:
+      - relay_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7779/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  relay_logs:

@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>greg.Multiplayer</AssemblyName>
+    <RootNamespace>greg.Multiplayer</RootNamespace>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <!-- Output directly to Mods folder for hot-reload testing -->
+    <OutputPath>..\..\bin\Mods\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <!--
+    DEPENDENCY NOTES:
+    All paths use $(GameDir) MSBuild variable – set in Directory.Build.props or
+    via CLI: dotnet build /p:GameDir="C:\SteamLibrary\...\DataCenterSim"
+
+    FishNet DLLs are extracted from the game's Managed folder after MelonLoader
+    injects FishNet (imported as Unity package into a test project first).
+  -->
+
+  <ItemGroup Label="MelonLoader 0.7.2">
+    <Reference Include="MelonLoader">
+      <HintPath>$(GameDir)\MelonLoader\MelonLoader.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(GameDir)\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(GameDir)\MelonLoader\net6\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Label="FishNet (from game Managed or test project Build)">
+    <!-- Copy FishNet.Runtime.dll from test Unity project's build output -->
+    <Reference Include="FishNet.Runtime">
+      <HintPath>..\..\lib\FishNet\FishNet.Runtime.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Label="Unity 6 Stubs">
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameDir)\DataCenterSim_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

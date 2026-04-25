@@ -13,9 +13,9 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-    <Version>1.0.0.38</Version>
-    <FileVersion>1.0.0.38</FileVersion>
-    <AssemblyVersion>1.0.0.38</AssemblyVersion>
+    <Version>1.0.0.40-pre</Version>
+    <FileVersion>1.0.0.40-pre</FileVersion>
+    <AssemblyVersion>1.0.0.40-pre</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,13 +1,30 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore", "gregCore.csproj", "{73B346A1-72BC-4F8C-BDAF-C2E88AB9CF69}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gregFramework", "gregFramework", "{9A0CCAB9-4303-13B4-2371-F1B97FF5B728}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Abstractions", "src\gregCore.Abstractions\gregCore.Abstractions.csproj", "{A1B2C3D4-E5F6-4789-ABCD-EF1234567890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.SDK", "src\gregCore.SDK\gregCore.SDK.csproj", "{B2C3D4E5-F678-49AB-CDEF-123456789012}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Core", "src\gregCore.Core\gregCore.Core.csproj", "{C3D4E567-89AB-4CDE-F123-456789012345}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Mod", "src\gregCore.Mod\gregCore.Mod.csproj", "{D4E56789-ABCD-4E12-3456-789012345678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Hooks", "src\gregCore.Hooks\gregCore.Hooks.csproj", "{E56789AB-CDEF-4512-3456-789012345678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Patches", "src\gregCore.Patches\gregCore.Patches.csproj", "{F6789ABC-DEF5-5123-4567-890123456789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Compatibility", "src\gregCore.Compatibility\gregCore.Compatibility.csproj", "{89ABCD12-EF67-4123-4567-890123456789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Bridge", "src\gregCore.Bridge\gregCore.Bridge.csproj", "{9ABCDE23-F678-4231-5678-901234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.UI", "src\gregCore.UI\gregCore.UI.csproj", "{ABCDEF34-5678-4321-6789-012345678901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Shared", "src\gregCore.Shared\gregCore.Shared.csproj", "{BCDE1234-5678-5341-7890-123456789012}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "tests\gregCore.Tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,11 +64,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{FAF3FBA7-1865-41EF-BA90-215D9E7BF597} = {9A0CCAB9-4303-13B4-2371-F1B97FF5B728}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {798E71F5-042F-4369-BFB3-984CC5DB2169}
 	EndGlobalSection
 EndGlobal
-

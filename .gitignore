@@ -1,13 +1,47 @@
+*
+
+
+.DS_Store
+Thumbs.db
+
+# Build output
 bin/
 obj/
-node_modules/
+out/
+out_*/
+
+# IDE
+.vs/
 .vscode/
 .idea/
 *.user
 *.suo
+*.swp
+
+# NuGet
+packages/
+*.nupkg
+
+# Test results
+TestResults/
+coverage/
+
+# Logs
+*.log
+logs/
+
+# Misc
+*.tmp
+*.bak
 MISSING.md
 **/MISSING.md
 
-# Specifically allow reference DLLs for CI
-!gregLib/references/
+# Reference DLLs
+!lib/references/**
+!references/**
 
+# Build artifacts
+publish/
+publish_out/
+publish_full/
+build/artifacts/

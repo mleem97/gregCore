@@ -18,6 +18,7 @@ public class MockLogger : IGregLogger
 
     public void Debug(string message) => Logs.Add((LogLevel.Debug, message));
     public void Info(string message) => Logs.Add((LogLevel.Info, message));
+    public void Success(string message) => Logs.Add((LogLevel.Info, message));
     public void Warning(string message) => Logs.Add((LogLevel.Warning, message));
     public void Error(string message, Exception? ex = null) => Logs.Add((LogLevel.Error, $"{message} {ex?.Message}"));
 

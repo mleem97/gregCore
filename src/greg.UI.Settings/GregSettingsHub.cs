@@ -51,7 +51,7 @@ namespace greg.UI.Settings
         {
             RegisterTab("greg.core", "Framework", builder =>
             {
-                builder.AddLabel("gregCore v1.0.0.35")
+                builder.AddLabel("gregCore v1.0.0.40-pre")
                        .AddLabel("MelonLoader v0.6+")
                        .AddLabel($"Save Mode: {(frameworkSdk.GregFeatureGuard.IsVanillaSave ? "Vanilla" : "Greg")}")
                        .AddToggle("Verbose Startup Log", false, v => { })

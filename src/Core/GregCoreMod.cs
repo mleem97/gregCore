@@ -7,7 +7,7 @@ using gregCore.Core.Events;
 using gregCore.Core.Persistence;
 using Il2CppInterop.Runtime.Injection;
 
-[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.0.0.38-pre", "TeamGreg")]
+[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.0.0.40-pre", "TeamGreg")]
 [assembly: MelonColor(255, 0, 191, 165)] // Teal
 [assembly: MelonPriority(-1000)] // Load first!
 

@@ -164,6 +164,44 @@ private static GregUIBuilder CreateBase(string title, bool isTablet)
             return this;
         }
 
+        public GregUIBuilder AddInputField(string label, string defaultValue, Action<string> onChanged)
+        {
+            var obj = GregUIManager.CreateUIObject("InputGroup", _contentContainer);
+            obj.AddComponent<LayoutElement>().minHeight = 40f;
+            var inputObj = GregUIManager.CreateUIObject("InputField", obj);
+            var input = inputObj.AddComponent<InputField>();
+            input.text = defaultValue;
+            input.onValueChanged.AddListener(new Action<string>(onChanged));
+            var txt = inputObj.AddComponent<Text>();
+            txt.text = label;
+            GregUITheme.ApplyText(txt);
+            return this;
+        }
+
+        public GregUIBuilder AddDropdown<T>(string label, T[] options, int selectedIndex, Action<T> onSelected)
+        {
+            var obj = GregUIManager.CreateUIObject("DropdownGroup", _contentContainer);
+            obj.AddComponent<LayoutElement>().minHeight = 40f;
+            var dp = obj.AddComponent<Dropdown>();
+            dp.value = selectedIndex;
+            var txt = GregUIManager.CreateUIObject("Label", obj).AddComponent<Text>();
+            txt.text = label;
+            GregUITheme.ApplyText(txt);
+            return this;
+        }
+
+        public GregUIBuilder AddSection(string title)
+        {
+            return AddHeadline(title);
+        }
+
+        public GregUIBuilder AddSpacer(float height = 20f)
+        {
+            var obj = GregUIManager.CreateUIObject("Spacer", _contentContainer);
+            obj.AddComponent<LayoutElement>().minHeight = height;
+            return this;
+        }
+
         public GregUIBuilder AddSearchableList<T>(IEnumerable<T> items, Func<T, string> labelSelector, Action<T> onSelected)
         {
             // Implementation of a scrollable list (UGUI ScrollRect based)
@@ -208,6 +246,18 @@ private static GregUIBuilder CreateBase(string title, bool isTablet)
             GregUIManager.RegisterPanel(name, _activePanel);
             return _activePanel;
         }
+
+        public GregUIBuilder Show() => SetVisible(true);
+        public GregUIBuilder Hide() => SetVisible(false);
+        public GregUIBuilder Toggle() => SetVisible(!_activePanel.activeSelf);
+
+        private GregUIBuilder SetVisible(bool visible)
+        {
+            if (_activePanel != null) _activePanel.SetActive(visible);
+            return this;
+        }
+
+        public bool IsVisible => _activePanel?.activeSelf ?? false;
     }
 
     public class GregUIDragHandler : MonoBehaviour

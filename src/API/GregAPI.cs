@@ -44,7 +44,7 @@ namespace gregCore.API
         /// Referenz zum zentralen HookBus – wird von GregCoreMod beim Boot gesetzt.
         /// </summary>
         internal static GregHookBus? HookBus { get; set; }
-        internal static GregEventBus? EventBus { get; set; }
+        public static GregEventBus? EventBus { get; set; }
 
         public static void FireEvent(string id, object? data = null)
         {
@@ -105,9 +105,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return 0.0;
-                return mgr.money;
+                var pm = Il2Cpp.PlayerManager.instance;
+                return pm?.playerClass?.money ?? 0.0;
             }
             catch { return 0.0; }
         }
@@ -116,9 +115,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return;
-                mgr.money = (float)val;
+                var pm = Il2Cpp.PlayerManager.instance;
+                if (pm?.playerClass != null) pm.playerClass.money = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerMoney failed: {ex.Message}"); }
         }
@@ -127,9 +125,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return 0.0;
-                return mgr.xp;
+                var pm = Il2Cpp.PlayerManager.instance;
+                return pm?.playerClass?.xp ?? 0.0;
             }
             catch { return 0.0; }
         }
@@ -138,9 +135,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return;
-                mgr.xp = (float)val;
+                var pm = Il2Cpp.PlayerManager.instance;
+                if (pm?.playerClass != null) pm.playerClass.xp = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerXp failed: {ex.Message}"); }
         }
@@ -149,9 +145,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return 0.0;
-                return mgr.reputation;
+                var pm = Il2Cpp.PlayerManager.instance;
+                return pm?.playerClass?.reputation ?? 0.0;
             }
             catch { return 0.0; }
         }
@@ -160,9 +155,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return;
-                mgr.reputation = (float)val;
+                var pm = Il2Cpp.PlayerManager.instance;
+                if (pm?.playerClass != null) pm.playerClass.reputation = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerReputation failed: {ex.Message}"); }
         }
@@ -237,9 +231,14 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return 0u;
-                return (uint)mgr.freeTechnicians;
+                var tm = Il2Cpp.TechnicianManager.instance;
+                if (tm?.technicians == null) return 0u;
+                int busyCount = 0;
+                foreach (var t in tm.technicians)
+                {
+                    try { if (t.isBusy) busyCount++; } catch { }
+                }
+                return (uint)Math.Max(0, tm.technicians.Count - busyCount);
             }
             catch { return 0u; }
         }
@@ -248,9 +247,8 @@ namespace gregCore.API
         {
             try
             {
-                var mgr = Il2Cpp.MainGameManager.instance;
-                if (mgr == null) return 0u;
-                return (uint)mgr.totalTechnicians;
+                var tm = Il2Cpp.TechnicianManager.instance;
+                return tm?.technicians != null ? (uint)tm.technicians.Count : 0u;
             }
             catch { return 0u; }
         }

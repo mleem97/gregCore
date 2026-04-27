@@ -43,6 +43,8 @@ public sealed class GregPythonHost : IGregLanguageHost
         PythonFFIBridge.OnUpdate(dt);
     }
 
+    public void OnGUI() { }
+
     public void OnSceneLoaded(string sceneName)
     {
         if (!IsActive)

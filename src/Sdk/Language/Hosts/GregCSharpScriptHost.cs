@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MelonLoader;
 
 namespace gregCore.Sdk.Language.Hosts;
@@ -34,6 +34,10 @@ public sealed class GregCSharpScriptHost : IGregLanguageHost
     }
 
     public void OnUpdate(float dt)
+    {
+    }
+
+    public void OnGUI()
     {
     }
 

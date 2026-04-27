@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -103,6 +103,21 @@ public static class GregLanguageRegistry
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] Host update failed ({host.HostName}): {ex}");
+            }
+        }
+    }
+
+    public static void OnGUI()
+    {
+        foreach (var host in ActiveHosts.Values)
+        {
+            try
+            {
+                host.OnGUI();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Host OnGUI failed ({host.HostName}): {ex}");
             }
         }
     }

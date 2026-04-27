@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Jint;
 using MelonLoader;
@@ -52,6 +52,10 @@ public sealed class GregJsHost : IGregLanguageHost
     }
 
     public void OnUpdate(float dt)
+    {
+    }
+
+    public void OnGUI()
     {
     }
 

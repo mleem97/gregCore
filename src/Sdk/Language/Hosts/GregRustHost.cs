@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using gregCore.Bridge.RustFFI;
 
 namespace gregCore.Sdk.Language.Hosts;
@@ -35,6 +35,8 @@ public sealed class GregRustHost : IGregLanguageHost
 
         RustFFIBridge.OnUpdate(dt);
     }
+
+    public void OnGUI() { }
 
     public void OnSceneLoaded(string sceneName)
     {

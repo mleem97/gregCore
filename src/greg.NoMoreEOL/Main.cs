@@ -132,6 +132,10 @@ namespace greg.NoMoreEOL
         {
             if (!_autoRepairBrokenSwitches || _networkMap == null) return;
 
+            // Optimization: Skip expensive GetAllBrokenSwitches() and defensive array allocation
+            // if there are no broken switches to repair. Reduces GC pressure in OnUpdate.
+            if (_networkMap.brokenSwitches == null || _networkMap.brokenSwitches.Count == 0) return;
+
             var broken = _networkMap.GetAllBrokenSwitches();
             if (broken != null)
             {
@@ -145,6 +149,10 @@ namespace greg.NoMoreEOL
         private void RepairServers()
         {
             if (!_autoRepairBrokenServers || _networkMap == null) return;
+
+            // Optimization: Skip expensive GetAllBrokenServers() and defensive array allocation
+            // if there are no broken servers to repair. Reduces GC pressure in OnUpdate.
+            if (_networkMap.brokenServers == null || _networkMap.brokenServers.Count == 0) return;
 
             var broken = _networkMap.GetAllBrokenServers();
             if (broken != null)

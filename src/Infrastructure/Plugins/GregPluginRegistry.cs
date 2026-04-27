@@ -37,9 +37,10 @@ public sealed class GregPluginRegistry : IGregPluginRegistry
 
         if (string.IsNullOrEmpty(metadata.PersistentId))
         {
-            using var md5 = MD5.Create();
-            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(metadata.ModId));
-            metadata.PersistentId = new Guid(hash).ToString();
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(metadata.ModId));
+            var guidBytes = new byte[16];
+            Array.Copy(hash, guidBytes, 16);
+            metadata.PersistentId = new Guid(guidBytes).ToString();
         }
 
         _registeredMods[metadata.ModId] = metadata;

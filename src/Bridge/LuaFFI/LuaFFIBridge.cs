@@ -4,12 +4,15 @@ using System.IO;
 using MoonSharp.Interpreter;
 using MelonLoader;
 using gregCore.API;
+using gregCore.Infrastructure.Scripting.Lua;
 
 namespace gregCore.Bridge.LuaFFI;
 
 public static class LuaFFIBridge
 {
     private static readonly List<LuaPlugin> _plugins = new();
+    private static LuaHotReload? _hotReload;
+    private static LuaCoroutineScheduler? _coroutineScheduler;
 
     public static void Initialize()
     {
@@ -21,6 +24,10 @@ public static class LuaFFIBridge
         if (!Directory.Exists(luaDir)) Directory.CreateDirectory(luaDir);
         
         LoadPlugins(luaDir);
+
+        // Start hot-reload watcher
+        _hotReload = new LuaHotReload(luaDir, OnPluginNeedsReload);
+        _hotReload.Start();
     }
 
     private static void LoadPlugins(string luaDir)
@@ -36,7 +43,8 @@ public static class LuaFFIBridge
                 var script = new Script(CoreModules.Preset_SoftSandbox);
                 var gregTable = new Table(script);
                 
-                RegisterApi(gregTable, script);
+                // Register all APIs
+                RegisterApi(gregTable, script, id, dir);
                 script.Globals["greg"] = gregTable;
 
                 script.DoFile(mainFile);
@@ -45,15 +53,24 @@ public static class LuaFFIBridge
                 {
                     Id = id,
                     Script = script,
+                    MainFile = mainFile,
                     OnInit = script.Globals.Get("on_init").Type == DataType.Function ? script.Globals.Get("on_init").Function : null,
                     OnUpdate = script.Globals.Get("on_update").Type == DataType.Function ? script.Globals.Get("on_update").Function : null,
                     OnEvent = script.Globals.Get("on_event").Type == DataType.Function ? script.Globals.Get("on_event").Function : null,
                     OnSceneLoaded = script.Globals.Get("on_scene_loaded").Type == DataType.Function ? script.Globals.Get("on_scene_loaded").Function : null,
-                    OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function ? script.Globals.Get("on_shutdown").Function : null
+                    OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function ? script.Globals.Get("on_shutdown").Function : null,
+                    Scheduler = new LuaCoroutineScheduler(script)
                 };
+
+                // Register scheduler in greg table
+                plugin.Scheduler.Register(gregTable);
 
                 SafeCall(plugin, plugin.OnInit);
                 _plugins.Add(plugin);
+
+                // Register for hot-reload
+                _hotReload?.RegisterPlugin(id, script, mainFile);
+
                 GregAPI.LogInfo($"Lua Plugin loaded: {id}");
             }
             catch (Exception ex)
@@ -63,7 +80,7 @@ public static class LuaFFIBridge
         }
     }
 
-    private static void RegisterApi(Table greg, Script script)
+    private static void RegisterApi(Table greg, Script script, string modId, string modDir)
     {
         // Logging
         greg["log_info"] = (Action<string>)GregAPI.LogInfo;
@@ -153,11 +170,57 @@ public static class LuaFFIBridge
         greg["config_get_int"] = (Func<string, string, int, int>)GregAPI.ConfigGetInt;
         greg["config_set_string"] = (Action<string, string, string>)GregAPI.ConfigSetString;
         greg["config_get_string"] = (Func<string, string, string, string>)GregAPI.ConfigGetString;
+
+        // Module Loader (require system)
+        var moduleLoader = new LuaModuleLoader(script, modDir);
+        moduleLoader.Register();
+    }
+
+    private static void OnPluginNeedsReload(LuaPluginReloadInfo info)
+    {
+        // Find and reload the plugin
+        var plugin = _plugins.Find(p => p.Id == info.ModId);
+        if (plugin == null) return;
+
+        try
+        {
+            // Call shutdown
+            SafeCall(plugin, plugin.OnShutdown);
+
+            // Reload script
+            var newScript = new Script(CoreModules.Preset_SoftSandbox);
+            var gregTable = new Table(newScript);
+            RegisterApi(gregTable, newScript, plugin.Id, Path.GetDirectoryName(info.MainFilePath)!);
+            newScript.Globals["greg"] = gregTable;
+
+            newScript.DoFile(info.MainFilePath);
+
+            // Update plugin
+            plugin.Script = newScript;
+            plugin.OnInit = newScript.Globals.Get("on_init").Type == DataType.Function ? newScript.Globals.Get("on_init").Function : null;
+            plugin.OnUpdate = newScript.Globals.Get("on_update").Type == DataType.Function ? newScript.Globals.Get("on_update").Function : null;
+            plugin.OnShutdown = newScript.Globals.Get("on_shutdown").Type == DataType.Function ? newScript.Globals.Get("on_shutdown").Function : null;
+            plugin.Scheduler = new LuaCoroutineScheduler(newScript);
+            plugin.Scheduler.Register(gregTable);
+
+            // Call init
+            SafeCall(plugin, plugin.OnInit);
+
+            GregAPI.LogInfo($"[HotReload] Reloaded: {plugin.Id}");
+        }
+        catch (Exception ex)
+        {
+            GregAPI.LogError($"[HotReload] Failed to reload {plugin.Id}: {ex.Message}");
+        }
     }
 
     public static void OnUpdate(float dt)
     {
-        foreach (var p in _plugins) SafeCall(p, p.OnUpdate, dt);
+        foreach (var p in _plugins)
+        {
+            SafeCall(p, p.OnUpdate, dt);
+            p.Scheduler?.OnUpdate(dt);
+        }
     }
 
     public static void OnSceneLoaded(string name)
@@ -169,6 +232,7 @@ public static class LuaFFIBridge
     {
         foreach (var p in _plugins) SafeCall(p, p.OnShutdown);
         _plugins.Clear();
+        _hotReload?.Dispose();
     }
 
     private static void SafeCall(LuaPlugin p, Closure? func, params object[] args)
@@ -188,6 +252,8 @@ public static class LuaFFIBridge
     {
         public string Id = "";
         public Script Script = null!;
+        public string MainFile = "";
         public Closure? OnInit, OnUpdate, OnEvent, OnSceneLoaded, OnShutdown;
+        public LuaCoroutineScheduler? Scheduler;
     }
 }

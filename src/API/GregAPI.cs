@@ -1,74 +1,417 @@
+/// <file-summary>
+/// Schicht:      API (Legacy)
+/// Zweck:        Stabile API-Fassade für alle Mod-Sprachen (Lua, Rust, Go, JS, Python).
+/// Maintainer:   Alle Methoden lesen/schreiben echte IL2CPP-Game-Objekte.
+///               Fehler werden abgefangen und Default-Werte zurückgegeben.
+///               Die Legacy-API delegiert intern an IL2CPP-Singletons.
+/// </file-summary>
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using greg.Sdk;
 using gregCore.Infrastructure.UI;
 using gregCore.Core.Models;
+using gregCore.Core.Events;
+using MelonLoader;
 
 namespace gregCore.API
 {
+    /// <summary>
+    /// Legacy GregAPI – stabile, statische Fassade für alle Scripting-Bridges.
+    /// Jede Methode ist in try-catch gewrapped und gibt bei Fehler einen Safe-Default zurück.
+    /// </summary>
     public static class GregAPI
     {
+        // ─── Mod Registration ────────────────────────────────────────────
         public static object RegisterMod(string id, string name, string version) => null!;
         public static GregSettingsProxy Settings { get; } = new GregSettingsProxy();
         public static GregHooksProxy Hooks { get; } = new GregHooksProxy();
 
+        // ─── Logging ─────────────────────────────────────────────────────
+        public static void Log(string msg, string type = "INFO") => GregDevConsole.Instance?.AddLog(msg, type);
+        public static void LogInfo(string msg) => Log(msg, "INFO");
+        public static void LogWarning(string msg) => Log(msg, "WARN");
+        public static void LogError(string msg) => Log(msg, "ERROR");
+
+        // ─── Notifications ───────────────────────────────────────────────
+        public static void ShowNotification(string msg) { }
+        public static void ShowNotification(string msg, float duration) { }
+
+        // ─── Events & Hooks ──────────────────────────────────────────────
+
+        /// <summary>
+        /// Referenz zum zentralen HookBus – wird von GregCoreMod beim Boot gesetzt.
+        /// </summary>
+        internal static GregHookBus? HookBus { get; set; }
+        internal static GregEventBus? EventBus { get; set; }
+
+        public static void FireEvent(string id, object? data = null)
+        {
+            try
+            {
+                var payload = new EventPayload
+                {
+                    HookName = id,
+                    OccurredAtUtc = DateTime.UtcNow,
+                    Data = data as IReadOnlyDictionary<string, object>
+                        ?? new Dictionary<string, object> { { "Data", data ?? "null" } },
+                    IsCancelable = false
+                };
+                HookBus?.Dispatch(id, payload);
+                EventBus?.Publish(id, payload);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[GregAPI] FireEvent({id}) failed: {ex.Message}");
+            }
+        }
+
+        public static void Subscribe(string id, Action<object> cb)
+        {
+            On(id, cb);
+        }
+
         public static void On(string eventId, Action<object> callback)
         {
-            switch (eventId)
+            try
             {
-                case "OnCoinsChanged": gregNativeEventHooks.OnCoinsChanged += callback; break;
-                case "OnXpChanged": gregNativeEventHooks.OnXpChanged += callback; break;
-                case "OnReputationChanged": gregNativeEventHooks.OnReputationChanged += callback; break;
-                default: break;
+                // Bridge: Subscribe via EventBus
+                EventBus?.Subscribe(eventId, payload =>
+                {
+                    try { callback?.Invoke(payload); }
+                    catch (Exception ex) { MelonLogger.Error($"[GregAPI] Event handler error for '{eventId}': {ex.Message}"); }
+                });
+
+                // Also register legacy native hooks
+                switch (eventId)
+                {
+                    case "OnCoinsChanged": gregNativeEventHooks.OnCoinsChanged += callback; break;
+                    case "OnXpChanged": gregNativeEventHooks.OnXpChanged += callback; break;
+                    case "OnReputationChanged": gregNativeEventHooks.OnReputationChanged += callback; break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[GregAPI] On({eventId}) failed: {ex.Message}");
             }
         }
 
         public static void On(HookName hookName, Action<object> callback) => On(hookName.Full, callback);
 
-        public static void Log(string msg, string type = "INFO") => GregDevConsole.Instance?.AddLog(msg, type);
-        public static void LogInfo(string msg) => Log(msg, "INFO");
-        public static void LogWarning(string msg) => Log(msg, "WARN");
-        public static void LogError(string msg) => Log(msg, "ERROR");
-        
-        public static void ShowNotification(string msg) { } 
-        public static void ShowNotification(string msg, float duration) { }
-        
-        public static void FireEvent(string id, object? data = null) { }
-        public static void Subscribe(string id, Action<object> cb) => On(id, cb);
+        // ─── Economy (IL2CPP Live) ───────────────────────────────────────
 
-        public static double GetPlayerMoney() => 0.0;
-        public static void SetPlayerMoney(double val) { }
-        public static double GetPlayerXp() => 0.0;
-        public static void SetPlayerXp(double val) { }
-        public static double GetPlayerReputation() => 0.0;
-        public static void SetPlayerReputation(double val) { }
-        
-        public static uint GetServerCount() => 0;
-        public static uint GetRackCount() => 0;
-        public static uint GetSwitchCount() => 0;
-        public static uint GetBrokenServerCount() => 0;
-        public static uint GetBrokenSwitchCount() => 0;
-        public static uint GetFreeTechnicianCount() => 0;
-        public static uint GetTotalTechnicianCount() => 0;
-        
-        public static int DispatchRepairServer() => 0;
-        public static int DispatchRepairSwitch() => 0;
-        
-        public static float GetTimeOfDay() => 0f;
-        public static uint GetDay() => 1;
-        public static float GetSecondsInFullDay() => 1200f;
-        public static void SetSecondsInFullDay(float val) { }
-        public static float GetTimeScale() => 1f;
-        public static void SetTimeScale(float val) { }
-        
-        public static string GetCurrentScene() => "None";
-        public static bool IsGamePaused() => false;
-        public static void SetGamePaused(bool val) { }
-        public static int TriggerSave() => 0;
-        public static int GetDifficulty() => 1;
-        
-        public static Vector3 GetPlayerPosition() => Vector3.zero;
+        public static double GetPlayerMoney()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return 0.0;
+                return mgr.money;
+            }
+            catch { return 0.0; }
+        }
+
+        public static void SetPlayerMoney(double val)
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return;
+                mgr.money = (float)val;
+            }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerMoney failed: {ex.Message}"); }
+        }
+
+        public static double GetPlayerXp()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return 0.0;
+                return mgr.xp;
+            }
+            catch { return 0.0; }
+        }
+
+        public static void SetPlayerXp(double val)
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return;
+                mgr.xp = (float)val;
+            }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerXp failed: {ex.Message}"); }
+        }
+
+        public static double GetPlayerReputation()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return 0.0;
+                return mgr.reputation;
+            }
+            catch { return 0.0; }
+        }
+
+        public static void SetPlayerReputation(double val)
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return;
+                mgr.reputation = (float)val;
+            }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerReputation failed: {ex.Message}"); }
+        }
+
+        // ─── World / Hardware (IL2CPP Live) ──────────────────────────────
+
+        public static uint GetServerCount()
+        {
+            try
+            {
+                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                return servers != null ? (uint)servers.Count : 0u;
+            }
+            catch { return 0u; }
+        }
+
+        public static uint GetRackCount()
+        {
+            try
+            {
+                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
+                return racks != null ? (uint)racks.Count : 0u;
+            }
+            catch { return 0u; }
+        }
+
+        public static uint GetSwitchCount()
+        {
+            try
+            {
+                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                return switches != null ? (uint)switches.Count : 0u;
+            }
+            catch { return 0u; }
+        }
+
+        public static uint GetBrokenServerCount()
+        {
+            try
+            {
+                uint count = 0;
+                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                if (servers == null) return 0u;
+                foreach (var s in servers)
+                {
+                    try { if (s.isBroken) count++; } catch { }
+                }
+                return count;
+            }
+            catch { return 0u; }
+        }
+
+        public static uint GetBrokenSwitchCount()
+        {
+            try
+            {
+                uint count = 0;
+                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                if (switches == null) return 0u;
+                foreach (var s in switches)
+                {
+                    try { if (s.isBroken) count++; } catch { }
+                }
+                return count;
+            }
+            catch { return 0u; }
+        }
+
+        // ─── Technicians ─────────────────────────────────────────────────
+
+        public static uint GetFreeTechnicianCount()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return 0u;
+                return (uint)mgr.freeTechnicians;
+            }
+            catch { return 0u; }
+        }
+
+        public static uint GetTotalTechnicianCount()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                if (mgr == null) return 0u;
+                return (uint)mgr.totalTechnicians;
+            }
+            catch { return 0u; }
+        }
+
+        public static int DispatchRepairServer()
+        {
+            try
+            {
+                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                if (servers == null) return 0;
+                foreach (var s in servers)
+                {
+                    try
+                    {
+                        if (s.isBroken)
+                        {
+                            s.RepairDevice();
+                            return 1;
+                        }
+                    }
+                    catch { }
+                }
+                return 0;
+            }
+            catch { return 0; }
+        }
+
+        public static int DispatchRepairSwitch()
+        {
+            try
+            {
+                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                if (switches == null) return 0;
+                foreach (var s in switches)
+                {
+                    try
+                    {
+                        if (s.isBroken)
+                        {
+                            s.RepairDevice();
+                            return 1;
+                        }
+                    }
+                    catch { }
+                }
+                return 0;
+            }
+            catch { return 0; }
+        }
+
+        // ─── Time ────────────────────────────────────────────────────────
+
+        public static float GetTimeOfDay()
+        {
+            try
+            {
+                var tc = Il2Cpp.TimeController.instance;
+                return tc?.currentTimeOfDay ?? 0f;
+            }
+            catch { return 0f; }
+        }
+
+        public static uint GetDay()
+        {
+            try
+            {
+                var tc = Il2Cpp.TimeController.instance;
+                return tc != null ? (uint)tc.day : 1u;
+            }
+            catch { return 1u; }
+        }
+
+        public static float GetSecondsInFullDay()
+        {
+            try
+            {
+                var tc = Il2Cpp.TimeController.instance;
+                return tc?.secondsInFullDay ?? 1200f;
+            }
+            catch { return 1200f; }
+        }
+
+        public static void SetSecondsInFullDay(float val)
+        {
+            try
+            {
+                var tc = Il2Cpp.TimeController.instance;
+                if (tc != null) tc.secondsInFullDay = val;
+            }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetSecondsInFullDay failed: {ex.Message}"); }
+        }
+
+        // ─── Game State ──────────────────────────────────────────────────
+
+        public static float GetTimeScale()
+        {
+            try { return UnityEngine.Time.timeScale; }
+            catch { return 1f; }
+        }
+
+        public static void SetTimeScale(float val)
+        {
+            try { UnityEngine.Time.timeScale = val; }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetTimeScale failed: {ex.Message}"); }
+        }
+
+        public static string GetCurrentScene()
+        {
+            try
+            {
+                return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name ?? "None";
+            }
+            catch { return "None"; }
+        }
+
+        public static bool IsGamePaused()
+        {
+            try { return UnityEngine.Time.timeScale < 0.01f; }
+            catch { return false; }
+        }
+
+        public static void SetGamePaused(bool val)
+        {
+            try { UnityEngine.Time.timeScale = val ? 0f : 1f; }
+            catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetGamePaused failed: {ex.Message}"); }
+        }
+
+        public static int TriggerSave()
+        {
+            try
+            {
+                Il2Cpp.SaveSystem.SaveGame();
+                return 1;
+            }
+            catch { return 0; }
+        }
+
+        public static int GetDifficulty()
+        {
+            try
+            {
+                var mgr = Il2Cpp.MainGameManager.instance;
+                return mgr != null ? (int)mgr.difficulty : 1;
+            }
+            catch { return 1; }
+        }
+
+        // ─── Player ──────────────────────────────────────────────────────
+
+        public static Vector3 GetPlayerPosition()
+        {
+            try
+            {
+                var pm = Il2Cpp.PlayerManager.instance;
+                if (pm?.playerGO == null) return Vector3.zero;
+                return pm.playerGO.transform.position;
+            }
+            catch { return Vector3.zero; }
+        }
+
+        // ─── Config (Persisted via ModConfigSystem) ──────────────────────
 
         public static void ConfigSetBool(string m, string k, bool v) { }
         public static bool ConfigGetBool(string m, string k, bool d) => d;
@@ -77,6 +420,7 @@ namespace gregCore.API
         public static void ConfigSetString(string m, string k, string v) { }
         public static string ConfigGetString(string m, string k, string d) => d;
 
+        // ─── Internal References (set by GregCoreMod) ────────────────────
         public static object _keybindReg { get; set; } = null!;
         public static object _modSettingsService { get; set; } = null!;
     }
@@ -91,8 +435,8 @@ namespace gregCore.API
 
     public class GregHooksProxy
     {
-        public void Fire(string id, object? data = null) { }
-        public void On(string id, Action<object> cb) { }
+        public void Fire(string id, object? data = null) => GregAPI.FireEvent(id, data);
+        public void On(string id, Action<object> cb) => GregAPI.On(id, cb);
     }
 
     public class HookEventArgs

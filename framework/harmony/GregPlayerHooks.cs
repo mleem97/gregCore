@@ -82,13 +82,17 @@ internal static class GregPlayerHooks
         }
     }
 
-    // Player.UpdateCoin
+    // Player.UpdateCoin - Prefix to override original that returns false
     [HarmonyPatch(typeof(Player), nameof(Player.UpdateCoin))]
-    [HarmonyPostfix]
-    private static void OnPlayerUpdateCoin(Player __instance, float _coinChhangeAmount, bool withoutSound)
+    [HarmonyPrefix]
+    private static bool PrefixPlayerUpdateCoin(Player __instance, float _coinChangeAmount, bool withoutSound, ref bool __result)
     {
         try
         {
+            // Apply coin change
+            __instance.money += _coinChangeAmount;
+            __result = true;
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.Player, "MoneyChanged"),
                 new
@@ -96,12 +100,15 @@ internal static class GregPlayerHooks
                     money = __instance.money,
                     reputation = __instance.reputation,
                     xp = __instance.xp,
+                    changeAmount = _coinChangeAmount
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnPlayerUpdateCoin failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixPlayerUpdateCoin failed: {ex.Message}");
+            __result = false;
         }
+        return false; // Skip original method
     }
 
     // Player.DropAllItems
@@ -170,13 +177,17 @@ internal static class GregPlayerHooks
         }
     }
 
-    // Player.UpdateXP
+    // Player.UpdateXP - Prefix to override original that returns false
     [HarmonyPatch(typeof(Player), nameof(Player.UpdateXP))]
-    [HarmonyPostfix]
-    private static void OnPlayerUpdateXP(Player __instance, float amount)
+    [HarmonyPrefix]
+    private static bool PrefixPlayerUpdateXP(Player __instance, float amount, ref bool __result)
     {
         try
         {
+            // Apply XP change
+            __instance.xp += amount;
+            __result = true;
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.Player, "XpChanged"),
                 new
@@ -184,12 +195,15 @@ internal static class GregPlayerHooks
                     money = __instance.money,
                     reputation = __instance.reputation,
                     xp = __instance.xp,
+                    changeAmount = amount
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnPlayerUpdateXP failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixPlayerUpdateXP failed: {ex.Message}");
+            __result = false;
         }
+        return false; // Skip original method
     }
 
     // PlayerHit.OnEnable

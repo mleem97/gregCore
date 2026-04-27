@@ -236,24 +236,31 @@ internal static class GregNetworkHooks
         }
     }
 
-    // CablePositions.CreateNewCable
+    // CablePositions.CreateNewCable - Prefix to override original that returns 0 (causes ID collision)
     [HarmonyPatch(typeof(CablePositions), nameof(CablePositions.CreateNewCable))]
-    [HarmonyPostfix]
-    private static void OnCablePositionsCreateNewCable(CablePositions __instance)
+    [HarmonyPrefix]
+    private static bool PrefixCablePositionsCreateNewCable(CablePositions __instance, ref int __result)
     {
         try
         {
+            // Generate unique cable ID to prevent collisions
+            int newCableId = (__instance.cablePoints != null) ? __instance.cablePoints.Count : 0;
+            __result = newCableId;
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.Network, "CreateNewCable"),
                 new
                 {
                     instance = __instance,
+                    cableId = newCableId
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnCablePositionsCreateNewCable failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixCablePositionsCreateNewCable failed: {ex.Message}");
+            __result = -1;
         }
+        return false; // Skip original method
     }
 
     // CablePositions.CreateNewReverseCable

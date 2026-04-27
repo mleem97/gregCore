@@ -32,7 +32,6 @@
     <Reference Include="Il2CppSystem.Core"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UI"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UIModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.IMGUIModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath><Private>false</Private></Reference>
@@ -45,7 +44,6 @@
     <Reference Include="Unity.InputSystem"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.TextMeshPro"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Il2CppUMA_Core"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppUMA_Core.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppTMPro"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppTMPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.Entities"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.Entities.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 

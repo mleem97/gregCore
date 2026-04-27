@@ -6596,44 +6596,58 @@ internal static class GregSystemHooks
         }
     }
 
-    // FirstPersonController.GetMouseLook
+    // FirstPersonController.GetMouseLook - Prefix to bypass null getter (Look input)
     [HarmonyPatch(typeof(FirstPersonController), nameof(FirstPersonController.GetMouseLook))]
-    [HarmonyPostfix]
-    private static void OnFirstPersonControllerGetMouseLook(FirstPersonController __instance)
+    [HarmonyPrefix]
+    private static bool PrefixFirstPersonControllerGetMouseLook(FirstPersonController __instance, ref Vector2 __result)
     {
         try
         {
+            // Bypass original that returns null - provide default mouse look
+            __result = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.System, "GetMouseLook"),
                 new
                 {
                     instance = __instance,
+                    mouseLook = __result
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnFirstPersonControllerGetMouseLook failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixFirstPersonControllerGetMouseLook failed: {ex.Message}");
+            __result = Vector2.zero;
         }
+        return false; // Skip original method
     }
 
-    // FirstPersonController.GetInput
+    // FirstPersonController.GetInput - Prefix to bypass null getter (Move input)
     [HarmonyPatch(typeof(FirstPersonController), nameof(FirstPersonController.GetInput))]
-    [HarmonyPostfix]
-    private static void OnFirstPersonControllerGetInput(FirstPersonController __instance, float speed)
+    [HarmonyPrefix]
+    private static bool PrefixFirstPersonControllerGetInput(FirstPersonController __instance, float speed, ref Vector3 __result)
     {
         try
         {
+            // Bypass original that returns null - provide default movement input
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
+            __result = new Vector3(horizontal * speed, 0, vertical * speed);
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.System, "GetInput"),
                 new
                 {
                     instance = __instance,
+                    moveInput = __result
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnFirstPersonControllerGetInput failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixFirstPersonControllerGetInput failed: {ex.Message}");
+            __result = Vector3.zero;
         }
+        return false; // Skip original method
     }
 
     // FirstPersonController.Crouch

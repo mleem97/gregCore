@@ -56,24 +56,42 @@ internal static class GregRackHooks
         }
     }
 
-    // Rack.IsPositionAvailable
+    // Rack.IsPositionAvailable - Prefix to override original that always returns false
     [HarmonyPatch(typeof(Rack), nameof(Rack.IsPositionAvailable))]
-    [HarmonyPostfix]
-    private static void OnRackIsPositionAvailable(Rack __instance, int index, int sizeInU)
+    [HarmonyPrefix]
+    private static bool PrefixRackIsPositionAvailable(Rack __instance, int index, int sizeInU, ref bool __result)
     {
         try
         {
+            // Original returns false always - we need to compute correctly
+            bool isAvailable = true;
+            if (__instance.isPositionUsed != null)
+            {
+                for (int i = index; i < index + sizeInU && i < __instance.isPositionUsed.Length; i++)
+                {
+                    if (__instance.isPositionUsed[i])
+                    {
+                        isAvailable = false;
+                        break;
+                    }
+                }
+            }
+            __result = isAvailable;
+
             gregEventDispatcher.Emit(
                 gregHookName.Create(GregDomain.Rack, "IsPositionAvailable"),
                 new
                 {
                     instance = __instance,
+                    result = isAvailable
                 });
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning($"[gregCore] Hook OnRackIsPositionAvailable failed: {ex.Message}");
+            MelonLogger.Warning($"[gregCore] Hook PrefixRackIsPositionAvailable failed: {ex.Message}");
+            __result = false;
         }
+        return false; // Skip original method
     }
 
     // Rack.MarkPositionAsUsed

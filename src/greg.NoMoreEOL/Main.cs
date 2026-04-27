@@ -21,9 +21,11 @@ namespace greg.NoMoreEOL
         internal static bool WarningsVisible = true;
 
         // Internal State
+        internal static readonly HashSet<PositionIndicator> Indicators = new();
         private bool _readyToRun;
         private NetworkMap? _networkMap;
         private MainGameManager? _gameManager;
+        private float _maintenanceTimer;
 
         private Dictionary<int, int> _switchTypeDefaultEOL = new Dictionary<int, int>();
         private Dictionary<int, int> _serverTypeDefaultEOL = new Dictionary<int, int>();
@@ -66,15 +68,13 @@ namespace greg.NoMoreEOL
 
         private void UpdateWarningSignsVisibility()
         {
-            var indicators = UnityEngine.Object.FindObjectsOfType<PositionIndicator>();
-            if (indicators != null)
+            Indicators.RemoveWhere(indicator => indicator == null || indicator.Pointer == IntPtr.Zero);
+
+            foreach (var indicator in Indicators)
             {
-                foreach (var indicator in indicators)
+                if (indicator.gameObject != null)
                 {
-                    if (indicator != null && indicator.gameObject != null)
-                    {
-                        indicator.gameObject.SetActive(WarningsVisible);
-                    }
+                    indicator.gameObject.SetActive(WarningsVisible);
                 }
             }
         }
@@ -87,6 +87,7 @@ namespace greg.NoMoreEOL
                 _readyToRun = false;
                 _gameManager = null;
                 _networkMap = null;
+                Indicators.Clear();
             }
         }
 
@@ -94,10 +95,15 @@ namespace greg.NoMoreEOL
         {
             if (_readyToRun && _networkMap != null)
             {
-                RepairSwitches();
-                RepairServers();
-                HandleSwitchesEOL();
-                HandleServersEOL();
+                _maintenanceTimer += Time.deltaTime;
+                if (_maintenanceTimer >= 1.0f)
+                {
+                    _maintenanceTimer = 0f;
+                    RepairSwitches();
+                    RepairServers();
+                    HandleSwitchesEOL();
+                    HandleServersEOL();
+                }
             }
             else
             {
@@ -126,6 +132,10 @@ namespace greg.NoMoreEOL
         {
             if (!_autoRepairBrokenSwitches || _networkMap == null) return;
 
+            // Optimization: Skip expensive GetAllBrokenSwitches() and defensive array allocation
+            // if there are no broken switches to repair. Reduces GC pressure in OnUpdate.
+            if (_networkMap.brokenSwitches == null || _networkMap.brokenSwitches.Count == 0) return;
+
             var broken = _networkMap.GetAllBrokenSwitches();
             if (broken != null)
             {
@@ -139,6 +149,10 @@ namespace greg.NoMoreEOL
         private void RepairServers()
         {
             if (!_autoRepairBrokenServers || _networkMap == null) return;
+
+            // Optimization: Skip expensive GetAllBrokenServers() and defensive array allocation
+            // if there are no broken servers to repair. Reduces GC pressure in OnUpdate.
+            if (_networkMap.brokenServers == null || _networkMap.brokenServers.Count == 0) return;
 
             var broken = _networkMap.GetAllBrokenServers();
             if (broken != null)

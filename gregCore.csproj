@@ -67,5 +67,6 @@
     <Compile Remove="mods\**" />
     <Compile Remove="lib\MoonSharp\**" />
     <Compile Remove="temp_dump\**" />
+    <Compile Remove="src\greg.Multiplayer\**" />
   </ItemGroup>
 </Project>

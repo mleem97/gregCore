@@ -15,21 +15,37 @@ public sealed class GregPersistenceService : IGregPersistenceService
         Directory.CreateDirectory(_saveDirectory);
     }
 
+    private string GetSafePath(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key) || key.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || key.Contains(Path.DirectorySeparatorChar) || key.Contains(Path.AltDirectorySeparatorChar))
+            throw new System.ArgumentException("Invalid key provided for persistence file.", nameof(key));
+        return Path.Combine(_saveDirectory, $"{key}.json");
+    }
+
     public void Set<T>(string key, T value) where T : notnull
     {
-        var path = Path.Combine(_saveDirectory, $"{key}.json");
+        var path = GetSafePath(key);
         File.WriteAllText(path, JsonSerializer.Serialize(value));
     }
 
     public T Get<T>(string key, T defaultValue = default!) where T : notnull
     {
-        var path = Path.Combine(_saveDirectory, $"{key}.json");
-        if (!File.Exists(path)) return defaultValue;
         try {
+            var path = GetSafePath(key);
+            if (!File.Exists(path)) return defaultValue;
             return JsonSerializer.Deserialize<T>(File.ReadAllText(path)) ?? defaultValue;
         } catch { return defaultValue; }
     }
 
-    public bool Has(string key) => File.Exists(Path.Combine(_saveDirectory, $"{key}.json"));
-    public void Delete(string key) => File.Delete(Path.Combine(_saveDirectory, $"{key}.json"));
+    public bool Has(string key)
+    {
+        try { return File.Exists(GetSafePath(key)); }
+        catch { return false; }
+    }
+
+    public void Delete(string key)
+    {
+        try { File.Delete(GetSafePath(key)); }
+        catch { }
+    }
 }

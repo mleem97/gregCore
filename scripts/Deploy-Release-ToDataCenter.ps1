@@ -110,5 +110,24 @@ if ($IncludeWorkshopUploader) {
     Write-Host "[deploy] -> $WuTarget (WorkshopUploader, self-contained)"
 }
 
+# --- Lua Framework Assets ---
+$UserData = Join-Path $GameDir 'UserData\gregCore'
+$LuaMods = Join-Path $UserData 'Mods\Lua'
+New-Item -ItemType Directory -Path $LuaMods -Force | Out-Null
+
+# Copy game_hooks.json
+$HooksSrc = Join-Path $RepoRoot 'game_hooks.json'
+if (Test-Path -LiteralPath $HooksSrc) {
+    Copy-Item -LiteralPath $HooksSrc -Destination (Join-Path $UserData 'game_hooks.json') -Force
+    Write-Host "[deploy] -> $UserData\game_hooks.json"
+}
+
+# Copy Lua Examples
+$ExamplesSrc = Join-Path $RepoRoot 'examples\Lua'
+if (Test-Path -LiteralPath $ExamplesSrc) {
+    Copy-Item -Path (Join-Path $ExamplesSrc '*') -Destination $LuaMods -Recurse -Force
+    Write-Host "[deploy] -> $LuaMods (Examples & Templates)"
+}
+
 Write-Host "[deploy] Done. GameRoot=$GameDir"
 

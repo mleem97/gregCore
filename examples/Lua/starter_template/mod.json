@@ -1,0 +1,11 @@
+{
+  "id": "my_first_mod",
+  "name": "My First Mod",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "description": "A starter template for gregCore Lua modding.",
+  "entry": "main.lua",
+  "min_framework_version": "1.1.0",
+  "dependencies": [],
+  "tags": ["starter", "template"]
+}

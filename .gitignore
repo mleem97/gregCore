@@ -1,9 +1,3 @@
-*
-
-
-.DS_Store
-Thumbs.db
-
 # Build output
 bin/
 obj/
@@ -36,12 +30,12 @@ logs/
 MISSING.md
 **/MISSING.md
 
-# Reference DLLs
-!lib/references/**
-!references/**
-
 # Build artifacts
 publish/
 publish_out/
 publish_full/
 build/artifacts/
+
+# System
+.DS_Store
+Thumbs.db

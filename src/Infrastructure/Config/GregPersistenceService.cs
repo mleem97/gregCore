@@ -15,21 +15,38 @@ public sealed class GregPersistenceService : IGregPersistenceService
         Directory.CreateDirectory(_saveDirectory);
     }
 
+    private string GetSafePath(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            throw new System.ArgumentException("Key cannot be null or empty", nameof(key));
+
+        if (key.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+            key.Contains(Path.DirectorySeparatorChar) ||
+            key.Contains(Path.AltDirectorySeparatorChar) ||
+            key.Contains(".."))
+        {
+            _logger.Error($"[Security] Attempted path traversal detected with key: {key}");
+            throw new System.ArgumentException("Invalid characters in key", nameof(key));
+        }
+
+        return Path.Combine(_saveDirectory, $"{key}.json");
+    }
+
     public void Set<T>(string key, T value) where T : notnull
     {
-        var path = Path.Combine(_saveDirectory, $"{key}.json");
+        var path = GetSafePath(key);
         File.WriteAllText(path, JsonSerializer.Serialize(value));
     }
 
     public T Get<T>(string key, T defaultValue = default!) where T : notnull
     {
-        var path = Path.Combine(_saveDirectory, $"{key}.json");
+        var path = GetSafePath(key);
         if (!File.Exists(path)) return defaultValue;
         try {
             return JsonSerializer.Deserialize<T>(File.ReadAllText(path)) ?? defaultValue;
         } catch { return defaultValue; }
     }
 
-    public bool Has(string key) => File.Exists(Path.Combine(_saveDirectory, $"{key}.json"));
-    public void Delete(string key) => File.Delete(Path.Combine(_saveDirectory, $"{key}.json"));
+    public bool Has(string key) => File.Exists(GetSafePath(key));
+    public void Delete(string key) => File.Delete(GetSafePath(key));
 }

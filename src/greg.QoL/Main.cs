@@ -4,7 +4,6 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using greg.Logging;
 
 namespace greg.QoL

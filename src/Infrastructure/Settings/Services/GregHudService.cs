@@ -1,56 +1,92 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 using gregCore.Core.Abstractions;
 
-namespace gregCore.Infrastructure.Settings.Services;
-
-public class GregHudService
+namespace gregCore.Infrastructure.Settings.Services
 {
-    private readonly IGregLogger _logger;
-    private readonly GregKeybindRegistry _keybindRegistry;
-    private bool _showHud = false;
-
-    public GregHudService(IGregLogger logger, GregKeybindRegistry keybindRegistry)
+    public class GregHudService
     {
-        _logger = logger.ForContext("HudService");
-        _keybindRegistry = keybindRegistry;
-    }
+        private readonly IGregLogger _logger;
+        private readonly GregKeybindRegistry _keybindRegistry;
+        private bool _showHud = false;
+        private VisualElement? _hudPanel;
 
-    private GameObject? _hudPanel;
-
-    public void Toggle() 
-    {
-        _showHud = !_showHud;
-        if (_showHud && _hudPanel == null)
+        public GregHudService(IGregLogger logger, GregKeybindRegistry keybindRegistry)
         {
-            BuildUI();
+            _logger = logger.ForContext("HudService");
+            _keybindRegistry = keybindRegistry;
         }
-        gregCore.UI.GregUIManager.SetPanelActive("HUD", _showHud);
-    }
 
-    private void BuildUI()
-    {
-        var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
-        var builder = gregCore.UI.GregUIBuilder.Create("HUD")
-            .SetSize(300, 40 + (conflicts.Count * 20));
+        public void Toggle() 
+        {
+            _showHud = !_showHud;
+            if (_showHud && _hudPanel == null)
+            {
+                BuildUI();
+            }
+            GregUIManager.SetPanelActive("HUD", _showHud);
+        }
+
+        private void BuildUI()
+        {
+            _hudPanel = new VisualElement
+            {
+                name = "HUD",
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 10,
+                    left = 10,
+                    width = 300,
+                    backgroundColor = new Color(0.07f, 0.07f, 0.07f, 0.96f),
+                    borderTopColor = new Color(1f, 0.32f, 0.32f),
+                    borderBottomColor = new Color(1f, 0.32f, 0.32f),
+                    borderLeftColor = new Color(1f, 0.32f, 0.32f),
+                    borderRightColor = new Color(1f, 0.32f, 0.32f),
+                    borderTopWidth = 2,
+                    borderBottomWidth = 2,
+                    borderLeftWidth = 2,
+                    borderRightWidth = 2,
+                    borderRadius = 6,
+                    paddingTop = 8,
+                    paddingBottom = 8,
+                    paddingLeft = 10,
+                    paddingRight = 10,
+                    display = DisplayStyle.None
+                }
+            };
+
+            var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
             
-        builder.AddLabel("gregCore: Keybind-Konflikte!");
-        foreach (var conflict in conflicts)
-        {
-            builder.AddLabel($"{conflict.DisplayName} ({conflict.CurrentKey})");
-        }
-        
-        _hudPanel = builder.Build();
-        var rt = _hudPanel.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0, 1);
-        rt.anchorMax = new Vector2(0, 1);
-        rt.pivot = new Vector2(0, 1);
-        rt.anchoredPosition = new Vector2(10, -10);
-    }
+            var titleLabel = new Label("gregCore: Keybind-Konflikte!")
+            {
+                style =
+                {
+                    fontSize = 14,
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    color = new Color(1f, 0.32f, 0.32f),
+                    marginBottom = 8
+                }
+            };
+            _hudPanel.Add(titleLabel);
 
-    public void OnGUI()
-    {
-        // IMGUI disabled
+            foreach (var conflict in conflicts)
+            {
+                var conflictLabel = new Label($"{conflict.DisplayName} ({conflict.CurrentKey})")
+                {
+                    style =
+                    {
+                        fontSize = 12,
+                        color = new Color(0.88f, 0.88f, 0.88f),
+                        marginBottom = 4
+                    }
+                };
+                _hudPanel.Add(conflictLabel);
+            }
+
+            GregUIManager.RegisterPanel("HUD", _hudPanel);
+        }
     }
 }

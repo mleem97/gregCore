@@ -211,11 +211,6 @@ public class Core
         }
     }
 
-    public void OnGUI()
-    {
-        // IMGUI Drawing disabled globally for Unity 6 stability.
-    }
-
     public void OnApplicationQuit()
     {
         try

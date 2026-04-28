@@ -49,11 +49,6 @@ namespace greg.WallRack
             // }
         }
 
-        public void OnGUI()
-        {
-            // IMGUI disabled
-        }
-
         public void TryMount(Vector3 worldPos)
         {
             if (previewDevice == null) return;

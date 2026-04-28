@@ -2,175 +2,167 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using gregCore.Infrastructure.Settings.Models;
 using gregCore.Infrastructure.Plugins;
 using gregCore.Core.Abstractions;
 using Il2CppTMPro;
 
-namespace gregCore.Infrastructure.Settings.Services;
-
-public class GregSettingsUiBridge
+namespace gregCore.Infrastructure.Settings.Services
 {
-    private readonly IGregLogger _logger;
-    private readonly GregModSettingsService _settingsService;
-    private readonly GregKeybindRegistry _keybindRegistry;
-    private readonly GregInputBindingService _inputBindingService;
-    private readonly GregPluginRegistry _pluginRegistry;
-
-    private GameObject _mainPanel = null!;
-    private InputField _searchInput = null!;
-    private Transform _contentContainer = null!;
-
-    public GregSettingsUiBridge(
-        IGregLogger logger,
-        GregModSettingsService settingsService,
-        GregKeybindRegistry keybindRegistry,
-        GregInputBindingService inputBindingService,
-        GregPluginRegistry pluginRegistry)
+    public class GregSettingsUiBridge
     {
-        _logger = logger.ForContext("SettingsUiBridge");
-        _settingsService = settingsService;
-        _keybindRegistry = keybindRegistry;
-        _inputBindingService = inputBindingService;
-        _pluginRegistry = pluginRegistry;
-    }
+        private readonly IGregLogger _logger;
+        private readonly GregModSettingsService _settingsService;
+        private readonly GregKeybindRegistry _keybindRegistry;
+        private readonly GregInputBindingService _inputBindingService;
+        private readonly GregPluginRegistry _pluginRegistry;
+        private VisualElement? _root;
+        private TextField? _searchInput;
+        private VisualElement? _contentContainer;
 
-    public void BuildModSettingsPanel(GameObject panel)
-    {
-        _mainPanel = panel;
-        greg.Logging.GregLogger.Msg("Baue Mod-Settings UI...", "SettingsUiBridge");
-
-        // 1. Setup ScrollView
-        var scrollObj = new GameObject("ModSettingsScrollView");
-        scrollObj.transform.SetParent(panel.transform, false);
-        var scrollRect = scrollObj.AddComponent<ScrollRect>();
-
-        var viewport = new GameObject("Viewport");
-        viewport.transform.SetParent(scrollObj.transform, false);
-        viewport.AddComponent<Image>().color = new Color(0, 0, 0, 0.5f);
-        viewport.AddComponent<Mask>().showMaskGraphic = false;
-
-        var content = new GameObject("Content");
-        content.transform.SetParent(viewport.transform, false);
-        _contentContainer = content.transform;
-
-        var vlg = content.AddComponent<VerticalLayoutGroup>();
-        vlg.childControlHeight = true;
-        vlg.childControlWidth = true;
-        vlg.childForceExpandHeight = false;
-        vlg.spacing = 10;
-        vlg.padding = new RectOffset();
-        vlg.padding.left = 20;
-        vlg.padding.right = 20;
-        vlg.padding.top = 20;
-        vlg.padding.bottom = 20;
-
-        var csf = content.AddComponent<ContentSizeFitter>();
-        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        scrollRect.viewport = viewport.GetComponent<RectTransform>();
-        scrollRect.content = content.GetComponent<RectTransform>();
-
-        // 2. Add Search Bar
-        AddSearchBar(content.transform);
-
-        // 3. Populate Mods
-        RefreshUi();
-    }
-
-    private void AddSearchBar(Transform parent)
-    {
-        var searchObj = new GameObject("SearchBar");
-        searchObj.transform.SetParent(parent, false);
-        _searchInput = searchObj.AddComponent<InputField>();
-        _searchInput.onValueChanged.AddListener(new Action<string>(query => RefreshUi(query)));
-
-        var placeholderObj = new GameObject("Placeholder");
-        placeholderObj.transform.SetParent(searchObj.transform, false);
-        var placeholderText = placeholderObj.AddComponent<Text>();
-        placeholderText.text = "Suche nach Mods oder Keybinds...";
-        placeholderText.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
-        placeholderText.color = Color.gray;
-
-        _searchInput.placeholder = placeholderText;
-    }
-
-    public void RefreshUi(string query = "")
-    {
-        if (_contentContainer == null) return;
-
-        // Clear existing (except search bar)
-        foreach (Transform child in _contentContainer)
+        public GregSettingsUiBridge(
+            IGregLogger logger,
+            GregModSettingsService settingsService,
+            GregKeybindRegistry keybindRegistry,
+            GregInputBindingService inputBindingService,
+            GregPluginRegistry pluginRegistry)
         {
-            if (child.name == "SearchBar") continue;
-            UnityEngine.Object.Destroy(child.gameObject);
+            _logger = logger.ForContext("SettingsUiBridge");
+            _settingsService = settingsService;
+            _keybindRegistry = keybindRegistry;
+            _inputBindingService = inputBindingService;
+            _pluginRegistry = pluginRegistry;
         }
 
-        var mods = _pluginRegistry.GetAllRegisteredMods();
-        foreach (var mod in mods)
+        public void BuildModSettingsPanel(VisualElement panel)
         {
-            if (!string.IsNullOrEmpty(query) && !mod.Name.ToLowerInvariant().Contains(query.ToLowerInvariant()))
-                continue;
+            _root = panel;
+            _root.style.flexDirection = FlexDirection.Column;
+            _root.style.backgroundColor = new Color(0.07f, 0.07f, 0.07f, 0.96f);
+            _root.style.paddingTop = 10;
+            _root.style.paddingBottom = 10;
+            _root.style.paddingLeft = 10;
+            _root.style.paddingRight = 10;
 
-            AddModHeader(mod);
-
-            // Add Settings
-            var settings = _settingsService.GetByMod(mod.ModId);
-            foreach (var setting in settings)
+            // Scroll view
+            var scrollView = new ScrollView(ScrollViewMode.Vertical)
             {
-                AddSettingEntry(setting);
-            }
+                style =
+                {
+                    flexGrow = 1,
+                    marginTop = 10
+                }
+            };
+            _root.Add(scrollView);
+            _contentContainer = scrollView;
 
-            // Add Keybinds
-            var keybinds = _keybindRegistry.GetByMod(mod.ModId);
-            foreach (var keybind in keybinds)
+            // Search bar
+            AddSearchBar();
+            
+            // Populate mods
+            RefreshUi();
+        }
+
+        private void AddSearchBar()
+        {
+            _searchInput = new TextField
             {
-                AddKeybindEntry(keybind);
+                placeholderText = "Suche nach Mods oder Keybinds...",
+                style =
+                {
+                    backgroundColor = new Color(0.1f, 0.1f, 0.1f),
+                    color = Color.white,
+                    height = 30,
+                    marginBottom = 10
+                }
+            };
+            _searchInput.RegisterValueChangedCallback(evt => RefreshUi(evt.newValue));
+            _root!.Add(_searchInput);
+        }
+
+        public void RefreshUi(string query = "")
+        {
+            if (_contentContainer == null) return;
+
+            _contentContainer.Clear();
+
+            var mods = _pluginRegistry.GetAllRegisteredMods();
+            foreach (var mod in mods)
+            {
+                if (!string.IsNullOrEmpty(query) && !mod.Name.ToLowerInvariant().Contains(query.ToLowerInvariant()))
+                    continue;
+
+                AddModHeader(mod.Name, mod.Version);
+
+                // Add Settings
+                var settings = _settingsService.GetByMod(mod.ModId);
+                foreach (var setting in settings)
+                {
+                    AddSettingEntry(setting);
+                }
+
+                // Add Keybinds
+                var keybinds = _keybindRegistry.GetByMod(mod.ModId);
+                foreach (var keybind in keybinds)
+                {
+                    AddKeybindEntry(keybind);
+                }
             }
         }
-    }
 
-    private void AddModHeader(ModMetadata mod)
-    {
-        var headerObj = new GameObject($"Header_{mod.ModId}");
-        headerObj.transform.SetParent(_contentContainer, false);
-        var text = headerObj.AddComponent<Text>();
-        text.text = $"{mod.Name} (v{mod.Version})";
-        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
-        text.fontSize = 24;
-        text.fontStyle = UnityEngine.FontStyle.Bold;
-        text.color = Color.white;
-    }
+        private void AddModHeader(string name, string version)
+        {
+            var header = new Label($"{name} (v{version})")
+            {
+                style =
+                {
+                    fontSize = 18,
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    color = Color.white,
+                    marginTop = 10,
+                    marginBottom = 6
+                }
+            };
+            _contentContainer!.Add(header);
+        }
 
-    private void AddSettingEntry(BaseSettingEntry setting)
-    {
-        var entryObj = new GameObject($"Setting_{setting.GetFullId()}");
-        entryObj.transform.SetParent(_contentContainer, false);
-        var text = entryObj.AddComponent<Text>();
-        text.text = $"  {setting.DisplayName}: {GetValue(setting)}";
-        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
-        text.fontSize = 18;
-        text.color = Color.cyan;
-    }
+        private void AddSettingEntry(BaseSettingEntry setting)
+        {
+            var entry = new Label($"  {setting.DisplayName}: {GetValue(setting)}")
+            {
+                style =
+                {
+                    fontSize = 14,
+                    color = Color.cyan,
+                    marginBottom = 3,
+                    marginLeft = 10
+                }
+            };
+            _contentContainer!.Add(entry);
+        }
 
-    private void AddKeybindEntry(KeybindEntry keybind)
-    {
-        var entryObj = new GameObject($"Keybind_{keybind.GetFullId()}");
-        entryObj.transform.SetParent(_contentContainer, false);
-        var text = entryObj.AddComponent<Text>();
-        var conflictText = keybind.HasConflict ? " <color=red>[KONFLIKT]</color>" : "";
-        text.text = $"  {keybind.DisplayName}: {keybind.CurrentKey}{conflictText}";
-        text.font = Resources.GetBuiltinResource<UnityEngine.Font>("Arial.ttf");
-        text.fontSize = 18;
-        text.color = keybind.HasConflict ? Color.red : Color.yellow;
-        text.supportRichText = true;
-    }
+        private void AddKeybindEntry(KeybindEntry keybind)
+        {
+            var conflictText = keybind.HasConflict ? " [KONFLIKT]" : "";
+            var entry = new Label($"  {keybind.DisplayName}: {keybind.CurrentKey}{conflictText}")
+            {
+                style =
+                {
+                    fontSize = 14,
+                    color = keybind.HasConflict ? Color.red : Color.yellow,
+                    marginBottom = 3,
+                    marginLeft = 10
+                }
+            };
+            _contentContainer!.Add(entry);
+        }
 
-    private string GetValue(BaseSettingEntry entry)
-    {
-        var type = entry.GetType();
-        var prop = type.GetProperty("Value");
-        return prop?.GetValue(entry)?.ToString() ?? "N/A";
+        private string GetValue(BaseSettingEntry entry)
+        {
+            var type = entry.GetType();
+            var prop = type.GetProperty("Value");
+            return prop?.GetValue(entry)?.ToString() ?? "N/A";
+        }
     }
 }

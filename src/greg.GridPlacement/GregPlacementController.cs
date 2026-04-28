@@ -119,9 +119,5 @@ namespace greg.GridPlacement
             }
         }
 
-        public void OnGUI()
-        {
-            // IMGUI disabled
-        }
     }
 }

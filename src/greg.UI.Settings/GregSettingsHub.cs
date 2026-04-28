@@ -10,14 +10,13 @@ namespace greg.UI.Settings
     {
         private static GregSettingsHub? _instance;
         private bool _isVisible = false;
-        private int _selectedTab = 0;
-        private GameObject? _uiPanel;
-        
+        private VisualElement? _root;
+
         private class TabData
         {
             public string Id = string.Empty;
             public string Label = string.Empty;
-            public Action<gregCore.UI.GregUIBuilder>? BuildFn;
+            public Action<GregUIBuilder>? BuildFn;
         }
         
         private static readonly List<TabData> _tabs = new();
@@ -34,7 +33,7 @@ namespace greg.UI.Settings
             }
         }
 
-        public static void RegisterTab(string tabId, string label, Action<gregCore.UI.GregUIBuilder> buildFn)
+        public static void RegisterTab(string tabId, string label, Action<GregUIBuilder> buildFn)
         {
             if (!_tabs.Exists(t => t.Id == tabId))
             {
@@ -120,7 +119,7 @@ namespace greg.UI.Settings
         public void Toggle()
         {
             _isVisible = !_isVisible;
-            if (_isVisible && _uiPanel == null)
+            if (_isVisible && _root == null)
             {
                 BuildUI();
             }
@@ -133,18 +132,13 @@ namespace greg.UI.Settings
                 .SetSize(500, 600)
                 .AddHeadline("GREGCORE SETTINGS");
 
-            // Build UI for each registered mod
+            // Build UI for each registered tab
             foreach (var category in gregCore.Core.Config.ModMenu.Categories)
             {
                 category.BuildUI(builder);
             }
 
-            _uiPanel = builder.Build();
-        }
-
-        public void OnGUI()
-        {
-            // IMGUI disabled
+            _root = builder.Build();
         }
     }
 }

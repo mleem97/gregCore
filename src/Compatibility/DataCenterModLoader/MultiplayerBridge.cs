@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using Il2Cpp;
 using Il2CppTMPro;
 using Il2CppUMA;
 using Il2CppUMA.CharacterSystem;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 
 namespace DataCenterModLoader;
@@ -154,15 +154,8 @@ public class MultiplayerBridge
     private string _displayRoomCode = "";  // room code received after hosting
 
     private bool _showPanel;
-    private UnityEngine.EventSystems.EventSystem? _mpDisabledEventSystem;
-    private int _mpReenableCountdown;
-    private bool _pendingMenuInjection;
-    private float _menuInjectionTimer;
-    private GameObject? _menuButton;
-    private Rect _panelRect;
+    private VisualElement? _panelRoot;
     private bool _stylesInitialized;
-    private GUIStyle _windowStyle = null!, _buttonStyle = null!, _labelStyle = null!, _textFieldStyle = null!, _titleStyle = null!, _statusStyle = null!, _stopHostButtonStyle = null!, _fieldFocusedStyle = null!;
-    private Texture2D _windowBg = null!, _buttonBg = null!, _buttonHoverBg = null!, _fieldBg = null!, _stopBtnBg = null!, _stopBtnHoverBg = null!, _fieldActiveBg = null!;
 
     // Custom text field state (GUI.TextField doesn't work with new Input System)
     private bool _roomCodeFieldFocused;
@@ -1988,151 +1981,7 @@ public class MultiplayerBridge
             _mpReenableCountdown = 2;
     }
 
-    public void DrawGUI()
-    {
-        try
-        {
-            if (!_showPanel) return;
-
-            if (!_stylesInitialized)
-                InitStyles();
-
-            _panelRect = new Rect((Screen.width - 400) / 2, (Screen.height - 400) / 2, 400, 420);
-            GUI.DrawTexture(_panelRect, _windowBg);
-
-            // Title bar dragging (simplified for brevity)
-            GUI.Label(new Rect(_panelRect.x + 20, _panelRect.y + 15, 300, 30), "MULTIPLAYER", _titleStyle);
-
-            if (GUI.Button(new Rect(_panelRect.x + _panelRect.width - 35, _panelRect.y + 10, 25, 25), "X", _buttonStyle))
-                HideMultiplayerPanel();
-
-            float contentY = _panelRect.y + 60;
-            float margin = 25;
-            float innerW = _panelRect.width - (margin * 2);
-
-            bool connected = _isConnected() != 0;
-
-            if (!connected)
-            {
-                // Join / Host screen
-                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), "ROOM CODE (UPPERCASE)", _labelStyle);
-                contentY += 30;
-
-                // Handle room code field
-                Rect fieldRect = new Rect(_panelRect.x + margin, contentY, innerW, 40);
-                if (Event.current.type == EventType.MouseDown && fieldRect.Contains(Event.current.mousePosition))
-                {
-                    _roomCodeFieldFocused = true;
-                    Event.current.Use();
-                }
-
-                GUI.DrawTexture(fieldRect, _fieldBg);
-                if (_roomCodeFieldFocused)
-                {
-                    GUI.DrawTexture(fieldRect, _fieldActiveBg);
-                }
-
-                string displayText = _roomCode ?? "";
-                if (_roomCodeFieldFocused)
-                {
-                    _cursorBlinkTimer += Time.deltaTime;
-                    if (_cursorBlinkTimer >= 0.5f)
-                    {
-                        _cursorVisible = !_cursorVisible;
-                        _cursorBlinkTimer = 0f;
-                    }
-                    if (_cursorVisible) displayText += "|";
-                }
-
-                var prevAlign = _labelStyle.alignment;
-                _labelStyle.alignment = TextAnchor.MiddleCenter;
-                GUI.Label(fieldRect, displayText, _labelStyle);
-                _labelStyle.alignment = prevAlign;
-
-                contentY += 60;
-
-                if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "JOIN GAME", _buttonStyle))
-                {
-                    _roomCodeFieldFocused = false;
-                    DoConnect();
-                }
-
-                contentY += 70;
-                GUI.DrawTexture(new Rect(_panelRect.x + margin, contentY, innerW, 1), _fieldBg);
-                contentY += 20;
-
-                if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "HOST GAME", _buttonStyle))
-                {
-                    _roomCodeFieldFocused = false;
-                    DoHost();
-                }
-            }
-            else
-            {
-                // Session details
-                string status = _isHosting ? "HOSTING SESSION" : "CONNECTED TO SESSION";
-                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), status, _statusStyle);
-                contentY += 35;
-
-                string codeToDisplay = _isHosting ? _displayRoomCode : _roomCode;
-                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 35), $"ROOM: {codeToDisplay}", _labelStyle);
-                contentY += 45;
-
-                uint players = _getPlayerCount != null ? _getPlayerCount() : 1;
-                GUI.Label(new Rect(_panelRect.x + margin, contentY, innerW, 25), $"Players: {players}", _labelStyle);
-                contentY += 40;
-
-                if (_isHosting)
-                {
-                    if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "STOP HOSTING", _stopHostButtonStyle))
-                        DoStopHosting();
-                }
-                else
-                {
-                    if (GUI.Button(new Rect(_panelRect.x + margin, contentY, innerW, 50), "DISCONNECT", _stopHostButtonStyle))
-                        DoDisconnect();
-                }
-            }
-
-            // Close when clicking outside
-            if (Event.current.type == EventType.MouseDown && !_panelRect.Contains(Event.current.mousePosition))
-            {
-                HideMultiplayerPanel();
-            }
-        }
-        catch (Exception ex)
-        {
-            CrashLog.LogException("MultiplayerBridge.DrawGUI", ex);
-        }
-    }
-
-    private void InitStyles()
-    {
-        _windowBg = MakeTex(1, 1, new Color(0.12f, 0.12f, 0.15f, 0.95f));
-        _buttonBg = MakeTex(1, 1, new Color(0.0f, 0.6f, 0.7f, 1f));
-        _buttonHoverBg = MakeTex(1, 1, new Color(0.0f, 0.8f, 0.9f, 1f));
-        _fieldBg = MakeTex(1, 1, new Color(0.2f, 0.2f, 0.25f, 1f));
-        _fieldActiveBg = MakeTex(1, 1, new Color(0.25f, 0.25f, 0.35f, 1f));
-        _stopBtnBg = MakeTex(1, 1, new Color(0.7f, 0.2f, 0.2f, 1f));
-        _stopBtnHoverBg = MakeTex(1, 1, new Color(0.9f, 0.3f, 0.3f, 1f));
-
-        _titleStyle = new GUIStyle { fontSize = 22, fontStyle = FontStyle.Bold, normal = { textColor = Color.white } };
-        _labelStyle = new GUIStyle { fontSize = 16, normal = { textColor = new Color(0.8f, 0.8f, 0.8f) } };
-        _statusStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, normal = { textColor = new Color(0.0f, 0.9f, 0.6f) } };
-
-        _buttonStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { background = _buttonBg, textColor = Color.white }, hover = { background = _buttonHoverBg, textColor = Color.white } };
-        _stopHostButtonStyle = new GUIStyle { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { background = _stopBtnBg, textColor = Color.white }, hover = { background = _stopBtnHoverBg, textColor = Color.white } };
-
-        _stylesInitialized = true;
-    }
-
-    private Texture2D MakeTex(int w, int h, Color col)
-    {
-        var tex = new Texture2D(w, h);
-        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) tex.SetPixel(x, y, col);
-        tex.Apply();
-        return tex;
-    }
+    // UI Toolkit implementation in MultiplayerBridge.UI.cs
 
     private void CleanupAll()
     {

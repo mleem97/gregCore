@@ -36,8 +36,6 @@ public sealed class GregRustHost : IGregLanguageHost
         RustFFIBridge.OnUpdate(dt);
     }
 
-    public void OnGUI() { }
-
     public void OnSceneLoaded(string sceneName)
     {
         if (!IsActive)

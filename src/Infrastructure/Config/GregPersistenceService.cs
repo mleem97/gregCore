@@ -40,19 +40,15 @@ public sealed class GregPersistenceService : IGregPersistenceService
 
     public T Get<T>(string key, T defaultValue = default!) where T : notnull
     {
-<<<<<<< HEAD
-=======
-        var path = GetSafePath(key);
-        if (!File.Exists(path)) return defaultValue;
->>>>>>> 94b9b12c1e148f8844b975f68126cc4b377dfe77
-        try {
+        try
+        {
             var path = GetSafePath(key);
             if (!File.Exists(path)) return defaultValue;
             return JsonSerializer.Deserialize<T>(File.ReadAllText(path)) ?? defaultValue;
-        } catch { return defaultValue; }
+        }
+        catch { return defaultValue; }
     }
 
-<<<<<<< HEAD
     public bool Has(string key)
     {
         try { return File.Exists(GetSafePath(key)); }
@@ -64,8 +60,4 @@ public sealed class GregPersistenceService : IGregPersistenceService
         try { File.Delete(GetSafePath(key)); }
         catch { }
     }
-=======
-    public bool Has(string key) => File.Exists(GetSafePath(key));
-    public void Delete(string key) => File.Delete(GetSafePath(key));
->>>>>>> 94b9b12c1e148f8844b975f68126cc4b377dfe77
 }

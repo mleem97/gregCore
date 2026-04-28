@@ -17,8 +17,18 @@ public sealed class GregPersistenceService : IGregPersistenceService
 
     private string GetSafePath(string key)
     {
-        if (string.IsNullOrWhiteSpace(key) || key.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || key.Contains(Path.DirectorySeparatorChar) || key.Contains(Path.AltDirectorySeparatorChar))
-            throw new System.ArgumentException("Invalid key provided for persistence file.", nameof(key));
+        if (string.IsNullOrWhiteSpace(key))
+            throw new System.ArgumentException("Key cannot be null or empty", nameof(key));
+
+        if (key.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+            key.Contains(Path.DirectorySeparatorChar) ||
+            key.Contains(Path.AltDirectorySeparatorChar) ||
+            key.Contains(".."))
+        {
+            _logger.Error($"[Security] Attempted path traversal detected with key: {key}");
+            throw new System.ArgumentException("Invalid characters in key", nameof(key));
+        }
+
         return Path.Combine(_saveDirectory, $"{key}.json");
     }
 
@@ -30,6 +40,11 @@ public sealed class GregPersistenceService : IGregPersistenceService
 
     public T Get<T>(string key, T defaultValue = default!) where T : notnull
     {
+<<<<<<< HEAD
+=======
+        var path = GetSafePath(key);
+        if (!File.Exists(path)) return defaultValue;
+>>>>>>> 94b9b12c1e148f8844b975f68126cc4b377dfe77
         try {
             var path = GetSafePath(key);
             if (!File.Exists(path)) return defaultValue;
@@ -37,6 +52,7 @@ public sealed class GregPersistenceService : IGregPersistenceService
         } catch { return defaultValue; }
     }
 
+<<<<<<< HEAD
     public bool Has(string key)
     {
         try { return File.Exists(GetSafePath(key)); }
@@ -48,4 +64,8 @@ public sealed class GregPersistenceService : IGregPersistenceService
         try { File.Delete(GetSafePath(key)); }
         catch { }
     }
+=======
+    public bool Has(string key) => File.Exists(GetSafePath(key));
+    public void Delete(string key) => File.Delete(GetSafePath(key));
+>>>>>>> 94b9b12c1e148f8844b975f68126cc4b377dfe77
 }

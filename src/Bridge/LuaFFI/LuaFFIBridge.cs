@@ -162,13 +162,6 @@ public sealed class LuaFFIBridge
         _profiler?.EndFrame();
     }
 
-    public static void OnGUI()
-    {
-        if (!_initialized) return;
-        _repl?.OnGUI();
-        _errorOverlay?.OnGUI();
-    }
-
     public static void OnSceneLoaded(string name)
     {
         if (!_initialized) return;

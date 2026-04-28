@@ -41,10 +41,6 @@ namespace gregCore.Core
             }
         }
 
-        public override void OnGUI()
-        {
-            Sdk.Language.GregLanguageRegistry.OnGUI();
-        }
     }
 
     public sealed class DataCenterModLoaderMod : MelonMod

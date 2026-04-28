@@ -23,6 +23,21 @@ namespace gregCore.API
     /// </summary>
     public static class GregAPI
     {
+        private static IGregLogger _logger;
+
+        internal static void Initialize(IGregLogger logger)
+        {
+            _logger = logger.ForContext("API");
+            EventBus = new GregEventBus(_logger);
+            Persistence = new Infrastructure.Config.GregPersistenceService(_logger);
+            
+            _logger.Info("GregAPI initialized successfully.");
+        }
+
+        public static GregUIController UI { get; internal set; }
+        public static GregEventBus EventBus { get; internal set; }
+        public static IGregPersistenceService Persistence { get; internal set; }
+
         // ─── Mod Registration ────────────────────────────────────────────
         public static object RegisterMod(string id, string name, string version) => null!;
         public static GregSettingsProxy Settings { get; } = new GregSettingsProxy();
@@ -44,7 +59,6 @@ namespace gregCore.API
         /// Referenz zum zentralen HookBus – wird von GregCoreMod beim Boot gesetzt.
         /// </summary>
         internal static GregHookBus? HookBus { get; set; }
-        public static GregEventBus? EventBus { get; set; }
 
         public static void FireEvent(string id, object? data = null)
         {

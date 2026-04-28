@@ -37,10 +37,6 @@ public sealed class GregCSharpScriptHost : IGregLanguageHost
     {
     }
 
-    public void OnGUI()
-    {
-    }
-
     public void OnSceneLoaded(string sceneName)
     {
     }

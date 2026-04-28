@@ -37,16 +37,6 @@ public sealed class GregLuaHost : IGregLanguageHost
         LuaFFIBridge.OnUpdate(dt);
     }
  
-    public void OnGUI()
-    {
-        if (!IsActive)
-        {
-            return;
-        }
- 
-        LuaFFIBridge.OnGUI();
-    }
-
     public void OnSceneLoaded(string sceneName)
     {
         if (!IsActive)

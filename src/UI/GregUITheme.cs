@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UIElements;
+using System;
 
 namespace gregCore.UI
 {
@@ -23,9 +25,6 @@ namespace gregCore.UI
         public static readonly float BorderWidthWidget = 1.5f;
         public static readonly float BorderWidth = 2f;
 
-        // --- Asset References ---
-        public static Sprite? RoundedSprite; 
-
         private static Color ParseHex(string hex)
         {
             if (ColorUtility.TryParseHtmlString(hex, out Color color))
@@ -33,37 +32,35 @@ namespace gregCore.UI
             return Color.magenta;
         }
 
-        public static void ApplyText(UnityEngine.UI.Text txt, bool isHeadline = false)
+        public static void ApplyTextStyle(Label label, bool isHeadline = false)
         {
-            txt.color = isHeadline ? SecondaryColor : new Color(0.88f, 0.88f, 0.88f);
-            txt.fontSize = isHeadline ? 20 : 14;
-            txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            txt.fontStyle = isHeadline ? FontStyle.Bold : FontStyle.Normal;
+            label.style.fontSize = isHeadline ? 20 : 14;
+            label.style.color = isHeadline ? SecondaryColor : new Color(0.88f, 0.88f, 0.88f);
+            label.style.unityFontStyleAndWeight = isHeadline ? FontStyle.Bold : FontStyle.Normal;
         }
 
-        public static void ApplyPrimaryButton(UnityEngine.UI.Button btn, UnityEngine.UI.Image img)
+        public static void ApplyPrimaryButtonStyle(Button button)
         {
-            img.color = PrimaryAccent;
-            img.sprite = RoundedSprite;
-            img.type = UnityEngine.UI.Image.Type.Sliced;
-
-            var colors = btn.colors;
-            colors.normalColor = Color.white;
-            colors.highlightedColor = SecondaryColor;
-            colors.pressedColor = TertiaryColor;
-            btn.colors = colors;
+            button.style.backgroundColor = PrimaryAccent;
+            button.style.color = Color.black;
+            button.style.unityFontStyleAndWeight = FontStyle.Bold;
+            button.style.borderTopLeftRadius = CornerRadius;
+            button.style.borderTopRightRadius = CornerRadius;
+            button.style.borderBottomLeftRadius = CornerRadius;
+            button.style.borderBottomRightRadius = CornerRadius;
+            button.style.unityTextAlign = TextAnchor.MiddleCenter;
         }
-        
-        public static void ApplySecondaryButton(UnityEngine.UI.Button btn, UnityEngine.UI.Image img)
+
+        public static void ApplySecondaryButtonStyle(Button button)
         {
-            img.color = new Color(0.15f, 0.15f, 0.15f, 0.5f); // Semi-transparent
-            img.sprite = RoundedSprite;
-            img.type = UnityEngine.UI.Image.Type.Sliced;
-            
-            var colors = btn.colors;
-            colors.normalColor = NeutralBorder;
-            colors.highlightedColor = SecondaryColor;
-            btn.colors = colors;
+            button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+            button.style.color = NeutralBorder;
+            button.style.unityFontStyleAndWeight = FontStyle.Bold;
+            button.style.borderTopLeftRadius = CornerRadius;
+            button.style.borderTopRightRadius = CornerRadius;
+            button.style.borderBottomLeftRadius = CornerRadius;
+            button.style.borderBottomRightRadius = CornerRadius;
+            button.style.unityTextAlign = TextAnchor.MiddleCenter;
         }
     }
 }

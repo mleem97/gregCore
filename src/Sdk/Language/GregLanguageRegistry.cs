@@ -107,21 +107,6 @@ public static class GregLanguageRegistry
         }
     }
 
-    public static void OnGUI()
-    {
-        foreach (var host in ActiveHosts.Values)
-        {
-            try
-            {
-                host.OnGUI();
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Host OnGUI failed ({host.HostName}): {ex}");
-            }
-        }
-    }
-
     public static void OnSceneLoaded(string sceneName)
     {
         foreach (var host in ActiveHosts.Values)

@@ -55,10 +55,6 @@ public sealed class GregJsHost : IGregLanguageHost
     {
     }
 
-    public void OnGUI()
-    {
-    }
-
     public void OnSceneLoaded(string sceneName)
     {
     }

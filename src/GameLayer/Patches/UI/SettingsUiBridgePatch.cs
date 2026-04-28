@@ -42,13 +42,6 @@ internal static class SettingsUiBridgePatch
                     var newTabObj = UnityEngine.Object.Instantiate(sourceTab.gameObject, sourceTab.transform.parent);
                     newTabObj.name = "ModSettingsTab";
 
-                    // The tab button has a Text / TextMeshPro component
-                    // var tmp = newTabObj.GetComponentInChildren<global::Il2CppTMPro.TextMeshProUGUI>();
-                    // if (tmp != null)
-                    // {
-                    //     tmp.text = "Mods";
-                    // }
-
                     var newTabButton = newTabObj.GetComponent<global::Il2Cpp.PauseMenu_TabButton>();
 
                     // We need a corresponding panel object to swap to

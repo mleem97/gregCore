@@ -18,7 +18,7 @@ from collections import defaultdict
 from datetime import date
 
 
-def load_json(path: str) -> object:
+def load_json(path: str) -> "dict | list | None":
     if not os.path.isfile(path):
         print(f"[warn] File not found: {path}", file=sys.stderr)
         return None
@@ -36,7 +36,7 @@ def format_params(params: list) -> str:
 def render_game_hooks(data: list) -> str:
     if not data:
         return "_No game hooks defined._\n"
-    groups: dict[str, list] = defaultdict(list)
+    groups: defaultdict[str, list] = defaultdict(list)
     for entry in data:
         groups[entry.get("Group", "Uncategorized")].append(entry)
 
@@ -65,7 +65,7 @@ def render_greg_hooks(data: dict) -> str:
         return "_Hook registry is empty._\n"
 
     # Group by name prefix (e.g. greg.SYSTEM, greg.AUDIO …)
-    groups: dict[str, list] = defaultdict(list)
+    groups: defaultdict[str, list] = defaultdict(list)
     for h in hooks:
         name: str = h.get("name", "")
         parts = name.split(".")

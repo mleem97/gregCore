@@ -56,7 +56,7 @@ jobs:
         run: |
           V="${{ steps.bump.outputs.version }}"
           DATE=$(date +%Y-%m-%d)
-          PREV=$(git log --oneline -1 --skip=1 --format="%s" 2>/dev/null || echo "previous commit")
+          PREV=$(git log --format="%s" HEAD~1 -1 2>/dev/null || echo "patch update")
           ENTRY="## [${V}] - ${DATE}\n\n### Changed\n\n- Auto-release: ${PREV}\n\n"
           # Insert after first line (# Changelog)
           awk -v entry="$ENTRY" 'NR==1{print; print ""; printf "%s", entry; next} /^## \[/{if(!done){done=1} print; next} {print}' CHANGELOG.md > CHANGELOG.tmp

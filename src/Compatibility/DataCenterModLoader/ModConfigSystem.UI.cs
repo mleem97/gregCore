@@ -49,7 +49,10 @@ namespace DataCenterModLoader
                         borderBottomWidth = 1,
                         borderLeftWidth = 1,
                         borderRightWidth = 1,
-                        borderRadius = 8,
+                        borderTopLeftRadius = 8,
+                        borderTopRightRadius = 8,
+                        borderBottomLeftRadius = 8,
+                        borderBottomRightRadius = 8,
                         flexDirection = FlexDirection.Row,
                         paddingTop = 16,
                         paddingBottom = 16,
@@ -213,7 +216,7 @@ namespace DataCenterModLoader
                     value = entry.BoolValue,
                     style = { width = 50 }
                 };
-                toggle.RegisterValueChangedCallback(evt => 
+                toggle.RegisterValueChangedCallback<bool>(evt => 
                 {
                     entry.BoolValue = evt.newValue;
                     SaveConfig(entry);
@@ -227,7 +230,7 @@ namespace DataCenterModLoader
                     value = entry.IntValue,
                     style = { flexGrow = 1 }
                 };
-                slider.RegisterValueChangedCallback(evt => 
+                slider.RegisterValueChangedCallback<float>(evt => 
                 {
                     entry.IntValue = (int)evt.newValue;
                     SaveConfig(entry);
@@ -241,7 +244,7 @@ namespace DataCenterModLoader
                     value = entry.FloatValue,
                     style = { flexGrow = 1 }
                 };
-                slider.RegisterValueChangedCallback(evt => 
+                slider.RegisterValueChangedCallback<float>(evt => 
                 {
                     entry.FloatValue = evt.newValue;
                     SaveConfig(entry);

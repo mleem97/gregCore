@@ -35,15 +35,34 @@ namespace gregCore.Infrastructure.Settings.Services
             _pluginRegistry = pluginRegistry;
         }
 
-        public void BuildModSettingsPanel(VisualElement panel)
+        public void BuildModSettingsPanel(GameObject panelGo)
         {
-            _root = panel;
-            _root.style.flexDirection = FlexDirection.Column;
-            _root.style.backgroundColor = new Color(0.07f, 0.07f, 0.07f, 0.96f);
-            _root.style.paddingTop = 10;
-            _root.style.paddingBottom = 10;
-            _root.style.paddingLeft = 10;
-            _root.style.paddingRight = 10;
+            var doc = panelGo.GetComponent<UIDocument>();
+            if (doc == null) doc = panelGo.AddComponent<UIDocument>();
+            if (doc.panelSettings == null)
+            {
+                var settings = ScriptableObject.CreateInstance<PanelSettings>();
+                settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+                settings.referenceResolution = new Vector2Int(1920, 1080);
+                settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
+                settings.match = 0.5f;
+                doc.panelSettings = settings;
+            }
+
+            _root = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Column,
+                    backgroundColor = new Color(0.07f, 0.07f, 0.07f, 0.96f),
+                    paddingTop = 10,
+                    paddingBottom = 10,
+                    paddingLeft = 10,
+                    paddingRight = 10
+                }
+            };
+            doc.rootVisualElement.Add(_root);
 
             // Scroll view
             var scrollView = new ScrollView(ScrollViewMode.Vertical)
@@ -77,7 +96,7 @@ namespace gregCore.Infrastructure.Settings.Services
                     marginBottom = 10
                 }
             };
-            _searchInput.RegisterValueChangedCallback(evt => RefreshUi(evt.newValue));
+            _searchInput.RegisterValueChangedCallback<string>(evt => RefreshUi(evt.newValue));
             _root!.Add(_searchInput);
         }
 

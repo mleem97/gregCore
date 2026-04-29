@@ -74,7 +74,7 @@ namespace gregCore.Core
 
                 try
                 {
-                    var modsDir = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "Mods", "Scripts");
+                    var modsDir = System.IO.Path.Combine(global::MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "Mods", "Scripts");
                     GregLanguageRegistry.ScanAndActivate(modsDir);
                 }
                 catch (Exception ex)

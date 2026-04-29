@@ -70,7 +70,7 @@ namespace DataCenterModLoader
                     marginBottom = 20
                 }
             };
-            codeField.RegisterValueChangedCallback(evt =>
+            codeField.RegisterValueChangedCallback<string>(evt =>
             {
                 _roomCode = evt.newValue;
                 _roomCodeFieldFocused = !string.IsNullOrEmpty(evt.newValue);
@@ -93,7 +93,10 @@ namespace DataCenterModLoader
                     height = 50,
                     fontSize = 18,
                     marginBottom = 20,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             _panelRoot.Add(joinBtn);
@@ -125,7 +128,10 @@ namespace DataCenterModLoader
                     unityFontStyleAndWeight = FontStyle.Bold,
                     height = 50,
                     fontSize = 18,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             _panelRoot.Add(hostBtn);
@@ -223,7 +229,10 @@ namespace DataCenterModLoader
                     unityFontStyleAndWeight = FontStyle.Bold,
                     height = 50,
                     fontSize = 18,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             _panelRoot.Add(actionBtn);

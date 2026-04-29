@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using gregCore.Core.Abstractions;
+using gregCore.UI;
 
 namespace gregCore.Infrastructure.Settings.Services
 {
@@ -46,7 +47,10 @@ namespace gregCore.Infrastructure.Settings.Services
                     borderBottomWidth = 2,
                     borderLeftWidth = 2,
                     borderRightWidth = 2,
-                    borderRadius = 6,
+                    borderTopLeftRadius = 6,
+                    borderTopRightRadius = 6,
+                    borderBottomLeftRadius = 6,
+                    borderBottomRightRadius = 6,
                     paddingTop = 8,
                     paddingBottom = 8,
                     paddingLeft = 10,

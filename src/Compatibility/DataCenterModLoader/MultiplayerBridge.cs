@@ -139,6 +139,11 @@ public partial class MultiplayerBridge
     private string? _reconnectRoomCode = null;    // room code to auto-reconnect after scene transition
     private bool _skipSaveOnReconnect = false;   // skip save processing when reconnecting after load
     private float _reconnectCooldown = 0f;       // cooldown to prevent rapid-fire reconnect attempts
+    private int _mpReenableCountdown = 0;
+    private UnityEngine.EventSystems.EventSystem? _mpDisabledEventSystem = null;
+    private bool _pendingMenuInjection = false;
+    private float _menuInjectionTimer = 0f;
+    private GameObject? _menuButton = null;
     private bool _gameHandledSaveLoad = false;   // true when MainMenu.Continue() handles the load
 
     // Host: cached save bytes so multiple client joins don't re-trigger SaveGame()

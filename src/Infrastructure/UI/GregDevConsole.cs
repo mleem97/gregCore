@@ -60,6 +60,16 @@ namespace gregCore.Infrastructure.UI
                 if (_root != null)
                     _root.style.display = _isVisible ? DisplayStyle.Flex : DisplayStyle.None;
             }
+
+            if (_isVisible && _inputField != null && Input.GetKeyDown(KeyCode.Return))
+            {
+                string command = _inputField.value;
+                if (!string.IsNullOrWhiteSpace(command))
+                {
+                    AddLog(command, "COMMAND");
+                    _inputField.value = "";
+                }
+            }
         }
 
         private void BuildUI()
@@ -151,19 +161,6 @@ namespace gregCore.Infrastructure.UI
                     height = 24
                 }
             };
-            _inputField.RegisterCallback<KeyDownEvent>(evt =>
-            {
-                if (evt.keyCode == KeyCode.Return)
-                {
-                    string command = _inputField.value;
-                    if (!string.IsNullOrWhiteSpace(command))
-                    {
-                        AddLog(command, "COMMAND");
-                        _inputField.value = "";
-                    }
-                    evt.StopPropagation();
-                }
-            });
             _root.Add(_inputField);
 
             GregUIManager.RegisterPanel("DevConsole", _root);

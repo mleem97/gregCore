@@ -25,6 +25,7 @@ public sealed class LuaRepl
     private TextField _inputField;
     private VisualElement _root;
     private readonly int _maxOutputLines = 200;
+    private Script? _replScript;
 
     /// <summary>
     /// Erstellt den REPL mit einem frischen MoonSharp-Script-Context.
@@ -110,8 +111,42 @@ public sealed class LuaRepl
         }
     }
 
+    public void Update()
+    {
+        if (_root == null || _root.style.display == DisplayStyle.None) return;
+        if (_inputField == null) return;
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) && _history.Count > 0)
+        {
+            _historyIndex = Math.Max(0, _historyIndex - 1);
+            if (_historyIndex < _history.Count)
+            {
+                _input = _history[_historyIndex];
+                _inputField.value = _input;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) && _history.Count > 0)
+        {
+            _historyIndex = Math.Min(_history.Count, _historyIndex + 1);
+            _input = _historyIndex < _history.Count ? _history[_historyIndex] : "";
+            _inputField.value = _input;
+        }
+        else if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (!string.IsNullOrWhiteSpace(_input) && _replScript != null)
+            {
+                Evaluate(_input, _replScript);
+                _history.Add(_input);
+                _historyIndex = _history.Count;
+                _input = "";
+                _inputField.value = "";
+            }
+        }
+    }
+
     private void BuildUI(Script replScript)
     {
+        _replScript = replScript;
         _root = new VisualElement
         {
             name = "LuaREPL",
@@ -131,7 +166,10 @@ public sealed class LuaRepl
                 borderBottomWidth = 2,
                 borderLeftWidth = 2,
                 borderRightWidth = 2,
-                borderRadius = 8,
+                borderTopLeftRadius = 8,
+                borderTopRightRadius = 8,
+                borderBottomLeftRadius = 8,
+                borderBottomRightRadius = 8,
                 flexDirection = FlexDirection.Column,
                 paddingTop = 10,
                 paddingBottom = 10,
@@ -175,7 +213,10 @@ public sealed class LuaRepl
                 borderBottomWidth = 1,
                 borderLeftWidth = 1,
                 borderRightWidth = 1,
-                borderRadius = 4,
+                borderTopLeftRadius = 4,
+                borderTopRightRadius = 4,
+                borderBottomLeftRadius = 4,
+                borderBottomRightRadius = 4,
                 paddingTop = 6,
                 paddingBottom = 6,
                 paddingLeft = 6,
@@ -218,39 +259,7 @@ public sealed class LuaRepl
                 height = 24
             }
         };
-        _inputField.RegisterValueChangedCallback(evt => _input = evt.newValue);
-        _inputField.RegisterCallback<KeyDownEvent>(evt =>
-        {
-            if (evt.keyCode == KeyCode.UpArrow && _history.Count > 0)
-            {
-                _historyIndex = Math.Max(0, _historyIndex - 1);
-                if (_historyIndex < _history.Count)
-                {
-                    _input = _history[_historyIndex];
-                    _inputField.value = _input;
-                }
-                evt.StopPropagation();
-            }
-            else if (evt.keyCode == KeyCode.DownArrow && _history.Count > 0)
-            {
-                _historyIndex = Math.Min(_history.Count, _historyIndex + 1);
-                _input = _historyIndex < _history.Count ? _history[_historyIndex] : "";
-                _inputField.value = _input;
-                evt.StopPropagation();
-            }
-            else if (evt.keyCode == KeyCode.Return)
-            {
-                if (!string.IsNullOrWhiteSpace(_input))
-                {
-                    Evaluate(_input, replScript);
-                    _history.Add(_input);
-                    _historyIndex = _history.Count;
-                    _input = "";
-                    _inputField.value = "";
-                }
-                evt.StopPropagation();
-            }
-        });
+        _inputField.RegisterValueChangedCallback<string>(evt => _input = evt.newValue);
         inputRow.Add(_inputField);
 
         var runButton = new Button(() =>

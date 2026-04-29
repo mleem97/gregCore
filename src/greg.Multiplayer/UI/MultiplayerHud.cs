@@ -59,7 +59,10 @@ namespace greg.Multiplayer
                     borderBottomWidth = 2,
                     borderLeftWidth = 2,
                     borderRightWidth = 2,
-                    borderRadius = 8,
+                    borderTopLeftRadius = 8,
+                    borderTopRightRadius = 8,
+                    borderBottomLeftRadius = 8,
+                    borderBottomRightRadius = 8,
                     paddingTop = 10,
                     paddingBottom = 10,
                     paddingLeft = 10,
@@ -170,7 +173,10 @@ namespace greg.Multiplayer
                     unityFontStyleAndWeight = FontStyle.Bold,
                     height = 30,
                     marginBottom = 6,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             root.Add(btnLAN);
@@ -191,7 +197,10 @@ namespace greg.Multiplayer
                     unityFontStyleAndWeight = FontStyle.Bold,
                     height = 30,
                     marginBottom = 6,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             root.Add(btnRelay);
@@ -223,7 +232,7 @@ namespace greg.Multiplayer
                     marginBottom = 4
                 }
             };
-            inviteField.RegisterValueChangedCallback(evt => _inviteLink = evt.newValue);
+            inviteField.RegisterValueChangedCallback<string>(evt => _inviteLink = evt.newValue);
             inviteContainer.Add(inviteField);
 
             var copyBtn = new Button(() =>
@@ -239,7 +248,10 @@ namespace greg.Multiplayer
                     backgroundColor = new Color(0.15f, 0.15f, 0.15f),
                     color = new Color(0f, 0.75f, 0.65f),
                     height = 24,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             inviteContainer.Add(copyBtn);
@@ -277,7 +289,7 @@ namespace greg.Multiplayer
                     marginBottom = 6
                 }
             };
-            joinField.RegisterValueChangedCallback(evt => _joinInput = evt.newValue);
+            joinField.RegisterValueChangedCallback<string>(evt => _joinInput = evt.newValue);
             root.Add(joinField);
 
             var connectBtn = new Button(() =>
@@ -301,7 +313,10 @@ namespace greg.Multiplayer
                     color = Color.black,
                     unityFontStyleAndWeight = FontStyle.Bold,
                     height = 30,
-                    borderRadius = 4
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
                 }
             };
             root.Add(connectBtn);

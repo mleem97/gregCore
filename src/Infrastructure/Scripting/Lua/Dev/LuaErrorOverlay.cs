@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using MelonLoader;
+using gregCore.UI;
 
 namespace gregCore.Infrastructure.Scripting.Lua.Dev;
 
@@ -60,8 +61,7 @@ public sealed class LuaErrorOverlay
                     alignItems = Align.FlexEnd,
                     paddingBottom = 20,
                     paddingRight = 20,
-                    backgroundColor = Color.clear,
-                    pointerEvents = PointerEvents.None
+                    backgroundColor = Color.clear
                 }
             };
 

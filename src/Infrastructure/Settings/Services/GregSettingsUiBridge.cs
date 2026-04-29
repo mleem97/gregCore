@@ -87,7 +87,6 @@ namespace gregCore.Infrastructure.Settings.Services
         {
             _searchInput = new TextField
             {
-                placeholderText = "Suche nach Mods oder Keybinds...",
                 style =
                 {
                     backgroundColor = new Color(0.1f, 0.1f, 0.1f),

@@ -71,5 +71,7 @@
     <Compile Remove="lib\MoonSharp\**" />
     <Compile Remove="temp_dump\**" />
     <Compile Remove="src\greg.Multiplayer\**" />
+    <Compile Remove="src\Compatibility\DataCenterModLoader\**" />
+    <Compile Remove="src\API\CustomEmployeeManager.cs" />
   </ItemGroup>
 </Project>

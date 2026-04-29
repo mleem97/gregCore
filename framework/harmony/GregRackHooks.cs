@@ -10,7 +10,7 @@ namespace gregFramework.Hooks;
 
 /// <summary>
 /// Harmony hooks for domain Rack (generated from Il2Cpp unpack).
-/// All patches are defensive: null-checks, try-catch, and NativePointer validation.
+/// All patches are defensive: null-checks, try-catch, and Pointer validation.
 /// </summary>
 internal static class GregRackHooks
 {
@@ -32,7 +32,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "ComponentInitialized"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -47,7 +47,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "ComponentInitialized"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -63,7 +63,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
+            if (__instance == null || __instance.Pointer == IntPtr.Zero)
             {
                 __result = false;
                 return false;
@@ -71,7 +71,7 @@ internal static class GregRackHooks
 
             bool isAvailable = true;
             var used = __instance.isPositionUsed;
-            if (used != null && used.NativePointer != IntPtr.Zero)
+            if (used != null && used.Pointer != IntPtr.Zero)
             {
                 for (int i = index; i < index + sizeInU && i < used.Length; i++)
                 {
@@ -99,7 +99,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "MarkPositionAsUsed"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -114,7 +114,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "MarkPositionAsUnused"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -129,7 +129,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "AudioVolumeChanged"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -144,7 +144,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "ButtonDisablePositionsInRack"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -159,7 +159,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "DisablePositionsButtonMaterialSet"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -174,7 +174,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "ButtonUnmountRack"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -189,7 +189,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "OnLoad"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -204,7 +204,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "OnDestroy"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -219,7 +219,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "InstantiateRack"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -234,7 +234,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "ApplyMaterialToLODs"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -249,7 +249,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "OnLoad"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -264,7 +264,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "OnDestroy"), new { instance = __instance });
         }
         catch (Exception ex)
@@ -279,7 +279,7 @@ internal static class GregRackHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Rack, "CheatInsertRack"), new { instance = __instance });
         }
         catch (Exception ex)

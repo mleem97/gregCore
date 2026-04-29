@@ -1,4 +1,4 @@
-﻿/// <file-summary>
+/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Extrahiert Netzwerk-Map Events.
 /// Maintainer:   Kein Business-Logic, reines Dispatch.

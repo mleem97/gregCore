@@ -64,6 +64,7 @@
   </Target>
 
   <ItemGroup>
+    <Compile Remove="src\CI_Stubs.cs" />
     <Compile Remove="tests\**" />
     <Compile Remove="plugins\**" />
     <Compile Remove="mods\**" />

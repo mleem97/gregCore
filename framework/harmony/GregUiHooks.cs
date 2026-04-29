@@ -36,7 +36,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -57,7 +57,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -78,7 +78,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -99,7 +99,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetOrCreateRecord",
                 new
@@ -120,7 +120,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RegisterSalary",
                 new
@@ -141,7 +141,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CountFailingApps",
                 new
@@ -162,7 +162,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SnapshotSaved",
                 new
@@ -183,7 +183,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetLatestSnapshot",
                 new
@@ -204,7 +204,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "FillInBalanceSheet",
                 new
@@ -225,7 +225,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SalaryRowAdded",
                 new
@@ -246,7 +246,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TotalRowAdded",
                 new
@@ -267,7 +267,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HeaderRowAdded",
                 new
@@ -288,7 +288,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SectionTitleAdded",
                 new
@@ -309,7 +309,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InstantiateRow",
                 new
@@ -330,7 +330,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClearRows",
                 new
@@ -351,7 +351,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSaveData",
                 new
@@ -372,7 +372,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "FromSaveLoaded",
                 new
@@ -393,7 +393,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RestoreRecord",
                 new
@@ -414,7 +414,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -435,7 +435,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Continue",
                 new
@@ -456,7 +456,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "NewGame",
                 new
@@ -477,7 +477,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "QuitGame",
                 new
@@ -498,7 +498,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GameLoaded",
                 new
@@ -519,7 +519,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HideMiddleMenu",
                 new
@@ -540,7 +540,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "tingsSet",
                 new
@@ -561,7 +561,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -582,7 +582,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "LookSensitivity",
                 new
@@ -603,7 +603,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InvertY",
                 new
@@ -624,7 +624,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SettingsLoaded",
                 new
@@ -645,7 +645,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -666,7 +666,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "QualitySet",
                 new
@@ -687,7 +687,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "FullScreenSet",
                 new
@@ -708,7 +708,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResDropDownSet",
                 new
@@ -729,7 +729,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResolutionSet",
                 new
@@ -750,7 +750,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AvailableRefreshRate",
                 new
@@ -771,7 +771,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RefreshRateSet",
                 new
@@ -792,7 +792,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "LimitFrameRate",
                 new
@@ -813,7 +813,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SettingsLoaded",
                 new
@@ -834,7 +834,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ChangeDepthOfField",
                 new
@@ -855,7 +855,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetDepthOfField",
                 new
@@ -876,7 +876,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "FieldOfViewSet",
                 new
@@ -897,7 +897,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShadowDistanceSet",
                 new
@@ -918,7 +918,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MotionBlurSet",
                 new
@@ -939,7 +939,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ExposureSet",
                 new
@@ -960,7 +960,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "upAASet",
                 new
@@ -981,7 +981,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AntiAliasingSet",
                 new
@@ -1002,7 +1002,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AAQualitySet",
                 new
@@ -1023,7 +1023,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "IsDLSSSupported",
                 new
@@ -1044,7 +1044,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PopulateMonitors",
                 new
@@ -1065,7 +1065,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MonitorSet",
                 new
@@ -1086,7 +1086,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RepopulateResolutions",
                 new
@@ -1107,7 +1107,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -1128,7 +1128,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MasterVolume",
                 new
@@ -1149,7 +1149,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MusicVolume",
                 new
@@ -1170,7 +1170,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "EffectVolume",
                 new
@@ -1191,7 +1191,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RacksVolume",
                 new
@@ -1212,7 +1212,7 @@ internal static class GregUiHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SettingsLoaded",
                 new

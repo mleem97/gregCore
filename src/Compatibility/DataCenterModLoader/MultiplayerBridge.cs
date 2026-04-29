@@ -21,7 +21,7 @@ namespace DataCenterModLoader;
 /// </summary>
 using UnityEngine.SceneManagement;
 
-public class MultiplayerBridge
+public partial class MultiplayerBridge
 {
     [DllImport("kernel32.dll")]
     private static extern IntPtr GetModuleHandle(string lpModuleName);
@@ -1952,32 +1952,6 @@ public class MultiplayerBridge
         {
             CrashLog.LogException("InjectMainMenuButton", ex);
         }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  IMGUI Multiplayer Panel
-    // ═══════════════════════════════════════════════════════════════════════
-
-    public void ShowMultiplayerPanel()
-    {
-        _showPanel = true;
-        try
-        {
-            var es = UnityEngine.EventSystems.EventSystem.current;
-            if (es != null)
-            {
-                _mpDisabledEventSystem = es;
-                es.enabled = false;
-            }
-        }
-        catch { }
-    }
-
-    public void HideMultiplayerPanel()
-    {
-        _showPanel = false;
-        if (_mpDisabledEventSystem != null)
-            _mpReenableCountdown = 2;
     }
 
     // UI Toolkit implementation in MultiplayerBridge.UI.cs

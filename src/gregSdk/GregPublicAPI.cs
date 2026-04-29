@@ -61,14 +61,14 @@ namespace greg.Sdk
             try
             {
                 var saveData = Il2Cpp.SaveData.instance;
-                if (saveData == null || saveData.NativePointer == IntPtr.Zero)
+                if (saveData == null || saveData.Pointer == IntPtr.Zero)
                 {
                     MelonLogger.Warning("[gregCore][PublicAPI] SaveData.instance is null or collected.");
                     return 0f;
                 }
 
                 var playerData = saveData.playerData;
-                if (playerData == null || playerData.NativePointer == IntPtr.Zero)
+                if (playerData == null || playerData.Pointer == IntPtr.Zero)
                 {
                     return 0f;
                 }
@@ -92,7 +92,7 @@ namespace greg.Sdk
 
                 foreach (var wall in walls)
                 {
-                    if (wall == null || wall.NativePointer == IntPtr.Zero)
+                    if (wall == null || wall.Pointer == IntPtr.Zero)
                         continue;
 
                     if (!wall.isWallOpened)
@@ -135,7 +135,7 @@ namespace greg.Sdk
             try
             {
                 var results = UnityEngine.Object.FindObjectsOfType<T>();
-                return results?.Where(r => r != null && r.NativePointer != IntPtr.Zero).ToArray() ?? Array.Empty<T>();
+                return results?.Where(r => r != null && r.Pointer != IntPtr.Zero).ToArray() ?? Array.Empty<T>();
             }
             catch (Exception ex)
             {
@@ -152,7 +152,7 @@ namespace greg.Sdk
             try
             {
                 var saveData = Il2Cpp.SaveData.instance;
-                if (saveData == null || saveData.NativePointer == IntPtr.Zero)
+                if (saveData == null || saveData.Pointer == IntPtr.Zero)
                     return null;
                 return saveData;
             }

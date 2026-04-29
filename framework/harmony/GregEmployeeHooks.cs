@@ -34,7 +34,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
@@ -56,7 +56,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonHireEmployee"),
@@ -78,7 +78,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonCancelBuying"),
@@ -100,7 +100,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonConfirmHire"),
@@ -122,7 +122,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonFireEmployee"),
@@ -144,7 +144,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonConfirmFireEmployee"),
@@ -166,7 +166,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
@@ -188,7 +188,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
@@ -210,7 +210,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "AssignJob"),
@@ -232,7 +232,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetCurrentDevicePrefabID"),
@@ -254,7 +254,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "DeviceRepaired"),
@@ -276,7 +276,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetCorrectDevicePrefab"),
@@ -298,7 +298,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "RotateTowardsGoal"),
@@ -320,7 +320,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "PositionHandTargetsOnDevice"),
@@ -342,7 +342,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnLoadingStarted"),
@@ -364,7 +364,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnDestroy"),
@@ -386,7 +386,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
@@ -408,7 +408,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Hired"),
@@ -430,7 +430,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Dispatched"),
@@ -452,7 +452,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "NextJobRequested"),
@@ -474,7 +474,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "JobQueued"),
@@ -496,7 +496,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "IsDeviceAlreadyAssigned"),
@@ -518,7 +518,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "JobQueueLoaded"),
@@ -540,7 +540,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Fired"),
@@ -562,7 +562,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OpenDumpsterArea"),
@@ -584,7 +584,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetClosestOpenedDumpsterIndex"),
@@ -606,7 +606,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnDestroy"),
@@ -628,7 +628,7 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
 
             SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnLoadingStarted"),

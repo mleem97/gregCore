@@ -27,7 +27,7 @@ namespace greg.Mods.AutoBuilder
         public void ToggleUI()
         {
             GregUIManager.TogglePanel("AutoBuilder");
-            if (GregUIManager.RootObject.transform.Find("Panel_AutoBuilder") == null)
+            if (GregUIManager.Root?.Q<UnityEngine.UIElements.VisualElement>("Panel_AutoBuilder") == null)
             {
                 BuildUI();
             }

@@ -14,7 +14,7 @@ namespace greg.Furniture
                 .AddLabel("L-CLICK: Place | ESC: Exit");
             
             var widget = builder.Build();
-            widget.SetActive(false);
+            widget.style.display = DisplayStyle.None;
         }
     }
 }

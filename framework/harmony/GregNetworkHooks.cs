@@ -35,7 +35,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ComponentInitialized"),
                 new
@@ -56,7 +56,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ConnectionSpeedSet"),
                 new
@@ -77,7 +77,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "InsertSFP"),
                 new
@@ -98,7 +98,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "SFPRemoved"),
                 new
@@ -119,7 +119,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CollectPatchPanelChainCables"),
                 new
@@ -140,7 +140,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CreateRopeAttachPoint"),
                 new
@@ -161,7 +161,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetRopeAttachPoint"),
                 new
@@ -182,7 +182,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ComponentInitialized"),
                 new
@@ -203,7 +203,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ComponentInitialized"),
                 new
@@ -224,7 +224,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ClearAllCables"),
                 new
@@ -245,7 +245,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CableLoaded"),
                 new
@@ -293,7 +293,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CreateNewReverseCable"),
                 new
@@ -314,7 +314,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GenerateFinalPath"),
                 new
@@ -335,7 +335,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "RedrawCable"),
                 new
@@ -356,7 +356,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CreateTubeMesh"),
                 new
@@ -377,7 +377,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "PositionRemoved"),
                 new
@@ -398,7 +398,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "LastPositionRemoved"),
                 new
@@ -419,7 +419,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetCablePositions"),
                 new
@@ -440,7 +440,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetRawCablePositions"),
                 new
@@ -461,7 +461,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetRawLinkTransforms"),
                 new
@@ -482,7 +482,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsCableComplete"),
                 new
@@ -503,7 +503,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetCableMaterial"),
                 new
@@ -524,7 +524,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ComponentInitialized"),
                 new
@@ -545,7 +545,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ClearMap"),
                 new
@@ -566,7 +566,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "RegisterCustomerBase"),
                 new
@@ -587,7 +587,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetCustomerBase"),
                 new
@@ -608,7 +608,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "RegisterServer"),
                 new
@@ -629,7 +629,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "RegisterSwitch"),
                 new
@@ -650,7 +650,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetServer"),
                 new
@@ -671,7 +671,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetSwitchById"),
                 new
@@ -692,7 +692,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllServers"),
                 new
@@ -713,7 +713,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllNetworkSwitches"),
                 new
@@ -734,7 +734,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DeviceCustomerIDChanged"),
                 new
@@ -755,7 +755,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DeviceAdded"),
                 new
@@ -776,7 +776,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DeviceRemoved"),
                 new
@@ -797,7 +797,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "Connect"),
                 new
@@ -818,7 +818,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "Disconnect"),
                 new
@@ -839,7 +839,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "FindAllRoutes"),
                 new
@@ -860,7 +860,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "FindAllReachablePathsFrom"),
                 new
@@ -881,7 +881,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "FindPhysicalPath"),
                 new
@@ -902,7 +902,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetDevice"),
                 new
@@ -923,7 +923,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllDevices"),
                 new
@@ -944,7 +944,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GenerateDeviceName"),
                 new
@@ -965,7 +965,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "SwitchConnectionAdded"),
                 new
@@ -986,7 +986,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CableConnectionRemoved"),
                 new
@@ -1007,7 +1007,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "PrintNetworkMap"),
                 new
@@ -1028,7 +1028,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsIpAddressDuplicate"),
                 new
@@ -1049,7 +1049,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "BrokenServerAdded"),
                 new
@@ -1070,7 +1070,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "BrokenSwitchAdded"),
                 new
@@ -1091,7 +1091,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "BrokenServerRemoved"),
                 new
@@ -1112,7 +1112,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "BrokenSwitchRemoved"),
                 new
@@ -1133,7 +1133,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllBrokenServers"),
                 new
@@ -1154,7 +1154,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllBrokenSwitches"),
                 new
@@ -1175,7 +1175,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsPatchPanelPort"),
                 new
@@ -1196,7 +1196,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ResolveThroughPatchPanel"),
                 new
@@ -1217,7 +1217,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CreateLACPGroup"),
                 new
@@ -1238,7 +1238,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "LACPGroupRemoved"),
                 new
@@ -1259,7 +1259,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CableFromLACPGroupsRemoved"),
                 new
@@ -1280,7 +1280,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetLACPGroupForCable"),
                 new
@@ -1301,7 +1301,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetLACPGroupBetween"),
                 new
@@ -1322,7 +1322,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetAllLACPGroups"),
                 new
@@ -1343,7 +1343,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "LACPGroupsSet"),
                 new
@@ -1364,7 +1364,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ComponentInitialized"),
                 new
@@ -1385,7 +1385,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "PowerButton"),
                 new
@@ -1406,7 +1406,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "TurnOffCommonFunctions"),
                 new
@@ -1427,7 +1427,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "TurnOnCommonFunction"),
                 new
@@ -1448,7 +1448,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsAnyCableConnected"),
                 new
@@ -1469,7 +1469,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "SwitchInsertedInRack"),
                 new
@@ -1490,7 +1490,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GenerateUniqueSwitchId"),
                 new
@@ -1511,7 +1511,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DisconnectCablesWhenSwitchIsOff"),
                 new
@@ -1532,7 +1532,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "HandleNewCableWhileOff"),
                 new
@@ -1553,7 +1553,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetConnectedDevices"),
                 new
@@ -1574,7 +1574,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetSwitchId"),
                 new
@@ -1595,7 +1595,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ScreenUIChanged"),
                 new
@@ -1616,7 +1616,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ItIsBroken"),
                 new
@@ -1637,7 +1637,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DisconnectCables"),
                 new
@@ -1658,7 +1658,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ReconnectCables"),
                 new
@@ -1679,7 +1679,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ValidateRackPosition"),
                 new
@@ -1700,7 +1700,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ButtonShowNetworkSwitchConfig"),
                 new
@@ -1721,7 +1721,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ClearWarningSign"),
                 new
@@ -1742,7 +1742,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ClearErrorSign"),
                 new
@@ -1763,7 +1763,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "PowerLightMaterialSet"),
                 new
@@ -1784,7 +1784,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "DeviceRepaired"),
                 new
@@ -1805,7 +1805,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsVlanAllowedOnPort"),
                 new
@@ -1826,7 +1826,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsVlanAllowedOnCable"),
                 new
@@ -1847,7 +1847,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "VlanDisallowedSet"),
                 new
@@ -1868,7 +1868,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "VlanAllowedSet"),
                 new
@@ -1889,7 +1889,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "InsertSFPBackIntoBox"),
                 new
@@ -1910,7 +1910,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "GetFreeSpaceInTheBox"),
                 new
@@ -1931,7 +1931,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "SFPFromBoxRemoved"),
                 new
@@ -1952,7 +1952,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "SFPsFromSaveLoaded"),
                 new
@@ -1973,7 +1973,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "TakeSFPFromBox"),
                 new
@@ -1994,7 +1994,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "CanAcceptSFP"),
                 new
@@ -2015,7 +2015,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "ReturnSFPDirectly"),
                 new
@@ -2036,7 +2036,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "IsAnyCableConnected"),
                 new
@@ -2057,7 +2057,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "InsertedInSFPPort"),
                 new
@@ -2078,7 +2078,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "InsertDirectlyIntoPort"),
                 new
@@ -2099,7 +2099,7 @@ internal static class GregNetworkHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Network, "FromPortRemoved"),
                 new

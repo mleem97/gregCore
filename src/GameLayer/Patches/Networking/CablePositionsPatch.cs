@@ -3,7 +3,7 @@
 /// Zweck:        Prefix-Bypass für CablePositions.CreateNewCable (IL2CPP-Hohlmethode).
 /// Maintainer:   Die originale Methode returniert immer 0, was zu ID-Kollisionen führt.
 ///               Dieser Patch generiert thread-safe unique IDs via Atomaren Counter.
-///               Defensive: null-checks + NativePointer validation.
+///               Defensive: null-checks + Pointer validation.
 /// </file-summary>
 
 using System;
@@ -27,7 +27,7 @@ public static class CablePositionsPatch
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
+            if (__instance == null || __instance.Pointer == IntPtr.Zero)
             {
                 __result = 0;
                 return false;

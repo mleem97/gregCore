@@ -3,7 +3,7 @@
 /// Zweck:        Prefix-Bypass für Rack.IsPositionAvailable (IL2CPP-Hohlmethode).
 /// Maintainer:   Die originale Methode returniert immer false – dieser Patch stellt
 ///               eine Greg-seitige Registry bereit und dispatcht Events via HookBus.
-///               Defensive: null-checks + NativePointer validation.
+///               Defensive: null-checks + Pointer validation.
 /// </file-summary>
 
 using System;
@@ -31,7 +31,7 @@ public static class RackPatch
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
+            if (__instance == null || __instance.Pointer == IntPtr.Zero)
             {
                 __result = false;
                 return false;

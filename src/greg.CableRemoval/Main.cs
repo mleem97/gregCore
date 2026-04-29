@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using greg.Logging;
 using UnityEngine.UIElements;
+using gregCore.UI;
 
 namespace greg.CableRemoval
 {
@@ -62,7 +63,10 @@ namespace greg.CableRemoval
                     borderBottomWidth = 2,
                     borderLeftWidth = 2,
                     borderRightWidth = 2,
-                    borderRadius = 6,
+                    borderTopLeftRadius = 6,
+                    borderTopRightRadius = 6,
+                    borderBottomLeftRadius = 6,
+                    borderBottomRightRadius = 6,
                     paddingTop = 8,
                     paddingBottom = 8,
                     paddingLeft = 10,

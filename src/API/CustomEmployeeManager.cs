@@ -7,6 +7,7 @@ using MelonLoader.Utils;
 using Il2CppTMPro;
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 
 namespace gregCore.API;

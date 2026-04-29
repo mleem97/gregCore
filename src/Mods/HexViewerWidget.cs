@@ -1,39 +1,40 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using gregCore.UI;
 
 namespace greg.Mods.HexViewer
 {
+    /// <summary>
+    /// HexViewer widget using UI Toolkit (primary) with no UGUI dependencies.
+    /// </summary>
     public class HexViewerWidget : MonoBehaviour
     {
-        private GameObject? _widget;
-        private UnityEngine.UI.Text? _infoText;
+        private VisualElement? _root;
+        private Label? _infoLabel;
         private bool _isVisible = false;
 
         public static void Initialize()
         {
             var go = new GameObject("greg_HexViewer");
             UnityEngine.Object.DontDestroyOnLoad(go);
-            
-            // Safer IL2CPP initialization
+
             Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<HexViewerWidget>();
             go.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<HexViewerWidget>());
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F1)) // standard hexviewer hotkey
+            if (Input.GetKeyDown(KeyCode.F1))
             {
                 _isVisible = !_isVisible;
-                if (_isVisible && _widget == null) BuildUI();
+                if (_isVisible && _root == null) BuildUI();
                 GregUIManager.SetPanelActive("HexViewer", _isVisible);
             }
 
-            if (_isVisible && _infoText != null)
+            if (_isVisible && _infoLabel != null)
             {
-                // Real-time data binding without EventBus (for low-level memory/hex view)
-                // Update text with pseudo hex data or real offsets
-                _infoText.text = $"MEMORY ADDR: 0x{DateTime.Now.Ticks:X8}\nFRAME_BUFF: {Time.frameCount % 255:X2} FF 00 12";
+                _infoLabel.text = $"MEMORY ADDR: 0x{DateTime.Now.Ticks:X8}\nFRAME_BUFF: {Time.frameCount % 255:X2} FF 00 12";
             }
         }
 
@@ -43,9 +44,20 @@ namespace greg.Mods.HexViewer
                 .SetSize(300, 400)
                 .AddHeadline("Memory Inspector")
                 .AddLabel("Scanning IL2CPP heap...");
-            
-            _widget = builder.Build();
-            _infoText = _widget.GetComponentInChildren<UnityEngine.UI.Text>();
+
+            _root = builder.Build();
+
+            // Find the last label added (our info label) by querying the content
+            var content = _root?.Q<VisualElement>("Content");
+            if (content != null)
+            {
+                // Replace the placeholder label with our tracked label
+                var placeholder = content.Q<Label>();
+                if (placeholder != null)
+                {
+                    _infoLabel = placeholder;
+                }
+            }
         }
     }
 }

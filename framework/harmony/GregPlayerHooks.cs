@@ -10,7 +10,7 @@ namespace gregFramework.Hooks;
 
 /// <summary>
 /// Harmony hooks for domain Player (generated from Il2Cpp unpack).
-/// All patches are defensive: null-checks, try-catch, and NativePointer validation.
+/// All patches are defensive: null-checks, try-catch, and Pointer validation.
 /// </summary>
 internal static class GregPlayerHooks
 {
@@ -26,7 +26,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ComponentInitialized"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerStart failed: {ex.Message}"); }
@@ -38,7 +38,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "CheckFallsThroughMap"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerCheckFallsThroughMap failed: {ex.Message}"); }
@@ -50,7 +50,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "Loaded"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerLoadPlayer failed: {ex.Message}"); }
@@ -63,7 +63,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
+            if (__instance == null || __instance.Pointer == IntPtr.Zero)
             {
                 __result = false;
                 return false;
@@ -86,7 +86,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "DroppedAllItems"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerDropAllItems failed: {ex.Message}"); }
@@ -98,7 +98,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "Warped"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerWarpPlayer failed: {ex.Message}"); }
@@ -110,7 +110,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ReputationChanged"), new { money = __instance.money, reputation = __instance.reputation, xp = __instance.xp });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerUpdateReputation failed: {ex.Message}"); }
@@ -123,7 +123,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
+            if (__instance == null || __instance.Pointer == IntPtr.Zero)
             {
                 __result = false;
                 return false;
@@ -146,7 +146,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ComponentInitialized"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerHitOnEnable failed: {ex.Message}"); }
@@ -158,7 +158,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ComponentInitialized"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerAwake failed: {ex.Message}"); }
@@ -170,7 +170,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ComponentInitialized"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerStart failed: {ex.Message}"); }
@@ -182,7 +182,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "ConfinedCursorforUI"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerConfinedCursorforUI failed: {ex.Message}"); }
@@ -194,7 +194,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "PlayerStopMovement"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerPlayerStopMovement failed: {ex.Message}"); }
@@ -206,7 +206,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "LockedCursorForPlayerMovement"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerLockedCursorForPlayerMovement failed: {ex.Message}"); }
@@ -218,7 +218,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "DefaultActionEffect"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerDefaultActionEffect failed: {ex.Message}"); }
@@ -230,7 +230,7 @@ internal static class GregPlayerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(gregHookName.Create(GregDomain.Player, "GainIOPSEffect"), new { instance = __instance });
         }
         catch (Exception ex) { MelonLogger.Warning($"[gregCore] Hook OnPlayerManagerGainIOPSEffect failed: {ex.Message}"); }

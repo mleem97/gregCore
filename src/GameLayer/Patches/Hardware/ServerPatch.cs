@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using gregCore.GameLayer.Hooks;
 using gregCore.Core.Models;
 using gregCore.API;

@@ -34,7 +34,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ComponentInitialized"),
                 new
@@ -55,7 +55,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "OnLoadingStarted"),
                 new
@@ -76,7 +76,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "OnLoadingComplete"),
                 new
@@ -97,7 +97,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "PowerButton"),
                 new
@@ -118,7 +118,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "TurnOffCommonFunctions"),
                 new
@@ -139,7 +139,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "TurnOnCommonFunction"),
                 new
@@ -160,7 +160,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "IsAnyCableConnected"),
                 new
@@ -181,7 +181,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "GenerateUniqueServerId"),
                 new
@@ -202,7 +202,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ServerInsertedInRack"),
                 new
@@ -223,7 +223,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "RegisterLink"),
                 new
@@ -244,7 +244,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "UnregisterLink"),
                 new
@@ -265,7 +265,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ServerScreenUIChanged"),
                 new
@@ -286,7 +286,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ButtonClickChangeCustomer"),
                 new
@@ -307,7 +307,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "GetNextCustomerID"),
                 new
@@ -328,7 +328,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ButtonClickChangeIP"),
                 new
@@ -349,7 +349,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "IPSet"),
                 new
@@ -370,7 +370,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "GetCustomerID"),
                 new
@@ -391,7 +391,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "CustomerChanged"),
                 new
@@ -412,7 +412,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "AppIDChanged"),
                 new
@@ -433,7 +433,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ItIsBroken"),
                 new
@@ -454,7 +454,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ValidateRackPosition"),
                 new
@@ -475,7 +475,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ClearWarningSign"),
                 new
@@ -496,7 +496,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "ClearErrorSign"),
                 new
@@ -517,7 +517,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "PowerLightMaterialSet"),
                 new
@@ -538,7 +538,7 @@ internal static class GregServerHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 gregHookName.Create(GregDomain.Server, "DeviceRepaired"),
                 new

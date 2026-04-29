@@ -37,7 +37,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -58,7 +58,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnCreated",
                 new
@@ -79,7 +79,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "StartingAnimation",
                 new
@@ -100,7 +100,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -121,7 +121,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -142,7 +142,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TargetSet",
                 new
@@ -163,7 +163,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AgentReachTarget",
                 new
@@ -184,7 +184,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "moveBack",
                 new
@@ -205,7 +205,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GotoNextPoint",
                 new
@@ -226,7 +226,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "StopLoopingDestinationPointsSet",
                 new
@@ -247,7 +247,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AnimSit",
                 new
@@ -268,7 +268,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -289,7 +289,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -310,7 +310,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnCreated",
                 new
@@ -331,7 +331,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Talk",
                 new
@@ -352,7 +352,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_none",
                 new
@@ -373,7 +373,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_A",
                 new
@@ -394,7 +394,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_O",
                 new
@@ -415,7 +415,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_U",
                 new
@@ -436,7 +436,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_BPM",
                 new
@@ -457,7 +457,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_FV",
                 new
@@ -478,7 +478,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouthShape_CDG",
                 new
@@ -499,7 +499,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -520,7 +520,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterAll",
                 new
@@ -541,7 +541,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterSwitches",
                 new
@@ -562,7 +562,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterServers",
                 new
@@ -583,7 +583,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterBroken",
                 new
@@ -604,7 +604,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterEOL",
                 new
@@ -625,7 +625,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonFilterOff",
                 new
@@ -646,7 +646,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TechnicianDispatched",
                 new
@@ -667,7 +667,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonConfirmSendingTechnician",
                 new
@@ -688,7 +688,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancelSendingTechnician",
                 new
@@ -709,7 +709,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TechnicianInformationChanged",
                 new
@@ -730,7 +730,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonAddAllBrokenDevicesToQueue",
                 new
@@ -751,7 +751,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonClearAllWarnings",
                 new
@@ -772,7 +772,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PopulateAutoRepairDropdown",
                 new
@@ -793,7 +793,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnAutoRepairDropdownChanged",
                 new
@@ -814,7 +814,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "upLineSet",
                 new
@@ -835,7 +835,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonClearWarningSign",
                 new
@@ -856,7 +856,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonSendTechnician",
                 new
@@ -877,7 +877,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -898,7 +898,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MusicSet",
                 new
@@ -919,7 +919,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayEffectAudioClip",
                 new
@@ -940,7 +940,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MasterVolumeSet",
                 new
@@ -961,7 +961,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "EffectsVolumeSet",
                 new
@@ -982,7 +982,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MusicVolumeSet",
                 new
@@ -1003,7 +1003,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RacksVolumeSet",
                 new
@@ -1024,7 +1024,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayRandomRJ45Clip",
                 new
@@ -1045,7 +1045,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayRandomImpactClip",
                 new
@@ -1066,7 +1066,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayRackDoorOpen",
                 new
@@ -1087,7 +1087,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -1108,7 +1108,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -1129,7 +1129,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -1150,7 +1150,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -1171,7 +1171,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PerformOverlapCheck",
                 new
@@ -1192,7 +1192,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RenderersEnabledSet",
                 new
@@ -1213,7 +1213,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -1234,7 +1234,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -1255,7 +1255,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonUpgradeCommandCenter",
                 new
@@ -1276,7 +1276,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonDowngradeCommandCenter",
                 new
@@ -1297,7 +1297,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OperatorsForLevelSpawned",
                 new
@@ -1318,7 +1318,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OperatorsForSingleLevelSpawned",
                 new
@@ -1339,7 +1339,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DestroyOperatorsForLevel",
                 new
@@ -1360,7 +1360,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ToggleClearWarningAuto",
                 new
@@ -1381,7 +1381,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AutoRepairModeSet",
                 new
@@ -1402,7 +1402,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnLoad",
                 new
@@ -1423,7 +1423,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonShopScreen",
                 new
@@ -1444,7 +1444,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonNetworkMap",
                 new
@@ -1465,7 +1465,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonAssetManagementScreen",
                 new
@@ -1486,7 +1486,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonBalanceSheetScreen",
                 new
@@ -1507,7 +1507,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonHireScreen",
                 new
@@ -1528,7 +1528,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonReturnMainScreen",
                 new
@@ -1549,7 +1549,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetNextAvailableSpawnPoint",
                 new
@@ -1570,7 +1570,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "FreeUpSpawnPoint",
                 new
@@ -1591,7 +1591,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetPrefabForItem",
                 new
@@ -1612,7 +1612,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HandleObjectives",
                 new
@@ -1633,7 +1633,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SpawnedItemRemoved",
                 new
@@ -1654,7 +1654,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CartUIItemRemoved",
                 new
@@ -1675,7 +1675,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectNextAvailable",
                 new
@@ -1696,7 +1696,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CartTotalChanged",
                 new
@@ -1717,7 +1717,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCheckOut",
                 new
@@ -1738,7 +1738,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClearTrackingWithoutDestroying",
                 new
@@ -1759,7 +1759,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OpenColorPicker",
                 new
@@ -1780,7 +1780,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonChosenColor",
                 new
@@ -1801,7 +1801,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancelColorPicker",
                 new
@@ -1822,7 +1822,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonClear",
                 new
@@ -1843,7 +1843,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancel",
                 new
@@ -1864,7 +1864,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DestroyAllSpawnedItems",
                 new
@@ -1885,7 +1885,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CleanUpShop",
                 new
@@ -1906,7 +1906,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CloseShop",
                 new
@@ -1927,7 +1927,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "UnlockFromSave",
                 new
@@ -1948,7 +1948,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnLoad",
                 new
@@ -1969,7 +1969,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -1990,7 +1990,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2011,7 +2011,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayRequestedStepSound",
                 new
@@ -2032,7 +2032,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetRandomFromRequest",
                 new
@@ -2053,7 +2053,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Step",
                 new
@@ -2074,7 +2074,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetRandomClip",
                 new
@@ -2095,7 +2095,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2116,7 +2116,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2137,7 +2137,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2158,7 +2158,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2179,7 +2179,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -2200,7 +2200,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "StartGodMod",
                 new
@@ -2221,7 +2221,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2242,7 +2242,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -2263,7 +2263,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CheckCurrentControls",
                 new
@@ -2284,7 +2284,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2305,7 +2305,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ChangeText",
                 new
@@ -2326,7 +2326,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TextSet",
                 new
@@ -2347,7 +2347,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -2368,7 +2368,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2389,7 +2389,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -2410,7 +2410,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetTrolleyPosition",
                 new
@@ -2431,7 +2431,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetServerPrefab",
                 new
@@ -2452,7 +2452,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSwitchPrefab",
                 new
@@ -2473,7 +2473,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetPatchPanelPrefab",
                 new
@@ -2494,7 +2494,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCableSpinnerPrefab",
                 new
@@ -2515,7 +2515,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSfpPrefab",
                 new
@@ -2536,7 +2536,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSfpBoxPrefab",
                 new
@@ -2557,7 +2557,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCustomerItemByID",
                 new
@@ -2578,7 +2578,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShuffleAvailableCustomers",
                 new
@@ -2599,7 +2599,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShuffleAvailableSubnets",
                 new
@@ -2620,7 +2620,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetAppLogo",
                 new
@@ -2641,7 +2641,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCustomerLogo",
                 new
@@ -2662,7 +2662,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetFreeSubnet",
                 new
@@ -2683,7 +2683,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "IsSubnetValid",
                 new
@@ -2704,7 +2704,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowCustomerCardsCanvas",
                 new
@@ -2725,7 +2725,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CreateFallbackCustomer",
                 new
@@ -2746,7 +2746,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCustomerChosen",
                 new
@@ -2767,7 +2767,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancelCustomerChoice",
                 new
@@ -2788,7 +2788,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowBuyWallCanvas",
                 new
@@ -2809,7 +2809,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonBuyWall",
                 new
@@ -2830,7 +2830,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancelBuyWall",
                 new
@@ -2851,7 +2851,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowNetworkConfigCanvas",
                 new
@@ -2872,7 +2872,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CloseNetworkConfigCanvas",
                 new
@@ -2893,7 +2893,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OpenAnyCanvas",
                 new
@@ -2914,7 +2914,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CloseAnyCanvas",
                 new
@@ -2935,7 +2935,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "UsedSubnetRemoved",
                 new
@@ -2956,7 +2956,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ReturnSubnet",
                 new
@@ -2977,7 +2977,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnLoad",
                 new
@@ -2998,7 +2998,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -3019,7 +3019,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AutoSaveIntervalSet",
                 new
@@ -3040,7 +3040,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AutoSaveEnabledSet",
                 new
@@ -3061,7 +3061,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RestartAutoSave",
                 new
@@ -3082,7 +3082,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ReturnServerNameFromType",
                 new
@@ -3103,7 +3103,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ReturnSwitchNameFromType",
                 new
@@ -3124,7 +3124,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TrolleyPositionLoaded",
                 new
@@ -3145,7 +3145,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCustomerTotalRequirement",
                 new
@@ -3166,7 +3166,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "IsCustomerSuitableForBase",
                 new
@@ -3187,7 +3187,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InitializeVlanPool",
                 new
@@ -3208,7 +3208,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetFreeVlanId",
                 new
@@ -3229,7 +3229,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ReturnVlanId",
                 new
@@ -3250,7 +3250,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "UsedVlanIdRemoved",
                 new
@@ -3271,7 +3271,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnApplicationQuit",
                 new
@@ -3292,7 +3292,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetPairedLink",
                 new
@@ -3313,7 +3313,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "IsAnyCableConnected",
                 new
@@ -3334,7 +3334,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InsertedInRack",
                 new
@@ -3355,7 +3355,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GenerateUniquePatchPanelId",
                 new
@@ -3376,7 +3376,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ValidateRackPosition",
                 new
@@ -3397,7 +3397,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -3418,7 +3418,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SpawnedItemAdded",
                 new
@@ -3439,7 +3439,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "LastSpawnedItemRemoved",
                 new
@@ -3460,7 +3460,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClearAllUIDs",
                 new
@@ -3481,7 +3481,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnAddClicked",
                 new
@@ -3502,7 +3502,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnRemoveClicked",
                 new
@@ -3523,7 +3523,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DisplayChanged",
                 new
@@ -3544,7 +3544,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -3565,7 +3565,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -3586,7 +3586,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -3607,7 +3607,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "NotificationSet",
                 new
@@ -3628,7 +3628,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowStaticCanvas",
                 new
@@ -3649,7 +3649,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CustomKeyHintRemoved",
                 new
@@ -3670,7 +3670,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InstantiateParticleUpgrade",
                 new
@@ -3691,7 +3691,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MessageDisplayChanged",
                 new
@@ -3712,7 +3712,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MeesageInFieldAdded",
                 new
@@ -3733,7 +3733,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InstantiateErrorWarningSign",
                 new
@@ -3754,7 +3754,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DestroyErrorWarningSign",
                 new
@@ -3775,7 +3775,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowSpriteNextToPointer",
                 new
@@ -3796,7 +3796,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClearSpriteNextToPointer",
                 new
@@ -3817,7 +3817,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowTextUnderCursor",
                 new
@@ -3838,7 +3838,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HideTextUnderCursor",
                 new
@@ -3859,7 +3859,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HoldProgressChanged",
                 new
@@ -3880,7 +3880,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "LoadingInfoSet",
                 new
@@ -3901,7 +3901,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnLoadingStarted",
                 new
@@ -3922,7 +3922,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonSaveInputTextOverlay",
                 new
@@ -3943,7 +3943,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ButtonCancelInputTextOverlay",
                 new
@@ -3964,7 +3964,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RestorePreviousSelection",
                 new
@@ -3985,7 +3985,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ConvertToSplatMapCoordinate",
                 new
@@ -4006,7 +4006,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetActiveTerrainTextureIdx",
                 new
@@ -4027,7 +4027,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CurrentTerrainSet",
                 new
@@ -4048,7 +4048,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4069,7 +4069,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4090,7 +4090,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TimeIsBetween",
                 new
@@ -4111,7 +4111,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CurrentTimeInHours",
                 new
@@ -4132,7 +4132,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HoursFromDate",
                 new
@@ -4153,7 +4153,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -4174,7 +4174,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MoveBetweenPositions",
                 new
@@ -4195,7 +4195,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnLoadDestroy",
                 new
@@ -4216,7 +4216,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnCollisionEnter",
                 new
@@ -4237,7 +4237,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RigidbodyRemoved",
                 new
@@ -4258,7 +4258,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RestoreRigidbody",
                 new
@@ -4279,7 +4279,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCableCurrentSpeed",
                 new
@@ -4300,7 +4300,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetAllCables",
                 new
@@ -4321,7 +4321,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CableInfoChanged",
                 new
@@ -4342,7 +4342,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClearNetworkState",
                 new
@@ -4363,7 +4363,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CreateCableWithSpawners",
                 new
@@ -4384,7 +4384,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ServerCustomerIDChanged",
                 new
@@ -4405,7 +4405,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RequestRouteEvaluation",
                 new
@@ -4426,7 +4426,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "EvaluationCooldownSet",
                 new
@@ -4447,7 +4447,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetEvaluationCooldown",
                 new
@@ -4468,7 +4468,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PacketSpawnerEnabledSet",
                 new
@@ -4489,7 +4489,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "EvaluateAllRoutes",
                 new
@@ -4510,7 +4510,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetServerProcessingSpeed",
                 new
@@ -4531,7 +4531,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetCustomerRoutes",
                 new
@@ -4552,7 +4552,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetAllSpawners",
                 new
@@ -4573,7 +4573,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RegisterCableInNetworkMap",
                 new
@@ -4594,7 +4594,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnCableRemoved",
                 new
@@ -4615,7 +4615,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DoesCableServeMultipleCustomers",
                 new
@@ -4636,7 +4636,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CleanUpSystem",
                 new
@@ -4657,7 +4657,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4678,7 +4678,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Move",
                 new
@@ -4699,7 +4699,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Steer",
                 new
@@ -4720,7 +4720,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "BrakeAndDeacceleration",
                 new
@@ -4741,7 +4741,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TakeTheWheel",
                 new
@@ -4762,7 +4762,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "LeaveTheTrolley",
                 new
@@ -4783,7 +4783,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "StopCar",
                 new
@@ -4804,7 +4804,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetTrolleyPosition",
                 new
@@ -4825,7 +4825,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HandleAudio",
                 new
@@ -4846,7 +4846,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TurnOffCollidersInTrolley",
                 new
@@ -4867,7 +4867,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TurnBackOnCollidersInTRolley",
                 new
@@ -4888,7 +4888,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnCollisionEnter",
                 new
@@ -4909,7 +4909,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -4930,7 +4930,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4951,7 +4951,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4972,7 +4972,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -4993,7 +4993,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5014,7 +5014,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5035,7 +5035,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5056,7 +5056,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetPlayerInput",
                 new
@@ -5077,7 +5077,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5098,7 +5098,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5119,7 +5119,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5140,7 +5140,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5161,7 +5161,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CopyAnimationCurve",
                 new
@@ -5182,7 +5182,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5203,7 +5203,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5224,7 +5224,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5245,7 +5245,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -5266,7 +5266,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ON_TEXT_CHANGED",
                 new
@@ -5287,7 +5287,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5308,7 +5308,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5329,7 +5329,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5350,7 +5350,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5371,7 +5371,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5392,7 +5392,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5413,7 +5413,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -5434,7 +5434,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5455,7 +5455,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ON_TEXT_CHANGED",
                 new
@@ -5476,7 +5476,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5497,7 +5497,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5518,7 +5518,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -5539,7 +5539,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5560,7 +5560,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ON_TEXT_CHANGED",
                 new
@@ -5581,7 +5581,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5602,7 +5602,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5623,7 +5623,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -5644,7 +5644,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5665,7 +5665,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ON_TEXT_CHANGED",
                 new
@@ -5686,7 +5686,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5707,7 +5707,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5728,7 +5728,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentDisabled",
                 new
@@ -5749,7 +5749,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5770,7 +5770,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ON_TEXT_CHANGED",
                 new
@@ -5791,7 +5791,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5812,7 +5812,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5833,7 +5833,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CopyAnimationCurve",
                 new
@@ -5854,7 +5854,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "IsVisible",
                 new
@@ -5875,7 +5875,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -5896,7 +5896,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AccentMapLoaded",
                 new
@@ -5917,7 +5917,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -5938,7 +5938,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ConsoleSet",
                 new
@@ -5959,7 +5959,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Set",
                 new
@@ -5980,7 +5980,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Reset",
                 new
@@ -6001,7 +6001,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowBackground",
                 new
@@ -6022,7 +6022,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ConsoleRemoved",
                 new
@@ -6043,7 +6043,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AccentCharClick",
                 new
@@ -6064,7 +6064,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Generate",
                 new
@@ -6085,7 +6085,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GamepadPrep",
                 new
@@ -6106,7 +6106,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSelectedKey",
                 new
@@ -6127,7 +6127,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectedKeySet",
                 new
@@ -6148,7 +6148,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Activate",
                 new
@@ -6169,7 +6169,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "DeActivate",
                 new
@@ -6190,7 +6190,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6211,7 +6211,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "JoystickInput",
                 new
@@ -6232,7 +6232,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "JoystickButtonA",
                 new
@@ -6253,7 +6253,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "JoystickButtonB",
                 new
@@ -6274,7 +6274,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AutoCorrectLayout",
                 new
@@ -6295,7 +6295,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AcceptPhysicalKeyboard",
                 new
@@ -6316,7 +6316,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Prep",
                 new
@@ -6337,7 +6337,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetOSKKeyCode",
                 new
@@ -6358,7 +6358,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetKeyCode",
                 new
@@ -6379,7 +6379,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClickSound",
                 new
@@ -6400,7 +6400,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectSound",
                 new
@@ -6421,7 +6421,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OutputTextUpdate",
                 new
@@ -6442,7 +6442,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetSelectedKey",
                 new
@@ -6463,7 +6463,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GetOSKKey",
                 new
@@ -6484,7 +6484,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InputFromPointerDevice",
                 new
@@ -6505,7 +6505,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6526,7 +6526,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6547,7 +6547,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnGUI",
                 new
@@ -6568,7 +6568,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6589,7 +6589,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlaySound",
                 new
@@ -6610,7 +6610,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlaySelectKeySound",
                 new
@@ -6631,7 +6631,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "TMPInputFieldReActivate",
                 new
@@ -6652,7 +6652,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectionEnd",
                 new
@@ -6673,7 +6673,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ShowHideKeyboard",
                 new
@@ -6694,7 +6694,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "GamepadWrapNavigation",
                 new
@@ -6715,7 +6715,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectedKey",
                 new
@@ -6736,7 +6736,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SelectedKeySet",
                 new
@@ -6757,7 +6757,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PrepAssetGroup",
                 new
@@ -6778,7 +6778,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6799,7 +6799,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -6820,7 +6820,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HandleZoom",
                 new
@@ -6841,7 +6841,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CameraPositionChanged",
                 new
@@ -6862,7 +6862,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayLandingSound",
                 new
@@ -6883,7 +6883,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ProgressStepCycle",
                 new
@@ -6904,7 +6904,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "RotateView",
                 new
@@ -6925,7 +6925,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnControllerColliderHit",
                 new
@@ -7000,7 +7000,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Crouch",
                 new
@@ -7021,7 +7021,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "StopCrouching",
                 new
@@ -7042,7 +7042,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetCameraPosition",
                 new
@@ -7063,7 +7063,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "NormalFovChanged",
                 new
@@ -7084,7 +7084,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnDestroy",
                 new
@@ -7105,7 +7105,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Init",
                 new
@@ -7126,7 +7126,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetRotation",
                 new
@@ -7147,7 +7147,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "MouseLookOnDisable",
                 new
@@ -7168,7 +7168,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CursorLockSet",
                 new
@@ -7189,7 +7189,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CursorLockChanged",
                 new
@@ -7210,7 +7210,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "InternalLockUpdate",
                 new
@@ -7231,7 +7231,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ClampRotationAroundXAxis",
                 new
@@ -7252,7 +7252,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "SittingClampRotation",
                 new
@@ -7273,7 +7273,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Init",
                 new
@@ -7294,7 +7294,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Cleanup",
                 new
@@ -7315,7 +7315,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HandleLookAtRay",
                 new
@@ -7336,7 +7336,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ResetHold",
                 new
@@ -7357,7 +7357,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HideItemNameOrSiluete",
                 new
@@ -7378,7 +7378,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "CloseInteractionMenu",
                 new
@@ -7399,7 +7399,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ComponentInitialized",
                 new
@@ -7420,7 +7420,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "Move",
                 new
@@ -7441,7 +7441,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "AnimatorChanged",
                 new
@@ -7462,7 +7462,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "HandleGroundedMovement",
                 new
@@ -7483,7 +7483,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "ApplyExtraTurnRotation",
                 new
@@ -7504,7 +7504,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnAnimatorMove",
                 new
@@ -7525,7 +7525,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "PlayStepSound",
                 new
@@ -7546,7 +7546,7 @@ internal static class GregSystemHooks
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             SafeEmit(
                 "OnAnimationEventFootStep",
                 new

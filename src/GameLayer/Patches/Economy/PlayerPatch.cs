@@ -3,7 +3,7 @@
 /// Zweck:        Extrahiert Daten aus dem IL2CPP Player-Objekt + Prefix-Bypasses.
 /// Maintainer:   Prefix-Patches überschreiben hohle IL2CPP-Methoden (UpdateCoin/UpdateXP
 ///               returnieren immer false). Postfix-Callbacks bleiben für Backward-Compat.
-///               Defensive: null-checks + NativePointer validation.
+///               Defensive: null-checks + Pointer validation.
 /// </file-summary>
 
 using System;
@@ -27,7 +27,7 @@ internal static class PlayerPatch
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return true;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return true;
 
             __result = true;
 
@@ -54,7 +54,7 @@ internal static class PlayerPatch
     {
         try
         {
-            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return true;
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return true;
 
             __result = true;
 

@@ -7,6 +7,7 @@ using gregCore.UI;
 using gregCore.Infrastructure.UI;
 using gregCore.Core.Events;
 using gregCore.Core.Persistence;
+using gregCore.Sdk;
 using gregCore.Sdk.Language;
 using Il2CppInterop.Runtime.Injection;
 
@@ -25,17 +26,17 @@ namespace gregCore.Core
     {
         public static GregCoreMod Instance { get; private set; }
         public static IGregAPI? PublicAPI { get; private set; }
+        private static bool _lateInitCompleted;
 
         public override void OnInitializeMelon()
         {
             Instance = this;
-            MelonLogger.Msg(ConsoleColor.Cyan, "--- Framework Boot v1.1.0 ---");
+            MelonLogger.Msg("--- Framework Boot v1.1.0 ---");
             
             // Register persistent IL2CPP components
             try
             {
                 ClassInjector.RegisterTypeInIl2Cpp<GregHardwareID>();
-                ClassInjector.RegisterTypeInIl2Cpp<GregUIDragHandler>();
                 MelonLogger.Msg("[gregCore] IL2CPP types registered.");
             }
             catch (Exception ex)
@@ -56,32 +57,42 @@ namespace gregCore.Core
             }
         }
 
-        public override void OnLateLoad()
+        public override void OnUpdate()
         {
-            base.OnLateLoad();
-            
-            // Discover and register gregExt language hosts
+            // Deferred late initialization (Load-Order Safety)
+            if (!_lateInitCompleted)
+            {
+                _lateInitCompleted = true;
+                try
+                {
+                    DiscoverGregExtHosts();
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"[gregCore] gregExt discovery failed: {ex.Message}");
+                }
+
+                try
+                {
+                    var modsDir = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "Mods", "Scripts");
+                    GregLanguageRegistry.ScanAndActivate(modsDir);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"[gregCore] Language host activation failed: {ex.Message}");
+                }
+
+                MelonLogger.Msg("[gregCore] Framework initialization complete.");
+            }
+
             try
             {
-                DiscoverGregExtHosts();
+                GregLanguageRegistry.OnUpdate(Time.deltaTime);
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"[gregCore] gregExt discovery failed: {ex.Message}");
+                MelonLogger.Error($"[gregCore] Update callback failed: {ex.Message}");
             }
-
-            // Activate built-in and extension language hosts
-            try
-            {
-                var modsDir = System.IO.Path.Combine(MelonUtils.UserDataPath, "Mods", "Scripts");
-                GregLanguageRegistry.ScanAndActivate(modsDir);
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Language host activation failed: {ex.Message}");
-            }
-
-            MelonLogger.Msg(ConsoleColor.Green, "[gregCore] Framework initialization complete.");
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -100,19 +111,7 @@ namespace gregCore.Core
             }
         }
 
-        public override void OnUpdate()
-        {
-            try
-            {
-                GregLanguageRegistry.OnUpdate(Time.deltaTime);
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Update callback failed: {ex.Message}");
-            }
-        }
-
-        public override void OnQuitRequest()
+        public override void OnApplicationQuit()
         {
             try
             {
@@ -123,7 +122,7 @@ namespace gregCore.Core
             {
                 MelonLogger.Error($"[gregCore] Shutdown failed: {ex.Message}");
             }
-            base.OnQuitRequest();
+            base.OnApplicationQuit();
         }
 
         /// <summary>

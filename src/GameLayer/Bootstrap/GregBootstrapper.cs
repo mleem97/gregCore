@@ -1,4 +1,4 @@
-﻿/// <file-summary>
+/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Erstellt und konfiguriert den GregServiceContainer.
 /// Maintainer:   Einzige Stelle wo Implementierungen an Interfaces gebunden werden. Validiert den Startup.

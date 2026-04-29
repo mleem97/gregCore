@@ -3,6 +3,7 @@
 /// Zweck:        Prefix-Bypass für Rack.IsPositionAvailable (IL2CPP-Hohlmethode).
 /// Maintainer:   Die originale Methode returniert immer false – dieser Patch stellt
 ///               eine Greg-seitige Registry bereit und dispatcht Events via HookBus.
+///               Defensive: null-checks + NativePointer validation.
 /// </file-summary>
 
 using System;
@@ -15,13 +16,8 @@ using gregCore.Core.Models;
 
 namespace gregCore.GameLayer.Patches.Hardware;
 
-[HarmonyPatch]
 public static class RackPatch
 {
-    /// <summary>
-    /// Greg-seitige Registry für belegte Rack-Positionen.
-    /// Key = Rack-Instance-HashCode, Value = Set der belegten Positionen.
-    /// </summary>
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
     private static readonly object _lock = new();
 
@@ -35,7 +31,7 @@ public static class RackPatch
     {
         try
         {
-            if (__instance == null)
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero)
             {
                 __result = false;
                 return false;
@@ -67,20 +63,16 @@ public static class RackPatch
                     }
                 });
 
-            return false; // Skip original (it's hollow – always returns false)
+            return false;
         }
         catch (Exception ex)
         {
             MelonLogger.Error($"[RackPatch] IsPositionAvailable failed: {ex.Message}");
-            __result = true; // Fail-open: allow placement on error
+            __result = true;
             return false;
         }
     }
 
-    /// <summary>
-    /// Registriert eine Position als belegt.
-    /// Wird von Placement-Logik und Multiplayer-Sync aufgerufen.
-    /// </summary>
     public static void MarkPositionUsed(int rackHash, int position)
     {
         lock (_lock)
@@ -106,9 +98,6 @@ public static class RackPatch
             });
     }
 
-    /// <summary>
-    /// Gibt eine Position wieder frei.
-    /// </summary>
     public static void MarkPositionFree(int rackHash, int position)
     {
         lock (_lock)
@@ -130,9 +119,6 @@ public static class RackPatch
             });
     }
 
-    /// <summary>
-    /// Entfernt alle Position-Daten für ein Rack (z.B. beim Entfernen).
-    /// </summary>
     public static void ClearRack(int rackHash)
     {
         lock (_lock)
@@ -141,9 +127,6 @@ public static class RackPatch
         }
     }
 
-    /// <summary>
-    /// Gibt die Anzahl der belegten Positionen für ein Rack zurück.
-    /// </summary>
     public static int GetUsedCount(int rackHash)
     {
         lock (_lock)

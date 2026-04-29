@@ -45,6 +45,8 @@
     <Reference Include="Unity.TextMeshPro"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Il2CppUMA_Core"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppUMA_Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.Entities"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.Entities.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIElementsModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>lib\references\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 
   <ItemGroup>

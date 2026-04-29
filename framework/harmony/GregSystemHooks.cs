@@ -13,9 +13,23 @@ namespace gregFramework.Hooks;
 /// <summary>
 /// Harmony hooks for domain System (generated from Il2Cpp unpack).
 /// </summary>
-[HarmonyPatch]
 internal static class GregSystemHooks
 {
+    private static void SafeEmit(string hookName, object? payload)
+    {
+        try
+        {
+            gregEventDispatcher.Emit(
+                gregHookName.Create(GregDomain.System, hookName),
+                payload);
+        }
+        catch (System.Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore] Hook SafeEmit '" + hookName + $"' failed: {ex.Message}");
+        }
+    }
+
+
     // AICharacterControl.OnEnable
     [HarmonyPatch(typeof(AICharacterControl), nameof(AICharacterControl.OnEnable))]
     [HarmonyPostfix]
@@ -23,8 +37,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -43,8 +58,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnCreated"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnCreated",
                 new
                 {
                     instance = __instance,
@@ -63,8 +79,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "StartingAnimation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "StartingAnimation",
                 new
                 {
                     instance = __instance,
@@ -83,8 +100,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -103,8 +121,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -123,8 +142,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TargetSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TargetSet",
                 new
                 {
                     instance = __instance,
@@ -143,8 +163,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AgentReachTarget"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AgentReachTarget",
                 new
                 {
                     instance = __instance,
@@ -163,8 +184,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "moveBack"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "moveBack",
                 new
                 {
                     instance = __instance,
@@ -183,8 +205,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GotoNextPoint"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GotoNextPoint",
                 new
                 {
                     instance = __instance,
@@ -203,8 +226,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "StopLoopingDestinationPointsSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "StopLoopingDestinationPointsSet",
                 new
                 {
                     instance = __instance,
@@ -223,8 +247,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AnimSit"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AnimSit",
                 new
                 {
                     instance = __instance,
@@ -243,8 +268,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -263,8 +289,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -283,8 +310,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnCreated"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnCreated",
                 new
                 {
                     instance = __instance,
@@ -303,8 +331,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Talk"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Talk",
                 new
                 {
                     instance = __instance,
@@ -323,8 +352,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_none"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_none",
                 new
                 {
                     instance = __instance,
@@ -343,8 +373,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_A"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_A",
                 new
                 {
                     instance = __instance,
@@ -363,8 +394,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_O"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_O",
                 new
                 {
                     instance = __instance,
@@ -383,8 +415,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_U"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_U",
                 new
                 {
                     instance = __instance,
@@ -403,8 +436,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_BPM"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_BPM",
                 new
                 {
                     instance = __instance,
@@ -423,8 +457,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_FV"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_FV",
                 new
                 {
                     instance = __instance,
@@ -443,8 +478,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouthShape_CDG"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouthShape_CDG",
                 new
                 {
                     instance = __instance,
@@ -463,8 +499,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -483,8 +520,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterAll"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterAll",
                 new
                 {
                     instance = __instance,
@@ -503,8 +541,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterSwitches"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterSwitches",
                 new
                 {
                     instance = __instance,
@@ -523,8 +562,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterServers"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterServers",
                 new
                 {
                     instance = __instance,
@@ -543,8 +583,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterBroken"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterBroken",
                 new
                 {
                     instance = __instance,
@@ -563,8 +604,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterEOL"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterEOL",
                 new
                 {
                     instance = __instance,
@@ -583,8 +625,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonFilterOff"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonFilterOff",
                 new
                 {
                     instance = __instance,
@@ -603,8 +646,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TechnicianDispatched"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TechnicianDispatched",
                 new
                 {
                     instance = __instance,
@@ -623,8 +667,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonConfirmSendingTechnician"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonConfirmSendingTechnician",
                 new
                 {
                     instance = __instance,
@@ -643,8 +688,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancelSendingTechnician"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancelSendingTechnician",
                 new
                 {
                     instance = __instance,
@@ -663,8 +709,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TechnicianInformationChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TechnicianInformationChanged",
                 new
                 {
                     instance = __instance,
@@ -683,8 +730,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonAddAllBrokenDevicesToQueue"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonAddAllBrokenDevicesToQueue",
                 new
                 {
                     instance = __instance,
@@ -703,8 +751,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonClearAllWarnings"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonClearAllWarnings",
                 new
                 {
                     instance = __instance,
@@ -723,8 +772,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PopulateAutoRepairDropdown"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PopulateAutoRepairDropdown",
                 new
                 {
                     instance = __instance,
@@ -743,8 +793,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnAutoRepairDropdownChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnAutoRepairDropdownChanged",
                 new
                 {
                     instance = __instance,
@@ -763,8 +814,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "upLineSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "upLineSet",
                 new
                 {
                     instance = __instance,
@@ -783,8 +835,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonClearWarningSign"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonClearWarningSign",
                 new
                 {
                     instance = __instance,
@@ -803,8 +856,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonSendTechnician"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonSendTechnician",
                 new
                 {
                     instance = __instance,
@@ -823,8 +877,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -843,8 +898,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MusicSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MusicSet",
                 new
                 {
                     instance = __instance,
@@ -863,8 +919,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayEffectAudioClip"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayEffectAudioClip",
                 new
                 {
                     instance = __instance,
@@ -883,8 +940,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MasterVolumeSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MasterVolumeSet",
                 new
                 {
                     instance = __instance,
@@ -903,8 +961,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "EffectsVolumeSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "EffectsVolumeSet",
                 new
                 {
                     instance = __instance,
@@ -923,8 +982,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MusicVolumeSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MusicVolumeSet",
                 new
                 {
                     instance = __instance,
@@ -943,8 +1003,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RacksVolumeSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RacksVolumeSet",
                 new
                 {
                     instance = __instance,
@@ -963,8 +1024,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayRandomRJ45Clip"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayRandomRJ45Clip",
                 new
                 {
                     instance = __instance,
@@ -983,8 +1045,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayRandomImpactClip"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayRandomImpactClip",
                 new
                 {
                     instance = __instance,
@@ -1003,8 +1066,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayRackDoorOpen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayRackDoorOpen",
                 new
                 {
                     instance = __instance,
@@ -1023,8 +1087,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1043,8 +1108,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1063,8 +1129,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1083,8 +1150,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -1103,8 +1171,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PerformOverlapCheck"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PerformOverlapCheck",
                 new
                 {
                     instance = __instance,
@@ -1123,8 +1192,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RenderersEnabledSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RenderersEnabledSet",
                 new
                 {
                     instance = __instance,
@@ -1143,8 +1213,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1163,8 +1234,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -1183,8 +1255,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonUpgradeCommandCenter"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonUpgradeCommandCenter",
                 new
                 {
                     instance = __instance,
@@ -1203,8 +1276,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonDowngradeCommandCenter"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonDowngradeCommandCenter",
                 new
                 {
                     instance = __instance,
@@ -1223,8 +1297,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OperatorsForLevelSpawned"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OperatorsForLevelSpawned",
                 new
                 {
                     instance = __instance,
@@ -1243,8 +1318,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OperatorsForSingleLevelSpawned"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OperatorsForSingleLevelSpawned",
                 new
                 {
                     instance = __instance,
@@ -1263,8 +1339,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DestroyOperatorsForLevel"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DestroyOperatorsForLevel",
                 new
                 {
                     instance = __instance,
@@ -1283,8 +1360,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ToggleClearWarningAuto"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ToggleClearWarningAuto",
                 new
                 {
                     instance = __instance,
@@ -1303,8 +1381,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AutoRepairModeSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AutoRepairModeSet",
                 new
                 {
                     instance = __instance,
@@ -1323,8 +1402,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnLoad"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnLoad",
                 new
                 {
                     instance = __instance,
@@ -1343,8 +1423,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonShopScreen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonShopScreen",
                 new
                 {
                     instance = __instance,
@@ -1363,8 +1444,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonNetworkMap"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonNetworkMap",
                 new
                 {
                     instance = __instance,
@@ -1383,8 +1465,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonAssetManagementScreen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonAssetManagementScreen",
                 new
                 {
                     instance = __instance,
@@ -1403,8 +1486,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonBalanceSheetScreen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonBalanceSheetScreen",
                 new
                 {
                     instance = __instance,
@@ -1423,8 +1507,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonHireScreen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonHireScreen",
                 new
                 {
                     instance = __instance,
@@ -1443,8 +1528,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonReturnMainScreen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonReturnMainScreen",
                 new
                 {
                     instance = __instance,
@@ -1463,8 +1549,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetNextAvailableSpawnPoint"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetNextAvailableSpawnPoint",
                 new
                 {
                     instance = __instance,
@@ -1483,8 +1570,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "FreeUpSpawnPoint"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "FreeUpSpawnPoint",
                 new
                 {
                     instance = __instance,
@@ -1503,8 +1591,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetPrefabForItem"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetPrefabForItem",
                 new
                 {
                     instance = __instance,
@@ -1523,8 +1612,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HandleObjectives"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HandleObjectives",
                 new
                 {
                     instance = __instance,
@@ -1543,8 +1633,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SpawnedItemRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SpawnedItemRemoved",
                 new
                 {
                     instance = __instance,
@@ -1563,8 +1654,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CartUIItemRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CartUIItemRemoved",
                 new
                 {
                     instance = __instance,
@@ -1583,8 +1675,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectNextAvailable"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectNextAvailable",
                 new
                 {
                     instance = __instance,
@@ -1603,8 +1696,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CartTotalChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CartTotalChanged",
                 new
                 {
                     instance = __instance,
@@ -1623,8 +1717,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCheckOut"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCheckOut",
                 new
                 {
                     instance = __instance,
@@ -1643,8 +1738,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClearTrackingWithoutDestroying"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClearTrackingWithoutDestroying",
                 new
                 {
                     instance = __instance,
@@ -1663,8 +1759,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OpenColorPicker"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OpenColorPicker",
                 new
                 {
                     instance = __instance,
@@ -1683,8 +1780,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonChosenColor"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonChosenColor",
                 new
                 {
                     instance = __instance,
@@ -1703,8 +1801,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancelColorPicker"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancelColorPicker",
                 new
                 {
                     instance = __instance,
@@ -1723,8 +1822,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonClear"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonClear",
                 new
                 {
                     instance = __instance,
@@ -1743,8 +1843,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancel"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancel",
                 new
                 {
                     instance = __instance,
@@ -1763,8 +1864,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DestroyAllSpawnedItems"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DestroyAllSpawnedItems",
                 new
                 {
                     instance = __instance,
@@ -1783,8 +1885,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CleanUpShop"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CleanUpShop",
                 new
                 {
                     instance = __instance,
@@ -1803,8 +1906,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CloseShop"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CloseShop",
                 new
                 {
                     instance = __instance,
@@ -1823,8 +1927,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "UnlockFromSave"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "UnlockFromSave",
                 new
                 {
                     instance = __instance,
@@ -1843,8 +1948,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnLoad"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnLoad",
                 new
                 {
                     instance = __instance,
@@ -1863,8 +1969,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -1883,8 +1990,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1903,8 +2011,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayRequestedStepSound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayRequestedStepSound",
                 new
                 {
                     instance = __instance,
@@ -1923,8 +2032,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetRandomFromRequest"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetRandomFromRequest",
                 new
                 {
                     instance = __instance,
@@ -1943,8 +2053,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Step"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Step",
                 new
                 {
                     instance = __instance,
@@ -1963,8 +2074,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetRandomClip"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetRandomClip",
                 new
                 {
                     instance = __instance,
@@ -1983,8 +2095,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2003,8 +2116,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2023,8 +2137,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2043,8 +2158,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2063,8 +2179,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -2083,8 +2200,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "StartGodMod"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "StartGodMod",
                 new
                 {
                     instance = __instance,
@@ -2103,8 +2221,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2123,8 +2242,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -2143,8 +2263,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CheckCurrentControls"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CheckCurrentControls",
                 new
                 {
                     instance = __instance,
@@ -2163,8 +2284,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2183,8 +2305,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ChangeText"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ChangeText",
                 new
                 {
                     instance = __instance,
@@ -2203,8 +2326,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TextSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TextSet",
                 new
                 {
                     instance = __instance,
@@ -2223,8 +2347,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -2243,8 +2368,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2263,8 +2389,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -2283,8 +2410,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetTrolleyPosition"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetTrolleyPosition",
                 new
                 {
                     instance = __instance,
@@ -2303,8 +2431,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetServerPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetServerPrefab",
                 new
                 {
                     instance = __instance,
@@ -2323,8 +2452,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetSwitchPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSwitchPrefab",
                 new
                 {
                     instance = __instance,
@@ -2343,8 +2473,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetPatchPanelPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetPatchPanelPrefab",
                 new
                 {
                     instance = __instance,
@@ -2363,8 +2494,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCableSpinnerPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCableSpinnerPrefab",
                 new
                 {
                     instance = __instance,
@@ -2383,8 +2515,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetSfpPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSfpPrefab",
                 new
                 {
                     instance = __instance,
@@ -2403,8 +2536,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetSfpBoxPrefab"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSfpBoxPrefab",
                 new
                 {
                     instance = __instance,
@@ -2423,8 +2557,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCustomerItemByID"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCustomerItemByID",
                 new
                 {
                     instance = __instance,
@@ -2443,8 +2578,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShuffleAvailableCustomers"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShuffleAvailableCustomers",
                 new
                 {
                     instance = __instance,
@@ -2463,8 +2599,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShuffleAvailableSubnets"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShuffleAvailableSubnets",
                 new
                 {
                     instance = __instance,
@@ -2483,8 +2620,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetAppLogo"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetAppLogo",
                 new
                 {
                     instance = __instance,
@@ -2503,8 +2641,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCustomerLogo"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCustomerLogo",
                 new
                 {
                     instance = __instance,
@@ -2523,8 +2662,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetFreeSubnet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetFreeSubnet",
                 new
                 {
                     instance = __instance,
@@ -2543,8 +2683,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "IsSubnetValid"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "IsSubnetValid",
                 new
                 {
                     instance = __instance,
@@ -2563,8 +2704,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowCustomerCardsCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowCustomerCardsCanvas",
                 new
                 {
                     instance = __instance,
@@ -2583,8 +2725,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CreateFallbackCustomer"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CreateFallbackCustomer",
                 new
                 {
                     instance = __instance,
@@ -2603,8 +2746,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCustomerChosen"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCustomerChosen",
                 new
                 {
                     instance = __instance,
@@ -2623,8 +2767,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancelCustomerChoice"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancelCustomerChoice",
                 new
                 {
                     instance = __instance,
@@ -2643,8 +2788,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowBuyWallCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowBuyWallCanvas",
                 new
                 {
                     instance = __instance,
@@ -2663,8 +2809,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonBuyWall"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonBuyWall",
                 new
                 {
                     instance = __instance,
@@ -2683,8 +2830,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancelBuyWall"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancelBuyWall",
                 new
                 {
                     instance = __instance,
@@ -2703,8 +2851,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowNetworkConfigCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowNetworkConfigCanvas",
                 new
                 {
                     instance = __instance,
@@ -2723,8 +2872,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CloseNetworkConfigCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CloseNetworkConfigCanvas",
                 new
                 {
                     instance = __instance,
@@ -2743,8 +2893,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OpenAnyCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OpenAnyCanvas",
                 new
                 {
                     instance = __instance,
@@ -2763,8 +2914,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CloseAnyCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CloseAnyCanvas",
                 new
                 {
                     instance = __instance,
@@ -2783,8 +2935,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "UsedSubnetRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "UsedSubnetRemoved",
                 new
                 {
                     instance = __instance,
@@ -2803,8 +2956,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ReturnSubnet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ReturnSubnet",
                 new
                 {
                     instance = __instance,
@@ -2823,8 +2977,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnLoad"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnLoad",
                 new
                 {
                     instance = __instance,
@@ -2843,8 +2998,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -2863,8 +3019,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AutoSaveIntervalSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AutoSaveIntervalSet",
                 new
                 {
                     instance = __instance,
@@ -2883,8 +3040,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AutoSaveEnabledSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AutoSaveEnabledSet",
                 new
                 {
                     instance = __instance,
@@ -2903,8 +3061,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RestartAutoSave"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RestartAutoSave",
                 new
                 {
                     instance = __instance,
@@ -2923,8 +3082,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ReturnServerNameFromType"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ReturnServerNameFromType",
                 new
                 {
                     instance = __instance,
@@ -2943,8 +3103,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ReturnSwitchNameFromType"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ReturnSwitchNameFromType",
                 new
                 {
                     instance = __instance,
@@ -2963,8 +3124,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TrolleyPositionLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TrolleyPositionLoaded",
                 new
                 {
                     instance = __instance,
@@ -2983,8 +3145,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCustomerTotalRequirement"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCustomerTotalRequirement",
                 new
                 {
                     instance = __instance,
@@ -3003,8 +3166,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "IsCustomerSuitableForBase"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "IsCustomerSuitableForBase",
                 new
                 {
                     instance = __instance,
@@ -3023,8 +3187,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InitializeVlanPool"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InitializeVlanPool",
                 new
                 {
                     instance = __instance,
@@ -3043,8 +3208,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetFreeVlanId"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetFreeVlanId",
                 new
                 {
                     instance = __instance,
@@ -3063,8 +3229,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ReturnVlanId"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ReturnVlanId",
                 new
                 {
                     instance = __instance,
@@ -3083,8 +3250,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "UsedVlanIdRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "UsedVlanIdRemoved",
                 new
                 {
                     instance = __instance,
@@ -3103,8 +3271,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnApplicationQuit"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnApplicationQuit",
                 new
                 {
                     instance = __instance,
@@ -3123,8 +3292,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetPairedLink"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetPairedLink",
                 new
                 {
                     instance = __instance,
@@ -3143,8 +3313,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "IsAnyCableConnected"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "IsAnyCableConnected",
                 new
                 {
                     instance = __instance,
@@ -3163,8 +3334,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InsertedInRack"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InsertedInRack",
                 new
                 {
                     instance = __instance,
@@ -3183,8 +3355,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GenerateUniquePatchPanelId"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GenerateUniquePatchPanelId",
                 new
                 {
                     instance = __instance,
@@ -3203,8 +3376,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ValidateRackPosition"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ValidateRackPosition",
                 new
                 {
                     instance = __instance,
@@ -3223,8 +3397,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -3243,8 +3418,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SpawnedItemAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SpawnedItemAdded",
                 new
                 {
                     instance = __instance,
@@ -3263,8 +3439,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "LastSpawnedItemRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "LastSpawnedItemRemoved",
                 new
                 {
                     instance = __instance,
@@ -3283,8 +3460,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClearAllUIDs"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClearAllUIDs",
                 new
                 {
                     instance = __instance,
@@ -3303,8 +3481,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnAddClicked"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnAddClicked",
                 new
                 {
                     instance = __instance,
@@ -3323,8 +3502,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnRemoveClicked"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnRemoveClicked",
                 new
                 {
                     instance = __instance,
@@ -3343,8 +3523,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DisplayChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DisplayChanged",
                 new
                 {
                     instance = __instance,
@@ -3363,8 +3544,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -3383,8 +3565,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -3403,8 +3586,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -3423,8 +3607,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "NotificationSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "NotificationSet",
                 new
                 {
                     instance = __instance,
@@ -3443,8 +3628,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowStaticCanvas"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowStaticCanvas",
                 new
                 {
                     instance = __instance,
@@ -3463,8 +3649,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CustomKeyHintRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CustomKeyHintRemoved",
                 new
                 {
                     instance = __instance,
@@ -3483,8 +3670,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InstantiateParticleUpgrade"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InstantiateParticleUpgrade",
                 new
                 {
                     instance = __instance,
@@ -3503,8 +3691,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MessageDisplayChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MessageDisplayChanged",
                 new
                 {
                     instance = __instance,
@@ -3523,8 +3712,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MeesageInFieldAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MeesageInFieldAdded",
                 new
                 {
                     instance = __instance,
@@ -3543,8 +3733,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InstantiateErrorWarningSign"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InstantiateErrorWarningSign",
                 new
                 {
                     instance = __instance,
@@ -3563,8 +3754,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DestroyErrorWarningSign"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DestroyErrorWarningSign",
                 new
                 {
                     instance = __instance,
@@ -3583,8 +3775,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowSpriteNextToPointer"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowSpriteNextToPointer",
                 new
                 {
                     instance = __instance,
@@ -3603,8 +3796,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClearSpriteNextToPointer"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClearSpriteNextToPointer",
                 new
                 {
                     instance = __instance,
@@ -3623,8 +3817,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowTextUnderCursor"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowTextUnderCursor",
                 new
                 {
                     instance = __instance,
@@ -3643,8 +3838,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HideTextUnderCursor"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HideTextUnderCursor",
                 new
                 {
                     instance = __instance,
@@ -3663,8 +3859,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HoldProgressChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HoldProgressChanged",
                 new
                 {
                     instance = __instance,
@@ -3683,8 +3880,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "LoadingInfoSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "LoadingInfoSet",
                 new
                 {
                     instance = __instance,
@@ -3703,8 +3901,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnLoadingStarted"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnLoadingStarted",
                 new
                 {
                     instance = __instance,
@@ -3723,8 +3922,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonSaveInputTextOverlay"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonSaveInputTextOverlay",
                 new
                 {
                     instance = __instance,
@@ -3743,8 +3943,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ButtonCancelInputTextOverlay"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ButtonCancelInputTextOverlay",
                 new
                 {
                     instance = __instance,
@@ -3763,8 +3964,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RestorePreviousSelection"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RestorePreviousSelection",
                 new
                 {
                     instance = __instance,
@@ -3783,8 +3985,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ConvertToSplatMapCoordinate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ConvertToSplatMapCoordinate",
                 new
                 {
                     instance = __instance,
@@ -3803,8 +4006,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetActiveTerrainTextureIdx"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetActiveTerrainTextureIdx",
                 new
                 {
                     instance = __instance,
@@ -3823,8 +4027,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CurrentTerrainSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CurrentTerrainSet",
                 new
                 {
                     instance = __instance,
@@ -3843,8 +4048,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -3863,8 +4069,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -3883,8 +4090,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TimeIsBetween"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TimeIsBetween",
                 new
                 {
                     instance = __instance,
@@ -3903,8 +4111,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CurrentTimeInHours"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CurrentTimeInHours",
                 new
                 {
                     instance = __instance,
@@ -3923,8 +4132,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HoursFromDate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HoursFromDate",
                 new
                 {
                     instance = __instance,
@@ -3943,8 +4153,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -3963,8 +4174,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MoveBetweenPositions"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MoveBetweenPositions",
                 new
                 {
                     instance = __instance,
@@ -3983,8 +4195,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnLoadDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnLoadDestroy",
                 new
                 {
                     instance = __instance,
@@ -4003,8 +4216,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnCollisionEnter"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnCollisionEnter",
                 new
                 {
                     instance = __instance,
@@ -4023,8 +4237,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RigidbodyRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RigidbodyRemoved",
                 new
                 {
                     instance = __instance,
@@ -4043,8 +4258,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RestoreRigidbody"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RestoreRigidbody",
                 new
                 {
                     instance = __instance,
@@ -4063,8 +4279,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCableCurrentSpeed"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCableCurrentSpeed",
                 new
                 {
                     instance = __instance,
@@ -4083,8 +4300,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetAllCables"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetAllCables",
                 new
                 {
                     instance = __instance,
@@ -4103,8 +4321,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CableInfoChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CableInfoChanged",
                 new
                 {
                     instance = __instance,
@@ -4123,8 +4342,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClearNetworkState"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClearNetworkState",
                 new
                 {
                     instance = __instance,
@@ -4143,8 +4363,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CreateCableWithSpawners"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CreateCableWithSpawners",
                 new
                 {
                     instance = __instance,
@@ -4163,8 +4384,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ServerCustomerIDChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ServerCustomerIDChanged",
                 new
                 {
                     instance = __instance,
@@ -4183,8 +4405,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RequestRouteEvaluation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RequestRouteEvaluation",
                 new
                 {
                     instance = __instance,
@@ -4203,8 +4426,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "EvaluationCooldownSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "EvaluationCooldownSet",
                 new
                 {
                     instance = __instance,
@@ -4223,8 +4447,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetEvaluationCooldown"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetEvaluationCooldown",
                 new
                 {
                     instance = __instance,
@@ -4243,8 +4468,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PacketSpawnerEnabledSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PacketSpawnerEnabledSet",
                 new
                 {
                     instance = __instance,
@@ -4263,8 +4489,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "EvaluateAllRoutes"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "EvaluateAllRoutes",
                 new
                 {
                     instance = __instance,
@@ -4283,8 +4510,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetServerProcessingSpeed"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetServerProcessingSpeed",
                 new
                 {
                     instance = __instance,
@@ -4303,8 +4531,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetCustomerRoutes"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetCustomerRoutes",
                 new
                 {
                     instance = __instance,
@@ -4323,8 +4552,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetAllSpawners"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetAllSpawners",
                 new
                 {
                     instance = __instance,
@@ -4343,8 +4573,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RegisterCableInNetworkMap"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RegisterCableInNetworkMap",
                 new
                 {
                     instance = __instance,
@@ -4363,8 +4594,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnCableRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnCableRemoved",
                 new
                 {
                     instance = __instance,
@@ -4383,8 +4615,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DoesCableServeMultipleCustomers"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DoesCableServeMultipleCustomers",
                 new
                 {
                     instance = __instance,
@@ -4403,8 +4636,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CleanUpSystem"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CleanUpSystem",
                 new
                 {
                     instance = __instance,
@@ -4423,8 +4657,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4443,8 +4678,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Move"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Move",
                 new
                 {
                     instance = __instance,
@@ -4463,8 +4699,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Steer"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Steer",
                 new
                 {
                     instance = __instance,
@@ -4483,8 +4720,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "BrakeAndDeacceleration"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "BrakeAndDeacceleration",
                 new
                 {
                     instance = __instance,
@@ -4503,8 +4741,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TakeTheWheel"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TakeTheWheel",
                 new
                 {
                     instance = __instance,
@@ -4523,8 +4762,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "LeaveTheTrolley"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "LeaveTheTrolley",
                 new
                 {
                     instance = __instance,
@@ -4543,8 +4783,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "StopCar"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "StopCar",
                 new
                 {
                     instance = __instance,
@@ -4563,8 +4804,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetTrolleyPosition"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetTrolleyPosition",
                 new
                 {
                     instance = __instance,
@@ -4583,8 +4825,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HandleAudio"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HandleAudio",
                 new
                 {
                     instance = __instance,
@@ -4603,8 +4846,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TurnOffCollidersInTrolley"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TurnOffCollidersInTrolley",
                 new
                 {
                     instance = __instance,
@@ -4623,8 +4867,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TurnBackOnCollidersInTRolley"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TurnBackOnCollidersInTRolley",
                 new
                 {
                     instance = __instance,
@@ -4643,8 +4888,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnCollisionEnter"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnCollisionEnter",
                 new
                 {
                     instance = __instance,
@@ -4663,8 +4909,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -4683,8 +4930,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4703,8 +4951,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4723,8 +4972,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4743,8 +4993,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4763,8 +5014,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4783,8 +5035,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4803,8 +5056,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetPlayerInput"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetPlayerInput",
                 new
                 {
                     instance = __instance,
@@ -4823,8 +5077,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4843,8 +5098,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4863,8 +5119,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4883,8 +5140,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4903,8 +5161,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CopyAnimationCurve"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CopyAnimationCurve",
                 new
                 {
                     instance = __instance,
@@ -4923,8 +5182,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4943,8 +5203,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4963,8 +5224,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -4983,8 +5245,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -5003,8 +5266,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ON_TEXT_CHANGED"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ON_TEXT_CHANGED",
                 new
                 {
                     instance = __instance,
@@ -5023,8 +5287,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5043,8 +5308,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5063,8 +5329,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5083,8 +5350,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5103,8 +5371,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5123,8 +5392,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5143,8 +5413,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -5163,8 +5434,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5183,8 +5455,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ON_TEXT_CHANGED"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ON_TEXT_CHANGED",
                 new
                 {
                     instance = __instance,
@@ -5203,8 +5476,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5223,8 +5497,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5243,8 +5518,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -5263,8 +5539,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5283,8 +5560,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ON_TEXT_CHANGED"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ON_TEXT_CHANGED",
                 new
                 {
                     instance = __instance,
@@ -5303,8 +5581,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5323,8 +5602,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5343,8 +5623,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -5363,8 +5644,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5383,8 +5665,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ON_TEXT_CHANGED"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ON_TEXT_CHANGED",
                 new
                 {
                     instance = __instance,
@@ -5403,8 +5686,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5423,8 +5707,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5443,8 +5728,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentDisabled"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentDisabled",
                 new
                 {
                     instance = __instance,
@@ -5463,8 +5749,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5483,8 +5770,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ON_TEXT_CHANGED"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ON_TEXT_CHANGED",
                 new
                 {
                     instance = __instance,
@@ -5503,8 +5791,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5523,8 +5812,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5543,8 +5833,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CopyAnimationCurve"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CopyAnimationCurve",
                 new
                 {
                     instance = __instance,
@@ -5563,8 +5854,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "IsVisible"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "IsVisible",
                 new
                 {
                     instance = __instance,
@@ -5583,8 +5875,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5603,8 +5896,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AccentMapLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AccentMapLoaded",
                 new
                 {
                     instance = __instance,
@@ -5623,8 +5917,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -5643,8 +5938,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ConsoleSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ConsoleSet",
                 new
                 {
                     instance = __instance,
@@ -5663,8 +5959,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Set"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Set",
                 new
                 {
                     instance = __instance,
@@ -5683,8 +5980,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Reset"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Reset",
                 new
                 {
                     instance = __instance,
@@ -5703,8 +6001,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowBackground"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowBackground",
                 new
                 {
                     instance = __instance,
@@ -5723,8 +6022,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ConsoleRemoved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ConsoleRemoved",
                 new
                 {
                     instance = __instance,
@@ -5743,8 +6043,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AccentCharClick"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AccentCharClick",
                 new
                 {
                     instance = __instance,
@@ -5763,8 +6064,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Generate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Generate",
                 new
                 {
                     instance = __instance,
@@ -5783,8 +6085,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GamepadPrep"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GamepadPrep",
                 new
                 {
                     instance = __instance,
@@ -5803,8 +6106,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetSelectedKey"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSelectedKey",
                 new
                 {
                     instance = __instance,
@@ -5823,8 +6127,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectedKeySet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectedKeySet",
                 new
                 {
                     instance = __instance,
@@ -5843,8 +6148,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Activate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Activate",
                 new
                 {
                     instance = __instance,
@@ -5863,8 +6169,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "DeActivate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "DeActivate",
                 new
                 {
                     instance = __instance,
@@ -5883,8 +6190,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -5903,8 +6211,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "JoystickInput"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "JoystickInput",
                 new
                 {
                     instance = __instance,
@@ -5923,8 +6232,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "JoystickButtonA"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "JoystickButtonA",
                 new
                 {
                     instance = __instance,
@@ -5943,8 +6253,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "JoystickButtonB"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "JoystickButtonB",
                 new
                 {
                     instance = __instance,
@@ -5963,8 +6274,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AutoCorrectLayout"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AutoCorrectLayout",
                 new
                 {
                     instance = __instance,
@@ -5983,8 +6295,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AcceptPhysicalKeyboard"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AcceptPhysicalKeyboard",
                 new
                 {
                     instance = __instance,
@@ -6003,8 +6316,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Prep"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Prep",
                 new
                 {
                     instance = __instance,
@@ -6023,8 +6337,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetOSKKeyCode"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetOSKKeyCode",
                 new
                 {
                     instance = __instance,
@@ -6043,8 +6358,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetKeyCode"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetKeyCode",
                 new
                 {
                     instance = __instance,
@@ -6063,8 +6379,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClickSound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClickSound",
                 new
                 {
                     instance = __instance,
@@ -6083,8 +6400,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectSound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectSound",
                 new
                 {
                     instance = __instance,
@@ -6103,8 +6421,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OutputTextUpdate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OutputTextUpdate",
                 new
                 {
                     instance = __instance,
@@ -6123,8 +6442,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetSelectedKey"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSelectedKey",
                 new
                 {
                     instance = __instance,
@@ -6143,8 +6463,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetOSKKey"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetOSKKey",
                 new
                 {
                     instance = __instance,
@@ -6163,8 +6484,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InputFromPointerDevice"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InputFromPointerDevice",
                 new
                 {
                     instance = __instance,
@@ -6183,8 +6505,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -6203,8 +6526,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -6223,8 +6547,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnGUI"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnGUI",
                 new
                 {
                     instance = __instance,
@@ -6243,8 +6568,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -6263,8 +6589,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlaySound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlaySound",
                 new
                 {
                     instance = __instance,
@@ -6283,8 +6610,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlaySelectKeySound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlaySelectKeySound",
                 new
                 {
                     instance = __instance,
@@ -6303,8 +6631,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "TMPInputFieldReActivate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TMPInputFieldReActivate",
                 new
                 {
                     instance = __instance,
@@ -6323,8 +6652,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectionEnd"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectionEnd",
                 new
                 {
                     instance = __instance,
@@ -6343,8 +6673,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ShowHideKeyboard"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShowHideKeyboard",
                 new
                 {
                     instance = __instance,
@@ -6363,8 +6694,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GamepadWrapNavigation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GamepadWrapNavigation",
                 new
                 {
                     instance = __instance,
@@ -6383,8 +6715,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectedKey"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectedKey",
                 new
                 {
                     instance = __instance,
@@ -6403,8 +6736,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SelectedKeySet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SelectedKeySet",
                 new
                 {
                     instance = __instance,
@@ -6423,8 +6757,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PrepAssetGroup"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PrepAssetGroup",
                 new
                 {
                     instance = __instance,
@@ -6443,8 +6778,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -6463,8 +6799,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -6483,8 +6820,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HandleZoom"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HandleZoom",
                 new
                 {
                     instance = __instance,
@@ -6503,8 +6841,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CameraPositionChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CameraPositionChanged",
                 new
                 {
                     instance = __instance,
@@ -6523,8 +6862,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayLandingSound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayLandingSound",
                 new
                 {
                     instance = __instance,
@@ -6543,8 +6883,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ProgressStepCycle"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ProgressStepCycle",
                 new
                 {
                     instance = __instance,
@@ -6563,8 +6904,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "RotateView"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RotateView",
                 new
                 {
                     instance = __instance,
@@ -6583,8 +6925,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnControllerColliderHit"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnControllerColliderHit",
                 new
                 {
                     instance = __instance,
@@ -6606,8 +6949,8 @@ internal static class GregSystemHooks
             // Bypass original that returns null - provide default mouse look
             __result = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetMouseLook"),
+            SafeEmit(
+                "GetMouseLook",
                 new
                 {
                     instance = __instance,
@@ -6634,8 +6977,8 @@ internal static class GregSystemHooks
             float vertical = Input.GetAxis("Vertical");
             __result = new Vector3(horizontal * speed, 0, vertical * speed);
 
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "GetInput"),
+            SafeEmit(
+                "GetInput",
                 new
                 {
                     instance = __instance,
@@ -6657,8 +7000,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Crouch"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Crouch",
                 new
                 {
                     instance = __instance,
@@ -6677,8 +7021,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "StopCrouching"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "StopCrouching",
                 new
                 {
                     instance = __instance,
@@ -6697,8 +7042,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetCameraPosition"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetCameraPosition",
                 new
                 {
                     instance = __instance,
@@ -6717,8 +7063,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "NormalFovChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "NormalFovChanged",
                 new
                 {
                     instance = __instance,
@@ -6737,8 +7084,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -6757,8 +7105,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Init"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Init",
                 new
                 {
                     instance = __instance,
@@ -6777,8 +7126,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetRotation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetRotation",
                 new
                 {
                     instance = __instance,
@@ -6797,8 +7147,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "MouseLookOnDisable"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MouseLookOnDisable",
                 new
                 {
                     instance = __instance,
@@ -6817,8 +7168,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CursorLockSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CursorLockSet",
                 new
                 {
                     instance = __instance,
@@ -6837,8 +7189,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CursorLockChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CursorLockChanged",
                 new
                 {
                     instance = __instance,
@@ -6857,8 +7210,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "InternalLockUpdate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InternalLockUpdate",
                 new
                 {
                     instance = __instance,
@@ -6877,8 +7231,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ClampRotationAroundXAxis"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClampRotationAroundXAxis",
                 new
                 {
                     instance = __instance,
@@ -6897,8 +7252,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "SittingClampRotation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SittingClampRotation",
                 new
                 {
                     instance = __instance,
@@ -6917,8 +7273,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Init"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Init",
                 new
                 {
                     instance = __instance,
@@ -6937,8 +7294,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Cleanup"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Cleanup",
                 new
                 {
                     instance = __instance,
@@ -6957,8 +7315,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HandleLookAtRay"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HandleLookAtRay",
                 new
                 {
                     instance = __instance,
@@ -6977,8 +7336,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ResetHold"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetHold",
                 new
                 {
                     instance = __instance,
@@ -6997,8 +7357,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HideItemNameOrSiluete"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HideItemNameOrSiluete",
                 new
                 {
                     instance = __instance,
@@ -7017,8 +7378,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "CloseInteractionMenu"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CloseInteractionMenu",
                 new
                 {
                     instance = __instance,
@@ -7037,8 +7399,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -7057,8 +7420,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "Move"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Move",
                 new
                 {
                     instance = __instance,
@@ -7077,8 +7441,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "AnimatorChanged"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AnimatorChanged",
                 new
                 {
                     instance = __instance,
@@ -7097,8 +7462,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "HandleGroundedMovement"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HandleGroundedMovement",
                 new
                 {
                     instance = __instance,
@@ -7117,8 +7483,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "ApplyExtraTurnRotation"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ApplyExtraTurnRotation",
                 new
                 {
                     instance = __instance,
@@ -7137,8 +7504,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnAnimatorMove"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnAnimatorMove",
                 new
                 {
                     instance = __instance,
@@ -7157,8 +7525,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "PlayStepSound"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PlayStepSound",
                 new
                 {
                     instance = __instance,
@@ -7177,8 +7546,9 @@ internal static class GregSystemHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.System, "OnAnimationEventFootStep"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnAnimationEventFootStep",
                 new
                 {
                     instance = __instance,

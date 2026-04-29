@@ -5,9 +5,10 @@ namespace gregCore.Sdk.Language.Hosts;
 
 public sealed class GregCSharpScriptHost : IGregLanguageHost
 {
-    public Language Language => Language.CSharpScript;
+    public string HostId => "csharp";
     public string HostName => nameof(GregCSharpScriptHost);
     public bool IsActive { get; private set; }
+    public string[] FileExtensions => new[] { ".cs" };
 
     public bool IsDependencyAvailable(out string detail)
     {
@@ -24,10 +25,7 @@ public sealed class GregCSharpScriptHost : IGregLanguageHost
 
     public void Activate(string modsScriptsDir)
     {
-        if (IsActive)
-        {
-            return;
-        }
+        if (IsActive) return;
 
         MelonLogger.Msg("[gregCore] GregCSharpScriptHost initialized (runtime execution layer is [UNVERIFIED]).");
         IsActive = true;

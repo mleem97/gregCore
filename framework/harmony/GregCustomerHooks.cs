@@ -13,9 +13,20 @@ namespace gregFramework.Hooks;
 /// <summary>
 /// Harmony hooks for domain Customer (generated from Il2Cpp unpack).
 /// </summary>
-[HarmonyPatch]
 internal static class GregCustomerHooks
 {
+    private static void SafeEmit(string hookName, object? payload)
+    {
+        try
+        {
+            gregEventDispatcher.Emit(hookName, payload);
+        }
+        catch (System.Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore] SafeEmit '{hookName}' failed: {ex.Message}");
+        }
+    }
+
     // CustomerBase.Awake
     [HarmonyPatch(typeof(CustomerBase), nameof(CustomerBase.Awake))]
     [HarmonyPostfix]
@@ -23,7 +34,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "ComponentInitialized"),
                 new
                 {
@@ -43,7 +55,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "ComponentInitialized"),
                 new
                 {
@@ -63,7 +76,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetEffectiveMoneySpeed"),
                 new
                 {
@@ -83,7 +97,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "AreAllAppRequirementsMet"),
                 new
                 {
@@ -103,7 +118,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "CustomerServerCountAndSpeedChanged"),
                 new
                 {
@@ -123,7 +139,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "AppPerformanceAdded"),
                 new
                 {
@@ -143,7 +160,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "ResetAllAppSpeeds"),
                 new
                 {
@@ -163,7 +181,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "IsIPPresent"),
                 new
                 {
@@ -183,7 +202,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetAppIDForIP"),
                 new
                 {
@@ -203,7 +223,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "UpBaseSet"),
                 new
                 {
@@ -223,7 +244,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "UpAppSet"),
                 new
                 {
@@ -243,7 +265,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "AppText"),
                 new
                 {
@@ -263,7 +286,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "SpeedOnCustomerBaseAppChanged"),
                 new
                 {
@@ -283,7 +307,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetSubnetsPerApp"),
                 new
                 {
@@ -303,7 +328,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetVlanIdsPerApp"),
                 new
                 {
@@ -323,7 +349,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetServerTypeForIP"),
                 new
                 {
@@ -343,7 +370,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "GetTotalAppSpeed"),
                 new
                 {
@@ -363,7 +391,8 @@ internal static class GregCustomerHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
                 gregHookName.Create(GregDomain.Customer, "DataLoaded"),
                 new
                 {

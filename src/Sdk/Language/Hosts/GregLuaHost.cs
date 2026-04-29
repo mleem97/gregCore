@@ -6,9 +6,10 @@ namespace gregCore.Sdk.Language.Hosts;
 
 public sealed class GregLuaHost : IGregLanguageHost
 {
-    public Language Language => Language.Lua;
+    public string HostId => "lua";
     public string HostName => nameof(GregLuaHost);
     public bool IsActive { get; private set; }
+    public string[] FileExtensions => new[] { ".lua" };
 
     public bool IsDependencyAvailable(out string detail)
     {
@@ -18,10 +19,7 @@ public sealed class GregLuaHost : IGregLanguageHost
 
     public void Activate(string modsScriptsDir)
     {
-        if (IsActive)
-        {
-            return;
-        }
+        if (IsActive) return;
 
         LuaFFIBridge.Initialize();
         IsActive = true;
@@ -29,31 +27,19 @@ public sealed class GregLuaHost : IGregLanguageHost
 
     public void OnUpdate(float dt)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         LuaFFIBridge.OnUpdate(dt);
     }
- 
+
     public void OnSceneLoaded(string sceneName)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         LuaFFIBridge.OnSceneLoaded(sceneName);
     }
 
     public void Shutdown()
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         LuaFFIBridge.Shutdown();
         IsActive = false;
     }

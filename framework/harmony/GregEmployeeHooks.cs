@@ -13,9 +13,20 @@ namespace gregFramework.Hooks;
 /// <summary>
 /// Harmony hooks for domain Employee (generated from Il2Cpp unpack).
 /// </summary>
-[HarmonyPatch]
 internal static class GregEmployeeHooks
 {
+    private static void SafeEmit(string hookName, object? payload)
+    {
+        try
+        {
+            gregEventDispatcher.Emit(hookName, payload);
+        }
+        catch (System.Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore] SafeEmit failed for '{hookName}': {ex.Message}");
+        }
+    }
+
     // HRSystem.OnEnable
     [HarmonyPatch(typeof(HRSystem), nameof(HRSystem.OnEnable))]
     [HarmonyPostfix]
@@ -23,7 +34,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
                 new
                 {
@@ -43,7 +56,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonHireEmployee"),
                 new
                 {
@@ -63,7 +78,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonCancelBuying"),
                 new
                 {
@@ -83,7 +100,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonConfirmHire"),
                 new
                 {
@@ -103,7 +122,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonFireEmployee"),
                 new
                 {
@@ -123,7 +144,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ButtonConfirmFireEmployee"),
                 new
                 {
@@ -143,7 +166,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
                 new
                 {
@@ -163,7 +188,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
                 new
                 {
@@ -183,7 +210,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "AssignJob"),
                 new
                 {
@@ -203,7 +232,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetCurrentDevicePrefabID"),
                 new
                 {
@@ -223,7 +254,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "DeviceRepaired"),
                 new
                 {
@@ -243,7 +276,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetCorrectDevicePrefab"),
                 new
                 {
@@ -263,7 +298,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "RotateTowardsGoal"),
                 new
                 {
@@ -283,7 +320,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "PositionHandTargetsOnDevice"),
                 new
                 {
@@ -303,7 +342,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnLoadingStarted"),
                 new
                 {
@@ -323,7 +364,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnDestroy"),
                 new
                 {
@@ -343,7 +386,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "ComponentInitialized"),
                 new
                 {
@@ -363,7 +408,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Hired"),
                 new
                 {
@@ -383,7 +430,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Dispatched"),
                 new
                 {
@@ -403,7 +452,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "NextJobRequested"),
                 new
                 {
@@ -423,7 +474,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "JobQueued"),
                 new
                 {
@@ -443,7 +496,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "IsDeviceAlreadyAssigned"),
                 new
                 {
@@ -463,7 +518,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "JobQueueLoaded"),
                 new
                 {
@@ -483,7 +540,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "Fired"),
                 new
                 {
@@ -503,7 +562,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OpenDumpsterArea"),
                 new
                 {
@@ -523,7 +584,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "GetClosestOpenedDumpsterIndex"),
                 new
                 {
@@ -543,7 +606,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnDestroy"),
                 new
                 {
@@ -563,7 +628,9 @@ internal static class GregEmployeeHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+
+            SafeEmit(
                 gregHookName.Create(GregDomain.Employee, "OnLoadingStarted"),
                 new
                 {

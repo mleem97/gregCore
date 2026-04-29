@@ -13,9 +13,22 @@ namespace gregFramework.Hooks;
 /// <summary>
 /// Harmony hooks for domain Ui (generated from Il2Cpp unpack).
 /// </summary>
-[HarmonyPatch]
 internal static class GregUiHooks
 {
+    private static void SafeEmit(string hookName, object? payload)
+    {
+        try
+        {
+            gregEventDispatcher.Emit(
+                gregHookName.Create(GregDomain.Ui, hookName),
+                payload);
+        }
+        catch (System.Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore] SafeEmit '{hookName}' failed: {ex.Message}");
+        }
+    }
+
     // BalanceSheet.Awake
     [HarmonyPatch(typeof(BalanceSheet), nameof(BalanceSheet.Awake))]
     [HarmonyPostfix]
@@ -23,8 +36,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -43,8 +57,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -63,8 +78,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "OnDestroy"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "OnDestroy",
                 new
                 {
                     instance = __instance,
@@ -83,8 +99,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "GetOrCreateRecord"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetOrCreateRecord",
                 new
                 {
                     instance = __instance,
@@ -103,8 +120,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "RegisterSalary"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RegisterSalary",
                 new
                 {
                     instance = __instance,
@@ -123,8 +141,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "CountFailingApps"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "CountFailingApps",
                 new
                 {
                     instance = __instance,
@@ -143,8 +162,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SnapshotSaved"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SnapshotSaved",
                 new
                 {
                     instance = __instance,
@@ -163,8 +183,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "GetLatestSnapshot"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetLatestSnapshot",
                 new
                 {
                     instance = __instance,
@@ -183,8 +204,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "FillInBalanceSheet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "FillInBalanceSheet",
                 new
                 {
                     instance = __instance,
@@ -203,8 +225,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SalaryRowAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SalaryRowAdded",
                 new
                 {
                     instance = __instance,
@@ -223,8 +246,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "TotalRowAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "TotalRowAdded",
                 new
                 {
                     instance = __instance,
@@ -243,8 +267,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "HeaderRowAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HeaderRowAdded",
                 new
                 {
                     instance = __instance,
@@ -263,8 +288,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SectionTitleAdded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SectionTitleAdded",
                 new
                 {
                     instance = __instance,
@@ -283,8 +309,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "InstantiateRow"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InstantiateRow",
                 new
                 {
                     instance = __instance,
@@ -303,8 +330,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ClearRows"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ClearRows",
                 new
                 {
                     instance = __instance,
@@ -323,8 +351,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "GetSaveData"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GetSaveData",
                 new
                 {
                     instance = __instance,
@@ -343,8 +372,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "FromSaveLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "FromSaveLoaded",
                 new
                 {
                     instance = __instance,
@@ -363,8 +393,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "RestoreRecord"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RestoreRecord",
                 new
                 {
                     instance = __instance,
@@ -383,8 +414,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -403,8 +435,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "Continue"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "Continue",
                 new
                 {
                     instance = __instance,
@@ -423,8 +456,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "NewGame"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "NewGame",
                 new
                 {
                     instance = __instance,
@@ -443,8 +477,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "QuitGame"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "QuitGame",
                 new
                 {
                     instance = __instance,
@@ -463,8 +498,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "GameLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "GameLoaded",
                 new
                 {
                     instance = __instance,
@@ -483,8 +519,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "HideMiddleMenu"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "HideMiddleMenu",
                 new
                 {
                     instance = __instance,
@@ -503,8 +540,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "tingsSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "tingsSet",
                 new
                 {
                     instance = __instance,
@@ -523,8 +561,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -543,8 +582,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "LookSensitivity"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "LookSensitivity",
                 new
                 {
                     instance = __instance,
@@ -563,8 +603,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "InvertY"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "InvertY",
                 new
                 {
                     instance = __instance,
@@ -583,8 +624,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SettingsLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SettingsLoaded",
                 new
                 {
                     instance = __instance,
@@ -603,8 +645,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -623,8 +666,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "QualitySet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "QualitySet",
                 new
                 {
                     instance = __instance,
@@ -643,8 +687,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "FullScreenSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "FullScreenSet",
                 new
                 {
                     instance = __instance,
@@ -663,8 +708,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ResDropDownSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResDropDownSet",
                 new
                 {
                     instance = __instance,
@@ -683,8 +729,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ResolutionSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResolutionSet",
                 new
                 {
                     instance = __instance,
@@ -703,8 +750,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "AvailableRefreshRate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AvailableRefreshRate",
                 new
                 {
                     instance = __instance,
@@ -723,8 +771,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "RefreshRateSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RefreshRateSet",
                 new
                 {
                     instance = __instance,
@@ -743,8 +792,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "LimitFrameRate"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "LimitFrameRate",
                 new
                 {
                     instance = __instance,
@@ -763,8 +813,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SettingsLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SettingsLoaded",
                 new
                 {
                     instance = __instance,
@@ -783,8 +834,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ChangeDepthOfField"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ChangeDepthOfField",
                 new
                 {
                     instance = __instance,
@@ -803,8 +855,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ResetDepthOfField"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ResetDepthOfField",
                 new
                 {
                     instance = __instance,
@@ -823,8 +876,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "FieldOfViewSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "FieldOfViewSet",
                 new
                 {
                     instance = __instance,
@@ -843,8 +897,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ShadowDistanceSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ShadowDistanceSet",
                 new
                 {
                     instance = __instance,
@@ -863,8 +918,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "MotionBlurSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MotionBlurSet",
                 new
                 {
                     instance = __instance,
@@ -883,8 +939,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ExposureSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ExposureSet",
                 new
                 {
                     instance = __instance,
@@ -903,8 +960,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "upAASet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "upAASet",
                 new
                 {
                     instance = __instance,
@@ -923,8 +981,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "AntiAliasingSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AntiAliasingSet",
                 new
                 {
                     instance = __instance,
@@ -943,8 +1002,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "AAQualitySet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "AAQualitySet",
                 new
                 {
                     instance = __instance,
@@ -963,8 +1023,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "IsDLSSSupported"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "IsDLSSSupported",
                 new
                 {
                     instance = __instance,
@@ -983,8 +1044,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "PopulateMonitors"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "PopulateMonitors",
                 new
                 {
                     instance = __instance,
@@ -1003,8 +1065,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "MonitorSet"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MonitorSet",
                 new
                 {
                     instance = __instance,
@@ -1023,8 +1086,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "RepopulateResolutions"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RepopulateResolutions",
                 new
                 {
                     instance = __instance,
@@ -1043,8 +1107,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "ComponentInitialized"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "ComponentInitialized",
                 new
                 {
                     instance = __instance,
@@ -1063,8 +1128,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "MasterVolume"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MasterVolume",
                 new
                 {
                     instance = __instance,
@@ -1083,8 +1149,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "MusicVolume"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "MusicVolume",
                 new
                 {
                     instance = __instance,
@@ -1103,8 +1170,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "EffectVolume"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "EffectVolume",
                 new
                 {
                     instance = __instance,
@@ -1123,8 +1191,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "RacksVolume"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "RacksVolume",
                 new
                 {
                     instance = __instance,
@@ -1143,8 +1212,9 @@ internal static class GregUiHooks
     {
         try
         {
-            gregEventDispatcher.Emit(
-                gregHookName.Create(GregDomain.Ui, "SettingsLoaded"),
+            if (__instance == null || __instance.NativePointer == IntPtr.Zero) return;
+            SafeEmit(
+                "SettingsLoaded",
                 new
                 {
                     instance = __instance,

@@ -1,19 +1,27 @@
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using MelonLoader;
 
 namespace gregCore.UI
 {
+    /// <summary>
+    /// Fluent builder for gregCore UI panels.
+    /// Primary output: UI Toolkit VisualElements.
+    /// Fallback output: UGUI GameObject hierarchy when UI Toolkit is insufficient.
+    /// </summary>
     public class GregUIBuilder
     {
         private readonly VisualElement _root;
         private readonly VisualElement _content;
         private readonly string _panelName;
+        private readonly bool _isTablet;
 
         private GregUIBuilder(string title, bool isTablet)
         {
             _panelName = $"Panel_{title}";
-            
+            _isTablet = isTablet;
+
             _root = new VisualElement
             {
                 name = _panelName,
@@ -37,7 +45,6 @@ namespace gregCore.UI
                 }
             };
 
-            // Header
             var header = new Label(title.ToUpper())
             {
                 style =
@@ -54,7 +61,6 @@ namespace gregCore.UI
             };
             _root.Add(header);
 
-            // Content container
             _content = new VisualElement
             {
                 name = "Content",
@@ -217,13 +223,7 @@ namespace gregCore.UI
 
         public GregUIBuilder AddSlider(string label, float min, float max, float currentValue, Action<float> onChanged)
         {
-            var container = new VisualElement
-            {
-                style =
-                {
-                    marginTop = GregUITheme.Spacing
-                }
-            };
+            var container = new VisualElement { style = { marginTop = GregUITheme.Spacing } };
 
             var labelElement = new Label(label)
             {
@@ -250,13 +250,7 @@ namespace gregCore.UI
 
         public GregUIBuilder AddInputField(string label, string defaultValue, Action<string> onChanged)
         {
-            var container = new VisualElement
-            {
-                style =
-                {
-                    marginTop = GregUITheme.Spacing
-                }
-            };
+            var container = new VisualElement { style = { marginTop = GregUITheme.Spacing } };
 
             var labelElement = new Label(label)
             {
@@ -290,18 +284,49 @@ namespace gregCore.UI
 
         public GregUIBuilder AddSpacer(float height = 20f)
         {
-            var spacer = new VisualElement
-            {
-                style = { height = height }
-            };
+            var spacer = new VisualElement { style = { height = height } };
             _content.Add(spacer);
             return this;
         }
 
+        /// <summary>
+        /// Builds the panel into the UI Toolkit root. This is the primary path.
+        /// </summary>
         public VisualElement Build()
         {
             GregUIManager.RegisterPanel(_panelName, _root);
             return _root;
+        }
+
+        /// <summary>
+        /// Fallback: builds the panel as a UGUI GameObject hierarchy.
+        /// Use only when UI Toolkit is unavailable or insufficient.
+        /// </summary>
+        public GameObject? BuildAsUGUI()
+        {
+            try
+            {
+                var go = GregUIManager.CreateUGUIFallbackObject(_panelName);
+                if (go == null) return null;
+
+                var rect = go.AddComponent<RectTransform>();
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.zero;
+                rect.pivot = new Vector2(0, 1);
+                rect.anchoredPosition = new Vector2(_root.style.left.value.value, -_root.style.top.value.value);
+                rect.sizeDelta = new Vector2(_root.style.width.value.value, _root.style.height.value.value);
+
+                var image = go.AddComponent<UnityEngine.UI.Image>();
+                image.color = GregUITheme.PanelBackground;
+
+                MelonLogger.Warning($"[gregCore] Panel '{_panelName}' built as UGUI fallback.");
+                return go;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] UGUI fallback build failed: {ex.Message}");
+                return null;
+            }
         }
 
         public GregUIBuilder Show() { _root.style.display = DisplayStyle.Flex; return this; }

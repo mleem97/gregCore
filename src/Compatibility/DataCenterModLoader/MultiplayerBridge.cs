@@ -155,9 +155,8 @@ public class MultiplayerBridge
 
     private bool _showPanel;
     private VisualElement? _panelRoot;
-    private bool _stylesInitialized;
 
-    // Custom text field state (GUI.TextField doesn't work with new Input System)
+    // Custom text field state (manual input handling for new Input System)
     private bool _roomCodeFieldFocused;
     private float _cursorBlinkTimer;
     private bool _cursorVisible = true;
@@ -603,8 +602,8 @@ public class MultiplayerBridge
     }
 
     /// <summary>
-    /// Manually handles keyboard input for the room code text field since GUI.TextField
-    /// doesn't work when the game uses the new Input System exclusively.
+    /// Manually handles keyboard input for the room code text field
+    /// since the game uses the new Input System exclusively.
     /// </summary>
     private void HandleTextFieldInput(Keyboard kb)
     {

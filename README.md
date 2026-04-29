@@ -1,118 +1,131 @@
 # gregCore
 
-A .NET 6 MelonLoader mod framework for Data Center and similar Unity IL2CPP games.
+A .NET 6 IL2CPP mod framework for MelonLoader and BepInEx — targeting Data Center and compatible Unity IL2CPP games.
 
-## Product Name
+## Overview
 
-The official product name is **gregCore**. This is a multi-project .NET 6 framework designed for MelonLoader-based modding.
+**gregCore** is a modular .NET 6 framework that provides:
 
-## Project Purpose
-
-This repository provides a modular modding framework for Unity-based games using MelonLoader. It includes hooks, patching systems, UI extensions, save handling, and core API services for building game modifications.
-
-## Target Users
-
-- Mod developers building extensions for Data Center or compatible IL2CPP Unity games
-- Contributors familiar with C#, MelonLoader, and Harmony patching
-- AI agents assisting with mod development workflows
-
-## Major Capabilities
-
-- Harmony-based runtime patching system
-- UI overlay and widget management
-- Save engine with versioning and migration support
+- Harmony-based runtime patching system (Prefix / Postfix only — no IL transpilers in IL2CPP)
+- UI overlay and widget management (UI Toolkit / UGUI)
+- Save engine with versioning and migration (LiteDB)
 - Multi-mod architecture with dependency resolution
 - Wall rack and grid placement systems
 - Custom shop and employee management APIs
 - Logging and diagnostic infrastructure
+- Lua, JS and Python scripting bridges
+- FishNet multiplayer sync layer (optional)
+
+## Compatibility
+
+| Loader | Platform | Status |
+|--------|----------|--------|
+| MelonLoader 0.7+ | Windows x64 | ✅ Supported |
+| MelonLoader 0.7+ | Linux x64 | ✅ Supported |
+| BepInEx 6+ | Windows x64 | ✅ Supported |
+| BepInEx 6+ | Linux x64 | ✅ Supported |
+
+- .NET 6.0 (net6.0)
+- Unity 2020.3+ (IL2CPP backend)
+
+## CI / Releases
+
+Every push to `main` automatically:
+
+1. **Bumps the patch version** (`X.Y.Z → X.Y.Z+1`) in `VERSION`, `gregCore.csproj` and `GregCoreMod.cs`
+2. **Builds** four release packages: MelonLoader-Windows, MelonLoader-Linux, BepInEx-Windows, BepInEx-Linux
+3. **Publishes** a GitHub Release with all four ZIPs attached
+4. **Regenerates** `docs/FrameworkAPI.md` when `game_hooks.json` or `framework/greg_hooks.json` change
+
+No tag required. No manual trigger required. Fully automatic.
+
+## Installation
+
+### MelonLoader
+
+1. Download `gregCore-vX.Y.Z-melonloader-windows.zip` (or `-linux.zip`)
+2. Extract into your game's root folder
+3. Your `Mods/` folder will contain `gregCore.dll`
+
+### BepInEx
+
+1. Download `gregCore-vX.Y.Z-bepinex-windows.zip` (or `-linux.zip`)
+2. Extract into your game's root folder
+3. `BepInEx/plugins/gregCore/gregCore.dll` is placed automatically
 
 ## Repository Layout
 
 ```
-GameFramework/
-├─ src/                    # Mod source code (multiple independent mods)
-├─ framework/              # Shared hook definitions
-├─ lib/                   # Reference assemblies and dependencies
-├─ tests/                 # Unit and integration tests
-├─ build/                 # Build scripts and artifacts
-├─ docs/                  # Documentation
-├─ .github/               # GitHub workflows and templates
-└─ [root files]          # Solution, project, build config
+gregCore/
+├─ src/                    # Framework + mod source code
+│  ├─ Core/               # GregCoreMod.cs – MelonLoader entry point
+│  ├─ Infrastructure/     # Config, logging, persistence
+│  ├─ GameLayer/          # Harmony patches for game classes
+│  ├─ UI/                 # UI Toolkit overlay
+│  └─ …
+├─ framework/              # greg_hooks.json – canonical hook registry
+├─ game_hooks.json         # Patchable methods from IL2CPP dump
+├─ lib/                   # Reference assemblies (game stubs, MelonLoader, etc.)
+├─ docs/                  # Auto-generated API docs (FrameworkAPI.md)
+├─ scripts/               # Build and code-generation helpers
+├─ tests/                 # Unit tests
+├─ .github/workflows/     # CI pipeline
+├─ VERSION                # Single source of truth for version
+└─ gregCore.csproj
 ```
 
-## Prerequisites
+## Prerequisites (local development)
 
-- .NET 6 SDK (net6.0)
+- .NET 6 SDK
 - Visual Studio 2022+ or VS Code with C# extension
-- MelonLoaderinstalled game (default: Data Center)
-- Reference assemblies from target game (local paths required)
+- Game reference assemblies in `lib/references/MelonLoader/` (not committed; see below)
 
-## Quick Start
-
-```powershell
-# Restore and build
-./build.ps1
-
-# Output goes to bin/Debug/net6.0/ or bin/Release/net6.0/
-# Deploy DLL to your game's MelonLoader Mods folder
-```
-
-## Build Instructions
-
-### Windows (PowerShell)
+## Building Locally
 
 ```powershell
+# Windows
 ./build.ps1
-```
 
-### Linux/macOS (Shell)
-
-```bash
+# Linux / macOS
 ./build.sh
 ```
 
-### Options
+Output goes to `bin/Release/net6.0/gregCore.dll`.
 
-- `-Configuration Debug|Release` - Build configuration
-- `-Clean` - Clean before build
+## Reference Assemblies
 
-## MelonLoader Deployment
+The `lib/references/MelonLoader/` folder is **not** committed (`.gitignore`).
+Populate it from your local game install:
 
-Built DLLs (`gregCore.dll`) go into your game's `Mods` folder:
+1. Run the game with MelonLoader once to generate IL2CPP assemblies
+2. Copy `MelonLoader/Il2CppAssemblies/` and `MelonLoader/net6/` into `lib/references/MelonLoader/`
 
+For CI, dummy stubs are created by `ci-stubs/create-stubs.sh` so the build
+succeeds without the real game binaries.
+
+## Updating Hook Definitions
+
+When the game updates:
+
+```bash
+# 1. Re-run Cpp2IL / Il2CppDumper on the new GameAssembly
+./scripts/Generate-GregHooksFromIl2CppDump.ps1
+
+# 2. Commit the updated JSONs
+git add game_hooks.json framework/greg_hooks.json
+git commit -m "chore: update game hooks for vX.Y"
+git push
+# → CI automatically regenerates docs/FrameworkAPI.md
 ```
-<Data Center>/Mods/gregCore.dll
-```
 
-Ensure reference DLLs (MelonLoader, Harmony, Il2CppInterop) are in the game's MelonLoader directory.
+## API Documentation
 
-## IL2CPP and AI-Assisted Modding
-
-> **Important**: When using AI for mod development against IL2CPP-based games, an IL2CPP unpack/decompilation workflow is strongly recommended.
-
-AI-assisted modding works best when you have readable game references and type information. For practical reverse-engineering and inspection:
-
-1. **Decompile or unpack** relevant game assemblies into a browsable C#-oriented reference project
-2. Tools such as **dnSpy** or **dotPeek** may be useful in the inspection pipeline where applicable
-3. Note that pure IL2CPP targets require additional metadata extraction steps beyond ordinary managed assembly inspection
-
-A **future dedicated helper tool** from this project is planned to simplify the IL2CPP reference extraction process.
+See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the auto-generated hook reference.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
-
-## Security
-
-See [SECURITY.md](SECURITY.md) for vulnerability reporting.
-
-## Compatibility
-
-- .NET 6.0 (net6.0)
-- MelonLoader compatible games
-- Unity 2020.3+ (IL2CPP backend)
-- Platform: Windows x64 (primary)
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-See LICENSE file for details.
+See [LICENSE](LICENSE) for details.

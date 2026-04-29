@@ -1,83 +1,42 @@
-name: gregFramework Release
+name: Generate FrameworkAPI Docs
 
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches: [ main ]
+    paths:
+      - 'game_hooks.json'
+      - 'framework/greg_hooks.json'
+
+permissions:
+  contents: write
 
 jobs:
-  build:
-    runs-on: windows-latest
-    permissions:
-      contents: write
-
+  generate-docs:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Set Version
-        shell: pwsh
+      - name: Generate FrameworkAPI.md
         run: |
-          $buildNum = "${{ github.run_number }}"
-          $version = "1.0.0.$buildNum-pre"
-          echo "VERSION=$version" >> $env:GITHUB_ENV
-          echo "Building gregFramework version $version"
+          python3 scripts/generate_api_docs.py \
+            --game-hooks game_hooks.json \
+            --greg-hooks framework/greg_hooks.json \
+            --output docs/FrameworkAPI.md \
+            --version "$(cat VERSION | tr -d '[:space:]')"
 
-      # 1. Build gregCore
-      - name: Build gregCore
-        shell: pwsh
+      - name: Commit updated docs
         run: |
-          if (Test-Path "ci-stubs/create-stubs.sh") { 
-            # Use bash (from Git for Windows) to run the stub script
-            bash ci-stubs/create-stubs.sh 
-          }
-          dotnet build src/gregCore.csproj -c Release -p:Version=${{ env.VERSION }} -p:CI=true
+          if [[ -n "$(git status --porcelain docs/FrameworkAPI.md)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/FrameworkAPI.md
+            git commit -m "docs: regenerate FrameworkAPI from hook definitions [skip ci]"
+            git push
+          else
+            echo "FrameworkAPI.md unchanged – skipping commit."
+          fi
 
-      # 2. Build gregExtractor (Optional, only if in this repo)
-      - name: Publish gregExtractor
-        shell: pwsh
-        run: |
-          if (Test-Path "gregExtractor/gregExtractor.csproj") {
-            dotnet publish gregExtractor/gregExtractor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.VERSION }} -o publish/extractor
-          }
-
-      # 3. Prepare Assets
-      - name: Prepare Assets
-        shell: pwsh
-        run: |
-          $releaseDir = "release-assets"
-          New-Item -ItemType Directory -Path $releaseDir -Force
-          
-          # gregCore
-          $coreDll = "src/bin/Release/net6.0/gregCore.dll"
-          if (Test-Path $coreDll) {
-            Copy-Item $coreDll $releaseDir/
-            Compress-Archive -Path $coreDll, "README.md" -DestinationPath "$releaseDir/gregCore-v${{ env.VERSION }}.zip"
-          }
-          
-          # gregExtractor
-          $extractorExe = "publish/extractor/gregExtractor.exe"
-          if (Test-Path $extractorExe) {
-            Copy-Item $extractorExe $releaseDir/
-            Compress-Archive -Path "publish/extractor/*" -DestinationPath "$releaseDir/gregExtractor-v${{ env.VERSION }}.zip"
-          }
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: gregFramework v${{ env.VERSION }}
-          tag_name: v${{ env.VERSION }}
-          prerelease: true
-          files: |
-            release-assets/*.dll
-            release-assets/*.exe
-            release-assets/*.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

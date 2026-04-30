@@ -14,6 +14,7 @@ using gregCore.UI;
 using gregCore.Infrastructure.UI;
 using gregCore.Core.Models;
 using gregCore.Core.Events;
+using gregCore.Core;
 using MelonLoader;
 
 namespace gregCore.API
@@ -29,7 +30,9 @@ namespace gregCore.API
         internal static void Initialize(IGregLogger logger)
         {
             _logger = logger.ForContext("API");
-            EventBus = new GregEventBus(_logger);
+            // Use shared event bus from GregCoreMod if available, otherwise create own
+            EventBus = GregCoreMod.EventBus ?? new GregEventBus(_logger);
+            HookBus = GregCoreMod.HookBus;
             Persistence = new Infrastructure.Config.GregPersistenceService(_logger);
             _logger.Info("GregAPI initialized successfully.");
         }

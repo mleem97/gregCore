@@ -106,7 +106,8 @@ internal static class GregBootstrapper
         container.Register<Sdk.IGregAPI>(sdkApi);
 
         // --- Harmony Initialization ---
-        Hooks.GregNativeEventHooks.Install(logger, hookBus);
+        var harmony = new HarmonyLib.Harmony("gregCore.bootstrapper");
+        Hooks.GregNativeEventHooks.Install(logger, hookBus, bus, harmony);
 
         // Link globally for legacy/mod compatibility
         gregCore.API.GregAPI._keybindReg = keybindRegistry;

@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using gregCore.UI;
@@ -9,6 +11,8 @@ using gregCore.Core.Events;
 using gregCore.Core.Persistence;
 using gregCore.Sdk;
 using gregCore.Sdk.Language;
+using gregCore.GameLayer.Hooks;
+using gregCore.Core.Abstractions;
 using Il2CppInterop.Runtime.Injection;
 
 [assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.1.0", "TeamGreg")]
@@ -20,12 +24,15 @@ namespace gregCore.Core
     /// <summary>
     /// Central MelonMod entry point for gregCore.
     /// Provides the modding framework backbone, IL2CPP type registration,
-    /// UI Toolkit initialization, and gregExt discovery.
+    /// UI Toolkit initialization, dynamic hook patching, and gregExt discovery.
     /// </summary>
     public sealed class GregCoreMod : MelonMod
     {
         public static GregCoreMod Instance { get; private set; }
         public static IGregAPI? PublicAPI { get; private set; }
+        public static new HarmonyLib.Harmony? HarmonyInstance { get; private set; }
+        public static GregEventBus? EventBus { get; private set; }
+        public static GregHookBus? HookBus { get; private set; }
         private static bool _lateInitCompleted;
 
         public override void OnInitializeMelon()
@@ -44,6 +51,20 @@ namespace gregCore.Core
                 MelonLogger.Error($"[gregCore] IL2CPP type registration failed: {ex.Message}");
             }
             
+            // Initialize core event buses
+            try
+            {
+                var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
+                EventBus = new GregEventBus(logger);
+                HookBus = new GregHookBus(logger);
+                API.GregAPI.Initialize(logger);
+                MelonLogger.Msg("[gregCore] Event buses initialized.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Event bus initialization failed: {ex.Message}");
+            }
+            
             // Initialize UI Toolkit root
             try
             {
@@ -54,6 +75,21 @@ namespace gregCore.Core
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] UI initialization failed: {ex.Message}");
+            }
+            
+            // Initialize Harmony and dynamic hook patcher
+            try
+            {
+                HarmonyInstance = new HarmonyLib.Harmony("gregCore.dynamic.hooks");
+                if (EventBus != null && HookBus != null)
+                {
+                    var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
+                    GregNativeEventHooks.Install(logger, HookBus, EventBus, HarmonyInstance);
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Dynamic hook initialization failed: {ex.Message}");
             }
         }
 

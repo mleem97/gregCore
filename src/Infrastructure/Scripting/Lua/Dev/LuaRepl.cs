@@ -260,20 +260,10 @@ public sealed class LuaRepl
                 height = 24
             }
         };
-        _inputField.RegisterValueChangedCallback<string>(evt => _input = evt.newValue);
+        _inputField.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => _input = evt.newValue));
         inputRow.Add(_inputField);
 
-        var runButton = new Button(() =>
-        {
-            if (!string.IsNullOrWhiteSpace(_input))
-            {
-                Evaluate(_input, replScript);
-                _history.Add(_input);
-                _historyIndex = _history.Count;
-                _input = "";
-                _inputField.value = "";
-            }
-        })
+        var runButton = new Button
         {
             text = "Run",
             style =
@@ -286,6 +276,17 @@ public sealed class LuaRepl
                 marginLeft = 4
             }
         };
+        runButton.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt =>
+        {
+            if (!string.IsNullOrWhiteSpace(_input))
+            {
+                Evaluate(_input, replScript);
+                _history.Add(_input);
+                _historyIndex = _history.Count;
+                _input = "";
+                _inputField.value = "";
+            }
+        }));
         inputRow.Add(runButton);
 
         _root.Add(inputRow);

@@ -58,18 +58,10 @@ public static class HardwareIdPersistencePatch
         }
     }
 
-    [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.switchId), MethodType.Getter)]
-    internal static class SwitchIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(SwitchPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
-        }
-    }
+    // REMOVED: SwitchIdPropertyPatch (getter postfix)
+    // Reason: Il2CppInterop reports "get_switchId() is a field accessor, it can't be patched".
+    // IL2CPP field accessors have no managed method body and are unhookable by Harmony.
+    // Cleanup logic moved into NewSwitchIdPatch and UniqueSwitchIdPatch below.
 
     [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.GenerateUniqueSwitchId))]
     internal static class UniqueSwitchIdPatch
@@ -115,18 +107,9 @@ public static class HardwareIdPersistencePatch
         }
     }
 
-    [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.patchPanelId), MethodType.Getter)]
-    internal static class PatchPanelIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.PatchPanel __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(PatchPanelPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
-        }
-    }
+    // REMOVED: PatchPanelIdPropertyPatch (getter postfix)
+    // Reason: Il2CppInterop field accessor — unhookable by Harmony.
+    // Cleanup logic moved into NewPatchPanelIdpatch and UniquePatchPanelIdPatch below.
 
     [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.GenerateUniquePatchPanelId))]
     internal static class UniquePatchPanelIdPatch
@@ -174,18 +157,9 @@ public static class HardwareIdPersistencePatch
         }
     }
 
-    [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.ServerID), MethodType.Getter)]
-    internal static class ServerIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.Server __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(ServerPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
-        }
-    }
+    // REMOVED: ServerIdPropertyPatch (getter postfix)
+    // Reason: Il2CppInterop field accessor — unhookable by Harmony.
+    // Cleanup logic moved into NewServerIdPatch and UniqueServerIdPatch below.
 
     [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.GenerateUniqueServerId))]
     internal static class UniqueServerIdPatch

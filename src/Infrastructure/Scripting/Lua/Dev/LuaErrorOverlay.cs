@@ -138,11 +138,7 @@ public sealed class LuaErrorOverlay
             }
 
             // Dismiss button
-            var dismissBtn = new Button(() =>
-            {
-                error.Dismissed = true;
-                BuildOrUpdateUI();
-            })
+            var dismissBtn = new Button
             {
                 text = "✕",
                 style =
@@ -161,6 +157,11 @@ public sealed class LuaErrorOverlay
                     borderRightWidth = 0
                 }
             };
+            dismissBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt =>
+            {
+                error.Dismissed = true;
+                BuildOrUpdateUI();
+            }));
             errorBox.Add(dismissBtn);
 
             // Timer indicator

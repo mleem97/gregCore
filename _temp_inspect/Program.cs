@@ -1,27 +1,31 @@
 using System;
 using System.Linq;
-using System.Reflection;
+using Mono.Cecil;
 
 class Program
 {
     static void Main()
     {
-        try
+        var basePath = @"C:\Users\marvi\GitRepos\GameFramework-Monorepo\GregCore\lib\references\MelonLoader\Il2CppAssemblies";
+        using (var asm = AssemblyDefinition.ReadAssembly(System.IO.Path.Combine(basePath, "UnityEngine.UIElementsModule.dll")))
         {
-            var asm = Assembly.LoadFrom(@"C:\Users\marvi\GitRepos\GameFramework-Monorepo\GregCore\lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll");
-            var types = asm.GetTypes().Where(t => t.Name.Contains("EventCallback")).Take(20);
-            foreach (var t in types)
+            var ec = asm.MainModule.Types.FirstOrDefault(t => t.Name.StartsWith("EventCallback"));
+            if (ec != null)
             {
-                Console.WriteLine(t.FullName + " | Base: " + t.BaseType + " | IsClass: " + t.IsClass + " | IsValueType: " + t.IsValueType + " | IsSealed: " + t.IsSealed);
-                foreach (var ctor in t.GetConstructors())
-                    Console.WriteLine("  Ctor: " + ctor);
-                var invoke = t.GetMethod("Invoke");
-                if (invoke != null) Console.WriteLine("  Invoke: " + invoke);
+                Console.WriteLine($"EventCallback: {ec.FullName}");
+                foreach (var m in ec.Methods.Where(m => m.Name == "op_Implicit"))
+                {
+                    Console.WriteLine($"  op_Implicit RETURN: {m.ReturnType.FullName}");
+                    foreach (var p in m.Parameters)
+                        Console.WriteLine($"    Param: {p.ParameterType.FullName}");
+                }
+                foreach (var m in ec.Methods.Where(m => m.Name == "op_Explicit"))
+                {
+                    Console.WriteLine($"  op_Explicit RETURN: {m.ReturnType.FullName}");
+                    foreach (var p in m.Parameters)
+                        Console.WriteLine($"    Param: {p.ParameterType.FullName}");
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
         }
     }
 }

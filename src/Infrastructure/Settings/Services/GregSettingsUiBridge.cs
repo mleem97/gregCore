@@ -95,7 +95,7 @@ namespace gregCore.Infrastructure.Settings.Services
                     marginBottom = 10
                 }
             };
-            _searchInput.RegisterValueChangedCallback<string>(evt => RefreshUi(evt.newValue));
+            _searchInput.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => RefreshUi(evt.newValue)));
             _root!.Add(_searchInput);
         }
 

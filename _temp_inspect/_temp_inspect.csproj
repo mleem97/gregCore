@@ -3,4 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil"><HintPath>..\lib\references\MelonLoader\net6\Mono.Cecil.dll</HintPath></Reference>
+  </ItemGroup>
 </Project>

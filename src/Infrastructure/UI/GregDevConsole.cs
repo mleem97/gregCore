@@ -27,9 +27,9 @@ namespace gregCore.Infrastructure.UI
 
         public bool IsOpen => _isVisible;
 
-        public void AddLog(string msg, object type = null)
+        public void AddLog(string msg, string type = "INFO")
         {
-            string typeStr = type?.ToString() ?? "INFO";
+            string typeStr = string.IsNullOrEmpty(type) ? "INFO" : type;
             MelonLoader.MelonLogger.Msg($"[{typeStr}] {msg}");
             
             if (_logDisplay != null)

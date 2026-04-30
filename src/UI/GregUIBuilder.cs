@@ -205,7 +205,7 @@ namespace gregCore.UI
                 value = currentValue,
                 style = { flexGrow = 0 }
             };
-            toggle.RegisterValueChangedCallback<bool>(evt => onChanged?.Invoke(evt.newValue));
+            toggle.RegisterCallback<ChangeEvent<bool>>(new Action<ChangeEvent<bool>>(evt => onChanged?.Invoke(evt.newValue)));
 
             var labelElement = new Label(label)
             {
@@ -243,7 +243,7 @@ namespace gregCore.UI
                 value = currentValue,
                 style = { flexGrow = 1 }
             };
-            slider.RegisterValueChangedCallback<float>(evt => onChanged?.Invoke(evt.newValue));
+            slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt => onChanged?.Invoke(evt.newValue)));
 
             container.Add(labelElement);
             container.Add(slider);
@@ -275,7 +275,7 @@ namespace gregCore.UI
                     height = 30
                 }
             };
-            textField.RegisterValueChangedCallback<string>(evt => onChanged?.Invoke(evt.newValue));
+            textField.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => onChanged?.Invoke(evt.newValue)));
 
             container.Add(labelElement);
             container.Add(textField);

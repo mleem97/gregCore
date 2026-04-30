@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using gregCore.UI;
 
@@ -53,7 +54,10 @@ namespace gregCore.Infrastructure.UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.BackQuote) || Input.GetKeyDown(KeyCode.F12))
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard.backquoteKey.wasPressedThisFrame || keyboard.f12Key.wasPressedThisFrame)
             {
                 _isVisible = !_isVisible;
                 if (_isVisible && _root == null) BuildUI();
@@ -61,7 +65,7 @@ namespace gregCore.Infrastructure.UI
                     _root.style.display = _isVisible ? DisplayStyle.Flex : DisplayStyle.None;
             }
 
-            if (_isVisible && _inputField != null && Input.GetKeyDown(KeyCode.Return))
+            if (_isVisible && _inputField != null && keyboard.enterKey.wasPressedThisFrame)
             {
                 string command = _inputField.value;
                 if (!string.IsNullOrWhiteSpace(command))

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using gregCore.UI;
 
@@ -117,7 +118,10 @@ public sealed class LuaRepl
         if (_root == null || _root.style.display == DisplayStyle.None) return;
         if (_inputField == null) return;
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && _history.Count > 0)
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
+
+        if (keyboard.upArrowKey.wasPressedThisFrame && _history.Count > 0)
         {
             _historyIndex = Math.Max(0, _historyIndex - 1);
             if (_historyIndex < _history.Count)
@@ -126,13 +130,13 @@ public sealed class LuaRepl
                 _inputField.value = _input;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) && _history.Count > 0)
+        else if (keyboard.downArrowKey.wasPressedThisFrame && _history.Count > 0)
         {
             _historyIndex = Math.Min(_history.Count, _historyIndex + 1);
             _input = _historyIndex < _history.Count ? _history[_historyIndex] : "";
             _inputField.value = _input;
         }
-        else if (Input.GetKeyDown(KeyCode.Return))
+        else if (keyboard.enterKey.wasPressedThisFrame)
         {
             if (!string.IsNullOrWhiteSpace(_input) && _replScript != null)
             {

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Il2CppInterop.Runtime.Injection;
 using gregCore.UI;
 
@@ -33,7 +34,10 @@ namespace greg.Furniture
         {
             if (!_isActive || _ghost == null) return;
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var mouse = Mouse.current;
+            var keyboard = Keyboard.current;
+
+            Ray ray = Camera.main.ScreenPointToRay(mouse != null ? mouse.position.ReadValue() : Vector2.zero);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 // Snapping Logic
@@ -53,10 +57,10 @@ namespace greg.Furniture
                     _ghost.transform.rotation = Quaternion.identity;
                 }
 
-                if (Input.GetMouseButtonDown(0)) FinalizePlacement(pos, _ghost.transform.rotation);
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame) FinalizePlacement(pos, _ghost.transform.rotation);
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape)) StopPlacement();
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame) StopPlacement();
         }
 
         private void FinalizePlacement(Vector3 pos, Quaternion rot)

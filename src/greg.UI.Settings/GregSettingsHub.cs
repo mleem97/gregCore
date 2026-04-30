@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using gregCore.API;
 using gregCore.UI;
@@ -107,11 +108,14 @@ namespace greg.UI.Settings
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F8))
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard.f8Key.wasPressedThisFrame)
             {
                 Toggle();
             }
-            if (_isVisible && Input.GetKeyDown(KeyCode.Escape))
+            if (_isVisible && keyboard.escapeKey.wasPressedThisFrame)
             {
                 Toggle();
             }

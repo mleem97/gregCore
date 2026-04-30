@@ -1,5 +1,6 @@
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace greg.Multiplayer
@@ -29,7 +30,8 @@ namespace greg.Multiplayer
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) && _visible)
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && _visible)
             {
                 Toggle();
                 if (_root != null)

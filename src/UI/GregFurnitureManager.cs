@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using MelonLoader;
 using gregCore.API;
 using gregCore.UI;
@@ -75,7 +76,10 @@ namespace greg.Furniture
         {
             if (!_isBuildModeActive || _ghostObject == null) return;
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var mouse = Mouse.current;
+            var keyboard = Keyboard.current;
+
+            Ray ray = Camera.main.ScreenPointToRay(mouse != null ? mouse.position.ReadValue() : Vector2.zero);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Vector3 snappedPos = SnapToGrid(hit.point);
@@ -91,13 +95,13 @@ namespace greg.Furniture
                     _ghostObject.transform.rotation = Quaternion.identity;
                 }
 
-                if (Input.GetMouseButtonDown(0))
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame)
                 {
                     PlaceObject(snappedPos, _ghostObject.transform.rotation);
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape)) ToggleBuildMode();
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame) ToggleBuildMode();
         }
 
         private Vector3 SnapToGrid(Vector3 pos)

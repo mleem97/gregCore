@@ -1,0 +1,7 @@
+{
+    "id": "sample_csharp_mod",
+    "name": "Sample C# Mod",
+    "version": "1.0.0",
+    "author": "gregCore Team",
+    "description": "Demonstrates the IGregCSharpMod interface and basic API usage."
+}

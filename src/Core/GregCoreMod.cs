@@ -16,7 +16,7 @@ using gregCore.GameLayer.Hooks;
 using gregCore.Core.Abstractions;
 using Il2CppInterop.Runtime.Injection;
 
-[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.1.0", "TeamGreg")]
+[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.2.0", "TeamGreg")]
 [assembly: MelonColor(255, 0, 191, 165)] // Teal
 [assembly: MelonPriority(-1000)] // Load first!
 
@@ -35,12 +35,13 @@ namespace gregCore.Core
         public static GregEventBus? EventBus { get; private set; }
         public static GregHookBus? HookBus { get; private set; }
         private static bool _lateInitCompleted;
+        private static bool _shutdownRequested;
 
         public override void OnInitializeMelon()
         {
             Instance = this;
-            MelonLogger.Msg("--- Framework Boot v1.1.0-F7 ---");
-            
+            MelonLogger.Msg("--- Framework Boot v1.2.0-UI-Toolkit ---");
+
             // Initialize Social Services
             try
             {
@@ -53,13 +54,14 @@ namespace gregCore.Core
             {
                 ClassInjector.RegisterTypeInIl2Cpp<GregHardwareID>();
                 ClassInjector.RegisterTypeInIl2Cpp<GregSettingsHub>();
+                ClassInjector.RegisterTypeInIl2Cpp<GregDevConsole>();
                 MelonLogger.Msg("[gregCore] IL2CPP types registered.");
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] IL2CPP type registration failed: {ex.Message}");
             }
-            
+
             // Initialize core event buses
             try
             {
@@ -73,20 +75,20 @@ namespace gregCore.Core
             {
                 MelonLogger.Error($"[gregCore] Event bus initialization failed: {ex.Message}");
             }
-            
+
             // Initialize UI Toolkit root
             try
             {
                 GregUIManager.Initialize();
                 GregDevConsole.Initialize();
-                greg.UI.Settings.GregSettingsHub.Initialize();
+                GregSettingsHub.Initialize();
                 MelonLogger.Msg("[gregCore] UI Toolkit root initialized.");
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] UI initialization failed: {ex.Message}");
             }
-            
+
             // Initialize Harmony and dynamic hook patcher
             try
             {
@@ -105,6 +107,8 @@ namespace gregCore.Core
 
         public override void OnUpdate()
         {
+            if (_shutdownRequested) return;
+
             // Deferred late initialization (Load-Order Safety)
             if (!_lateInitCompleted)
             {
@@ -131,6 +135,16 @@ namespace gregCore.Core
                 MelonLogger.Msg("[gregCore] Framework initialization complete.");
             }
 
+            // Update UI systems
+            try
+            {
+                GregNotificationManager.Update();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Notification update failed: {ex.Message}");
+            }
+
             try
             {
                 GregLanguageRegistry.OnUpdate(Time.deltaTime);
@@ -148,6 +162,16 @@ namespace gregCore.Core
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] Font search tick failed: {ex.Message}");
+            }
+
+            // Flush deferred events
+            try
+            {
+                EventBus?.FlushDeferredEvents();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Event flush failed: {ex.Message}");
             }
         }
 
@@ -168,6 +192,18 @@ namespace gregCore.Core
                     Infrastructure.Social.DiscordService.UpdatePresence("Planning Next Build", "Main Menu");
                 }
                 GregLanguageRegistry.OnSceneLoaded(sceneName);
+
+                // Notify mods about scene change
+                HookBus?.Dispatch("OnSceneLoaded", new gregCore.Core.Models.EventPayload
+                {
+                    HookName = "OnSceneLoaded",
+                    OccurredAtUtc = DateTime.UtcNow,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "BuildIndex", buildIndex },
+                        { "SceneName", sceneName }
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -177,10 +213,14 @@ namespace gregCore.Core
 
         public override void OnApplicationQuit()
         {
+            if (_shutdownRequested) return;
+            _shutdownRequested = true;
+
             try
             {
                 GregLanguageRegistry.Shutdown();
                 GregUIManager.Shutdown();
+                Infrastructure.Social.DiscordService.Shutdown();
             }
             catch (Exception ex)
             {

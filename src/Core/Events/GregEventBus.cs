@@ -16,6 +16,8 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
     private IGregPerformanceGovernor? _governor;
     private bool _isDirty = true;
     private bool _disposed;
+    private long _totalEventsProcessed;
+    private long _totalEventsDeferred;
 
     public GregEventBus(IGregLogger logger)
     {
@@ -30,7 +32,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (_disposed) return;
         ArgumentNullException.ThrowIfNull(hookName);
         ArgumentNullException.ThrowIfNull(handler);
-        
+
         _rwLock.EnterWriteLock();
         try
         {
@@ -48,18 +50,45 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         }
     }
 
+    public void SubscribeOnce(string hookName, Action<EventPayload> handler)
+    {
+        if (_disposed) return;
+        ArgumentNullException.ThrowIfNull(hookName);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        Action<EventPayload>? wrapper = null;
+        wrapper = payload =>
+        {
+            try
+            {
+                handler(payload);
+            }
+            finally
+            {
+                if (wrapper != null)
+                    Unsubscribe(hookName, wrapper);
+            }
+        };
+
+        Subscribe(hookName, wrapper);
+    }
+
     public void Unsubscribe(string hookName, Action<EventPayload> handler)
     {
         if (_disposed) return;
         ArgumentNullException.ThrowIfNull(hookName);
         ArgumentNullException.ThrowIfNull(handler);
-        
+
         _rwLock.EnterWriteLock();
         try
         {
             if (_handlers.TryGetValue(hookName, out var list))
             {
                 list.Remove(handler);
+                if (list.Count == 0)
+                {
+                    _handlers.Remove(hookName);
+                }
                 _isDirty = true;
             }
         }
@@ -77,19 +106,24 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (_governor != null && !_governor.CanDispatchEvent())
         {
             _deferredEvents.Enqueue((hookName, payload));
+            _totalEventsDeferred++;
             return false;
         }
-        
+
         return PublishDirect(hookName, payload);
     }
 
     internal void FlushDeferredEvents()
     {
         if (_disposed) return;
-        while (_deferredEvents.TryDequeue(out var ev))
+        int flushed = 0;
+        const int maxFlushPerFrame = 50;
+
+        while (_deferredEvents.TryDequeue(out var ev) && flushed < maxFlushPerFrame)
         {
             if (_governor != null && !_governor.CanDispatchEvent()) break;
             PublishDirect(ev.hookName, ev.payload);
+            flushed++;
         }
     }
 
@@ -134,12 +168,14 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (handlersToInvoke == null || handlersToInvoke.Length == 0) return true;
 
         var currentPayload = payload with { HookName = hookName };
+        int handlersExecuted = 0;
 
         foreach (var handler in handlersToInvoke)
         {
             try
             {
                 handler(currentPayload);
+                handlersExecuted++;
                 if (currentPayload.IsCancelable && currentPayload.IsCancelled)
                 {
                     return false;
@@ -151,7 +187,29 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
             }
         }
 
+        _totalEventsProcessed++;
         return true;
+    }
+
+    /// <summary>
+    /// Returns statistics about event processing.
+    /// </summary>
+    public (long processed, long deferred, int handlerCount) GetStats()
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            int handlerCount = 0;
+            foreach (var kvp in _handlers)
+            {
+                handlerCount += kvp.Value.Count;
+            }
+            return (_totalEventsProcessed, _totalEventsDeferred, handlerCount);
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     public void Dispose()

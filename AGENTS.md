@@ -86,7 +86,7 @@
 
 ## 6. UI & ASSETS (UNITY 6000.4+ / 2026)
 
-* **LEGACY-VERBOT:** Die Nutzung von `OnGUI()`, `GUILayout`, `Editor`-Klassen und IMGUI ist strikt untersagt.
+* **LEGACY-VERBOT:** Die Nutzung von `OnGUI()`, `GUILayout`, `Editor`-Klassen und IMGUI ist strikt untersagt. Alle bestehenden IMGUI-Komponenten wurden auf UI Toolkit migriert.
 * **MODERN UI STACK:** Nutze primär **UI Toolkit** (UXML/USS).
     * Lade UXML dynamisch via `AssetBundle` oder `Resources.Load()`
     * Nutze `UIElements.VisualElement` als Basisklasse
@@ -96,6 +96,22 @@
     var btn = new Button();
     btn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => OnClick()));
     ```
+* **GREGCORE UI ARCHITEKTUR:**
+    * `GregCanvasManager` – Verwaltet UIDocument-Layer mit PanelSettings pro Layer
+    * `GregUILayerManager` – Organisiert UI in Layers: Background, HUD, Panel, Dialog, Overlay, Tooltip, Notification
+    * `GregUIStack` – Push/Pop Navigation für Screens und Dialoge
+    * `GregPanelBuilder` – Fluent API für UI Toolkit Panels (ersetzt GregUIBuilder)
+    * `GregUIManager` – Zentrale Registrierung und Verwaltung aller Panels
+    * `GregNotificationManager` – Toast-Benachrichtigungen
+    * `GregTooltipManager` – Tooltip-System mit AttachTooltip-Helper
+    * `GregGameUI` – Spielspezifische Elemente (Healthbars, Cooldowns, Minimap)
+    * `GregLayoutSystem` – Layout-Helper (Vertical, Horizontal, Grid, Responsive)
+    * `GregUIAnimations` – Fade, Slide, Zoom, Pulse Transitionen
+* **IL2CPP UI TOOLKIT SPEZIFIKA:**
+    * `Button.clicked` existiert nicht in IL2CPP – verwende `RegisterCallback<ClickEvent>`
+    * `userData` ist `Il2CppSystem.Object` – verwende statische Dictionaries für C#-Daten
+    * `StyleList<T>` erwartet `Il2CppSystem.Collections.Generic.List<T>`
+    * `RegisterValueChangedCallback` erfordert explizite Typargumente oder `RegisterCallback<ChangeEvent<T>>`
 * **UGUI FALLBACK:** Wenn UI Toolkit nicht möglich ist, nutze UGUI ausschließlich via Code-Generierung:
     * Erstelle `GameObject` hierarchies via `AddComponent<GameObject>()`
     * Nutze `Canvas`/`CanvasRenderer` nur wenn unvermeidbar
@@ -303,6 +319,9 @@ Vor jeder Code-Generierung prüfe:
 - [ ] Keine Legacy-Input-API (`Input.GetKeyDown`, `Input.mousePosition`) verwendet?
 - [ ] Input-System-Device-Zugriffe null-guarded (`Keyboard.current?`, `Mouse.current?`)?
 - [ ] UI Toolkit Callbacks als explizite `new Action<TEvent>(...)` registriert?
+- [ ] `Button.clicked` vermieden – stattdessen `RegisterCallback<ClickEvent>`?
+- [ ] `userData` nicht für C#-Klassen verwendet – statische Dictionaries genutzt?
+- [ ] `StyleList<T>` mit `Il2CppSystem.Collections.Generic.List<T>` erstellt?
 - [ ] Asset Loading via Bundle/Addressables/Resources?
 - [ ] Keine direkten Prefab/YAML Edits?
 - [ ] Logging für kritische Pfade?

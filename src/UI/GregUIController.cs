@@ -5,6 +5,10 @@ using MelonLoader;
 
 namespace gregCore.UI;
 
+/// <summary>
+/// Central UI controller for GregCore.
+/// Provides initialization and management for the UI Toolkit-based interface.
+/// </summary>
 public sealed class GregUIController
 {
     private readonly IGregLogger _logger;
@@ -16,17 +20,28 @@ public sealed class GregUIController
 
     public void Initialize()
     {
-        GregUIManager.Initialize();
-        _logger?.Info("UI Controller (IMGUI) initialized.");
+        try
+        {
+            GregCanvasManager.Instance.Initialize();
+            GregUILayerManager.Instance.Initialize();
+            GregUIManager.Initialize();
+            GregNotificationManager.Initialize();
+            GregTooltipManager.Initialize();
+            _logger?.Info("UI Controller (UI Toolkit) initialized.");
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error($"UI Controller initialization failed: {ex.Message}");
+        }
     }
 
     public void AddElement(string id, object element)
     {
-        // Shimm for legacy code
+        // Legacy shim - UI Toolkit elements are added directly to VisualElement trees
     }
 
     public void RemoveElement(string id)
     {
-        // Shimm for legacy code
+        // Legacy shim
     }
 }

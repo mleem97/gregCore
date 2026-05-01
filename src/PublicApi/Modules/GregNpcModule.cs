@@ -9,13 +9,22 @@ public sealed class GregNpcModule
     internal GregNpcModule(GregApiContext ctx) => _ctx = ctx;
 
     public int GetFreeTechnicianCount() {
-        int count = 0;
-        foreach (var t in UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Technician>()) {
-            if (!t.isBusy) count++;
-        }
-        return count;
+        try {
+            var tm = global::Il2Cpp.TechnicianManager.instance;
+            if (tm == null || tm.technicians == null) return 0;
+            int count = 0;
+            foreach (var t in tm.technicians) {
+                if (t != null && !t.isBusy) count++;
+            }
+            return count;
+        } catch { return 0; }
     }
-    public int GetTotalTechnicianCount() => UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Technician>().Length;
+    public int GetTotalTechnicianCount() {
+        try {
+            var tm = global::Il2Cpp.TechnicianManager.instance;
+            return tm != null && tm.technicians != null ? tm.technicians.Count : 0;
+        } catch { return 0; }
+    }
     
     public bool DispatchRepairServer(global::Il2Cpp.Server? server) {
         try {

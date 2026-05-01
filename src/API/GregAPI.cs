@@ -189,8 +189,8 @@ namespace gregCore.API
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers != null ? (uint)servers.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.servers != null ? (uint)nm.servers.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -209,8 +209,8 @@ namespace gregCore.API
         {
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                return switches != null ? (uint)switches.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.switches != null ? (uint)nm.switches.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -219,14 +219,8 @@ namespace gregCore.API
         {
             try
             {
-                uint count = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                if (servers == null) return 0u;
-                foreach (var s in servers)
-                {
-                    try { if (s != null && s.Pointer != IntPtr.Zero && s.isBroken) count++; } catch { }
-                }
-                return count;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.brokenServers != null ? (uint)nm.brokenServers.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -235,14 +229,8 @@ namespace gregCore.API
         {
             try
             {
-                uint count = 0;
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                if (switches == null) return 0u;
-                foreach (var s in switches)
-                {
-                    try { if (s != null && s.Pointer != IntPtr.Zero && s.isBroken) count++; } catch { }
-                }
-                return count;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.brokenSwitches != null ? (uint)nm.brokenSwitches.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -280,16 +268,18 @@ namespace gregCore.API
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                if (servers == null) return 0;
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.brokenServers == null || nm.brokenServers.Count == 0) return 0;
+
+                foreach (var kvp in nm.brokenServers)
                 {
                     try
                     {
+                        var s = kvp.Value;
                         if (s != null && s.Pointer != IntPtr.Zero && s.isBroken)
                         {
                             s.RepairDevice();
-                            return 1;
+                            return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
                     catch { }
@@ -303,16 +293,18 @@ namespace gregCore.API
         {
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                if (switches == null) return 0;
-                foreach (var s in switches)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.brokenSwitches == null || nm.brokenSwitches.Count == 0) return 0;
+
+                foreach (var kvp in nm.brokenSwitches)
                 {
                     try
                     {
+                        var s = kvp.Value;
                         if (s != null && s.Pointer != IntPtr.Zero && s.isBroken)
                         {
                             s.RepairDevice();
-                            return 1;
+                            return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
                     catch { }

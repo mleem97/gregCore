@@ -829,6 +829,18 @@ public static partial class ModConfigSystem
 
     private static string GetConfigPath(string modId)
     {
+        if (string.IsNullOrWhiteSpace(modId))
+            throw new ArgumentException("modId cannot be null or empty", nameof(modId));
+
+        if (modId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+            modId.Contains(Path.DirectorySeparatorChar) ||
+            modId.Contains(Path.AltDirectorySeparatorChar) ||
+            modId.Contains(".."))
+        {
+            CrashLog.Log($"[Security] Attempted path traversal detected with modId: {modId}");
+            throw new ArgumentException("Invalid characters in modId", nameof(modId));
+        }
+
         return Path.Combine(_configDir, modId + ".json");
     }
 

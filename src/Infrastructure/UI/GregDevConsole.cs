@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 using gregCore.UI;
 
 namespace gregCore.Infrastructure.UI
@@ -12,10 +12,10 @@ namespace gregCore.Infrastructure.UI
 
         public static GregDevConsole Instance { get; private set; } = null!;
 
-        private VisualElement? _root;
-        private TextField? _inputField;
-        private ScrollView? _logDisplay;
+        private readonly List<string> _logs = new();
+        private string _input = "";
         private bool _isVisible = false;
+        private Rect _rect = new Rect(50, 50, 600, 400);
 
         public static void Initialize()
         {
@@ -32,24 +32,8 @@ namespace gregCore.Infrastructure.UI
         {
             string typeStr = string.IsNullOrEmpty(type) ? "INFO" : type;
             MelonLoader.MelonLogger.Msg($"[{typeStr}] {msg}");
-            
-            if (_logDisplay != null)
-            {
-                var label = new Label($"[{typeStr}] {msg}")
-                {
-                    style =
-                    {
-                        fontSize = 12,
-                        color = typeStr == "ERROR" ? new Color(1f, 0.32f, 0.32f) : 
-                               typeStr == "WARN" ? new Color(1f, 0.76f, 0.03f) : 
-                               new Color(0.88f, 0.88f, 0.88f),
-                        whiteSpace = WhiteSpace.Normal,
-                        marginBottom = 2
-                    }
-                };
-                _logDisplay.Add(label);
-                _logDisplay.ScrollTo(label);
-            }
+            _logs.Add($"[{typeStr}] {msg}");
+            if (_logs.Count > 50) _logs.RemoveAt(0);
         }
 
         private void Update()
@@ -60,114 +44,43 @@ namespace gregCore.Infrastructure.UI
             if (keyboard.backquoteKey.wasPressedThisFrame || keyboard.f12Key.wasPressedThisFrame)
             {
                 _isVisible = !_isVisible;
-                if (_isVisible && _root == null) BuildUI();
-                if (_root != null)
-                    _root.style.display = _isVisible ? DisplayStyle.Flex : DisplayStyle.None;
-            }
-
-            if (_isVisible && _inputField != null && keyboard.enterKey.wasPressedThisFrame)
-            {
-                string command = _inputField.value;
-                if (!string.IsNullOrWhiteSpace(command))
-                {
-                    AddLog(command, "COMMAND");
-                    _inputField.value = "";
-                }
             }
         }
 
-        private void BuildUI()
+        private void OnGUI()
         {
-            _root = new VisualElement
-            {
-                name = "DevConsole",
-                style =
-                {
-                    position = Position.Absolute,
-                    top = 50,
-                    left = 50,
-                    width = 600,
-                    height = 400,
-                    backgroundColor = new Color(0.07f, 0.07f, 0.07f, 0.96f),
-                    borderTopColor = new Color(0f, 0.75f, 0.65f),
-                    borderBottomColor = new Color(0f, 0.75f, 0.65f),
-                    borderLeftColor = new Color(0f, 0.75f, 0.65f),
-                    borderRightColor = new Color(0f, 0.75f, 0.65f),
-                    borderTopWidth = 2,
-                    borderBottomWidth = 2,
-                    borderLeftWidth = 2,
-                    borderRightWidth = 2,
-                    borderTopLeftRadius = 8,
-                    borderTopRightRadius = 8,
-                    borderBottomLeftRadius = 8,
-                    borderBottomRightRadius = 8,
-                    flexDirection = FlexDirection.Column,
-                    paddingTop = 10,
-                    paddingBottom = 10,
-                    paddingLeft = 10,
-                    paddingRight = 10
-                }
-            };
+            if (!_isVisible) return;
 
-            // Header
-            var header = new Label("Developer Console")
-            {
-                style =
-                {
-                    fontSize = 18,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    color = new Color(0f, 0.75f, 0.65f),
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                    marginBottom = 8,
-                    borderBottomColor = new Color(0.2f, 0.2f, 0.2f),
-                    borderBottomWidth = 1,
-                    paddingBottom = 6
-                }
-            };
-            _root.Add(header);
+            GregImGui.EnsureInitialized();
+            GregImGui.DrawBox(_rect, "Developer Console");
+
+            float x = _rect.x + 15;
+            float y = _rect.y + 40;
+            float w = _rect.width - 30;
 
             // Log display
-            _logDisplay = new ScrollView(ScrollViewMode.Vertical)
+            var logRect = new Rect(x, y, w, _rect.height - 100);
+            GUI.Box(logRect, "", GUI.skin.box);
+            
+            float logY = logRect.y + 5;
+            for (int i = Math.Max(0, _logs.Count - 15); i < _logs.Count; i++)
             {
-                style =
-                {
-                    flexGrow = 1,
-                    marginTop = 4,
-                    marginBottom = 8,
-                    backgroundColor = new Color(0.05f, 0.05f, 0.05f, 0.8f),
-                    borderTopColor = new Color(0.15f, 0.15f, 0.15f),
-                    borderBottomColor = new Color(0.15f, 0.15f, 0.15f),
-                    borderLeftColor = new Color(0.15f, 0.15f, 0.15f),
-                    borderRightColor = new Color(0.15f, 0.15f, 0.15f),
-                    borderTopWidth = 1,
-                    borderBottomWidth = 1,
-                    borderLeftWidth = 1,
-                    borderRightWidth = 1,
-                    borderTopLeftRadius = 4,
-                    borderTopRightRadius = 4,
-                    borderBottomLeftRadius = 4,
-                    borderBottomRightRadius = 4,
-                    paddingTop = 6,
-                    paddingBottom = 6,
-                    paddingLeft = 6,
-                    paddingRight = 6
-                }
-            };
-            _root.Add(_logDisplay);
+                GUI.Label(new Rect(x + 5, logY, w - 10, 20), _logs[i], GregImGui.stLabel);
+                logY += 18;
+            }
 
-            // Input field
-            _inputField = new TextField
+            // Input
+            var inputRect = new Rect(x, _rect.y + _rect.height - 40, w, 25);
+            _input = GUI.TextField(inputRect, _input);
+            
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
             {
-                style =
+                if (!string.IsNullOrWhiteSpace(_input))
                 {
-                    backgroundColor = new Color(0.1f, 0.1f, 0.1f),
-                    color = Color.white,
-                    height = 24
+                    AddLog(_input, "COMMAND");
+                    _input = "";
                 }
-            };
-            _root.Add(_inputField);
-
-            GregUIManager.RegisterPanel("DevConsole", _root);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using gregCore.UI;
+using greg.UI.Settings;
 using gregCore.Infrastructure.UI;
 using gregCore.Core.Events;
 using gregCore.Core.Persistence;
@@ -28,7 +29,7 @@ namespace gregCore.Core
     /// </summary>
     public sealed class GregCoreMod : MelonMod
     {
-        public static GregCoreMod Instance { get; private set; }
+        public static GregCoreMod Instance { get; private set; } = null!;
         public static IGregAPI? PublicAPI { get; private set; }
         public static new HarmonyLib.Harmony? HarmonyInstance { get; private set; }
         public static GregEventBus? EventBus { get; private set; }
@@ -38,12 +39,20 @@ namespace gregCore.Core
         public override void OnInitializeMelon()
         {
             Instance = this;
-            MelonLogger.Msg("--- Framework Boot v1.1.0 ---");
+            MelonLogger.Msg("--- Framework Boot v1.1.0-F7 ---");
             
+            // Initialize Social Services
+            try
+            {
+                Infrastructure.Social.DiscordService.Initialize();
+            }
+            catch (Exception ex) { MelonLogger.Error($"[Discord] Init error: {ex.Message}"); }
+
             // Register persistent IL2CPP components
             try
             {
                 ClassInjector.RegisterTypeInIl2Cpp<GregHardwareID>();
+                ClassInjector.RegisterTypeInIl2Cpp<GregSettingsHub>();
                 MelonLogger.Msg("[gregCore] IL2CPP types registered.");
             }
             catch (Exception ex)
@@ -70,6 +79,7 @@ namespace gregCore.Core
             {
                 GregUIManager.Initialize();
                 GregDevConsole.Initialize();
+                greg.UI.Settings.GregSettingsHub.Initialize();
                 MelonLogger.Msg("[gregCore] UI Toolkit root initialized.");
             }
             catch (Exception ex)
@@ -129,15 +139,33 @@ namespace gregCore.Core
             {
                 MelonLogger.Error($"[gregCore] Update callback failed: {ex.Message}");
             }
+
+            // Font search: retries periodically until game fonts are found
+            try
+            {
+                GregFontLoader.Tick();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Font search tick failed: {ex.Message}");
+            }
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             try
             {
+                // Lazy font search — fonts are only available after scene load
+                GregFontLoader.SearchFonts();
+
                 if (sceneName != "MainMenu")
                 {
                     GregUIOverrideManager.HideVanillaUI();
+                    Infrastructure.Social.DiscordService.UpdatePresence("Managing Infrastructure", $"Scene: {sceneName}");
+                }
+                else
+                {
+                    Infrastructure.Social.DiscordService.UpdatePresence("Planning Next Build", "Main Menu");
                 }
                 GregLanguageRegistry.OnSceneLoaded(sceneName);
             }

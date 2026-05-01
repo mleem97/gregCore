@@ -25,7 +25,7 @@ namespace gregCore.API
     /// </summary>
     public static class GregAPI
     {
-        private static IGregLogger _logger;
+        private static IGregLogger _logger = null!;
 
         internal static void Initialize(IGregLogger logger)
         {
@@ -37,9 +37,9 @@ namespace gregCore.API
             _logger.Info("GregAPI initialized successfully.");
         }
 
-        public static GregUIController UI { get; internal set; }
-        public static GregEventBus EventBus { get; internal set; }
-        public static IGregPersistenceService Persistence { get; internal set; }
+        public static GregUIController UI { get; internal set; } = null!;
+        public static GregEventBus EventBus { get; internal set; } = null!;
+        public static IGregPersistenceService Persistence { get; internal set; } = null!;
 
         public static object RegisterMod(string id, string name, string version) => null!;
         public static GregSettingsProxy Settings { get; } = new GregSettingsProxy();

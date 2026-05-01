@@ -1,0 +1,1324 @@
+# GregCore AGENTS.md — AI Mandatory Instructions (2026)
+
+## STATUS: MANDATORY AI SYSTEM RULES
+**Context:** Unity 6.4+ | IL2CPP Backend | MelonLoader 0.7+ / BepInEx 6 | Il2CppInterop
+**Environment:** Blackbox Modding — NO Game Source Code Access. Pure Reverse Engineering via Dummy DLLs.
+**Target Game:** "Data Center" (Unity IL2CPP)
+**Framework:** GregCore 1900+ Hook System
+**Supported Languages:** C#, Lua, JavaScript/TypeScript, Python, Rust, Go
+
+---
+
+## 0. SYSTEM ARCHITECTURE OVERVIEW
+
+GregCore is a **3-layer hook abstraction** that wraps ~1900 IL2CPP hollow hooks into a safe, language-agnostic modding framework.
+
+```
+┌─────────────────────────────────────────────┐
+│  AI & Humans Write Mods (C#, Lua, JS, etc) │
+└─────────────────┬───────────────────────────┘
+                  │
+         ┌────────▼────────────┐
+         │  greg.* Public API  │  (greg.Economy, greg.Player, greg.UI, etc)
+         │  Language Bridges   │  (LuaBridge, JsBridge, PythonFFIBridge)
+         └────────┬────────────┘
+                  │
+    ┌─────────────┼─────────────┐
+    │             │             │
+    ▼             ▼             ▼
+┌─────────┐ ┌──────────┐ ┌──────────────┐
+│EventBus │ │ HookBus  │ │ Win32FFI     │
+│(deferred)│ │(sync)    │ │ (native mods)│
+└────┬────┘ └────┬─────┘ └──────┬───────┘
+     │           │              │
+     └─────┬─────┴──────────────┘
+           │
+    ┌──────▼──────────────────┐
+    │  Harmony Patch Layer    │
+    │  (SafePatch base class) │
+    └──────┬──────────────────┘
+           │
+    ┌──────▼──────────────────┐
+    │ IL2CPP Type System      │
+    │ (Cast<T>, Il2CppType)   │
+    └──────┬──────────────────┘
+           │
+    ┌──────▼──────────────────┐
+    │ Dummy DLLs from         │
+    │ global-metadata.dat     │
+    │ (Cpp2IL, Il2CppDumper)  │
+    └─────────────────────────┘
+```
+
+**Key Principles:**
+- All ~1900 hooks are auto-generated from `framework/greg_hooks.json`
+- Hooks are exposed via `greg.*.*.*` naming convention (e.g., `greg.PLAYER.CoinChanged`)
+- All languages go through the same EventBus/HookBus dispatch
+- FFI mods (Rust, Go) interact directly via `GameApiTable` ABI
+- No game source code ever needed — only reverse-engineered IL2CPP metadata
+
+---
+
+## 1. ABSOLUTE DON'Ts & WHY (MANDATORY READING)
+
+These rules exist because of fundamental constraints in the IL2CPP modding environment.
+
+### DON'T: Copy Game Code or Decompile Source Directly
+**WHY:** DMCA violation. You have NO legal access to the game's C# source. Only Dummy DLLs extracted from `global-metadata.dat` are permitted for compilation. The game is shipped as IL2CPP native code — the DLLs are stubs.
+**Consequence:** Legal liability, banned from distribution.
+
+### DON'T: Assume Game Method Logic from Dummy DLLs
+**WHY:** All IL2CPP methods in Dummy DLLs are **hollow — they have empty bodies**. You cannot deduce game logic by reading the original method. You **must** reverse-engineer via Harmony hooks, runtime inspection (UnityExplorer, BetterMonoInspector), or static IL2CPP dumps (Cpp2IL, Ghidra).
+**Consequence:** Writing mods with wrong assumptions → player data corruption, exploits.
+
+### DON'T: Use Transpilers in Harmony Patches
+**WHY:** IL2CPP compiles to native code. IL-level transpilation is meaningless. Only Prefix and Postfix work.
+**Consequence:** Hook silently fails to apply, or crashes the process.
+
+### DON'T: Use C# Standard Casts on IL2CPP Types
+**WHY:** IL2CPP types are not normal managed objects. Standard `(T)obj` or `obj as T` cause `InvalidCastException` at runtime.
+**Rule:** Always use `obj.Cast<T>()` or `obj.TryCast<T>()` from Il2CppInterop.
+**Consequence:** Instant runtime crash.
+
+### DON'T: Use `typeof(T)` for IL2CPP Types
+**WHY:** `typeof(T)` returns the managed CLR type, not the IL2CPP type. They have different memory layouts.
+**Rule:** Use `Il2CppType.Of<T>()` when interacting with IL2CPP domain methods.
+**Consequence:** Type mismatch → crash or corrupt data.
+
+### DON'T: Use OnGUI() / IMGUI / Editor Classes
+**WHY:** IMGUI is deprecated and removed in Unity 6.4+. IL2CPP doesn't support it. OnGUI crashes instantly.
+**Rule:** UI Toolkit (UXML/USS) mandatory. UGUI acceptable only via code generation (no prefab YAML edits).
+**Consequence:** Immediate crash on UI initialization.
+
+### DON'T: Hardcode New Hooks Directly into Source
+**WHY:** Hooks are generated from `framework/greg_hooks.json` via `scripts/Generate-GregHooksFromIl2CppDump.ps1`. The JSON is the source of truth.
+**Rule:** If you need new hooks, regenerate from IL2CPP dump using the script.
+**Consequence:** Mods built on hardcoded hooks become unmaintainable across game updates.
+
+### DON'T: Reorder or Delete Fields in GameApiTable
+**WHY:** `GameApiTable` is the ABI contract between managed (.NET) and native (Rust, Go, C++) code. Reordering fields breaks all Rust/Go mods instantly.
+**Rule:** Only append new fields to the end. Increment `ApiVersion` before appending.
+**Consequence:** All native mods crash with `InvalidOperationException` or silent memory corruption.
+
+### DON'T: Hold Raw Pointers Without `Pointer != IntPtr.Zero` Checks
+**WHY:** IL2CPP objects can be garbage-collected. A cached pointer becomes dangling. Dereferencing = instant crash.
+**Rule:** Always guard: `if (obj.Pointer == IntPtr.Zero) return;`
+**Consequence:** Intermittent hard crashes (difficult to diagnose).
+
+### DON'T: Use async/await or Threading in Harmony Patches
+**WHY:** Harmony patches execute on the Unity main thread. The IL2CPP runtime is single-threaded for script execution. Spawning threads or async tasks from a patch can cause race conditions or deadlocks.
+**Rule:** Keep patches synchronous. Offload heavy work to a coroutine or background task via `MelonCoroutines.Start()`.
+**Consequence:** Deadlocks, race conditions, unpredictable behavior.
+
+### DON'T: Modify `.prefab` or `.unity` Files Directly in Mod Distribution
+**WHY:** Unity asset paths change between game versions. Direct YAML edits are fragile and won't survive game updates.
+**Rule:** Generate or modify UI at runtime via code only.
+**Consequence:** Mods break silently on game updates; hard to debug.
+
+### DON'T: Call `original()` from Prefix Blocks
+**WHY:** Undefined behavior. The original method is already in IL2CPP native code. Calling it from a Prefix doesn't do what you think.
+**Rule:** Use Prefix only to short-circuit with `return false;`. Use Postfix to modify results.
+**Consequence:** Logic executes twice, or doesn't execute at all.
+
+### DON'T: Invent Hook Names
+**WHY:** Hooks must exist in `framework/greg_hooks.json`. Inventing names causes silent failures (no subscribers) or mis-routing events.
+**Rule:** Always look up hook names in the canonical registry or enumerate via `IGregHookRegistry.GetAllHooks()`.
+**Consequence:** Event handlers never fire; player mod doesn't work.
+
+---
+
+## 2. IL2CPP INTEROP & TYPE SYSTEM (2026)
+
+### Type Casting — MANDATORY Patterns
+```csharp
+// WRONG ❌
+var player = (Il2Cpp.Player)someObject;
+var rack = someObject as Il2Cpp.Rack;
+
+// RIGHT ✅
+var player = someObject.Cast<Il2Cpp.Player>();
+var rack = someObject.TryCast<Il2Cpp.Rack>();
+if (rack != null) { /* use rack */ }
+```
+
+### Type Information
+```csharp
+// WRONG ❌
+var type = typeof(Il2Cpp.Player);
+
+// RIGHT ✅
+var type = Il2CppType.Of<Il2Cpp.Player>();
+```
+
+### Generic Method Lookup
+```csharp
+// IL2CPP specializes generics at compile time. To call a generic method:
+var method = AccessTools.Method(
+    typeof(SomeGenericClass),
+    nameof(SomeGenericClass.SomeMethod),
+    generics: new[] { typeof(string) }
+);
+method?.Invoke(instance, new object[] { arg });
+```
+
+### Custom Classes Inheriting Unity Types
+Every class that inherits from `MonoBehaviour`, `Component`, or Il2Cpp base types MUST:
+
+1. **Have an IntPtr Constructor:**
+   ```csharp
+   public MyComponent(IntPtr ptr) : base(ptr) { }
+   ```
+
+2. **Be Registered in IL2CPP:**
+   ```csharp
+   ClassInjector.RegisterTypeInIl2Cpp<MyComponent>();
+   ```
+
+3. **Use readonly/private fields:**
+   ```csharp
+   private readonly string _id;
+   public string Id => _id;
+   ```
+
+### Native Object Handles
+```csharp
+// WRONG ❌
+IntPtr cachedPtr = obj.Pointer;
+// Later... obj might be garbage-collected
+UsePointer(cachedPtr); // Crash!
+
+// RIGHT ✅
+if (obj.Pointer != IntPtr.Zero) {
+    UseObject(obj);
+}
+```
+
+### String Handling in IL2CPP
+```csharp
+// When calling IL2CPP methods that take strings:
+string managedStr = "hello";
+Il2CppSystem.String nativeStr = managedStr;
+
+// To get managed string from Il2CppSystem.String:
+string back = nativeStr.ToString();
+```
+
+---
+
+## 3. THE greg.*.* HOOK SYSTEM (1771+ Hooks)
+
+All hooks follow the naming pattern: `greg.<DOMAIN>.<Action>` or `greg.<DOMAIN>.<SubDomain>.<Action>`
+
+### Domains (from `framework/greg_hooks.json`)
+- `SYSTEM` — Game lifecycle (Init, SaveLoad, Pause)
+- `PLAYER` — Player state (CoinChanged, LevelUp, Inventory)
+- `ECONOMY` — Money/resources (AddCoin, RemoveMoney)
+- `SERVER` — Server instances (StatusChanged, Added, Removed)
+- `RACK` — Rack hardware (Placed, Removed, UpgradeComplete)
+- `NETWORK` — Networking (CableConnected, MessageSent)
+- `UI` — User interface (PauseMenu.Opened, SettingsChanged)
+- `WORLD` — World state (WallRegistered, TileModified)
+- `CUSTOMER` — Customer NPCs (Arrived, Left, Demanded)
+- `EMPLOYEE` — Employee NPCs (Hired, Fired, Tired)
+- `POWER` — Power systems (OutageStarted, RestoredFull)
+- `HARDWARE` — Hardware components (Overheating, Degraded)
+- `GAMEPLAY` — Gameplay mechanics (ObjectiveComplete, MissionFailed)
+- `INPUT` — Player input (KeyPressed, MouseClicked)
+- `SAVE` — Persistence (SaveStarted, LoadComplete)
+
+### Hook Examples
+```
+greg.PLAYER.CoinChanged          → Player's coin count changed
+greg.PLAYER.InventoryUpdated      → Inventory modified
+greg.SYSTEM.GameSaved             → Game save completed
+greg.UI.PauseMenu.Opened          → Pause menu opened
+greg.UI.SettingsChanged           → Any setting changed
+greg.RACK.Placed                  → Rack placed in world
+greg.RACK.UpgradeStarted          → Rack upgrade began
+greg.NETWORK.CableConnected       → Cable connection made
+greg.SERVER.StatusChanged         → Server online/offline
+greg.ECONOMY.MoneyTransferred     → Money moved between accounts
+```
+
+### Hook Registry Lookup
+Always validate hook names before using:
+```csharp
+var hookRegistry = GregApiContext.Current.HookRegistry;
+var allHooks = hookRegistry.GetAllHooks();
+
+foreach (var hook in allHooks)
+{
+    MelonLogger.Msg($"Hook: {hook.Name} (Domain: {hook.Domain})");
+}
+
+// Check if hook exists
+if (hookRegistry.TryGetHook("greg.PLAYER.CoinChanged", out var hookDef))
+{
+    MelonLogger.Msg($"Found hook: {hookDef.Description}");
+}
+```
+
+### Subscribing to Hooks (All Languages)
+
+**C#:**
+```csharp
+greg.EventBus.Subscribe("greg.PLAYER.CoinChanged", (EventPayload e) =>
+{
+    MelonLogger.Msg($"Coins changed: {e.GetValue<int>("previousValue")} -> {e.GetValue<int>("newValue")}");
+});
+```
+
+**Lua:**
+```lua
+greg.on("greg.PLAYER.CoinChanged", function(e)
+    print("Coins changed:", e.previousValue, "->", e.newValue)
+end)
+```
+
+**JavaScript:**
+```js
+greg.on("greg.PLAYER.CoinChanged", (e) => {
+    console.log("Coins:", e.previousValue, "->", e.newValue);
+});
+```
+
+**Python:**
+```python
+import greg
+def on_coins_changed(e):
+    print(f"Coins: {e.previous_value} -> {e.new_value}")
+greg.on("greg.PLAYER.CoinChanged", on_coins_changed)
+```
+
+---
+
+## 4. HARMONY PATCHING — RULES & PATTERNS
+
+### Base Class: SafePatch
+All Harmony patches should inherit from or follow the pattern of `SafePatch`:
+
+```csharp
+public abstract class SafePatch
+{
+    protected static IGregLogger Logger { get; }
+    protected static IGregHookBus HookBus { get; }
+
+    protected static void TriggerHook(string hookName, params object[] data)
+    {
+        var payload = new EventPayload { HookName = hookName };
+        HookBus.Dispatch(payload);
+    }
+}
+```
+
+### Mandatory Prefix/Postfix Pattern
+```csharp
+[HarmonyPatch(typeof(TargetClass), nameof(TargetClass.TargetMethod))]
+[HarmonyPrefix]
+[HarmonyPriority(Priority.High)]
+private static bool TargetMethodPrefix(TargetClass __instance, int param1, ref SomeReturn __result)
+{
+    try
+    {
+        // NULL-CHECKS FIRST
+        if (__instance == null) return true;
+        if (__instance.Pointer == IntPtr.Zero) return true;
+        if (param1 == null) return true;
+
+        // Early return (skip original): return false;
+        // Allow original to run: return true;
+        return true;
+    }
+    catch (Exception ex)
+    {
+        MelonLogger.Error($"TargetMethodPrefix FAILED: {ex.Message}");
+        MelonLogger.WriteToLogDetailed(ex, true);
+        return true; // Default: let original run (safe fallback)
+    }
+}
+
+[HarmonyPatch(typeof(TargetClass), nameof(TargetClass.TargetMethod))]
+[HarmonyPostfix]
+private static void TargetMethodPostfix(TargetClass __instance, ref SomeReturn __result)
+{
+    try
+    {
+        if (__instance == null) return;
+        if (__instance.Pointer == IntPtr.Zero) return;
+
+        // Modify __result as needed
+        if (__result != null && __result.Pointer != IntPtr.Zero)
+        {
+            // Safe to use __result
+        }
+    }
+    catch (Exception ex)
+    {
+        MelonLogger.Error($"TargetMethodPostfix FAILED: {ex.Message}");
+    }
+}
+```
+
+### Priority Ordering
+When multiple mods patch the same method:
+```csharp
+[HarmonyPriority(Priority.VeryHigh)]   // Runs first
+[HarmonyPriority(Priority.High)]       // Runs second
+[HarmonyPriority(Priority.Normal)]     // Default
+[HarmonyPriority(Priority.Low)]        // Runs fourth
+```
+
+### Never Call `original()` from Prefix
+```csharp
+// WRONG ❌
+[HarmonyPrefix]
+private static void BadPrefix(TargetClass __instance)
+{
+    var result = original(__instance); // Undefined behavior!
+}
+
+// RIGHT ✅
+[HarmonyPostfix]
+private static void GoodPostfix(TargetClass __instance, ref ReturnType __result)
+{
+    // Modify __result here
+}
+```
+
+---
+
+## 5. GREG.CS PUBLIC API FACADE
+
+The static `greg` class provides lazy-initialized access to all framework modules:
+
+```csharp
+// Economy
+greg.Economy.GetBalance(playerId);
+greg.Economy.AddMoney(playerId, amount);
+greg.Economy.RemoveMoney(playerId, amount);
+greg.Economy.SetBalance(playerId, amount);
+
+// Player
+greg.Player.GetCurrent();
+greg.Player.GetLevel();
+greg.Player.GetInventory();
+greg.Player.UpdateInventory(itemId, quantity);
+
+// Server
+greg.Server.GetAll();
+greg.Server.GetById(serverId);
+greg.Server.Create(config);
+greg.Server.Destroy(serverId);
+
+// Rack
+greg.Facility.GetRacks();
+greg.Facility.GetRackById(rackId);
+greg.Facility.PlaceRack(position, type);
+greg.Facility.RemoveRack(rackId);
+
+// Network
+greg.Network.SendMessage(recipientId, messageType, payload);
+greg.Network.Broadcast(messageType, payload);
+greg.Network.GetConnections();
+
+// Automation
+greg.Automation.Queue(task);
+greg.Automation.GetQueuedTasks();
+greg.Automation.CancelTask(taskId);
+
+// UI
+greg.UI.ShowNotification(title, message);
+greg.UI.ShowDialog(title, message, buttons);
+greg.UI.HideDialog(dialogId);
+greg.UI.GetActiveMenu();
+
+// Save
+greg.Save.Persist(key, value);
+greg.Save.Load(key);
+greg.Save.Delete(key);
+greg.Save.Flush();
+
+// NPC
+greg.Npc.GetAllCustomers();
+greg.Npc.GetAllEmployees();
+greg.Npc.GetById(npcId);
+
+// Performance
+greg.Performance.SetFrameBudget(milliseconds);
+greg.Performance.GetMetrics();
+greg.Performance.GCCollect();
+
+// Time
+greg.Time.GetGameTime();
+greg.Time.GetServerTime();
+greg.Time.SetTimeScale(scale);
+```
+
+All module properties are lazy-initialized on first access.
+
+---
+
+## 6. GREGMOD — C# MOD BASE CLASS
+
+For C# plugin mods (not MelonMod subclasses), use the `GregMod` abstract base:
+
+```csharp
+using GregCore.PublicApi;
+
+[GregMod("com.mycompany.mymod", "1.0.0")]
+public class MyMod : GregMod
+{
+    protected override void OnLoad()
+    {
+        // Called when mod is loaded
+        Logger.Msg("MyMod loaded!");
+
+        // Subscribe to hooks
+        Api.On("greg.PLAYER.CoinChanged", OnCoinChanged);
+        Api.On("greg.SERVER.StatusChanged", OnServerStatusChanged);
+    }
+
+    protected override void OnReady()
+    {
+        // Called after all mods are loaded
+        Logger.Msg("MyMod ready!");
+    }
+
+    protected override void OnUnload()
+    {
+        // Called on mod unload or game shutdown
+        Logger.Msg("MyMod unloaded!");
+    }
+
+    private void OnCoinChanged(EventPayload e)
+    {
+        Logger.Msg($"Coins: {e.GetValue<int>("from")} -> {e.GetValue<int>("to")}");
+    }
+
+    private void OnServerStatusChanged(EventPayload e)
+    {
+        var serverId = e.GetValue<string>("serverId");
+        var newStatus = e.GetValue<string>("newStatus");
+        Logger.Msg($"Server {serverId} is now {newStatus}");
+    }
+}
+```
+
+Properties available in GregMod:
+- `Logger` — Mod-specific logger
+- `Api` — IGregAPI interface (same as `greg` facade)
+- `EventBus` — Direct access to event bus
+- `Config` — Configuration service
+
+---
+
+## 7. LUA MODS (MOONSHARP)
+
+GregCore ships with **MoonSharp** (vendored full source in `lib/MoonSharp/`).
+
+### Basic Lua Mod Template
+```lua
+-- File: my_mod.lua
+
+-- Hook subscriptions
+greg.on("greg.PLAYER.CoinChanged", function(payload)
+    print("Coins changed!")
+    print("  From: " .. payload.from)
+    print("  To:   " .. payload.to)
+end)
+
+greg.on("greg.UI.PauseMenu.Opened", function(payload)
+    greg.ui.notify("Game paused!")
+end)
+
+-- Access APIs
+local balance = greg.economy.get_balance(player_id)
+greg.economy.add_money(player_id, 1000)
+
+local servers = greg.server.get_all()
+for _, server in ipairs(servers) do
+    print("Server:", server.id, "Status:", server.status)
+end
+
+-- Send messages
+greg.network.send_message(recipient_id, "GREETING", { text = "Hello!" })
+
+-- Save/load persistent data
+greg.save.persist("my_setting", 42)
+local value = greg.save.load("my_setting")
+```
+
+### Lua Module Patterns
+```lua
+-- Tables for organization
+local MyModule = {}
+
+function MyModule.initialize()
+    print("MyModule initialized")
+end
+
+function MyModule.on_server_status_changed(payload)
+    -- Handle event
+end
+
+greg.on("greg.SERVER.StatusChanged", MyModule.on_server_status_changed)
+
+return MyModule
+```
+
+### Async Operations in Lua
+```lua
+-- Use coroutines for deferred operations
+local function async_operation()
+    local task = greg.automation.queue({
+        type = "UPDATE_INVENTORY",
+        itemId = "CPU_001",
+        quantity = 5
+    })
+
+    -- Wait for task completion
+    while not task.is_complete do
+        coroutine.yield()
+    end
+
+    print("Task done:", task.result)
+end
+
+greg.coroutine.start(async_operation)
+```
+
+---
+
+## 8. JAVASCRIPT / TYPESCRIPT MODS (JINT)
+
+GregCore uses **Jint 4.8.0** for JavaScript execution.
+
+### Basic JavaScript Mod Template
+```javascript
+// File: my_mod.js
+
+// Hook subscriptions
+greg.on("greg.PLAYER.CoinChanged", (payload) => {
+    console.log("Coins changed!");
+    console.log(`  From: ${payload.from}`);
+    console.log(`  To:   ${payload.to}`);
+});
+
+greg.on("greg.UI.PauseMenu.Opened", (payload) => {
+    greg.ui.notify("Game paused!");
+});
+
+// API access
+const balance = greg.economy.getBalance(playerId);
+greg.economy.addMoney(playerId, 1000);
+
+const servers = greg.server.getAll();
+servers.forEach((server) => {
+    console.log(`Server: ${server.id} Status: ${server.status}`);
+});
+
+// Network messages
+greg.network.sendMessage(recipientId, "GREETING", { text: "Hello!" });
+
+// Persistence
+greg.save.persist("mySetting", 42);
+const value = greg.save.load("mySetting");
+```
+
+### TypeScript Definitions
+TypeScript mods require `greg.d.ts`:
+```typescript
+declare namespace greg {
+    interface EventPayload {
+        [key: string]: any;
+    }
+
+    function on(hookName: string, handler: (payload: EventPayload) => void): void;
+    function fire(hookName: string, payload: EventPayload): void;
+
+    namespace economy {
+        function getBalance(playerId: string): number;
+        function addMoney(playerId: string, amount: number): void;
+    }
+
+    namespace ui {
+        function notify(message: string): void;
+        function showDialog(title: string, message: string, buttons: string[]): Promise<number>;
+    }
+    // ... more modules
+}
+```
+
+---
+
+## 9. PYTHON MODS (PYTHONNET)
+
+GregCore uses **pythonnet 3.0.5** for Python execution.
+
+### Basic Python Mod Template
+```python
+# File: my_mod.py
+
+import greg
+
+def on_coins_changed(payload):
+    print("Coins changed!")
+    print(f"  From: {payload['from']}")
+    print(f"  To:   {payload['to']}")
+
+def on_pause_menu_opened(payload):
+    greg.ui.notify("Game paused!")
+
+# Register hooks
+greg.on("greg.PLAYER.CoinChanged", on_coins_changed)
+greg.on("greg.UI.PauseMenu.Opened", on_pause_menu_opened)
+
+# API access
+balance = greg.economy.get_balance(player_id)
+greg.economy.add_money(player_id, 1000)
+
+servers = greg.server.get_all()
+for server in servers:
+    print(f"Server: {server['id']} Status: {server['status']}")
+
+# Network
+greg.network.send_message(recipient_id, "GREETING", {"text": "Hello!"})
+
+# Persistence
+greg.save.persist("my_setting", 42)
+value = greg.save.load("my_setting")
+```
+
+### Python Module Patterns
+```python
+# my_module.py
+
+class MyMod:
+    def __init__(self):
+        self.config = {}
+
+    def initialize(self):
+        print("MyMod initialized")
+        greg.on("greg.SERVER.StatusChanged", self.on_server_status_changed)
+
+    def on_server_status_changed(self, payload):
+        server_id = payload['serverId']
+        new_status = payload['newStatus']
+        print(f"Server {server_id} is now {new_status}")
+
+mod = MyMod()
+mod.initialize()
+```
+
+---
+
+## 10. RUST MODS (FFI VIA WIN32FFIBRIDGE)
+
+Rust mods are native DLLs that interact with GregCore via the `GameApiTable` FFI contract.
+
+### Rust SDK Layout
+Download `greg-rust-sdk.zip` and extract:
+```
+greg-rust-sdk/
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   └── api.rs          # GameApiTable definitions
+├── examples/
+│   └── hello_mod.rs
+└── build.sh            # Compilation script
+```
+
+### Basic Rust Mod Template
+```rust
+// src/lib.rs
+
+use std::ffi::CStr;
+use std::ptr::null_mut;
+
+#[repr(C)]
+pub struct GameApiTable {
+    pub version: u32,
+    pub register_event_handler: unsafe extern "C" fn(event_id: u32, handler: *const u8) -> i32,
+    pub send_network_message: unsafe extern "C" fn(recipient: *const u8, msg_type: *const u8, payload: *const u8) -> i32,
+    pub get_balance: unsafe extern "C" fn(player_id: *const u8) -> i64,
+    pub add_money: unsafe extern "C" fn(player_id: *const u8, amount: i64) -> i32,
+    // ... more function pointers
+}
+
+static mut API: *const GameApiTable = null_mut();
+
+#[no_mangle]
+pub extern "C" fn greg_init(api: *const GameApiTable) {
+    if api.is_null() {
+        return;
+    }
+    unsafe {
+        API = api;
+        let api_ref = &*api;
+        if api_ref.version < 1 {
+            return; // Incompatible version
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn greg_on_event(event_id: u32, payload: *const u8) {
+    match event_id {
+        1 => handle_player_coin_changed(payload),
+        2 => handle_server_status_changed(payload),
+        _ => {}
+    }
+}
+
+fn handle_player_coin_changed(payload: *const u8) {
+    if payload.is_null() {
+        return;
+    }
+    // Parse payload and handle event
+    println!("Player coins changed!");
+}
+
+fn handle_server_status_changed(payload: *const u8) {
+    if payload.is_null() {
+        return;
+    }
+    println!("Server status changed!");
+}
+
+#[no_mangle]
+pub extern "C" fn mod_version() -> *const u8 {
+    b"1.0.0\0".as_ptr()
+}
+```
+
+### Compilation
+```bash
+cargo build --release
+# Output: target/release/my_mod.dll
+# Copy to: Data/Mods/my_mod.dll
+```
+
+---
+
+## 11. GO MODS (FFI VIA CGO)
+
+Go mods are native DLLs using CGO to interface with `GameApiTable`.
+
+### Go SDK Layout
+Download `greg-go-sdk.zip` and extract:
+```
+greg-go-sdk/
+├── go.mod
+├── greg/
+│   ├── api.go          # GameApiTable definitions
+│   └── events.go
+├── examples/
+│   └── hello_mod.go
+└── build.sh            # Compilation script
+```
+
+### Basic Go Mod Template
+```go
+// main.go
+
+package main
+
+/*
+#include "api.h"
+typedef struct {
+    uint32_t version;
+    int (*RegisterEventHandler)(uint32_t event_id, const char* handler);
+    int (*SendNetworkMessage)(const char* recipient, const char* msg_type, const char* payload);
+    int64_t (*GetBalance)(const char* player_id);
+    int (*AddMoney)(const char* player_id, int64_t amount);
+} GameApiTable;
+*/
+import "C"
+
+import (
+    "fmt"
+    "unsafe"
+)
+
+var api *C.GameApiTable
+
+//export GregInit
+func GregInit(apiPtr *C.GameApiTable) {
+    if apiPtr == nil {
+        return
+    }
+    if apiPtr.version < 1 {
+        return // Incompatible version
+    }
+    api = apiPtr
+    fmt.Println("Mod initialized!")
+}
+
+//export GregOnEvent
+func GregOnEvent(eventId C.uint32_t, payload *C.char) {
+    switch eventId {
+    case 1:
+        handlePlayerCoinChanged(payload)
+    case 2:
+        handleServerStatusChanged(payload)
+    }
+}
+
+func handlePlayerCoinChanged(payload *C.char) {
+    fmt.Println("Player coins changed!")
+    // Parse payload and handle event
+}
+
+func handleServerStatusChanged(payload *C.char) {
+    fmt.Println("Server status changed!")
+}
+
+//export ModVersion
+func ModVersion() *C.char {
+    return C.CString("1.0.0")
+}
+
+func main() {
+    // Dummy main for CGO compilation
+}
+```
+
+### Compilation
+```bash
+go build -o my_mod.dll
+# Copy to: Data/Mods/my_mod.dll
+```
+
+---
+
+## 12. FFI/ABI RULES FOR NATIVE MODS (RUST & GO)
+
+The `GameApiTable` struct is the ABI contract. Breaking it breaks all native mods.
+
+### IMMUTABLE RULES
+1. **Never reorder fields** — Native code has offset assumptions burned in
+2. **Never delete fields** — Old mods will read garbage
+3. **Always append new fields to the end** — Safe for backward compatibility
+4. **Increment ApiVersion before appending** — Mods must version-check
+
+### Example: Adding a New Field
+```csharp
+// OLD (v1)
+[StructLayout(LayoutKind.Sequential)]
+public struct GameApiTable
+{
+    public uint Version;                          // +0
+    public IntPtr RegisterEventHandler;           // +4
+    public IntPtr SendNetworkMessage;             // +8
+    public IntPtr GetBalance;                     // +12
+}
+
+// NEW (v2) - APPEND ONLY
+[StructLayout(LayoutKind.Sequential)]
+public struct GameApiTable
+{
+    public uint Version;                          // +0  (unchanged)
+    public IntPtr RegisterEventHandler;           // +4  (unchanged)
+    public IntPtr SendNetworkMessage;             // +8  (unchanged)
+    public IntPtr GetBalance;                     // +12 (unchanged)
+    public IntPtr AddMoney;                       // +16 (NEW - appended)
+}
+```
+
+Rust mods must version-check:
+```rust
+unsafe {
+    let api = &*API;
+    if api.version >= 2 {
+        // Safe to call AddMoney
+        (api.add_money)(player_id_ptr, 1000);
+    }
+}
+```
+
+### EventPayload ABI
+```csharp
+[StructLayout(LayoutKind.Sequential)]
+public struct EventPayload
+{
+    public uint EventId;                          // +0
+    public IntPtr PayloadData;                    // +4/+8 (platform-dependent)
+    public uint PayloadSize;                      // +8/+12
+    public uint Flags;                            // +12/+16
+}
+```
+
+**NO PADDING ALLOWED** — The memory layout is critical for native code.
+
+---
+
+## 13. MELONLOADER 0.7+ & BEPINEX 6 SPECIFICS
+
+### MelonMod Lifecycle
+```csharp
+public class MyMelonMod : MelonMod
+{
+    public override void OnPreLoad()
+    {
+        // Called before game starts
+        // Register IL2CPP types here
+        ClassInjector.RegisterTypeInIl2Cpp<MyComponent>();
+    }
+
+    public override void OnApplicationStart()
+    {
+        // Called when game initializes
+        // Safe to access game objects
+    }
+
+    public override void OnLateLoad()
+    {
+        // Called after all mods load
+        // Safe to communicate between mods
+        MelonEvents.OnLateLoad?.Invoke();
+    }
+
+    public override void OnUpdate()
+    {
+        // Called every frame
+        // Handle frame-dependent logic
+    }
+
+    public override void OnQuitRequest()
+    {
+        // Called when game is shutting down
+        // Cleanup resources
+    }
+}
+```
+
+### Logging
+```csharp
+MelonLogger.Msg(ConsoleColor.Cyan, "Info message");
+MelonLogger.Warning("Warning message");
+MelonLogger.Error("Error message");
+MelonLogger.WriteToLogDetailed(exception, true);
+MelonLogger.BigError("Critical error!");
+```
+
+### Preferences (Config)
+```csharp
+var myEntry = MelonPreferences.CreateEntry<int>(
+    category: "MyMod",
+    identifier: "max_coins",
+    defaultValue: 1000000,
+    displayName: "Maximum Coins",
+    description: "Max coins allowed per player"
+);
+
+int maxCoins = myEntry.Value;
+myEntry.Value = 2000000;
+```
+
+### Coroutines
+```csharp
+MelonCoroutines.Start(MyCoroutine());
+
+private IEnumerator MyCoroutine()
+{
+    yield return new WaitForSeconds(1f);
+    MelonLogger.Msg("Delayed message");
+}
+```
+
+---
+
+## 14. MEMORY MANAGEMENT & STABILITY
+
+### IL2CPP Object Lifetime
+```csharp
+// UNSAFE ❌
+public class BadCache
+{
+    private IntPtr _cachedPtr;
+
+    public void Cache(Il2CppObjectBase obj)
+    {
+        _cachedPtr = obj.Pointer;  // Dangerous!
+    }
+
+    public void Use()
+    {
+        Marshal.ReadInt32(_cachedPtr);  // Crash if GC collected obj
+    }
+}
+
+// SAFE ✅
+public class GoodCache
+{
+    private Il2CppObjectBase _cachedObj;
+
+    public void Cache(Il2CppObjectBase obj)
+    {
+        _cachedObj = obj;  // Hold the managed wrapper
+    }
+
+    public void Use()
+    {
+        if (_cachedObj == null || _cachedObj.Pointer == IntPtr.Zero)
+            return;
+        // Safe to use
+    }
+}
+```
+
+### Circular Reference Prevention
+```csharp
+// WRONG ❌ — Circular ref: Managed → IL2CPP → Managed
+public class Bad
+{
+    private Il2CppPlayer _player;
+
+    public void Subscribe()
+    {
+        _player.OnCoinChanged += (delta) => HandleCoinChange(delta);
+    }
+}
+
+// RIGHT ✅ — Use event bus instead
+public class Good
+{
+    public void Subscribe()
+    {
+        greg.EventBus.Subscribe("greg.PLAYER.CoinChanged", (payload) =>
+        {
+            HandleCoinChange(payload);
+        });
+    }
+}
+```
+
+### String Conversions
+```csharp
+// IL2CPP string → managed string
+Il2CppSystem.String nativeStr = GetNativeString();
+string managedStr = nativeStr?.ToString() ?? "";
+
+// managed string → IL2CPP string
+string managedStr = "hello";
+Il2CppSystem.String nativeStr = (Il2CppSystem.String)(object)managedStr;
+```
+
+### GC Pressure
+```csharp
+// Don't force GC in hot paths
+for (int i = 0; i < 1000000; i++)
+{
+    // Don't call GC.Collect() here!
+    ProcessFrame();
+}
+
+// Only call GC.Collect() during safe pauses
+public override void OnUpdate()
+{
+    if (Input.GetKeyDown(KeyCode.F12))
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+    }
+}
+```
+
+---
+
+## 15. UI / ASSETS (UNITY 6000.4+)
+
+### FORBIDDEN: IMGUI / OnGUI
+```csharp
+// WRONG ❌ — Will crash instantly
+void OnGUI()
+{
+    if (GUILayout.Button("Click me"))
+    {
+        // ...
+    }
+}
+```
+
+### REQUIRED: UI Toolkit
+```csharp
+public override void OnUpdate()
+{
+    if (!_uiCreated)
+    {
+        CreateUI();
+        _uiCreated = true;
+    }
+}
+
+private void CreateUI()
+{
+    var root = new VisualElement();
+    root.style.width = Length.Percent(100);
+    root.style.height = Length.Percent(100);
+
+    var button = new Button(() => OnButtonClicked());
+    button.text = "Click Me";
+    root.Add(button);
+
+    // Attach to screen
+    var panel = UIDocument.GetComponent<UIDocument>();
+    panel.rootVisualElement = root;
+}
+
+private void OnButtonClicked()
+{
+    MelonLogger.Msg("Button clicked!");
+}
+```
+
+### Asset Loading Priority
+```csharp
+// 1. AssetBundle (preferred for mods)
+var bundle = AssetBundle.LoadFromFile("path/to/bundle.ab");
+var prefab = bundle.LoadAsset<GameObject>("MyPrefab");
+
+// 2. Addressables
+var handle = Addressables.LoadAssetAsync<GameObject>("my_key");
+var obj = handle.Result;
+
+// 3. Resources.Load (fallback)
+var obj = Resources.Load<GameObject>("Prefabs/MyPrefab");
+```
+
+### NO YAML Direct Edits
+```csharp
+// WRONG ❌
+File.WriteAllText("Assets/Scenes/MyScene.unity", modifiedYaml);
+
+// RIGHT ✅
+GameObject scene = Instantiate(Resources.Load<GameObject>("Scenes/MyScene"));
+// Modify at runtime
+```
+
+---
+
+## 16. ERROR HANDLING & DEBUGGING
+
+### Try-Catch Pattern in Hooks
+```csharp
+[HarmonyPrefix]
+[HarmonyPatch(typeof(SomeClass), nameof(SomeClass.SomeMethod))]
+private static bool SafeHook(SomeClass __instance)
+{
+    try
+    {
+        // NULL CHECKS FIRST
+        if (__instance == null) return true;
+        if (__instance.Pointer == IntPtr.Zero) return true;
+
+        // Hook logic
+        DoWork(__instance);
+
+        return true;
+    }
+    catch (ObjectDisposedException ex)
+    {
+        MelonLogger.Error($"Object was garbage-collected: {ex.Message}");
+        return true;
+    }
+    catch (NullReferenceException ex)
+    {
+        MelonLogger.Error($"Null reference in hook: {ex.Message}");
+        return true;
+    }
+    catch (Exception ex)
+    {
+        MelonLogger.Error($"Hook FAILED: {ex.Message}");
+        MelonLogger.WriteToLogDetailed(ex, true);  // Full stack trace
+        return true; // Safe fallback
+    }
+}
+```
+
+### Logging Levels
+```csharp
+MelonLogger.Msg("Info");              // Normal operation
+MelonLogger.Warning("Warn");          // Potential issues
+MelonLogger.Error("Error");           // Errors that don't crash
+MelonLogger.BigError("Fatal");        // Critical errors
+MelonLogger.WriteToLogDetailed(ex, true);  // Exception with stack trace
+```
+
+### In-Game Debug Console
+```csharp
+public override void OnUpdate()
+{
+    if (Input.GetKeyDown(KeyCode.BackQuote))
+    {
+        MelonConsole.Run_Command_On_Main_Thread("help");
+    }
+}
+
+[MelonConsoleCommand("my_command", "Does something")]
+public static void MyDebugCommand(params string[] args)
+{
+    MelonLogger.Msg($"Command called with {args.Length} args");
+}
+```
+
+### Stability Testing
+Test every hook with:
+1. **Null instance:** `if (__instance == null) return;`
+2. **Null parameters:** Validate all params before use
+3. **Race conditions:** Call hook rapidly from multiple sources
+4. **Memory pressure:** Run hook after GC.Collect()
+5. **Long runtime:** Keep game running for hours with hook active
+
+---
+
+## 17. COMPLIANCE CHECKLIST
+
+Before generating or distributing ANY mod:
+
+- [ ] All dummy-DLL references verified (types exist in extracted DLLs)?
+- [ ] No standard C# casts `(T)obj` or `as T` on IL2CPP types?
+- [ ] All custom IL2CPP classes have `IntPtr` constructor and `ClassInjector.RegisterTypeInIl2Cpp<T>()`?
+- [ ] All Harmony patches wrapped in `try-catch` with proper logging?
+- [ ] Null-checks for `__instance` and all parameters in every patch?
+- [ ] NO `OnGUI()`, `GUILayout`, or IMGUI usage?
+- [ ] Asset loading via `AssetBundle` / `Addressables` / `Resources.Load` only?
+- [ ] NO direct `.prefab` or `.unity` YAML edits?
+- [ ] Logging on error paths for all critical functions?
+- [ ] Cleanup in `OnDestroy()`, `OnQuitRequest()`, or `Dispose()`?
+- [ ] All hook names validated against `framework/greg_hooks.json` or `IGregHookRegistry`?
+- [ ] FFI mods (Rust/Go) version-check `GameApiTable.Version`?
+- [ ] No hardcoded game paths or assumptions about game state?
+- [ ] GameApiTable fields only appended, never reordered/deleted?
+
+---
+
+## AI INSTRUCTION: MANDATORY RULES
+
+When generating or reviewing GregCore mods:
+
+1. **NEVER invent** hook names, method signatures, or game logic without verifying them in:
+   - `framework/greg_hooks.json` (canonical hook registry)
+   - Dummy DLLs extracted via Cpp2IL/Il2CppDumper
+   - Running UnityExplorer inspections
+
+2. **ALWAYS use** `Cast<T>()` / `TryCast<T>()` for IL2CPP type conversions. Never use standard C# casts.
+
+3. **ALWAYS check** `Pointer != IntPtr.Zero` before using cached IL2CPP objects.
+
+4. **ALWAYS wrap** Harmony patches in `try-catch` with logged error fallbacks.
+
+5. **NEVER assume** game logic from decompiled code. The game is IL2CPP native; all C# is hollow.
+
+6. **NEVER modify** `GameApiTable` field order — only append at the end and increment version.
+
+7. **ALWAYS validate** hook names and parameters against the actual framework before coding.
+
+8. **WHEN UNCERTAIN:** Request full Cpp2IL dumps, Ghidra analysis, or UnityExplorer runtime inspection. No guessing.
+
+---
+
+**Last Updated:** 2026-04-30
+**Framework Version:** GregCore 1.1.0+
+**Status:** MANDATORY — All AI agents and humans must follow these rules.

@@ -75,7 +75,6 @@ public sealed class LuaErrorOverlay
 
         if (_errors.Count == 0) return;
 
-        float yOffset = 0;
         for (int i = _errors.Count - 1; i >= 0; i--)
         {
             var error = _errors[i];

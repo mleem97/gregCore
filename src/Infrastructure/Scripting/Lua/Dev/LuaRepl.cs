@@ -23,9 +23,10 @@ public sealed class LuaRepl
     private readonly List<string> _history = new();
     private readonly List<string> _output = new();
     private int _historyIndex = -1;
-    private ScrollView _outputScroll;
-    private TextField _inputField;
-    private VisualElement _root;
+    private ScrollView _outputScroll = null!;
+    private TextField _inputField = null!;
+    private VisualElement _root = null!;
+
     private readonly int _maxOutputLines = 200;
     private Script? _replScript;
 

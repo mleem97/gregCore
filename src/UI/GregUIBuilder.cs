@@ -1,340 +1,183 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using MelonLoader;
 
 namespace gregCore.UI
 {
     /// <summary>
-    /// Fluent builder for gregCore UI panels.
-    /// Primary output: UI Toolkit VisualElements.
-    /// Fallback output: UGUI GameObject hierarchy when UI Toolkit is insufficient.
+    /// Procedural IMGUI Builder. 
+    /// Replaces the Hybrid UI Toolkit system with a robust OnGUI-based approach.
+    /// Supports nested drawing for tabbed layouts and modern switches.
     /// </summary>
     public class GregUIBuilder
     {
-        private readonly VisualElement _root;
-        private readonly VisualElement _content;
-        private readonly string _panelName;
-        private readonly bool _isTablet;
+        private readonly string _title;
+        private Rect _rect;
+        private Rect _contentArea;
+        private readonly List<Action<Rect>> _drawActions = new();
+        private float _currentY = 10;
+        private const float PADDING_SIDE = 20;
+        private const float SPACING = 12;
+        private bool _isVisible;
+        private Vector2 _scrollPos;
 
-        private GregUIBuilder(string title, bool isTablet)
+        private GregUIBuilder(string title, Rect rect)
         {
-            _panelName = $"Panel_{title}";
-            _isTablet = isTablet;
-
-            _root = new VisualElement
-            {
-                name = _panelName,
-                style =
-                {
-                    flexDirection = FlexDirection.Column,
-                    backgroundColor = GregUITheme.PanelBackground,
-                    borderTopColor = GregUITheme.NeutralBorder,
-                    borderBottomColor = GregUITheme.NeutralBorder,
-                    borderLeftColor = GregUITheme.NeutralBorder,
-                    borderRightColor = GregUITheme.NeutralBorder,
-                    borderTopWidth = isTablet ? GregUITheme.BorderWidthTablet : GregUITheme.BorderWidthWidget,
-                    borderBottomWidth = isTablet ? GregUITheme.BorderWidthTablet : GregUITheme.BorderWidthWidget,
-                    borderLeftWidth = isTablet ? GregUITheme.BorderWidthTablet : GregUITheme.BorderWidthWidget,
-                    borderRightWidth = isTablet ? GregUITheme.BorderWidthTablet : GregUITheme.BorderWidthWidget,
-                    borderTopLeftRadius = GregUITheme.CornerRadius,
-                    borderTopRightRadius = GregUITheme.CornerRadius,
-                    borderBottomLeftRadius = GregUITheme.CornerRadius,
-                    borderBottomRightRadius = GregUITheme.CornerRadius,
-                    paddingTop = GregUITheme.Padding,
-                    paddingBottom = GregUITheme.Padding,
-                    paddingLeft = GregUITheme.Padding,
-                    paddingRight = GregUITheme.Padding
-                }
-            };
-
-            var header = new Label(title.ToUpper())
-            {
-                style =
-                {
-                    fontSize = 20,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    color = GregUITheme.SecondaryColor,
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    paddingBottom = 8,
-                    marginBottom = 8,
-                    borderBottomColor = GregUITheme.NeutralBorder,
-                    borderBottomWidth = 1
-                }
-            };
-            _root.Add(header);
-
-            _content = new VisualElement
-            {
-                name = "Content",
-                style =
-                {
-                    flexDirection = FlexDirection.Column,
-                    flexGrow = 1,
-                    marginTop = GregUITheme.Spacing
-                }
-            };
-            _root.Add(_content);
+            _title = title;
+            _rect = rect;
+            _contentArea = rect;
         }
 
-        public static GregUIBuilder Create(string title) => CreateTablet(title);
-
-        public static GregUIBuilder CreateTablet(string title)
+        public static GregUIBuilder Create(string title)
         {
-            var builder = new GregUIBuilder(title, true);
-            builder._root.style.position = Position.Absolute;
-            builder._root.style.top = 100;
-            builder._root.style.left = 200;
-            builder._root.style.width = 500;
-            builder._root.style.height = 600;
-            return builder;
+            return new GregUIBuilder(title, new Rect(Screen.width / 2 - 250, Screen.height / 2 - 300, 500, 600));
         }
+
+        public static GregUIBuilder CreateTablet(string title) => Create(title);
 
         public static GregUIBuilder CreateWidget(string title, float x = 50, float y = 50)
         {
-            var builder = new GregUIBuilder(title, false);
-            builder._root.style.position = Position.Absolute;
-            builder._root.style.top = y;
-            builder._root.style.left = x;
-            builder._root.style.width = 300;
-            builder._root.style.height = 200;
-            return builder;
+            return new GregUIBuilder(title, new Rect(x, y, 320, 220));
         }
 
         public GregUIBuilder SetSize(float width, float height)
         {
-            _root.style.width = width;
-            _root.style.height = height;
+            _rect.width = width;
+            _rect.height = height;
+            _contentArea.width = width;
+            _contentArea.height = height;
+            return this;
+        }
+
+        public void SetContentArea(Rect area)
+        {
+            _contentArea = area;
+        }
+
+        public void ResetActions()
+        {
+            _drawActions.Clear();
+            _currentY = 10;
+        }
+
+        public void Draw()
+        {
+            if (!_isVisible) return;
+            GregImGui.EnsureInitialized();
+            GregImGui.DrawWindowFrame(_rect, _title);
+            DrawContent();
+        }
+
+        public void DrawContent()
+        {
+            GregImGui.EnsureInitialized();
+
+            // Custom skin for styled scrollbars
+            var prevSkin = GUI.skin;
+            GUI.skin = GregImGui.GetCleanSkin();
+
+            // Scrolling container for content
+            var viewRect = new Rect(0, 0, _contentArea.width - 25, _currentY + 50);
+            _scrollPos = GUI.BeginScrollView(_contentArea, _scrollPos, viewRect, false, true);
+
+            // Positioning relative to scroll view
+            // Using slightly wider element width for better typography
+            var elementRect = new Rect(PADDING_SIDE, 0, _contentArea.width - (PADDING_SIDE * 2) - 10, 25);
+            
+            foreach (var action in _drawActions)
+            {
+                action(elementRect);
+            }
+
+            GUI.EndScrollView();
+            GUI.skin = prevSkin;
+        }
+
+        public GregUIBuilder Build()
+        {
+            GregUIManager.RegisterWindow(this);
             return this;
         }
 
         public GregUIBuilder AddHeadline(string text)
         {
-            var label = new Label(text.ToUpper())
-            {
-                style =
-                {
-                    fontSize = 16,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    color = GregUITheme.SecondaryColor,
-                    marginTop = GregUITheme.Spacing,
-                    marginBottom = 4
-                }
-            };
-            _content.Add(label);
+            float y = _currentY;
+            _drawActions.Add(r => GUI.Label(new Rect(r.x, y, r.width, 30), text.ToUpper(), GregImGui.stHeader));
+            _currentY += 30 + SPACING;
             return this;
         }
 
         public GregUIBuilder AddLabel(string text)
         {
-            var label = new Label(text)
-            {
-                style =
-                {
-                    fontSize = 14,
-                    color = new Color(0.88f, 0.88f, 0.88f),
-                    marginBottom = 4
-                }
-            };
-            _content.Add(label);
+            float y = _currentY;
+            _drawActions.Add(r => GUI.Label(new Rect(r.x, y, r.width, 24), text, GregImGui.stLabel));
+            _currentY += 24 + (SPACING / 2);
             return this;
         }
 
-        public GregUIBuilder AddButton(string label, Action onClick) => AddPrimaryButton(label, onClick);
-
-        public GregUIBuilder AddPrimaryButton(string label, Action onClick)
+        public GregUIBuilder AddButton(string label, Action onClick)
         {
-            var button = new Button(onClick)
-            {
-                text = label.ToUpper(),
-                style =
-                {
-                    backgroundColor = GregUITheme.PrimaryAccent,
-                    color = Color.black,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    height = 40,
-                    marginTop = GregUITheme.Spacing,
-                    borderTopLeftRadius = GregUITheme.CornerRadius,
-                    borderTopRightRadius = GregUITheme.CornerRadius,
-                    borderBottomLeftRadius = GregUITheme.CornerRadius,
-                    borderBottomRightRadius = GregUITheme.CornerRadius,
-                    unityTextAlign = TextAnchor.MiddleCenter
-                }
-            };
-            _content.Add(button);
-            return this;
-        }
-
-        public GregUIBuilder AddSecondaryButton(string label, Action onClick)
-        {
-            var button = new Button(onClick)
-            {
-                text = label.ToUpper(),
-                style =
-                {
-                    backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f),
-                    color = GregUITheme.NeutralBorder,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    height = 40,
-                    marginTop = GregUITheme.Spacing,
-                    borderTopLeftRadius = GregUITheme.CornerRadius,
-                    borderTopRightRadius = GregUITheme.CornerRadius,
-                    borderBottomLeftRadius = GregUITheme.CornerRadius,
-                    borderBottomRightRadius = GregUITheme.CornerRadius,
-                    unityTextAlign = TextAnchor.MiddleCenter
-                }
-            };
-            _content.Add(button);
+            float y = _currentY;
+            _drawActions.Add(r => {
+                if (GUI.Button(new Rect(r.x, y, r.width, 40), label, GregImGui.stButton))
+                    onClick?.Invoke();
+            });
+            _currentY += 40 + SPACING;
             return this;
         }
 
         public GregUIBuilder AddToggle(string label, bool currentValue, Action<bool> onChanged)
         {
-            var container = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    marginTop = GregUITheme.Spacing
-                }
-            };
+            float y = _currentY;
+            _drawActions.Add(r => {
+                bool next = GUI.Toggle(new Rect(r.x, y, r.width, 25), currentValue, "  " + label, GregImGui.stToggle);
+                if (next != currentValue) onChanged?.Invoke(next);
+            });
+            _currentY += 25 + SPACING;
+            return this;
+        }
 
-            var toggle = new Toggle
-            {
-                value = currentValue,
-                style = { flexGrow = 0 }
-            };
-            toggle.RegisterCallback<ChangeEvent<bool>>(new Action<ChangeEvent<bool>>(evt => onChanged?.Invoke(evt.newValue)));
-
-            var labelElement = new Label(label)
-            {
-                style =
-                {
-                    fontSize = 14,
-                    color = new Color(0.88f, 0.88f, 0.88f),
-                    marginLeft = 8,
-                    flexGrow = 1
-                }
-            };
-
-            container.Add(toggle);
-            container.Add(labelElement);
-            _content.Add(container);
+        public GregUIBuilder AddSwitch(string label, bool currentValue, Action<bool> onChanged)
+        {
+            float y = _currentY;
+            _drawActions.Add(r => {
+                GUI.Label(new Rect(r.x, y, r.width - 60, 25), label, GregImGui.stLabel);
+                bool next = GregImGui.DrawSwitch(new Rect(r.x + r.width - 45, y, 44, 25), currentValue);
+                if (next != currentValue) onChanged?.Invoke(next);
+            });
+            _currentY += 25 + SPACING;
             return this;
         }
 
         public GregUIBuilder AddSlider(string label, float min, float max, float currentValue, Action<float> onChanged)
         {
-            var container = new VisualElement { style = { marginTop = GregUITheme.Spacing } };
-
-            var labelElement = new Label(label)
-            {
-                style =
-                {
-                    fontSize = 14,
-                    color = new Color(0.88f, 0.88f, 0.88f),
-                    marginBottom = 4
-                }
-            };
-
-            var slider = new Slider(min, max)
-            {
-                value = currentValue,
-                style = { flexGrow = 1 }
-            };
-            slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt => onChanged?.Invoke(evt.newValue)));
-
-            container.Add(labelElement);
-            container.Add(slider);
-            _content.Add(container);
+            float y = _currentY;
+            _drawActions.Add(r => {
+                GUI.Label(new Rect(r.x, y, r.width, 20), $"{label}: {currentValue:F2}", GregImGui.stLabel);
+                float next = GUI.HorizontalSlider(new Rect(r.x, y + 24, r.width, 20), currentValue, min, max);
+                if (Mathf.Abs(next - currentValue) > 0.001f) onChanged?.Invoke(next);
+            });
+            _currentY += 48 + SPACING;
             return this;
         }
-
-        public GregUIBuilder AddInputField(string label, string defaultValue, Action<string> onChanged)
-        {
-            var container = new VisualElement { style = { marginTop = GregUITheme.Spacing } };
-
-            var labelElement = new Label(label)
-            {
-                style =
-                {
-                    fontSize = 14,
-                    color = new Color(0.88f, 0.88f, 0.88f),
-                    marginBottom = 4
-                }
-            };
-
-            var textField = new TextField
-            {
-                value = defaultValue,
-                style =
-                {
-                    backgroundColor = new Color(0.1f, 0.1f, 0.1f),
-                    color = Color.white,
-                    height = 30
-                }
-            };
-            textField.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => onChanged?.Invoke(evt.newValue)));
-
-            container.Add(labelElement);
-            container.Add(textField);
-            _content.Add(container);
-            return this;
-        }
-
-        public GregUIBuilder AddSection(string title) => AddHeadline(title);
 
         public GregUIBuilder AddSpacer(float height = 20f)
         {
-            var spacer = new VisualElement { style = { height = height } };
-            _content.Add(spacer);
+            _currentY += height;
             return this;
         }
 
-        /// <summary>
-        /// Builds the panel into the UI Toolkit root. This is the primary path.
-        /// </summary>
-        public VisualElement Build()
-        {
-            GregUIManager.RegisterPanel(_panelName, _root);
-            return _root;
+        public GregUIBuilder AddPrimaryButton(string label, Action onClick) => AddButton(label, onClick);
+        public GregUIBuilder AddSecondaryButton(string label, Action onClick) => AddButton(label, onClick);
+        public GregUIBuilder AddSection(string title) => AddHeadline(title);
+
+        public bool IsVisible 
+        { 
+            get => _isVisible; 
+            set => _isVisible = value; 
         }
-
-        /// <summary>
-        /// Fallback: builds the panel as a UGUI GameObject hierarchy.
-        /// Use only when UI Toolkit is unavailable or insufficient.
-        /// </summary>
-        public GameObject? BuildAsUGUI()
-        {
-            try
-            {
-                var go = GregUIManager.CreateUGUIFallbackObject(_panelName);
-                if (go == null) return null;
-
-                var rect = go.AddComponent<RectTransform>();
-                rect.anchorMin = Vector2.zero;
-                rect.anchorMax = Vector2.zero;
-                rect.pivot = new Vector2(0, 1);
-                rect.anchoredPosition = new Vector2(_root.style.left.value.value, -_root.style.top.value.value);
-                rect.sizeDelta = new Vector2(_root.style.width.value.value, _root.style.height.value.value);
-
-                var image = go.AddComponent<UnityEngine.UI.Image>();
-                image.color = GregUITheme.PanelBackground;
-
-                MelonLogger.Warning($"[gregCore] Panel '{_panelName}' built as UGUI fallback.");
-                return go;
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] UGUI fallback build failed: {ex.Message}");
-                return null;
-            }
-        }
-
-        public GregUIBuilder Show() { _root.style.display = DisplayStyle.Flex; return this; }
-        public GregUIBuilder Hide() { _root.style.display = DisplayStyle.None; return this; }
-        public GregUIBuilder Toggle() { _root.style.display = _root.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None; return this; }
-        public bool IsVisible => _root.style.display != DisplayStyle.None;
+        
+        public void Toggle() => _isVisible = !_isVisible;
     }
 }

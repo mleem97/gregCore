@@ -42,7 +42,7 @@ public class LuaModuleLoader
             if (_cache.TryGetValue(modulePath, out var cached))
                 return cached;
 
-            string fullPath = ResolvePath(modulePath);
+            string? fullPath = ResolvePath(modulePath);
             if (fullPath == null)
             {
                 throw new ScriptRuntimeException($"Module not found: {modulePath}");

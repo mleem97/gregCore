@@ -8,9 +8,9 @@ namespace gregCore.Core.Events
     /// </summary>
     public static class GameEventBus
     {
-        public static event Action<float> OnCoinsChanged;
-        public static event Action<float> OnReputationChanged;
-        public static event Action<float> OnXpChanged;
+        public static event Action<float>? OnCoinsChanged;
+        public static event Action<float>? OnReputationChanged;
+        public static event Action<float>? OnXpChanged;
 
         public static void PublishCoins(float amount) => OnCoinsChanged?.Invoke(amount);
         public static void PublishReputation(float amount) => OnReputationChanged?.Invoke(amount);

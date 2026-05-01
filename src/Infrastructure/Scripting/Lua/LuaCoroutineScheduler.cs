@@ -173,7 +173,7 @@ public class LuaCoroutineScheduler
     {
         public float Remaining;
         public float Interval;
-        public Closure Callback;
+        public Closure Callback = null!;
         public bool Repeating;
     }
 

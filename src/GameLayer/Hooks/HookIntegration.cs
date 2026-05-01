@@ -10,7 +10,7 @@ namespace gregCore.GameLayer.Hooks
     {
         public static void Install(object mod, bool auto) { }
         public static void LogPatchError(string mod, Exception ex) => MelonLogger.Error($"[{mod}] Patch Error: {ex.Message}");
-        public static void Emit(string id, object data = null) { }
+        public static void Emit(string id, object? data = null) { }
 
         public static void Apply(HarmonyLib.Harmony harmony)
         {
@@ -36,8 +36,8 @@ namespace gregCore.GameLayer.Hooks
 
         public static void Postfix_Generic()
         {
-            gregNativeEventHooks.OnCoinsChanged?.Invoke(null);
-            gregNativeEventHooks.GameLoaded?.Invoke(null);
+            gregNativeEventHooks.OnCoinsChanged?.Invoke(null!);
+            gregNativeEventHooks.GameLoaded?.Invoke(null!);
         }
     }
 }

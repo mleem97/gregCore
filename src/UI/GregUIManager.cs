@@ -1,133 +1,151 @@
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using Il2CppInterop.Runtime.Attributes;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
+using MelonLoader;
 
 namespace gregCore.UI
 {
+    /// <summary>
+    /// Global UI Manager for GregCore UI Toolkit panels.
+    /// Manages the rendering lifecycle, window states, and layer organization.
+    /// Replaces the legacy IMGUI-based GregUIManager.
+    /// </summary>
     public static class GregUIManager
     {
-        private static GameObject _rootObject = null!;
-        private static Canvas _canvas = null!;
-        private static CanvasScaler _scaler = null!;
-        private static GraphicRaycaster _raycaster = null!;
-        private static CanvasGroup _canvasGroup = null!;
-        private static readonly Dictionary<string, GameObject> _panels = new();
-
-        public static Canvas RootCanvas => _canvas;
-        public static GameObject RootObject => _rootObject;
+        private static readonly List<GregPanelBuilder> _activePanels = new();
+        private static readonly Dictionary<string, GregPanelBuilder> _namedPanels = new();
+        private static bool _initialized;
 
         public static void Initialize()
         {
-            if (_rootObject != null) return;
+            if (_initialized) return;
 
-            GenerateAssets();
-
-            _rootObject = new GameObject("gregCore_UI_Root");
-            UnityEngine.Object.DontDestroyOnLoad(_rootObject);
-
-            _canvas = _rootObject.AddComponent<Canvas>();
-            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            _canvas.sortingOrder = 999;
-
-            _scaler = _rootObject.AddComponent<CanvasScaler>();
-            _scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            _scaler.referenceResolution = new Vector2(1920, 1080);
-
-            _raycaster = _rootObject.AddComponent<GraphicRaycaster>();
-            _canvasGroup = _rootObject.AddComponent<CanvasGroup>();
-            
-            UpdateInputState();
-            EnsureEventSystem();
-        }
-
-        private static void UpdateInputState()
-        {
-            if (_canvasGroup == null) return;
-            
-            bool anyActive = false;
-            foreach (var panel in _panels.Values)
+            try
             {
-                if (panel != null && panel.activeSelf)
-                {
-                    anyActive = true;
-                    break;
-                }
+                GregCanvasManager.Instance.Initialize();
+                GregUILayerManager.Instance.Initialize();
+                MelonLogger.Msg("[GregUIManager] UI Toolkit manager initialized.");
+                _initialized = true;
             }
-            
-            _canvasGroup.blocksRaycasts = anyActive;
-            _canvasGroup.interactable = anyActive;
-        }
-
-        private static void GenerateAssets()
-        {
-            int size = 64;
-            float radius = 24f; 
-            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            var colors = new Color[size * size];
-
-            for (int x = 0; x < size; x++)
+            catch (Exception ex)
             {
-                for (int y = 0; y < size; y++)
-                {
-                    float dx = Mathf.Max(0, radius - x, x - (size - 1 - radius));
-                    float dy = Mathf.Max(0, radius - y, y - (size - 1 - radius));
-                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
-                    
-                    if (dist > radius) colors[y * size + x] = Color.clear;
-                    else colors[y * size + x] = Color.white;
-                }
+                MelonLogger.Error($"[GregUIManager] Initialization failed: {ex.Message}");
             }
-
-            tex.SetPixels(colors);
-            tex.Apply();
-            
-            GregUITheme.RoundedSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new Vector4(radius, radius, radius, radius));
         }
 
-        public static void RegisterPanel(string name, GameObject panel) 
+        public static void RegisterPanel(GregPanelBuilder panel)
         {
-            _panels[name] = panel;
-            UpdateInputState();
-        }
-
-        public static void SetPanelActive(string name, bool active)
-        {
-            if (_panels.TryGetValue(name, out var panel) && panel != null)
+            if (panel == null) return;
+            if (!_activePanels.Contains(panel))
             {
-                panel.SetActive(active);
-                UpdateInputState();
+                _activePanels.Add(panel);
+            }
+        }
+
+        public static void UnregisterPanel(GregPanelBuilder panel)
+        {
+            if (panel == null) return;
+            _activePanels.Remove(panel);
+        }
+
+        public static void RegisterNamedPanel(string name, GregPanelBuilder panel)
+        {
+            if (string.IsNullOrEmpty(name) || panel == null) return;
+            _namedPanels[name] = panel;
+        }
+
+        public static GregPanelBuilder? GetNamedPanel(string name)
+        {
+            _namedPanels.TryGetValue(name, out var panel);
+            return panel;
+        }
+
+        public static void ShowPanel(string name)
+        {
+            if (_namedPanels.TryGetValue(name, out var panel))
+            {
+                panel.Show();
+            }
+        }
+
+        public static void HidePanel(string name)
+        {
+            if (_namedPanels.TryGetValue(name, out var panel))
+            {
+                panel.Hide();
             }
         }
 
         public static void TogglePanel(string name)
         {
-            if (_panels.TryGetValue(name, out var panel) && panel != null)
+            if (_namedPanels.TryGetValue(name, out var panel))
             {
-                panel.SetActive(!panel.activeSelf);
-                UpdateInputState();
+                panel.Toggle();
             }
         }
 
-        private static void EnsureEventSystem()
+        public static void HideAllPanels()
         {
-            if (UnityEngine.Object.FindObjectOfType<EventSystem>() == null)
+            foreach (var panel in _activePanels)
             {
-                var eventSystemObj = new GameObject("gregCore_EventSystem");
-                eventSystemObj.AddComponent<EventSystem>();
-                eventSystemObj.AddComponent<StandaloneInputModule>();
-                UnityEngine.Object.DontDestroyOnLoad(eventSystemObj);
+                panel?.Hide();
+            }
+            GregUILayerManager.Instance.HideAllPanels();
+        }
+
+        /// <summary>
+        /// Create a quick notification toast.
+        /// </summary>
+        public static void ShowNotification(string message, float duration = 3f)
+        {
+            GregNotificationManager.Show(message, duration);
+        }
+
+        public static bool IsAnyPanelVisible
+        {
+            get
+            {
+                foreach (var panel in _activePanels)
+                {
+                    if (panel != null && panel.IsVisible) return true;
+                }
+                return false;
             }
         }
 
-        public static GameObject CreateUIObject(string name, GameObject parent = null)
+        // Legacy shims for backward compatibility
+        public static object? Root => null;
+        public static void SetPanelActive(string name, bool active)
         {
-            var obj = new GameObject(name);
-            obj.layer = LayerMask.NameToLayer("UI");
-            obj.transform.SetParent(parent?.transform ?? _rootObject.transform, false);
-            return obj;
+            if (active) ShowPanel(name);
+            else HidePanel(name);
+        }
+
+        public static void RegisterPanel(string name, object panel)
+        {
+            if (panel is GregPanelBuilder builder)
+                RegisterNamedPanel(name, builder);
+        }
+
+        public static void Shutdown()
+        {
+            try
+            {
+                foreach (var panel in _activePanels)
+                {
+                    panel?.Destroy();
+                }
+                _activePanels.Clear();
+                _namedPanels.Clear();
+                GregCanvasManager.Instance.Dispose();
+                _initialized = false;
+                MelonLogger.Msg("[GregUIManager] Shutdown complete.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[GregUIManager] Shutdown failed: {ex.Message}");
+            }
         }
     }
 }

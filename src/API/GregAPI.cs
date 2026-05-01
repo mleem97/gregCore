@@ -3,61 +3,56 @@
 /// Zweck:        Stabile API-Fassade für alle Mod-Sprachen (Lua, Rust, Go, JS, Python).
 /// Maintainer:   Alle Methoden lesen/schreiben echte IL2CPP-Game-Objekte.
 ///               Fehler werden abgefangen und Default-Werte zurückgegeben.
-///               Die Legacy-API delegiert intern an IL2CPP-Singletons.
+///               Pointer-Prüfungen verhindern ObjectCollectedException.
 /// </file-summary>
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using greg.Sdk;
+using gregCore.UI;
 using gregCore.Infrastructure.UI;
 using gregCore.Core.Models;
 using gregCore.Core.Events;
+using gregCore.Core;
 using MelonLoader;
 
 namespace gregCore.API
 {
     /// <summary>
     /// Legacy GregAPI – stabile, statische Fassade für alle Scripting-Bridges.
-    /// Jede Methode ist in try-catch gewrapped und gibt bei Fehler einen Safe-Default zurück.
+    /// Jede Methode ist in try-catch gewrapped, prüft Pointer und gibt bei Fehler einen Safe-Default zurück.
     /// </summary>
     public static class GregAPI
     {
-        private static IGregLogger _logger;
+        private static IGregLogger _logger = null!;
 
         internal static void Initialize(IGregLogger logger)
         {
             _logger = logger.ForContext("API");
-            EventBus = new GregEventBus(_logger);
+            // Use shared event bus from GregCoreMod if available, otherwise create own
+            EventBus = GregCoreMod.EventBus ?? new GregEventBus(_logger);
+            HookBus = GregCoreMod.HookBus;
             Persistence = new Infrastructure.Config.GregPersistenceService(_logger);
-            
             _logger.Info("GregAPI initialized successfully.");
         }
 
-        public static GregUIController UI { get; internal set; }
-        public static GregEventBus EventBus { get; internal set; }
-        public static IGregPersistenceService Persistence { get; internal set; }
+        public static GregUIController UI { get; internal set; } = null!;
+        public static GregEventBus EventBus { get; internal set; } = null!;
+        public static IGregPersistenceService Persistence { get; internal set; } = null!;
 
-        // ─── Mod Registration ────────────────────────────────────────────
         public static object RegisterMod(string id, string name, string version) => null!;
         public static GregSettingsProxy Settings { get; } = new GregSettingsProxy();
         public static GregHooksProxy Hooks { get; } = new GregHooksProxy();
 
-        // ─── Logging ─────────────────────────────────────────────────────
         public static void Log(string msg, string type = "INFO") => GregDevConsole.Instance?.AddLog(msg, type);
         public static void LogInfo(string msg) => Log(msg, "INFO");
         public static void LogWarning(string msg) => Log(msg, "WARN");
         public static void LogError(string msg) => Log(msg, "ERROR");
 
-        // ─── Notifications ───────────────────────────────────────────────
         public static void ShowNotification(string msg) { }
         public static void ShowNotification(string msg, float duration) { }
 
-        // ─── Events & Hooks ──────────────────────────────────────────────
-
-        /// <summary>
-        /// Referenz zum zentralen HookBus – wird von GregCoreMod beim Boot gesetzt.
-        /// </summary>
         internal static GregHookBus? HookBus { get; set; }
 
         public static void FireEvent(string id, object? data = null)
@@ -81,23 +76,18 @@ namespace gregCore.API
             }
         }
 
-        public static void Subscribe(string id, Action<object> cb)
-        {
-            On(id, cb);
-        }
+        public static void Subscribe(string id, Action<object> cb) => On(id, cb);
 
         public static void On(string eventId, Action<object> callback)
         {
             try
             {
-                // Bridge: Subscribe via EventBus
                 EventBus?.Subscribe(eventId, payload =>
                 {
                     try { callback?.Invoke(payload); }
                     catch (Exception ex) { MelonLogger.Error($"[GregAPI] Event handler error for '{eventId}': {ex.Message}"); }
                 });
 
-                // Also register legacy native hooks
                 switch (eventId)
                 {
                     case "OnCoinsChanged": gregNativeEventHooks.OnCoinsChanged += callback; break;
@@ -120,7 +110,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                return pm?.playerClass?.money ?? 0.0;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return 0.0;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return 0.0;
+                return pc.money;
             }
             catch { return 0.0; }
         }
@@ -130,7 +123,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                if (pm?.playerClass != null) pm.playerClass.money = (float)val;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return;
+                pc.money = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerMoney failed: {ex.Message}"); }
         }
@@ -140,7 +136,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                return pm?.playerClass?.xp ?? 0.0;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return 0.0;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return 0.0;
+                return pc.xp;
             }
             catch { return 0.0; }
         }
@@ -150,7 +149,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                if (pm?.playerClass != null) pm.playerClass.xp = (float)val;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return;
+                pc.xp = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerXp failed: {ex.Message}"); }
         }
@@ -160,7 +162,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                return pm?.playerClass?.reputation ?? 0.0;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return 0.0;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return 0.0;
+                return pc.reputation;
             }
             catch { return 0.0; }
         }
@@ -170,7 +175,10 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                if (pm?.playerClass != null) pm.playerClass.reputation = (float)val;
+                if (pm == null || pm.Pointer == IntPtr.Zero) return;
+                var pc = pm.playerClass;
+                if (pc == null || pc.Pointer == IntPtr.Zero) return;
+                pc.reputation = (float)val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetPlayerReputation failed: {ex.Message}"); }
         }
@@ -181,8 +189,8 @@ namespace gregCore.API
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers != null ? (uint)servers.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.servers != null ? (uint)nm.servers.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -201,8 +209,8 @@ namespace gregCore.API
         {
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                return switches != null ? (uint)switches.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.switches != null ? (uint)nm.switches.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -211,14 +219,8 @@ namespace gregCore.API
         {
             try
             {
-                uint count = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                if (servers == null) return 0u;
-                foreach (var s in servers)
-                {
-                    try { if (s.isBroken) count++; } catch { }
-                }
-                return count;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.brokenServers != null ? (uint)nm.brokenServers.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -227,14 +229,8 @@ namespace gregCore.API
         {
             try
             {
-                uint count = 0;
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                if (switches == null) return 0u;
-                foreach (var s in switches)
-                {
-                    try { if (s.isBroken) count++; } catch { }
-                }
-                return count;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.brokenSwitches != null ? (uint)nm.brokenSwitches.Count : 0u;
             }
             catch { return 0u; }
         }
@@ -246,11 +242,11 @@ namespace gregCore.API
             try
             {
                 var tm = Il2Cpp.TechnicianManager.instance;
-                if (tm?.technicians == null) return 0u;
+                if (tm == null || tm.Pointer == IntPtr.Zero || tm.technicians == null) return 0u;
                 int busyCount = 0;
                 foreach (var t in tm.technicians)
                 {
-                    try { if (t.isBusy) busyCount++; } catch { }
+                    try { if (t != null && t.Pointer != IntPtr.Zero && t.isBusy) busyCount++; } catch { }
                 }
                 return (uint)Math.Max(0, tm.technicians.Count - busyCount);
             }
@@ -262,7 +258,8 @@ namespace gregCore.API
             try
             {
                 var tm = Il2Cpp.TechnicianManager.instance;
-                return tm?.technicians != null ? (uint)tm.technicians.Count : 0u;
+                if (tm == null || tm.Pointer == IntPtr.Zero || tm.technicians == null) return 0u;
+                return (uint)tm.technicians.Count;
             }
             catch { return 0u; }
         }
@@ -271,16 +268,18 @@ namespace gregCore.API
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                if (servers == null) return 0;
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.brokenServers == null || nm.brokenServers.Count == 0) return 0;
+
+                foreach (var kvp in nm.brokenServers)
                 {
                     try
                     {
-                        if (s.isBroken)
+                        var s = kvp.Value;
+                        if (s != null && s.Pointer != IntPtr.Zero && s.isBroken)
                         {
                             s.RepairDevice();
-                            return 1;
+                            return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
                     catch { }
@@ -294,16 +293,18 @@ namespace gregCore.API
         {
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                if (switches == null) return 0;
-                foreach (var s in switches)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.brokenSwitches == null || nm.brokenSwitches.Count == 0) return 0;
+
+                foreach (var kvp in nm.brokenSwitches)
                 {
                     try
                     {
-                        if (s.isBroken)
+                        var s = kvp.Value;
+                        if (s != null && s.Pointer != IntPtr.Zero && s.isBroken)
                         {
                             s.RepairDevice();
-                            return 1;
+                            return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
                     catch { }
@@ -320,7 +321,8 @@ namespace gregCore.API
             try
             {
                 var tc = Il2Cpp.TimeController.instance;
-                return tc?.currentTimeOfDay ?? 0f;
+                if (tc == null || tc.Pointer == IntPtr.Zero) return 0f;
+                return tc.currentTimeOfDay;
             }
             catch { return 0f; }
         }
@@ -330,7 +332,8 @@ namespace gregCore.API
             try
             {
                 var tc = Il2Cpp.TimeController.instance;
-                return tc != null ? (uint)tc.day : 1u;
+                if (tc == null || tc.Pointer == IntPtr.Zero) return 1u;
+                return (uint)tc.day;
             }
             catch { return 1u; }
         }
@@ -340,7 +343,8 @@ namespace gregCore.API
             try
             {
                 var tc = Il2Cpp.TimeController.instance;
-                return tc?.secondsInFullDay ?? 1200f;
+                if (tc == null || tc.Pointer == IntPtr.Zero) return 1200f;
+                return tc.secondsInFullDay;
             }
             catch { return 1200f; }
         }
@@ -350,7 +354,8 @@ namespace gregCore.API
             try
             {
                 var tc = Il2Cpp.TimeController.instance;
-                if (tc != null) tc.secondsInFullDay = val;
+                if (tc == null || tc.Pointer == IntPtr.Zero) return;
+                tc.secondsInFullDay = val;
             }
             catch (Exception ex) { MelonLogger.Error($"[GregAPI] SetSecondsInFullDay failed: {ex.Message}"); }
         }
@@ -371,10 +376,7 @@ namespace gregCore.API
 
         public static string GetCurrentScene()
         {
-            try
-            {
-                return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name ?? "None";
-            }
+            try { return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name ?? "None"; }
             catch { return "None"; }
         }
 
@@ -405,7 +407,8 @@ namespace gregCore.API
             try
             {
                 var mgr = Il2Cpp.MainGameManager.instance;
-                return mgr != null ? (int)mgr.difficulty : 1;
+                if (mgr == null || mgr.Pointer == IntPtr.Zero) return 1;
+                return (int)mgr.difficulty;
             }
             catch { return 1; }
         }
@@ -417,7 +420,8 @@ namespace gregCore.API
             try
             {
                 var pm = Il2Cpp.PlayerManager.instance;
-                if (pm?.playerGO == null) return Vector3.zero;
+                if (pm == null || pm.Pointer == IntPtr.Zero || pm.playerGO == null || pm.playerGO.Pointer == IntPtr.Zero)
+                    return Vector3.zero;
                 return pm.playerGO.transform.position;
             }
             catch { return Vector3.zero; }

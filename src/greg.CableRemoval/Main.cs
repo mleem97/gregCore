@@ -5,6 +5,8 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using greg.Logging;
+using UnityEngine.UIElements;
+using gregCore.UI;
 
 namespace greg.CableRemoval
 {
@@ -22,8 +24,8 @@ namespace greg.CableRemoval
         private NetworkSwitch? _chargeSwitch;
         private PatchPanel? _chargePanel;
         private float _worldPurgeElapsed;
-        private GameObject? _hintPanel;
-        private UnityEngine.UI.Text? _hintText;
+        private VisualElement? _hintPanel;
+        private Label? _hintText;
 
         public override void OnInitializeMelon()
         {
@@ -43,19 +45,50 @@ namespace greg.CableRemoval
         {
             if (_hintPanel != null) return;
 
-            var builder = gregCore.UI.GregUIBuilder.Create("CableRemovalHint")
-                .SetSize(600, 80);
-            
-            _hintPanel = builder.Build();
-            _hintText = _hintPanel.GetComponentInChildren<UnityEngine.UI.Text>();
+            _hintPanel = new VisualElement
+            {
+                name = "CableRemovalHint",
+                style =
+                {
+                    position = Position.Absolute,
+                    bottom = 50,
+                    left = new StyleLength(new Length(50, LengthUnit.Percent)),
+                    width = 600,
+                    backgroundColor = new Color(0.12f, 0.12f, 0.12f, 0.95f),
+                    borderTopColor = GregUITheme.PrimaryAccent,
+                    borderBottomColor = GregUITheme.PrimaryAccent,
+                    borderLeftColor = GregUITheme.PrimaryAccent,
+                    borderRightColor = GregUITheme.PrimaryAccent,
+                    borderTopWidth = 2,
+                    borderBottomWidth = 2,
+                    borderLeftWidth = 2,
+                    borderRightWidth = 2,
+                    borderTopLeftRadius = 6,
+                    borderTopRightRadius = 6,
+                    borderBottomLeftRadius = 6,
+                    borderBottomRightRadius = 6,
+                    paddingTop = 8,
+                    paddingBottom = 8,
+                    paddingLeft = 10,
+                    paddingRight = 10,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    display = DisplayStyle.None
+                }
+            };
 
-            var rt = _hintPanel.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.5f, 0);
-            rt.anchorMax = new Vector2(0.5f, 0);
-            rt.pivot = new Vector2(0.5f, 0);
-            rt.anchoredPosition = new Vector2(0, 50);
+            _hintText = new Label
+            {
+                style =
+                {
+                    fontSize = 12,
+                    color = new Color(0.88f, 0.88f, 0.88f),
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    whiteSpace = WhiteSpace.Normal
+                }
+            };
+            _hintPanel.Add(_hintText);
 
-            _hintPanel.SetActive(false);
+            GregUIManager.RegisterPanel("CableRemovalHint", _hintPanel);
         }
 
         private void RegisterSettings()
@@ -133,16 +166,16 @@ namespace greg.CableRemoval
             if (_showWorldPurgeHint)
             {
                 _hintText.text = $"L-ALT: WORLD purge — NOT looking at a device.\nKeep holding L-CLICK for {WorldPurgeHoldSeconds - _worldPurgeElapsed:0}s to remove ALL cables everywhere.";
-                _hintPanel.SetActive(true);
+                _hintPanel.style.display = DisplayStyle.Flex;
             }
             else if (_showMassRemoveHint)
             {
                 _hintText.text = _charging ? $"L-ALT: Removing ALL cables — keep holding L-CLICK." : $"L-ALT: Hold L-CLICK to remove ALL cables from this device.";
-                _hintPanel.SetActive(true);
+                _hintPanel.style.display = DisplayStyle.Flex;
             }
             else
             {
-                _hintPanel.SetActive(false);
+                _hintPanel.style.display = DisplayStyle.None;
             }
         }
 
@@ -201,11 +234,6 @@ namespace greg.CableRemoval
 
         private void CancelCharge() { _charging = false; _chargeElapsed = 0f; _chargeSwitch = null; _chargePanel = null; }
         private void CancelWorldPurge() { _worldPurgeElapsed = 0f; }
-
-        public override void OnGUI()
-        {
-            // IMGUI disabled
-        }
 
         private bool TryGetLookedAtCableDevice(out NetworkSwitch? sw, out PatchPanel? panel)
         {

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using gregCore.API;
 using System;
 
@@ -67,17 +68,21 @@ namespace greg.GridPlacement
         {
             if (!BuildModeActive || _previewRack?.UnityGameObject == null) return;
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+
+            if (Camera.main == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
             if (UnityEngine.Physics.Raycast(ray, out UnityEngine.RaycastHit hit))
             {
                 Vector3 snapPos = _grid.SnapToGrid(hit.point);
                 _previewRack.UnityGameObject.transform.position = snapPos;
 
-                if (Input.GetMouseButtonDown(0))
+                if (mouse.leftButton.wasPressedThisFrame)
                 {
                     TryPlace(snapPos);
                 }
-                else if (Input.GetMouseButtonDown(1))
+                else if (mouse.rightButton.wasPressedThisFrame)
                 {
                     TryRemove(hit.point);
                 }
@@ -119,9 +124,5 @@ namespace greg.GridPlacement
             }
         }
 
-        public void OnGUI()
-        {
-            // IMGUI disabled
-        }
     }
 }

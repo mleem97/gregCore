@@ -23,7 +23,6 @@ namespace gregCore.Infrastructure.Scripting.Lua.Dev {
     public class LuaRepl {
         public void Initialize() { }
         public void Update() { }
-        public void OnGUI() { }
     }
     public class LuaProfiler {
         public LuaProfiler(float budget) { }
@@ -32,7 +31,6 @@ namespace gregCore.Infrastructure.Scripting.Lua.Dev {
     }
     public class LuaErrorOverlay {
         public void ReportError(string id, string msg) { }
-        public void OnGUI() { }
     }
 }
 

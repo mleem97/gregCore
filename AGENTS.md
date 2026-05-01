@@ -28,6 +28,7 @@
     2. Einen Konstruktor besitzen, der `IntPtr` akzeptiert: `public MyClass(IntPtr ptr) : base(ptr) {}`
     3. Alle managed Felder sollten `readonly` oder `private` sein, mit öffentlichen Properties für Access
 * **NATIVE HANDLES:** Nutze `new Il2CppObjectBase.NativePtr` für Referenzen auf native Objekte. Halte niemals direkte Pointer alive – nutze die managed Wrapper.
+* **DUMMY-ASSEMBLY-KOMPILIERUNG:** Kompiliere ausschließlich gegen die Il2CppInterop Dummy-Assemblies (aus `Il2CppDumper`/`Cpp2IL`). **NIE** gegen originale Game-Assemblies kompilieren — generische Value-Typen (z.B. `UnityEngine.UIElements.StyleEnum<T>`) können zwischen Original und Dummy unterschiedliche Layouts haben und verursachen zur Laufzeit `TypeLoadException: value type mismatch`.
 
 ---
 
@@ -43,7 +44,17 @@
 
 ---
 
-## 4. HARMONY PATCHING (NATIVE HOOKS) - 2026 REVISED
+## 4. INPUT SYSTEM MIGRATION (UNITY 6000.4+ / IL2CPP)
+
+* **LEGACY INPUT VERBOT:** Wenn das Spiel im Player Settings auf "Input System package" umgestellt ist (erkennbar an `InvalidOperationException: You are trying to read Input using the UnityEngine.Input class`), ist **jeder** Zugriff auf `UnityEngine.Input` (Legacy Input Manager) zur Laufzeit ungültig.
+    * `Input.GetKeyDown(KeyCode)` → `Keyboard.current?[Key.F1].wasPressedThisFrame` (mit Null-Check!)
+    * `Input.mousePosition` → `Mouse.current?.position.ReadValue()`
+    * `Input.GetMouseButtonDown(0)` → `Mouse.current?.leftButton.wasPressedThisFrame`
+    * `Input.GetAxis(...)` → Entsprechende `InputAction` aus dem Game referenzieren oder über `Keyboard`/`Mouse` direkt abfragen
+* **KEYCODE MAPPING:** `Keyboard.current` verwendet den `Key`-Enum, nicht `KeyCode`. Für dynamische Keybinds muss eine explizite `KeyCode → Key` Mapping-Tabelle existieren (siehe `GregInputBindingService`).
+* **NULL-SAFETY:** `Keyboard.current` und `Mouse.current` können in IL2CPP-Kontexten `null` sein. Immer null-guarden: `if (Keyboard.current?.f1Key.wasPressedThisFrame == true)`.
+
+## 5. HARMONY PATCHING (NATIVE HOOKS) - 2026 REVISED
 
 * **TRANSPILER-VERBOT:** In IL2CPP-Umgebungen sind IL-Transpiler funktionslos oder führen zu Inkonsistenzen. Nutze ausschließlich **Prefix** oder **Postfix**.
 * **DEFENSIVE HOOKING:** Jeder Patch MUSS in einem `try-catch`-Block gekapselt sein. Eine unbehandelte Exception in einem Hook bringt den nativen Game-Thread zum sofortigen Absturz (Hard Crash).
@@ -65,19 +76,42 @@
     ```
 * **NULL-CHECKS:** Führe in jedem Prefix einen Null-Check für `__instance` und ALLE Parameter durch, bevor Logik ausgeführt wird.
 * **METHOD SIGNATURES:** Stelle sicher, dass die Patch-Signatur exakt den Dummy-DLLs entspricht. Bei Discrepanzen nutze `HarmonyLib.Traverse` für flexible Accessors.
+* **IL2CPP FIELD ACCESSORS:** Auto-generierte Property-Getter für Felder (z.B. `switchId`, `patchPanelId`) haben in IL2CPP **keinen managed Method-Body** und sind daher mit Harmony **nicht patchbar**. Verwende stattdessen Postfix auf die aufrufende Methode oder intercepte auf höherer Ebene.
+* **NICHT-EXISTIERENDE METHODEN:** Methoden, die in den Original-Assemblies existieren, können in den Dummy-DLLs fehlen (z.B. `PositionIndicator.OnDestroy`, `InputController.Move/Look/Interact`). Vor dem Patchen IMMER gegen die Dummy-DLL verifizieren.
 * **MULTI-PATCH ORDNUNG:** Nutze explizite Priorities bei mehreren Patches auf dieselbe Methode: `[HarmonyPriority(int)]`.
 * **STACK TRACE HANDLING:** Fange in Postfix-Blocks keine Exceptions – lasse sie zum original Call durchpropagieren, aber logge sie vorher.
 * **ORIGINAL CALL ERHALTEN:** Rufe `original()` NIE aus Prefix-Blocks auf – dies führt zu undefiniertem Verhalten. Nutze ausschließlich Postfix für Ergebnis-Modifikationen.
 
 ---
 
-## 5. UI & ASSETS (UNITY 6000.4+ / 2026)
+## 6. UI & ASSETS (UNITY 6000.4+ / 2026)
 
-* **LEGACY-VERBOT:** Die Nutzung von `OnGUI()`, `GUILayout`, `Editor`-Klassen und IMGUI ist strikt untersagt.
+* **LEGACY-VERBOT:** Die Nutzung von `OnGUI()`, `GUILayout`, `Editor`-Klassen und IMGUI ist strikt untersagt. Alle bestehenden IMGUI-Komponenten wurden auf UI Toolkit migriert.
 * **MODERN UI STACK:** Nutze primär **UI Toolkit** (UXML/USS).
     * Lade UXML dynamisch via `AssetBundle` oder `Resources.Load()`
     * Nutze `UIElements.VisualElement` als Basisklasse
     * Setze Styles via USS oder C#-Properties
+* **UI TOOLKIT CALLBACKS IN IL2CPP:** `RegisterCallback<TEvent>()` akzeptiert in IL2CPP-Umgebungen keine impliziten Lambda-Konvertierungen, weil `EventCallback<T>` von `Il2CppSystem.MulticastDelegate` erbt. Verwende explizite `new Action<TEvent>(...)`-Wrapper:
+    ```csharp
+    var btn = new Button();
+    btn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => OnClick()));
+    ```
+* **GREGCORE UI ARCHITEKTUR:**
+    * `GregCanvasManager` – Verwaltet UIDocument-Layer mit PanelSettings pro Layer
+    * `GregUILayerManager` – Organisiert UI in Layers: Background, HUD, Panel, Dialog, Overlay, Tooltip, Notification
+    * `GregUIStack` – Push/Pop Navigation für Screens und Dialoge
+    * `GregPanelBuilder` – Fluent API für UI Toolkit Panels (ersetzt GregUIBuilder)
+    * `GregUIManager` – Zentrale Registrierung und Verwaltung aller Panels
+    * `GregNotificationManager` – Toast-Benachrichtigungen
+    * `GregTooltipManager` – Tooltip-System mit AttachTooltip-Helper
+    * `GregGameUI` – Spielspezifische Elemente (Healthbars, Cooldowns, Minimap)
+    * `GregLayoutSystem` – Layout-Helper (Vertical, Horizontal, Grid, Responsive)
+    * `GregUIAnimations` – Fade, Slide, Zoom, Pulse Transitionen
+* **IL2CPP UI TOOLKIT SPEZIFIKA:**
+    * `Button.clicked` existiert nicht in IL2CPP – verwende `RegisterCallback<ClickEvent>`
+    * `userData` ist `Il2CppSystem.Object` – verwende statische Dictionaries für C#-Daten
+    * `StyleList<T>` erwartet `Il2CppSystem.Collections.Generic.List<T>`
+    * `RegisterValueChangedCallback` erfordert explizite Typargumente oder `RegisterCallback<ChangeEvent<T>>`
 * **UGUI FALLBACK:** Wenn UI Toolkit nicht möglich ist, nutze UGUI ausschließlich via Code-Generierung:
     * Erstelle `GameObject` hierarchies via `AddComponent<GameObject>()`
     * Nutze `Canvas`/`CanvasRenderer` nur wenn unvermeidbar
@@ -90,7 +124,7 @@
 
 ---
 
-## 6. MELONLOADER 0.7+ SPEZIFISCH
+## 7. MELONLOADER 0.7+ SPEZIFISCH
 
 * **MOD LIFECYCLE:**
     * Registriere Typen in `OnPreLoad()` oder `OnApplicationStart()`
@@ -109,7 +143,7 @@
 
 ---
 
-## 7. BOILERPLATE TEMPLATES (2026)
+## 8. BOILERPLATE TEMPLATES (2026)
 
 ### Custom Component (MelonLoader)
 ```csharp
@@ -253,7 +287,7 @@ namespace MyMod
 
 ---
 
-## 8. FEHLERBEHANDLUNG & DEBUGGING
+## 9. FEHLERBEHANDLUNG & DEBUGGING
 
 * **EXCEPTION HANDLING:** Keine unbehandelten Exceptions. Jeder `try-catch` sollte in `catch` einen `MelonLogger.Error()` oder detaillierter Logging haben.
 * **LOGGING LEVELED:** Nutze die korrekten Level:
@@ -270,16 +304,24 @@ namespace MyMod
 
 ---
 
-## 9. COMPLIANCE CHECKLIST
+## 10. COMPLIANCE CHECKLIST
 
 Vor jeder Code-Generierung prüfe:
 
 - [ ] Dummy-DLL Referenz vorhanden für alle Typen?
+- [ ] Kompiliert ausschließlich gegen Il2CppInterop Dummy-Assemblies (nicht Original-Game-Assemblies)?
 - [ ] Keine Standard-Casts `(T)obj` oder `as T` verwendet?
 - [ ] Alle Custom-Klassen mit `IntPtr`-Konstruktor und `ClassInjector` registriert?
 - [ ] Alle Harmony-Patches in `try-catch`?
+- [ ] Patch-Ziele in Dummy-DLL verifiziert (existieren die Methoden wirklich)?
 - [ ] Null-Checks für `__instance` und alle Parameter?
 - [ ] Keine `OnGUI()` / IMGUI Verwendung?
+- [ ] Keine Legacy-Input-API (`Input.GetKeyDown`, `Input.mousePosition`) verwendet?
+- [ ] Input-System-Device-Zugriffe null-guarded (`Keyboard.current?`, `Mouse.current?`)?
+- [ ] UI Toolkit Callbacks als explizite `new Action<TEvent>(...)` registriert?
+- [ ] `Button.clicked` vermieden – stattdessen `RegisterCallback<ClickEvent>`?
+- [ ] `userData` nicht für C#-Klassen verwendet – statische Dictionaries genutzt?
+- [ ] `StyleList<T>` mit `Il2CppSystem.Collections.Generic.List<T>` erstellt?
 - [ ] Asset Loading via Bundle/Addressables/Resources?
 - [ ] Keine direkten Prefab/YAML Edits?
 - [ ] Logging für kritische Pfade?

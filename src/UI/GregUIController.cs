@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using MelonLoader;
 
 namespace gregCore.UI;
 
+/// <summary>
+/// Central UI controller for GregCore.
+/// Provides initialization and management for the UI Toolkit-based interface.
+/// </summary>
 public sealed class GregUIController
 {
     private readonly IGregLogger _logger;
-    private UIDocument _uiDocument;
-    private VisualElement _root;
-    private readonly Dictionary<string, VisualElement> _activeElements = new();
 
     public GregUIController(IGregLogger logger)
     {
@@ -22,49 +22,26 @@ public sealed class GregUIController
     {
         try
         {
-            var go = new GameObject("GregCore_UI");
-            UnityEngine.Object.DontDestroyOnLoad(go);
-            
-            _uiDocument = go.AddComponent<UIDocument>();
-            _uiDocument.panelSettings = CreateDefaultPanelSettings();
-            _root = _uiDocument.rootVisualElement;
-            
-            _logger.Info("UI Toolkit initialized successfully.");
+            GregCanvasManager.Instance.Initialize();
+            GregUILayerManager.Instance.Initialize();
+            GregUIManager.Initialize();
+            GregNotificationManager.Initialize();
+            GregTooltipManager.Initialize();
+            _logger?.Info("UI Controller (UI Toolkit) initialized.");
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to initialize UI Toolkit document.", ex);
+            _logger?.Error($"UI Controller initialization failed: {ex.Message}");
         }
     }
 
-    public void AddElement(string id, VisualElement element)
+    public void AddElement(string id, object element)
     {
-        if (_activeElements.ContainsKey(id))
-        {
-            _root.Remove(_activeElements[id]);
-        }
-        
-        _activeElements[id] = element;
-        _root.Add(element);
+        // Legacy shim - UI Toolkit elements are added directly to VisualElement trees
     }
 
     public void RemoveElement(string id)
     {
-        if (_activeElements.TryGetValue(id, out var element))
-        {
-            _root.Remove(element);
-            _activeElements.Remove(id);
-        }
-    }
-
-    private PanelSettings CreateDefaultPanelSettings()
-    {
-        // In a real IL2CPP environment, we might need to load this from a bundle or create it via Reflection if not available directly
-        var settings = ScriptableObject.CreateInstance<PanelSettings>();
-        settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-        settings.referenceResolution = new Vector2Int(1920, 1080);
-        settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-        settings.match = 0.5f;
-        return settings;
+        // Legacy shim
     }
 }

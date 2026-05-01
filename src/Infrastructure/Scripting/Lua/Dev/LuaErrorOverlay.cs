@@ -2,13 +2,15 @@
 /// Schicht:      Infrastructure
 /// Zweck:        UI-Overlay für Lua-Fehler.
 /// Maintainer:   Zeigt Fehler mit Stacktrace, Auto-Hide nach 10 Sekunden.
-///               IMGUI-basiert, semi-transparent.
+///               UI Toolkit-basiert, semi-transparent.
 /// </file-summary>
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using MelonLoader;
+using gregCore.UI;
 
 namespace gregCore.Infrastructure.Scripting.Lua.Dev;
 
@@ -17,6 +19,7 @@ public sealed class LuaErrorOverlay
     private readonly List<ErrorEntry> _errors = new();
     private readonly int _maxErrors = 5;
     private readonly float _autoHideDuration = 10f;
+    private VisualElement? _root;
 
     /// <summary>
     /// Fügt einen neuen Fehler hinzu.
@@ -35,67 +38,147 @@ public sealed class LuaErrorOverlay
         // Keep only the most recent errors
         while (_errors.Count > _maxErrors)
             _errors.RemoveAt(0);
+
+        BuildOrUpdateUI();
     }
 
-    /// <summary>
-    /// IMGUI-Rendering. Muss aus OnGUI aufgerufen werden.
-    /// </summary>
-    public void OnGUI()
+    private void BuildOrUpdateUI()
     {
-        float currentTime = Time.realtimeSinceStartup;
+        if (_root == null)
+        {
+            _root = new VisualElement
+            {
+                name = "ErrorOverlay",
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 0,
+                    right = 0,
+                    width = 520,
+                    bottom = 0,
+                    flexDirection = FlexDirection.Column,
+                    justifyContent = Justify.FlexEnd,
+                    alignItems = Align.FlexEnd,
+                    paddingBottom = 20,
+                    paddingRight = 20,
+                    backgroundColor = Color.clear
+                }
+            };
 
-        // Remove expired errors
+            GregUIManager.RegisterPanel("ErrorOverlay", _root);
+        }
+
+        _root.Clear();
+
+        float currentTime = Time.realtimeSinceStartup;
         _errors.RemoveAll(e => e.Dismissed || (currentTime - e.Timestamp) > _autoHideDuration);
 
         if (_errors.Count == 0) return;
-
-        float y = Screen.height - 20f;
 
         for (int i = _errors.Count - 1; i >= 0; i--)
         {
             var error = _errors[i];
             float elapsed = currentTime - error.Timestamp;
             float alpha = Mathf.Clamp01(1f - (elapsed / _autoHideDuration) * 0.5f);
-
             float boxHeight = string.IsNullOrEmpty(error.StackTrace) ? 50f : 80f;
-            y -= boxHeight + 5f;
 
-            // Semi-transparent background
-            var bgColor = new Color(0.15f, 0.05f, 0.05f, alpha * 0.9f);
-            GUI.color = new Color(1f, 1f, 1f, alpha);
+            var errorBox = new VisualElement
+            {
+                style =
+                {
+                    width = 500,
+                    height = boxHeight,
+                    backgroundColor = new Color(0.15f, 0.05f, 0.05f, alpha * 0.9f),
+                    borderTopColor = new Color(1f, 0.32f, 0.32f, alpha),
+                    borderBottomColor = new Color(1f, 0.32f, 0.32f, alpha),
+                    borderLeftColor = new Color(1f, 0.32f, 0.32f, alpha),
+                    borderRightColor = new Color(1f, 0.32f, 0.32f, alpha),
+                    borderTopWidth = 2,
+                    borderBottomWidth = 2,
+                    borderLeftWidth = 2,
+                    borderRightWidth = 2,
+                    borderTopLeftRadius = 6,
+                    borderTopRightRadius = 6,
+                    borderBottomLeftRadius = 6,
+                    borderBottomRightRadius = 6,
+                    marginBottom = 5,
+                    paddingTop = 8,
+                    paddingBottom = 8,
+                    paddingLeft = 10,
+                    paddingRight = 50,
+                    position = Position.Relative
+                }
+            };
 
-            var boxRect = new Rect(20f, y, 500f, boxHeight);
-            GUI.Box(boxRect, "");
-
-            // Error text
-            var oldColorTitle = GUI.contentColor;
-            GUI.contentColor = new Color(1f, 0.32f, 0.32f, alpha);
-            GUI.Label(new Rect(25f, y + 2f, 440f, 20f), new GUIContent($"[{error.ModId}] {error.Message}"));
-            GUI.contentColor = oldColorTitle;
+            var titleLabel = new Label($"[{error.ModId}] {error.Message}")
+            {
+                style =
+                {
+                    fontSize = 14,
+                    color = new Color(1f, 0.32f, 0.32f, alpha),
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    marginBottom = 4
+                }
+            };
+            errorBox.Add(titleLabel);
 
             if (!string.IsNullOrEmpty(error.StackTrace))
             {
-                var oldColorStack = GUI.contentColor;
-                GUI.contentColor = new Color(0.7f, 0.7f, 0.7f, alpha);
-                GUI.Label(new Rect(25f, y + 22f, 440f, 45f), new GUIContent(error.StackTrace));
-                GUI.contentColor = oldColorStack;
+                var stackLabel = new Label(error.StackTrace)
+                {
+                    style =
+                    {
+                        fontSize = 11,
+                        color = new Color(0.7f, 0.7f, 0.7f, alpha),
+                        whiteSpace = WhiteSpace.Normal
+                    }
+                };
+                errorBox.Add(stackLabel);
             }
 
             // Dismiss button
-            if (GUI.Button(new Rect(470f, y + 5f, 40f, 20f), "✕"))
+            var dismissBtn = new Button
+            {
+                text = "✕",
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 5,
+                    right = 5,
+                    width = 20,
+                    height = 20,
+                    fontSize = 12,
+                    backgroundColor = Color.clear,
+                    color = new Color(0.7f, 0.7f, 0.7f, alpha),
+                    borderTopWidth = 0,
+                    borderBottomWidth = 0,
+                    borderLeftWidth = 0,
+                    borderRightWidth = 0
+                }
+            };
+            dismissBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt =>
             {
                 error.Dismissed = true;
-            }
+                BuildOrUpdateUI();
+            }));
+            errorBox.Add(dismissBtn);
 
-            // Time remaining indicator
-            float remaining = _autoHideDuration - elapsed;
-            var oldColorTime = GUI.contentColor;
-            GUI.contentColor = new Color(0.5f, 0.5f, 0.5f, alpha);
-            GUI.Label(new Rect(25f, y + boxHeight - 15f, 480f, 15f), new GUIContent($"{remaining:F0}s"));
-            GUI.contentColor = oldColorTime;
+            // Timer indicator
+            var timerLabel = new Label($"{_autoHideDuration - elapsed:F0}s")
+            {
+                style =
+                {
+                    fontSize = 10,
+                    color = new Color(0.5f, 0.5f, 0.5f, alpha),
+                    position = Position.Absolute,
+                    bottom = 2,
+                    left = 10
+                }
+            };
+            errorBox.Add(timerLabel);
+
+            _root.Add(errorBox);
         }
-
-        GUI.color = Color.white; // Reset
     }
 
     /// <summary>
@@ -104,6 +187,7 @@ public sealed class LuaErrorOverlay
     public void DismissAll()
     {
         _errors.Clear();
+        _root?.Clear();
     }
 
     public int VisibleErrorCount => _errors.Count;

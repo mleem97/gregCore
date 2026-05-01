@@ -5,9 +5,10 @@ namespace gregCore.Sdk.Language.Hosts;
 
 public sealed class GregRustHost : IGregLanguageHost
 {
-    public Language Language => Language.Rust;
+    public string HostId => "rust";
     public string HostName => nameof(GregRustHost);
     public bool IsActive { get; private set; }
+    public string[] FileExtensions => new[] { ".rs", ".rmod" };
 
     public bool IsDependencyAvailable(out string detail)
     {
@@ -17,10 +18,7 @@ public sealed class GregRustHost : IGregLanguageHost
 
     public void Activate(string modsScriptsDir)
     {
-        if (IsActive)
-        {
-            return;
-        }
+        if (IsActive) return;
 
         RustFFIBridge.Initialize();
         IsActive = true;
@@ -28,33 +26,19 @@ public sealed class GregRustHost : IGregLanguageHost
 
     public void OnUpdate(float dt)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         RustFFIBridge.OnUpdate(dt);
     }
 
-    public void OnGUI() { }
-
     public void OnSceneLoaded(string sceneName)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         RustFFIBridge.OnSceneLoaded(sceneName);
     }
 
     public void Shutdown()
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         RustFFIBridge.Shutdown();
         IsActive = false;
     }

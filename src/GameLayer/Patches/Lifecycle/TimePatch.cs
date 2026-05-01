@@ -1,4 +1,4 @@
-﻿using gregCore.GameLayer.Hooks;
+using gregCore.GameLayer.Hooks;
 
 namespace gregCore.GameLayer.Patches.Lifecycle;
 

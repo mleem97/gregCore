@@ -1,4 +1,4 @@
-﻿using gregCore.Infrastructure.Settings.Services;
+using gregCore.Infrastructure.Settings.Services;
 using gregCore.Core.Abstractions;
 using gregCore.GameLayer.Bootstrap;
 using HarmonyLib;

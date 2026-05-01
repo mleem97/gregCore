@@ -1,12 +1,12 @@
 -- example_mod/main.lua
 function on_init()
-    greg.log_info("Lua Example Mod initialized!")
+    greg.ui.log_info("Lua Example Mod initialized!")
     
     -- Subscribe to coin changed hook
     greg.on("greg.PLAYER.CoinChanged", function(payload)
         local amount = payload.data["Amount"]
         local total = payload.data["Total"]
-        greg.log_info("Lua received money update: " .. tostring(amount) .. " (Total: " .. tostring(total) .. ")")
+        greg.ui.log_info("Lua received money update: " .. tostring(amount) .. " (Total: " .. tostring(total) .. ")")
         
         -- Fire a custom hook back
         greg.fire("greg.CUSTOM.LuaResponse", {
@@ -21,5 +21,5 @@ function on_update(dt)
 end
 
 function on_shutdown()
-    greg.log_info("Lua Example Mod shutdown.")
+    greg.ui.log_info("Lua Example Mod shutdown.")
 end

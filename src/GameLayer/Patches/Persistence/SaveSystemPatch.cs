@@ -1,4 +1,4 @@
-﻿/// <file-summary>
+/// <file-summary>
 /// Schicht:      GameLayer
 /// Zweck:        Extrahiert Speicher-Events aus IL2CPP.
 /// Maintainer:   Kein Business-Logic, reines Dispatch.

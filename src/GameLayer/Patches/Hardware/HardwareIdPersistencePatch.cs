@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppSystem.Collections.Generic;
 using System;
@@ -13,18 +13,26 @@ public static class HardwareIdPersistencePatch
     private const string PatchPanelPrefix = "gregID:PatchPanel:";
     private const string ServerPrefix = "gregID:Server:";
 
-    private static string CleanId(string prefix, string deviceId, int hashCode)
+    private static string? CleanId(string prefix, string? deviceId, int hashCode)
     {
-        if (deviceId != null && deviceId.StartsWith(prefix) && deviceId.Contains('_'))
+        if (deviceId != null && deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
         {
-            string cleanId = deviceId.Split('_')[0];
-            if (!PatchedDevices.Contains(hashCode))
+            if (deviceId.Contains('_'))
             {
-                greg.Logging.GregLogger.Msg($"Unity Id Removal | Cleaned Device Id | {deviceId} -> {cleanId}", "PersistentID");
+                string cleanId = deviceId.Split('_')[0];
+                if (!PatchedDevices.Contains(hashCode))
+                {
+                    greg.Logging.GregLogger.Msg($"Unity Id Removal | Cleaned Device Id | {deviceId} -> {cleanId}", "PersistentID");
+                }
+                return cleanId;
             }
-            return cleanId;
         }
         return deviceId;
+    }
+
+    public static string GenerateGregId(string prefix)
+    {
+        return $"{prefix}{Guid.NewGuid().ToString("N").ToUpper().Substring(0, 12)}";
     }
 
     #region SWITCH ID PERSISTENCE
@@ -38,10 +46,10 @@ public static class HardwareIdPersistencePatch
             try
             {
                 string currentId = __instance.switchId;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(SwitchPrefix))
+                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(SwitchPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string uniqueId = $"{SwitchPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
-                    __instance.switchId = uniqueId;
+                    string uniqueId = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
+                    __instance.switchId = uniqueId!;
                     __instance.gameObject.name = uniqueId;
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
@@ -55,19 +63,6 @@ public static class HardwareIdPersistencePatch
                 }
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewSwitchIdPatch), ex); }
-        }
-    }
-
-    [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.switchId), MethodType.Getter)]
-    internal static class SwitchIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(SwitchPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
         }
     }
 
@@ -97,10 +92,10 @@ public static class HardwareIdPersistencePatch
             try
             {
                 string currentId = __instance.patchPanelId;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(PatchPanelPrefix))
+                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(PatchPanelPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string uniqueId = $"{PatchPanelPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
-                    __instance.patchPanelId = uniqueId;
+                    string uniqueId = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
+                    __instance.patchPanelId = uniqueId!;
                     __instance.gameObject.name = uniqueId;
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
@@ -112,19 +107,6 @@ public static class HardwareIdPersistencePatch
                 }
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewPatchPanelIdpatch), ex); }
-        }
-    }
-
-    [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.patchPanelId), MethodType.Getter)]
-    internal static class PatchPanelIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.PatchPanel __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(PatchPanelPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
         }
     }
 
@@ -154,10 +136,11 @@ public static class HardwareIdPersistencePatch
             try
             {
                 string currentId = __instance.ServerID;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(ServerPrefix))
+                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(ServerPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string uniqueId = $"{ServerPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
-                    __instance.ServerID = uniqueId;
+                    string uniqueId = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
+                    __instance.ServerID = uniqueId!;
+
                     __instance.gameObject.name = uniqueId;
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
@@ -171,19 +154,6 @@ public static class HardwareIdPersistencePatch
                 }
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewServerIdPatch), ex); }
-        }
-    }
-
-    [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.ServerID), MethodType.Getter)]
-    internal static class ServerIdPropertyPatch
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(global::Il2Cpp.Server __instance, ref string __result)
-        {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(ServerPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
         }
     }
 
@@ -223,9 +193,9 @@ public static class MapDataHealing
             foreach (var swData in data.switches)
             {
                 string oldId = swData.switchID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(SwitchPrefix))
+                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(SwitchPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string newGuid = $"{SwitchPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
+                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
                     swData.switchID = newGuid;
                     int healedCables = 0;
                     foreach (var cable in data.cables)
@@ -240,9 +210,9 @@ public static class MapDataHealing
             foreach (var ppData in data.patchPanels)
             {
                 string oldId = ppData.patchPanelID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(PatchPanelPrefix))
+                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(PatchPanelPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string newGuid = $"{PatchPanelPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
+                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
                     ppData.patchPanelID = newGuid;
                     int healedCables = 0;
                     foreach (var cable in data.cables)
@@ -265,9 +235,9 @@ public static class MapDataHealing
             foreach (var serverData in data.servers)
             {
                 string oldId = serverData.serverID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(ServerPrefix))
+                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(ServerPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    string newGuid = $"{ServerPrefix}{Guid.NewGuid().ToString().Substring(0, 8)}";
+                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
                     serverData.serverID = newGuid;
                     int healedCables = 0;
                     foreach (var cable in data.cables)
@@ -298,4 +268,3 @@ public static class MapDataHealing
         }
     }
 }
-

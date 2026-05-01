@@ -1,16 +1,17 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using UnityEngine;
 
 namespace gregCore.GameLayer.Patches.Input;
 
 /// <summary>
-/// Patches fÃ¼r Input-Handling. 
-/// Vormals genutzte Console-Blocking-Logik wurde entfernt, 
-/// da der Fokus nun auf dem MelonLoader-Terminal liegt.
+/// DEACTIVATED — Patching UnityEngine.Input.GetKeyDown is not viable under IL2CPP.
+/// The Legacy Input Manager is disabled in this game (Input System package active).
+/// All input polling has been migrated to UnityEngine.InputSystem.
 /// </summary>
 [HarmonyPatch]
 internal static class KeybindPatches
 {
+    /*
     // Must specify ArgumentTypes to disambiguate GetKeyDown(KeyCode) from GetKeyDown(string)
     [HarmonyPatch(typeof(UnityEngine.Input), nameof(UnityEngine.Input.GetKeyDown),
         argumentTypes: new[] { typeof(UnityEngine.KeyCode) })]
@@ -24,4 +25,5 @@ internal static class KeybindPatches
         }
         return true;
     }
+    */
 }

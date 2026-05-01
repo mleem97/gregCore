@@ -40,11 +40,13 @@ public sealed class GregPersistenceService : IGregPersistenceService
 
     public T Get<T>(string key, T defaultValue = default!) where T : notnull
     {
-        try {
+        try
+        {
             var path = GetSafePath(key);
             if (!File.Exists(path)) return defaultValue;
             return JsonSerializer.Deserialize<T>(File.ReadAllText(path)) ?? defaultValue;
-        } catch { return defaultValue; }
+        }
+        catch { return defaultValue; }
     }
 
     public bool Has(string key)

@@ -50,21 +50,9 @@ namespace greg.NoMoreEOL
             }
         }
 
-        [HarmonyPatch(typeof(global::Il2Cpp.PositionIndicator), "OnDestroy")]
-        [HarmonyPostfix]
-        public static void OnPositionIndicatorOnDestroy(global::Il2Cpp.PositionIndicator __instance)
-        {
-            try
-            {
-                if (__instance != null)
-                {
-                    Main.Indicators.Remove(__instance);
-                }
-            }
-            catch (Exception ex)
-            {
-                HookIntegration.LogPatchError(nameof(WarningSignPatch), ex);
-            }
-        }
+        // REMOVED: OnDestroy patch on PositionIndicator.
+        // Reason: Il2CppInterop dummy-assembly does not emit OnDestroy for PositionIndicator
+        // (it only exists on the native MonoBehaviour base). Harmony cannot resolve the target.
+        // Workaround: Filter Main.Indicators for null/destroyed objects before iterating.
     }
 }

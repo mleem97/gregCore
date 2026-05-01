@@ -45,6 +45,11 @@
     <Reference Include="Unity.TextMeshPro"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Il2CppUMA_Core"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Il2CppUMA_Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.Entities"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\Unity.Entities.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIElementsModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextCoreTextEngineModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreTextEngineModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextCoreFontEngineModule"><HintPath>lib\references\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreFontEngineModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>lib\references\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -61,12 +66,34 @@
     <Delete Files="$(OutputPath)Acornima.dll;$(OutputPath)Python.Runtime.dll" />
   </Target>
 
+  <!--
+    Deploys the built DLL to the game's Mods folder.
+    Override path via env var GREG_GAME_MODS or MSBuild property GameModsPath.
+    Skipped silently if the target directory does not exist (CI / non-dev machines).
+  -->
+  <PropertyGroup>
+    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(GREG_GAME_MODS)' != ''">$(GREG_GAME_MODS)</GameModsPath>
+    <GameModsPath Condition="'$(GameModsPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods</GameModsPath>
+  </PropertyGroup>
+  <Target Name="DeployToGame" AfterTargets="CleanupAfterBuild" Condition="Exists('$(GameModsPath)')">
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFolder="$(GameModsPath)"
+          OverwriteReadOnlyFiles="true"
+          ContinueOnError="ErrorAndContinue" />
+    <Error Condition="!Exists('$(GameModsPath)\$(AssemblyName).dll') OR '$([System.IO.File]::GetLastWriteTime(&quot;$(GameModsPath)\$(AssemblyName).dll&quot;).Ticks)' &lt; '$([System.IO.File]::GetLastWriteTime(&quot;$(OutputPath)$(AssemblyName).dll&quot;).Ticks)'"
+           Text="[Deploy FAILED] Could not copy $(AssemblyName).dll to $(GameModsPath) — is the game running and has the DLL locked? Close the game and rebuild." />
+    <Message Text="[Deploy] $(AssemblyName).dll → $(GameModsPath)" Importance="high" />
+  </Target>
+
   <ItemGroup>
+    <Compile Remove="src\CI_Stubs.cs" />
     <Compile Remove="tests\**" />
     <Compile Remove="plugins\**" />
     <Compile Remove="mods\**" />
     <Compile Remove="lib\MoonSharp\**" />
     <Compile Remove="temp_dump\**" />
     <Compile Remove="src\greg.Multiplayer\**" />
+    <Compile Remove="src\Compatibility\DataCenterModLoader\**" />
+    <Compile Remove="src\API\CustomEmployeeManager.cs" />
   </ItemGroup>
 </Project>

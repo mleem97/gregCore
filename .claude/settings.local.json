@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\marvi\\\\GitRepos\\\\GameFramework-Monorepo\\\\GregCore\\\\lib\\\\references\\\\MelonLoader\\\\Il2CppAssemblies\" -Filter \"*TextMeshPro*\" -Recurse)",
+      "Bash(xargs grep *)",
+      "Bash(dotnet build *)",
+      "Bash(Select-String \"error|warning|erfolgreich|Fehler\")",
+      "Bash(Select-Object -Last 15)",
+      "Bash(grep -a \"--- !u!223\" \"/c/Users/marvi/GitRepos/GameFramework-Monorepo/gregReferences/ExportedProject/Assets/Scenes/BaseScene.unity\" -A 15)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\marvi\\\\GitRepos\\\\GameFramework-Monorepo\\\\GregCore\\\\src\\\\UI\" -Filter \"*.cs\")"
+    ]
+  }
+}

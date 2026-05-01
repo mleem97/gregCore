@@ -18,3 +18,6 @@
 ## 2025-05-15 - [Environment: Dotnet Tooling Timeouts]
 **Learning:** The `dotnet` CLI can time out in certain restricted environments during restore or build.
 **Action:** Use `--no-restore` if dependencies are already present, or use background execution with log files if commands take longer than the session allows. Ensure junk files are cleaned up before submission.
+## 2024-05-21 - Expensive Polling for Count Check in API
+**Learning:** `UnityEngine.Object.FindObjectsOfType<T>` was being used in several global counts check via `GregAPI`, `GregServerModule`, `GregNetworkModule` and `GregNpcModule`. Finding objects of a type across the entire hierarchy is very expensive, especially as the number of devices or objects grow over time.
+**Action:** Always prefer using global singleton collections managed by the game over calling `FindObjectsOfType<T>`. For example, use `Il2Cpp.NetworkMap.instance.servers` to get servers, `Il2Cpp.NetworkMap.instance.switches` for switches and `Il2Cpp.TechnicianManager.instance.technicians` to get technicians. Ensure null checks are present.

@@ -9,9 +9,10 @@ public sealed class GregJsHost : IGregLanguageHost
 {
     private Engine? _engine;
 
-    public Language Language => Language.JavaScript;
+    public string HostId => "javascript";
     public string HostName => nameof(GregJsHost);
     public bool IsActive { get; private set; }
+    public string[] FileExtensions => new[] { ".js", ".ts" };
 
     public bool IsDependencyAvailable(out string detail)
     {
@@ -21,10 +22,7 @@ public sealed class GregJsHost : IGregLanguageHost
 
     public void Activate(string modsScriptsDir)
     {
-        if (IsActive)
-        {
-            return;
-        }
+        if (IsActive) return;
 
         _engine = new Engine(cfg => cfg.LimitMemory(4_000_000));
         _engine.SetValue("greg_log", new Action<string>(msg => MelonLogger.Msg($"[gregCore][JS] {msg}")));
@@ -39,7 +37,7 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"[gregCore] JS script error in {jsFile}: {ex}");
+                MelonLogger.Error($"[gregCore] JS script error in {jsFile}: {ex.Message}");
             }
         }
 

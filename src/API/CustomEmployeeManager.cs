@@ -7,8 +7,8 @@ using MelonLoader.Utils;
 using Il2CppTMPro;
 using MelonLoader;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace gregCore.API;
 
@@ -558,11 +558,7 @@ public static class CustomEmployeeManager
 
             bool hasText = false;
             try { if (child.GetComponent<TextMeshProUGUI>() != null) hasText = true; } catch { }
-            if (!hasText)
-            {
-                try { if (child.GetComponent<UnityEngine.UI.Text>() != null) hasText = true; } catch { }
-            }
-
+            
             if (hasText) result.Add(child);
 
             CollectTextTransforms(child, result);

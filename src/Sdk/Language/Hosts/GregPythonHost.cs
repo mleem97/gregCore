@@ -5,9 +5,10 @@ namespace gregCore.Sdk.Language.Hosts;
 
 public sealed class GregPythonHost : IGregLanguageHost
 {
-    public Language Language => Language.Python;
+    public string HostId => "python";
     public string HostName => nameof(GregPythonHost);
     public bool IsActive { get; private set; }
+    public string[] FileExtensions => new[] { ".py" };
 
     public bool IsDependencyAvailable(out string detail)
     {
@@ -24,10 +25,7 @@ public sealed class GregPythonHost : IGregLanguageHost
 
     public void Activate(string modsScriptsDir)
     {
-        if (IsActive)
-        {
-            return;
-        }
+        if (IsActive) return;
 
         PythonFFIBridge.Initialize();
         IsActive = true;
@@ -35,31 +33,19 @@ public sealed class GregPythonHost : IGregLanguageHost
 
     public void OnUpdate(float dt)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         PythonFFIBridge.OnUpdate(dt);
     }
 
     public void OnSceneLoaded(string sceneName)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         PythonFFIBridge.OnSceneLoaded(sceneName);
     }
 
     public void Shutdown()
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
+        if (!IsActive) return;
         PythonFFIBridge.Shutdown();
         IsActive = false;
     }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using greg.Logging;
 
 namespace greg.WallRack
@@ -47,11 +48,6 @@ namespace greg.WallRack
             // if (targetGrid != null) {
             //     hoveredSlot = targetGrid.GetSlotAtWorldPos(hitPos);
             // }
-        }
-
-        public void OnGUI()
-        {
-            // IMGUI disabled
         }
 
         public void TryMount(Vector3 worldPos)
@@ -123,7 +119,8 @@ namespace greg.WallRack
             if (slot == null || !slot.isOccupied) return;
 
             // Open context menu Widget
-            var builder = gregCore.UI.GregUIBuilder.CreateWidget($"Rack_{slot.coord}", Input.mousePosition.x, Screen.height - Input.mousePosition.y)
+            var mousePos = Mouse.current?.position.ReadValue() ?? Vector2.zero;
+            var builder = gregCore.UI.GregUIBuilder.CreateWidget($"Rack_{slot.coord}", mousePos.x, Screen.height - mousePos.y)
                 .SetSize(250, 150)
                 .AddHeadline("Device Context")
                 .AddLabel($"ID: {slot.mountedDevice?.deviceId}")

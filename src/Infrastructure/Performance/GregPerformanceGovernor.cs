@@ -24,8 +24,12 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
         _memHandler = new GregMemoryPressureHandler(ctx.Logger, ctx.EventBus, _profile);
         _queue = new GregOperationQueue(_throttler, ctx.Logger);
         
+        // Performance-Patches initialisieren (Throttle, Cleanup, etc.)
+        GregPerformancePatches.Initialize();
+        ApplyPatchSettings(_profile);
+        
         _monitor.Start(5000);
-        _logger.Info($"[Governor] Initialisiert mit Prefix-Architektur.");
+        _logger.Info($"[Governor] Initialisiert mit Prefix-Architektur + Performance-Patches.");
     }
 
     public void OnUpdate()
@@ -51,6 +55,21 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
         _profile = profile;
         _fpsLimiter.Apply(profile);
         _throttler.UpdateProfile(profile);
+        ApplyPatchSettings(profile);
+    }
+
+    private void ApplyPatchSettings(PerformanceProfile profile)
+    {
+        GregPerformancePatches.CanvasThrottleEnabled = true;
+        GregPerformancePatches.CanvasUpdateInterval = 0.1f;
+        GregPerformancePatches.IndicatorThrottleEnabled = true;
+        GregPerformancePatches.IndicatorUpdateInterval = 0.1f;
+        GregPerformancePatches.PulsatingThrottleEnabled = true;
+        GregPerformancePatches.PulsatingUpdateInterval = 0.05f;
+        GregPerformancePatches.NpcThrottleEnabled = true;
+        GregPerformancePatches.NpcThrottleDistance = 15f;
+        GregPerformancePatches.NpcThrottleInterval = 0.2f;
+        GregPerformancePatches.AsyncRouteEvalEnabled = false;
     }
 
     internal PerformanceStats GetStats() => new PerformanceStats { 

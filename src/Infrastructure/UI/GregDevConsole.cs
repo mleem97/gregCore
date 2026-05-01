@@ -30,7 +30,6 @@ namespace gregCore.Infrastructure.UI
                 var go = new GameObject("greg_DevConsole_Host");
                 UnityEngine.Object.DontDestroyOnLoad(go);
 
-                Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<GregDevConsole>();
                 Instance = go.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<GregDevConsole>()).Cast<GregDevConsole>();
             }
             catch (Exception ex)

@@ -34,7 +34,6 @@ namespace greg.UI.Settings
             if (_instance == null)
             {
                 var go = new GameObject("GregSettingsHub_Host");
-                Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<GregSettingsHub>();
                 _instance = go.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<GregSettingsHub>()).Cast<GregSettingsHub>();
                 UnityEngine.Object.DontDestroyOnLoad(go);
 

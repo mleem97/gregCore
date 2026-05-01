@@ -34,6 +34,8 @@ namespace gregCore.API
             EventBus = GregCoreMod.EventBus ?? new GregEventBus(_logger);
             HookBus = GregCoreMod.HookBus;
             Persistence = new Infrastructure.Config.GregPersistenceService(_logger);
+            UI = new GregUIController(_logger);
+            UI.Initialize();
             _logger.Info("GregAPI initialized successfully.");
         }
 

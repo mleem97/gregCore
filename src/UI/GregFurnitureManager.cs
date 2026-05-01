@@ -31,12 +31,12 @@ namespace greg.Furniture
             if (_isBuildModeActive && prefab != null)
             {
                 CreateGhost(prefab);
-                GregUIManager.SetPanelActive("PlacementWidget", true);
+                PlacementWidget.SetVisible(true);
             }
             else
             {
                 DestroyGhost();
-                GregUIManager.SetPanelActive("PlacementWidget", false);
+                PlacementWidget.SetVisible(false);
             }
         }
 

@@ -51,20 +51,23 @@ public class LuaModuleLoader
             ValidateSandbox(fullPath);
 
             string code = File.ReadAllText(fullPath);
-            var moduleScript = new Script(CoreModules.Preset_SoftSandbox);
 
-            // Copy globals (but not greg table to isolate modules)
+            // Execute the module in the same Script, but with an isolated environment table
+            // to avoid cross-Script DynValue issues while still reusing the same runtime.
+            var moduleEnv = new Table(_script);
+
+            // Copy allowed globals (but not greg table or original require to isolate modules)
             foreach (var pair in _script.Globals.Pairs)
             {
                 if (pair.Key.String != "greg" && pair.Key.String != "require")
-                    moduleScript.Globals[pair.Key] = pair.Value;
+                    moduleEnv[pair.Key] = pair.Value;
             }
 
             // Module gets its own require() pointing to same resolver
-            var subLoader = new LuaModuleLoader(moduleScript, Path.GetDirectoryName(fullPath)!, _sharedRoot);
-            subLoader.Register();
+            moduleEnv["require"] = (Func<string, DynValue>)Require;
 
-            DynValue result = moduleScript.DoString(code);
+            // Execute the module code using the isolated environment
+            DynValue result = _script.DoString(code, moduleEnv);
 
             // Cache the result (prefer return value, fallback to module table)
             DynValue moduleReturn = result;

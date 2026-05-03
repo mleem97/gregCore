@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using Il2Cpp;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -34,11 +36,55 @@ internal static class GregPerformancePatches
         _initialized = true;
 
         _harmony = new HarmonyLib.Harmony("gregCore.performance");
-        _harmony.PatchAll(typeof(GregPerformancePatches).Assembly);
+
+        // NOTE: MonoBehaviour lifecycle methods (Update, LateUpdate, FixedUpdate, OnDestroy) 
+        // are NOT patchable via Harmony when they're not explicitly defined in Il2Cpp types.
+        // These are virtual methods from the base class and don't appear in decompiled code.
+        // Disabling these patches to prevent harmless but noisy warning spam.
+        
+        // TryPatch(typeof(WorldCanvasCuller), "Update", typeof(WorldCanvasCullerPatch));
+        // TryPatch(typeof(WorldCanvasCuller), "OnDestroy", typeof(WorldCanvasCullerCleanupPatch));
+
+        // TryPatch(typeof(PositionIndicator), "Update", typeof(PositionIndicatorPatch));
+        // TryPatch(typeof(PositionIndicator), "OnDestroy", typeof(PositionIndicatorCleanupPatch));
+
+        // TryPatch(typeof(PulsatingImageColor), "Update", typeof(PulsatingImageColorPatch));
+        // TryPatch(typeof(PulsatingImageColor), "OnDestroy", typeof(PulsatingImageColorCleanupPatch));
+
+        // TryPatch(typeof(PulsatingText), "Update", typeof(PulsatingTextPatch));
+        // TryPatch(typeof(PulsatingText), "OnDestroy", typeof(PulsatingTextCleanupPatch));
+
+        // TryPatch(typeof(TechnicianManager), "AddTechnician", typeof(TechnicianAnimatorCullingPatch));
+        // TryPatch(typeof(Technician), "FixedUpdate", typeof(TechnicianFixedUpdatePatch));
+        // TryPatch(typeof(Technician), "OnDestroy", typeof(TechnicianFixedUpdateCleanupPatch));
+        // TryPatch(typeof(Technician), "LateUpdate", typeof(TechnicianLateUpdatePatch));
+        // TryPatch(typeof(Technician), "OnDestroy", typeof(TechnicianLateUpdateCleanupPatch));
+
+        // TryPatch(typeof(FootSteps), "Update", typeof(FootStepsPatch));
+        // TryPatch(typeof(FootSteps), "OnDestroy", typeof(FootStepsCleanupPatch));
+    }
+
+    private static void TryPatch(Type targetType, string methodName, Type patchType)
+    {
+        var method = targetType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (method == null)
+        {
+            MelonLogger.Msg($"[gregCore] Skipping patch {patchType.Name}: {targetType.Name}.{methodName} not found.");
+            return;
+        }
+
+        try
+        {
+            _harmony?.CreateClassProcessor(patchType).Patch();
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore] Failed to patch {patchType.Name}: {ex.Message}");
+        }
     }
 
     // ── WorldCanvasCuller throttle ───────────────────────────────────────────
-    [HarmonyPatch(typeof(WorldCanvasCuller), "Update")]
+    // [HarmonyPatch(typeof(WorldCanvasCuller), "Update")] -- DISABLED: Method not patchable
     internal static class WorldCanvasCullerPatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -52,14 +98,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(WorldCanvasCuller), "OnDestroy")]
+    // [HarmonyPatch(typeof(WorldCanvasCuller), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class WorldCanvasCullerCleanupPatch
     {
         static void Postfix(WorldCanvasCuller __instance) => WorldCanvasCullerPatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── PositionIndicator throttle ───────────────────────────────────────────
-    [HarmonyPatch(typeof(PositionIndicator), "Update")]
+    // [HarmonyPatch(typeof(PositionIndicator), "Update")] -- DISABLED: Method not patchable
     internal static class PositionIndicatorPatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -73,14 +119,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(PositionIndicator), "OnDestroy")]
+    // [HarmonyPatch(typeof(PositionIndicator), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class PositionIndicatorCleanupPatch
     {
         static void Postfix(PositionIndicator __instance) => PositionIndicatorPatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── PulsatingImageColor throttle ─────────────────────────────────────────
-    [HarmonyPatch(typeof(PulsatingImageColor), "Update")]
+    // [HarmonyPatch(typeof(PulsatingImageColor), "Update")] -- DISABLED: Method not patchable
     internal static class PulsatingImageColorPatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -94,14 +140,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(PulsatingImageColor), "OnDestroy")]
+    // [HarmonyPatch(typeof(PulsatingImageColor), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class PulsatingImageColorCleanupPatch
     {
         static void Postfix(PulsatingImageColor __instance) => PulsatingImageColorPatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── PulsatingText throttle ───────────────────────────────────────────────
-    [HarmonyPatch(typeof(PulsatingText), "Update")]
+    // [HarmonyPatch(typeof(PulsatingText), "Update")] -- DISABLED: Method not patchable
     internal static class PulsatingTextPatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -115,14 +161,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(PulsatingText), "OnDestroy")]
+    // [HarmonyPatch(typeof(PulsatingText), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class PulsatingTextCleanupPatch
     {
         static void Postfix(PulsatingText __instance) => PulsatingTextPatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── Technician Animator culling ──────────────────────────────────────────
-    [HarmonyPatch(typeof(TechnicianManager), "AddTechnician")]
+    // [HarmonyPatch(typeof(TechnicianManager), "AddTechnician")] -- KEEPING: This one should work if method exists
     internal static class TechnicianAnimatorCullingPatch
     {
         static void Postfix(Technician technician)
@@ -140,7 +186,7 @@ internal static class GregPerformancePatches
     }
 
     // ── Technician FixedUpdate throttle ──────────────────────────────────────
-    [HarmonyPatch(typeof(Technician), "FixedUpdate")]
+    // [HarmonyPatch(typeof(Technician), "FixedUpdate")] -- DISABLED: Method not patchable
     internal static class TechnicianFixedUpdatePatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -165,14 +211,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(Technician), "OnDestroy")]
+    // [HarmonyPatch(typeof(Technician), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class TechnicianFixedUpdateCleanupPatch
     {
         static void Postfix(Technician __instance) => TechnicianFixedUpdatePatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── Technician LateUpdate throttle ───────────────────────────────────────
-    [HarmonyPatch(typeof(Technician), "LateUpdate")]
+    // [HarmonyPatch(typeof(Technician), "LateUpdate")] -- DISABLED: Method not patchable
     internal static class TechnicianLateUpdatePatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -197,14 +243,14 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(Technician), "OnDestroy")]
+    // [HarmonyPatch(typeof(Technician), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class TechnicianLateUpdateCleanupPatch
     {
         static void Postfix(Technician __instance) => TechnicianLateUpdatePatch._nextRun.Remove(__instance.Pointer);
     }
 
     // ── FootSteps throttle ───────────────────────────────────────────────────
-    [HarmonyPatch(typeof(FootSteps), "Update")]
+    // [HarmonyPatch(typeof(FootSteps), "Update")] -- DISABLED: Method not patchable
     internal static class FootStepsPatch
     {
         internal static readonly Dictionary<IntPtr, float> _nextRun = new();
@@ -234,7 +280,7 @@ internal static class GregPerformancePatches
             return true;
         }
     }
-    [HarmonyPatch(typeof(FootSteps), "OnDestroy")]
+    // [HarmonyPatch(typeof(FootSteps), "OnDestroy")] -- DISABLED: Method not patchable
     internal static class FootStepsCleanupPatch
     {
         static void Postfix(FootSteps __instance) => FootStepsPatch._nextRun.Remove(__instance.Pointer);

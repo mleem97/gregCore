@@ -56,6 +56,8 @@ namespace gregCore.UI
                 _root.style.translate = new Translate(new Length(-50, LengthUnit.Percent), new Length(-50, LengthUnit.Percent));
                 _root.style.width = 500;
                 _root.style.height = 600;
+                _root.style.maxWidth = new Length(90, LengthUnit.Percent);
+                _root.style.maxHeight = new Length(90, LengthUnit.Percent);
                 _root.style.backgroundColor = GregUITheme.PanelBackground;
                 _root.style.borderTopLeftRadius = GregUITheme.CornerRadius;
                 _root.style.borderTopRightRadius = GregUITheme.CornerRadius;
@@ -140,6 +142,8 @@ namespace gregCore.UI
             {
                 _root.style.width = width;
                 _root.style.height = height;
+                // Recalculate translate to keep panel centered after size change
+                _root.style.translate = new Translate(new Length(-50, LengthUnit.Percent), new Length(-50, LengthUnit.Percent));
             }
             return this;
         }

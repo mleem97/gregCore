@@ -8,6 +8,8 @@
 using System;
 using MoonSharp.Interpreter;
 using MelonLoader;
+using gregCore.UI;
+using greg.UI.Settings;
 
 namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
@@ -44,6 +46,31 @@ public static class LuaUiModule
 
         // greg.ui.log_error(message)
         uiTable["log_error"] = (Action<string>)((msg) => API.GregAPI.LogError($"[{modId}] {msg}"));
+
+        // greg.ui.register_mod_config_tab(tab_id, label, builder_fn)
+        uiTable["register_mod_config_tab"] = (Action<string, string, Closure>)((tabId, label, builderFn) =>
+        {
+            try
+            {
+                Action<GregUIBuilder> registerTab = builder =>
+                {
+                    try
+                    {
+                        builderFn.Call(DynValue.FromObject(script, builder));
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Error($"[LuaMod:{modId}] ui.register_mod_config_tab callback failed: {ex.Message}");
+                    }
+                };
+
+                GregSettingsHub.RegisterTab(tabId, label, registerTab);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[LuaMod:{modId}] ui.register_mod_config_tab failed: {ex.Message}");
+            }
+        });
 
         greg["ui"] = uiTable;
     }

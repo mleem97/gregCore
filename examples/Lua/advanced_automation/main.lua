@@ -1,13 +1,10 @@
+```lua
 --[[
     gregCore Advanced Automation - Auto-Repair Mod
     Version: 1.1.0
     Description: Automatically detects and repairs broken servers every 30 seconds.
                   Demonstrates Coroutines, Timers, and Domain APIs.
 ]]
-
-local mod_id = "automation_pro"
-local repair_interval = 30 -- seconds
-local stats = { repairs_total = 0 }
 
 function on_init()
     greg.ui.log_info("[AutoRepair] Initializing advanced automation...")
@@ -18,9 +15,9 @@ function on_init()
         -- Simple parsing: extract number after "repairs_total":
         local num = tonumber(content:match('"repairs_total":%s*(%d+)'))
         if num then stats.repairs_total = num end
-    end
-
-    -- Start the background automation loop via a coroutine
+        -- Simple parsing: extract number after "repairs_total":
+        local num = tonumber(content:match('"repairs_total":%s*(%d+)'))
+        if num then stats.repairs_total = math.floor(num) end
     greg.start_coroutine(automation_loop)
 
     -- Register a timer for periodic status report

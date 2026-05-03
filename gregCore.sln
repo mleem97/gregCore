@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.UI", "src\gregCore
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Shared", "src\gregCore.Shared\gregCore.Shared.csproj", "{BCDE1234-5678-5341-7890-123456789012}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "tests\gregCore.Tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gregCore.Tests", "tests\gregCore.Tests.csproj", "{FAF3FBA7-1865-41EF-BA90-215D9E7BF597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

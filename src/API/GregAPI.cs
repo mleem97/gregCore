@@ -201,8 +201,8 @@ namespace gregCore.API
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks != null ? (uint)racks.Count : 0u;
+                // ⚡ Bolt: Performance Optimization - Replaced O(N) FindObjectsOfType with O(1) cache
+                return gregCore.GameLayer.Patches.Hardware.RackPatch.GetRackCount();
             }
             catch { return 0u; }
         }

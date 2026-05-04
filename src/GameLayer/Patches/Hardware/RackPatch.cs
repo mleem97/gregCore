@@ -20,6 +20,70 @@ public static class RackPatch
 {
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
     private static readonly object _lock = new();
+    private static readonly HashSet<global::Il2Cpp.Rack> _racksCache = new();
+    private static readonly object _cacheLock = new();
+
+    // ⚡ Bolt Performance Optimization:
+    // Replaced expensive `UnityEngine.Object.FindObjectsOfType<Rack>()` which is O(N)
+    // over all active GameObjects, causing main thread hitches and severe GC pressure.
+    // Instead, we maintain an O(1) cache of all active Racks via Awake/OnDestroy hooks.
+    // Impact: Eliminates GC allocations and slow scene traversals when counting Racks.
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.Awake))]
+    [HarmonyPostfix]
+    private static void AwakePostfix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+            lock (_cacheLock)
+            {
+                _racksCache.Add(__instance);
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] Awake failed: {ex.Message}");
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.OnDestroy))]
+    [HarmonyPrefix]
+    private static void OnDestroyPrefix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance == null) return;
+            lock (_cacheLock)
+            {
+                _racksCache.Remove(__instance);
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] OnDestroy failed: {ex.Message}");
+        }
+    }
+
+    public static uint GetRackCount()
+    {
+        lock (_cacheLock)
+        {
+            // Prune dead references defensively
+            _racksCache.RemoveWhere(r => r == null || r.Pointer == IntPtr.Zero);
+            return (uint)_racksCache.Count;
+        }
+    }
+
+    public static List<global::Il2Cpp.Rack> GetRacks()
+    {
+        lock (_cacheLock)
+        {
+            // Prune dead references defensively
+            _racksCache.RemoveWhere(r => r == null || r.Pointer == IntPtr.Zero);
+            return new List<global::Il2Cpp.Rack>(_racksCache);
+        }
+    }
 
     [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.IsPositionAvailable))]
     [HarmonyPrefix]

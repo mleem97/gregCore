@@ -271,8 +271,8 @@ public static class GameHooks
     {
         try
         {
-            var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
-            return racks != null ? (uint)racks.Length : 0;
+            // ⚡ Bolt: Performance Optimization - Replaced O(N) FindObjectsOfType with O(1) cache
+            return gregCore.GameLayer.Patches.Hardware.RackPatch.GetRackCount();
         }
         catch { return 0; }
     }

@@ -7,5 +7,6 @@ public sealed class GregFacilityModule
     private readonly GregApiContext _ctx;
     internal GregFacilityModule(GregApiContext ctx) => _ctx = ctx;
 
-    public int GetRackCount() => UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Rack>().Length;
+    // ⚡ Bolt: Performance Optimization - Replaced O(N) FindObjectsOfType with O(1) cache
+    public int GetRackCount() => (int)gregCore.GameLayer.Patches.Hardware.RackPatch.GetRackCount();
 }

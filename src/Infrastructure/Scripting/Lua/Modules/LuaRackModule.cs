@@ -23,7 +23,8 @@ public static class LuaRackModule
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
+                // Bolt: Performance Optimization - Replaced FindObjectsOfType (O(N)) with O(1) cached lookup to prevent main thread blocking and GC pressure
+                var racks = gregCore.GameLayer.Patches.Hardware.RackPatch.GetRacks();
                 var result = new Table(script);
                 int i = 1;
                 foreach (var rack in racks)
@@ -56,8 +57,8 @@ public static class LuaRackModule
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks?.Count ?? 0;
+                // Bolt: Performance Optimization - Replaced FindObjectsOfType with cached count
+                return (int)gregCore.GameLayer.Patches.Hardware.RackPatch.GetRackCount();
             }
             catch { return 0; }
         });

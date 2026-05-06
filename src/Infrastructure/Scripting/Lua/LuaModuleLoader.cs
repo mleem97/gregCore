@@ -109,6 +109,12 @@ public class LuaModuleLoader
         string modNormalized = Path.GetFullPath(_modRoot);
         string sharedNormalized = Path.GetFullPath(_sharedRoot);
 
+        if (!modNormalized.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            modNormalized += Path.DirectorySeparatorChar;
+
+        if (!sharedNormalized.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            sharedNormalized += Path.DirectorySeparatorChar;
+
         if (!normalized.StartsWith(modNormalized, StringComparison.OrdinalIgnoreCase)
             && !normalized.StartsWith(sharedNormalized, StringComparison.OrdinalIgnoreCase))
         {

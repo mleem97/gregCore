@@ -883,6 +883,17 @@ public static class CustomEmployeeManager
             var portraitTransform = card.Find("Image");
             if (portraitTransform == null) return;
 
+            if (string.IsNullOrWhiteSpace(employeeId)) return;
+
+            if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                employeeId.Contains(Path.DirectorySeparatorChar) ||
+                employeeId.Contains(Path.AltDirectorySeparatorChar) ||
+                employeeId.Contains(".."))
+            {
+                CrashLog.Log($"[Security] Attempted path traversal detected with employeeId: {employeeId}");
+                return;
+            }
+
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
             foreach (var ext in new[] { ".jpg", ".png" })

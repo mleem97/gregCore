@@ -42,6 +42,18 @@ public static class CustomEmployeeManager
     public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation = false)
     {
         if (string.IsNullOrEmpty(id)) return 0;
+
+        // Security: Prevent path traversal vulnerabilities
+        // The id is used later in SetPortrait via Path.Combine to construct file paths.
+        if (id.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+            id.Contains(Path.DirectorySeparatorChar) ||
+            id.Contains(Path.AltDirectorySeparatorChar) ||
+            id.Contains(".."))
+        {
+            CrashLog.Log($"[Security] CustomEmployee: invalid id rejected (path traversal attempt): {id}");
+            return 0;
+        }
+
         if (_employeeIndex.ContainsKey(id))
         {
             CrashLog.Log($"CustomEmployee: duplicate registration rejected for id={id}");

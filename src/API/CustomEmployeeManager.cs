@@ -42,6 +42,14 @@ public static class CustomEmployeeManager
     public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation = false)
     {
         if (string.IsNullOrEmpty(id)) return 0;
+
+        // Path Traversal Mitigation: Validate that 'id' is safe to use in file paths
+        if (id.Contains("..") || id.Contains(Path.DirectorySeparatorChar.ToString()) || id.Contains(Path.AltDirectorySeparatorChar.ToString()) || id.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            CrashLog.Log($"CustomEmployee: registration rejected due to invalid characters in id='{id}' (potential path traversal)");
+            return 0;
+        }
+
         if (_employeeIndex.ContainsKey(id))
         {
             CrashLog.Log($"CustomEmployee: duplicate registration rejected for id={id}");

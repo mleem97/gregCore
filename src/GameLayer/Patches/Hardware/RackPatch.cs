@@ -21,6 +21,59 @@ public static class RackPatch
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
     private static readonly object _lock = new();
 
+    private static readonly HashSet<global::Il2Cpp.Rack> _activeRacks = new();
+    private static readonly object _activeRacksLock = new();
+
+    public static global::Il2Cpp.Rack[] GetActiveRacks()
+    {
+        lock (_activeRacksLock)
+        {
+            // Prune invalid
+            _activeRacks.RemoveWhere(r => r == null || r.Pointer == IntPtr.Zero);
+
+            // Only return active instances to emulate FindObjectsOfType behavior
+            var activeList = new List<global::Il2Cpp.Rack>();
+            foreach (var r in _activeRacks)
+            {
+                if (r.gameObject != null && r.gameObject.activeInHierarchy)
+                {
+                    activeList.Add(r);
+                }
+            }
+            return activeList.ToArray();
+        }
+    }
+
+    public static void ClearActiveRacks()
+    {
+        lock (_activeRacksLock)
+        {
+            _activeRacks.Clear();
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "Awake")]
+    [HarmonyPrefix]
+    private static void AwakePrefix(global::Il2Cpp.Rack __instance)
+    {
+        if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+        lock (_activeRacksLock)
+        {
+            _activeRacks.Add(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "OnDestroy")]
+    [HarmonyPrefix]
+    private static void OnDestroyPrefix(global::Il2Cpp.Rack __instance)
+    {
+        if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+        lock (_activeRacksLock)
+        {
+            _activeRacks.Remove(__instance);
+        }
+    }
+
     [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.IsPositionAvailable))]
     [HarmonyPrefix]
     [HarmonyPriority(Priority.High)]

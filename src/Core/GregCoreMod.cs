@@ -189,6 +189,7 @@ namespace gregCore.Core
                 }
                 else
                 {
+                    gregCore.GameLayer.Patches.Hardware.RackPatch.ClearActiveRacks();
                     Infrastructure.Social.DiscordService.UpdatePresence("Planning Next Build", "Main Menu");
                 }
                 GregLanguageRegistry.OnSceneLoaded(sceneName);

@@ -21,6 +21,76 @@ public static class RackPatch
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
     private static readonly object _lock = new();
 
+    private static readonly HashSet<global::Il2Cpp.Rack> _rackCache = new();
+    private static readonly object _cacheLock = new();
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.Awake))]
+    [HarmonyPostfix]
+    private static void AwakePostfix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                lock (_cacheLock)
+                {
+                    _rackCache.Add(__instance);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] Awake failed: {ex.Message}");
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.OnDestroy))]
+    [HarmonyPostfix]
+    private static void OnDestroyPostfix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                lock (_cacheLock)
+                {
+                    _rackCache.Remove(__instance);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] OnDestroy failed: {ex.Message}");
+        }
+    }
+
+    public static void ClearRackCache()
+    {
+        lock (_cacheLock)
+        {
+            _rackCache.Clear();
+        }
+    }
+
+    public static int GetActiveRackCount()
+    {
+        lock (_cacheLock)
+        {
+            int count = 0;
+            // Iterate using a list to avoid InvalidOperationException if modified? Not modifying here.
+            _rackCache.RemoveWhere(r => r == null || r.Pointer == IntPtr.Zero); // Cleanup dead pointers
+
+            foreach (var rack in _rackCache)
+            {
+                if (rack.gameObject.activeInHierarchy)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    }
+
     [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.IsPositionAvailable))]
     [HarmonyPrefix]
     [HarmonyPriority(Priority.High)]

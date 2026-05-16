@@ -271,8 +271,7 @@ public static class GameHooks
     {
         try
         {
-            var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
-            return racks != null ? (uint)racks.Length : 0;
+            return (uint)gregCore.GameLayer.Patches.Hardware.RackPatch.GetActiveRackCount();
         }
         catch { return 0; }
     }

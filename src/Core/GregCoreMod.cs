@@ -179,6 +179,11 @@ namespace gregCore.Core
         {
             try
             {
+                if (buildIndex == 0)
+                {
+                    gregCore.GameLayer.Patches.Hardware.RackPatch.ClearCache();
+                }
+
                 // Lazy font search — fonts are only available after scene load
                 GregFontLoader.SearchFonts();
 

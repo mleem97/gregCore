@@ -19,7 +19,72 @@ namespace gregCore.GameLayer.Patches.Hardware;
 public static class RackPatch
 {
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
+    private static readonly HashSet<global::Il2Cpp.Rack> _cachedRacks = new();
     private static readonly object _lock = new();
+
+    internal static void ClearCache()
+    {
+        lock (_lock)
+        {
+            _cachedRacks.Clear();
+        }
+    }
+
+    public static global::Il2Cpp.Rack[] GetCachedRacks()
+    {
+        lock (_lock)
+        {
+            var activeRacks = new List<global::Il2Cpp.Rack>();
+            foreach (var rack in _cachedRacks)
+            {
+                if (rack != null && rack.Pointer != IntPtr.Zero && rack.gameObject != null && rack.gameObject.activeInHierarchy)
+                {
+                    activeRacks.Add(rack);
+                }
+            }
+            return activeRacks.ToArray();
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "Awake")]
+    [HarmonyPostfix]
+    private static void AwakePostfix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                lock (_lock)
+                {
+                    _cachedRacks.Add(__instance);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] Awake failed: {ex.Message}");
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "OnDestroy")]
+    [HarmonyPostfix]
+    private static void OnDestroyPostfix(global::Il2Cpp.Rack __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                lock (_lock)
+                {
+                    _cachedRacks.Remove(__instance);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[RackPatch] OnDestroy failed: {ex.Message}");
+        }
+    }
 
     [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.IsPositionAvailable))]
     [HarmonyPrefix]

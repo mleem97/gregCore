@@ -23,7 +23,7 @@ public static class LuaRackModule
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
+                var racks = RackPatch.GetCachedRacks();
                 var result = new Table(script);
                 int i = 1;
                 foreach (var rack in racks)
@@ -56,8 +56,8 @@ public static class LuaRackModule
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks?.Count ?? 0;
+                var racks = RackPatch.GetCachedRacks();
+                return racks?.Length ?? 0;
             }
             catch { return 0; }
         });

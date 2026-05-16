@@ -140,7 +140,14 @@ public static class GregIoLuaModule
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
         string dataDirFull = Path.GetFullPath(dataDir);
 
-        if (!fullPath.StartsWith(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        string dataDirWithSeparator = dataDirFull;
+        if (!dataDirWithSeparator.EndsWith(Path.DirectorySeparatorChar.ToString()))
+        {
+            dataDirWithSeparator += Path.DirectorySeparatorChar;
+        }
+
+        if (!fullPath.StartsWith(dataDirWithSeparator, StringComparison.OrdinalIgnoreCase) &&
+            !fullPath.Equals(dataDirFull, StringComparison.OrdinalIgnoreCase))
             throw new UnauthorizedAccessException($"Access denied: path escapes sandbox ('{relativePath}')");
 
         return fullPath;

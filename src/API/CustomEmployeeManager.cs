@@ -878,6 +878,16 @@ public static class CustomEmployeeManager
 
     private static void SetPortrait(Transform card, string employeeId)
     {
+        if (string.IsNullOrWhiteSpace(employeeId)) return;
+        if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+            employeeId.Contains(Path.DirectorySeparatorChar) ||
+            employeeId.Contains(Path.AltDirectorySeparatorChar) ||
+            employeeId.Contains(".."))
+        {
+            CrashLog.Log($"[Security] Attempted path traversal detected with employeeId: {employeeId}");
+            return;
+        }
+
         try
         {
             var portraitTransform = card.Find("Image");

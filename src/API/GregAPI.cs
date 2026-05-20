@@ -201,8 +201,9 @@ namespace gregCore.API
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks != null ? (uint)racks.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                var counts = nm != null ? nm.GetNumberOfDevices() : null;
+                return counts != null && counts.Length > 2 ? (uint)counts[2] : 0u;
             }
             catch { return 0u; }
         }

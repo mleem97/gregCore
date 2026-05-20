@@ -57,8 +57,8 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers?.Count ?? 0;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null && nm.servers != null ? nm.servers.Count : 0;
             }
             catch { return 0; }
         });

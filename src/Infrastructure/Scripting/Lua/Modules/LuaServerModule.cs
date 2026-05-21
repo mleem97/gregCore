@@ -21,8 +21,13 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 var result = new Table(script);
+                var nm = global::Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) {
+                    return result;
+                }
+
+                var servers = nm.servers.Values;
                 int i = 1;
                 foreach (var s in servers)
                 {
@@ -57,8 +62,11 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers?.Count ?? 0;
+                var nm = global::Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null) {
+                    return nm.servers.Count;
+                }
+                return 0;
             }
             catch { return 0; }
         });
@@ -75,8 +83,12 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = global::Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) {
+                    return false;
+                }
+
+                foreach (var s in nm.servers.Values)
                 {
                     try
                     {
@@ -99,8 +111,12 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = global::Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) {
+                    return 0;
+                }
+
+                foreach (var s in nm.servers.Values)
                 {
                     try
                     {

@@ -1,12 +1,37 @@
 using UnityEngine;
 using System.Reflection;
 
+using System;
+
 namespace gregCore.PublicApi.Modules;
+
+public interface INpcSubsystem
+{
+    void UpdateState(string npcId, string state);
+}
 
 public sealed class GregNpcModule
 {
     private readonly GregApiContext _ctx;
-    internal GregNpcModule(GregApiContext ctx) => _ctx = ctx;
+    internal readonly INpcSubsystem _internal;
+
+    internal GregNpcModule(GregApiContext ctx, INpcSubsystem subsystem = null)
+    {
+        _ctx = ctx;
+        _internal = subsystem;
+    }
+
+    public void UpdateNpcState(string npcId, string state)
+    {
+        try {
+            if (_internal != null) {
+                _internal.UpdateState(npcId, state);
+            }
+        }
+        catch (Exception ex) {
+            _ctx.Logger.Error($"NPC update failed: {ex.Message}");
+        }
+    }
 
     public int GetFreeTechnicianCount() {
         try {

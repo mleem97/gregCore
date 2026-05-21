@@ -138,7 +138,7 @@ public sealed class GregNetworkCables : IDisposable
                 _cables.Remove(cableId);
             }
             
-            // TODO: FishNetBridge.SendServerRpc("CableRemoved", cableId);
+            FishNetBridge.SendServerRpc("CableRemoved", cableId);
             
             _logger.Info($"Cable removed from sync: ID={cableId}");
         }

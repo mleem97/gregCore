@@ -76,7 +76,7 @@ public sealed class GregNetworkCables : IDisposable
             }
             
             // TODO: Broadcast via FishNet ServerRpc
-            // FishNetBridge.SendServerRpc("CableCreated", cableData);
+            FishNetBridge.SendServerRpc("CableCreated", cableData);
             
             _logger.Info($"Cable created and queued for sync: ID={cableId}");
         }
@@ -138,7 +138,7 @@ public sealed class GregNetworkCables : IDisposable
                 _cables.Remove(cableId);
             }
             
-            // TODO: FishNetBridge.SendServerRpc("CableRemoved", cableId);
+            FishNetBridge.SendServerRpc("CableRemoved", cableId);
             
             _logger.Info($"Cable removed from sync: ID={cableId}");
         }

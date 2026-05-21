@@ -73,7 +73,7 @@ public sealed class GregNetworkRack : IDisposable
             }
             
             // TODO: When FishNet is loaded, broadcast via ServerRpc
-            // FishNetBridge.SendServerRpc("RackPositionUsed", rackId, position);
+            FishNetBridge.SendServerRpc("RackPositionUsed", rackId, position);
             
             _logger.Info($"Rack position synced: Rack={rackId}, Pos={position}, State=Used");
         }
@@ -104,7 +104,7 @@ public sealed class GregNetworkRack : IDisposable
                     positions.Remove(position);
             }
             
-            // TODO: FishNetBridge.SendServerRpc("RackPositionFreed", rackId, position);
+            FishNetBridge.SendServerRpc("RackPositionFreed", rackId, position);
             
             _logger.Info($"Rack position synced: Rack={rackId}, Pos={position}, State=Free");
         }

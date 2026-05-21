@@ -55,10 +55,12 @@ public sealed class GregNetworkServer : IDisposable
             var status = payload.Data.TryGetValue("status", out var s) ? s?.ToString() : null;
             if (string.IsNullOrEmpty(status)) return;
             
-            // TODO: Broadcast via FishNet ServerRpc
-            // FishNetBridge.SendServerRpc("ServerStatusChanged", serverId, status);
+            var serverId = payload.Data.TryGetValue("ServerId", out var id) ? id?.ToString() : null;
+            if (string.IsNullOrEmpty(serverId)) return;
             
-            _logger.Info($"Server status change queued for sync: {status}");
+            FishNetBridge.SendServerRpc("ServerStatusChanged", serverId, status);
+
+            _logger.Info($"Server status change queued for sync: {serverId} -> {status}");
         }
         catch (Exception ex)
         {
@@ -120,7 +122,7 @@ public sealed class GregNetworkServer : IDisposable
                     ports.Add(portId);
             }
             
-            // TODO: FishNetBridge.SendServerRpc("PortConnected", serverId, portId);
+            FishNetBridge.SendServerRpc("PortConnected", serverId, portId);
             
             _logger.Info($"Port connected: Server={serverId}, Port={portId}");
         }
@@ -145,7 +147,7 @@ public sealed class GregNetworkServer : IDisposable
                     ports.Remove(portId);
             }
             
-            // TODO: FishNetBridge.SendServerRpc("PortDisconnected", serverId, portId);
+            FishNetBridge.SendServerRpc("PortDisconnected", serverId, portId);
             
             _logger.Info($"Port disconnected: Server={serverId}, Port={portId}");
         }

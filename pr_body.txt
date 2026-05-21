@@ -1,0 +1,13 @@
+🎯 **What:**
+Added a new xUnit test class `GregNetworkCablesTests` to address the missing test coverage for `GregNetworkCables.RegisterCable` method.
+
+📊 **Coverage:**
+The new tests cover the following scenarios:
+- Successful registration of a valid cable updates the internal sync list (`CableCount` and `GetAllCables`).
+- Successful registration publishes the correct `greg.NET.CableRegistered` event to the `GregEventBus` containing expected payload data.
+- Passing a null cable safely aborts without exceptions or modifying the sync list.
+- Attempting to register a cable when the system is disposed safely aborts.
+- Registering a duplicate CableId correctly overwrites the existing entry in the sync list.
+
+✨ **Result:**
+Enhanced reliability for the `GregNetworkCables` compatibility layer by ensuring cable state synchronization and event publishing logic works as expected without throwing unhandled exceptions.

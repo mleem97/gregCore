@@ -35,6 +35,7 @@ public static class EntityManager
         public GameObject GO = null!;
         public Animator? Animator;
         public NavMeshAgent? NavAgent;
+        public UMAData? UmaData;
         public bool WaitingForUMA;
         public float UMAWaitStart;
         public int SpeedParamHash;
@@ -138,6 +139,8 @@ public static class EntityManager
             if (animator != null)
                 animator.applyRootMotion = false;
 
+            var umaData = go.GetComponentInChildren<UMAData>(true);
+
             uint id = _nextId++;
             go.name = $"Entity_{id}";
 
@@ -147,6 +150,7 @@ public static class EntityManager
                 GO = go,
                 Animator = animator,
                 NavAgent = null, // NavMeshAgent destroyed — remote entities don't need pathfinding
+                UmaData = umaData,
                 WaitingForUMA = true,
                 UMAWaitStart = Time.time,
                 LastPos = spawnPos,
@@ -644,7 +648,11 @@ public static class EntityManager
             if (!entity.WaitingForUMA) continue;
             if (entity.GO == null) continue;
 
-            var umaData = entity.GO.GetComponentInChildren<UMAData>(true);
+            if (entity.UmaData == null)
+            {
+                entity.UmaData = entity.GO.GetComponentInChildren<UMAData>(true);
+            }
+            var umaData = entity.UmaData;
             bool meshReady = false;
             int rendererCount = 0;
 

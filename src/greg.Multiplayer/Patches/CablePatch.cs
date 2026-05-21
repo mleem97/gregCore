@@ -7,10 +7,9 @@ namespace greg.Multiplayer.Patches
     [HarmonyPatch]
     internal static class CablePatch
     {
-        // TODO: Confirm class/method via ILSpy on Assembly-CSharp.dll
-        [HarmonyPatch("CableManager", "ConnectCable")]
+        [HarmonyPatch(typeof(global::Il2Cpp.NetworkMap), nameof(global::Il2Cpp.NetworkMap.Connect))]
         [HarmonyPostfix]
-        private static void ConnectCable_Postfix(object __instance, object sourcePort, object targetPort)
+        private static void ConnectCable_Postfix(global::Il2Cpp.NetworkMap __instance, string from, string to)
         {
             try
             {
@@ -28,9 +27,9 @@ namespace greg.Multiplayer.Patches
             }
         }
 
-        [HarmonyPatch("CableManager", "DisconnectCable")]
+        [HarmonyPatch(typeof(global::Il2Cpp.NetworkMap), nameof(global::Il2Cpp.NetworkMap.Disconnect))]
         [HarmonyPostfix]
-        private static void DisconnectCable_Postfix(object __instance, object port)
+        private static void DisconnectCable_Postfix(global::Il2Cpp.NetworkMap __instance, string from, string to)
         {
             try
             {

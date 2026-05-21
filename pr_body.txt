@@ -1,0 +1,10 @@
+🎯 **What:** The `PythonFFIBridge.cs` file was lacking integration tests, making it difficult to verify if methods exposed to the Python engine via `pythonnet` were marshaled correctly and executed without errors.
+
+📊 **Coverage:** Added integration tests in `PythonFFIBridgeTests.cs` using xUnit and `pythonnet`. The tests specifically cover:
+- Initialization and teardown of the PythonEngine.
+- Calling C# methods from a Python scope (`scope.Exec("bridge.set_player_money(100)")`).
+- Verifying FFI boundaries for logging, player stats (`set_player_money`, `set_player_xp`), server stats, time, and game state.
+- Ensuring complex return types (like `get_player_position`) map to Python dictionaries accurately.
+- Registering Python callbacks to C# events via `subscribe_event` and `on`.
+
+✨ **Result:** Test coverage for the Python FFI boundary is established. `pythonnet` interop functionality is now automatically verified for correctness, providing a safety net against regressions in future bridge refactoring.

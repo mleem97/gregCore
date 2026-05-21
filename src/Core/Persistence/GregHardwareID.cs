@@ -13,11 +13,20 @@ namespace gregCore.Core.Persistence
         public GregHardwareID(IntPtr ptr) : base(ptr) { }
 
         public string UniqueID = "";
+        private string _hardwareId = "";
+
+        public string GetId() {
+            if (string.IsNullOrEmpty(_hardwareId)) {
+                _hardwareId = Guid.NewGuid().ToString();
+            }
+            return _hardwareId;
+        }
         public string PrefabID = "";
 
         public void Initialize(string prefabId, string? existingGuid = null)
         {
             UniqueID = string.IsNullOrEmpty(existingGuid) ? Guid.NewGuid().ToString() : existingGuid;
+            _hardwareId = UniqueID;
             PrefabID = prefabId;
             HardwareIDManager.Register(this);
         }

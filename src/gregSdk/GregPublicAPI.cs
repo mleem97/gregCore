@@ -114,17 +114,10 @@ namespace greg.Sdk
             }
         }
 
+        [Obsolete("AutoFillRacks is currently unimplemented due to complex native IL2CPP interactions.", true)]
         public static void AutoFillRacks()
         {
-            try
-            {
-                MelonLogger.Msg("[gregCore][PublicAPI] Initiating batch rack placement...");
-                // TODO: Integrate with RackBuilderCore via safe IL2CPP calls
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore][PublicAPI] AutoFillRacks failed: {ex.Message}");
-            }
+            throw new NotImplementedException("AutoFillRacks is not implemented. Integrating with native IL2CPP is complex and error-prone.");
         }
 
         /// <summary>

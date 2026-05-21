@@ -465,6 +465,24 @@ public partial class GameAPIManager : IDisposable
     private readonly RackGameUninstallDelegate _rackGameUninstall;
     private readonly ObjSetStringFieldDelegate _objSetStringField2;
 
+
+    private struct SteamEvent
+    {
+        public uint Type;
+        public ulong Data;
+    }
+
+    private readonly Queue<SteamEvent> _steamEventQueue = new Queue<SteamEvent>();
+    private readonly object _steamEventQueueLock = new object();
+
+    public void EnqueueSteamEvent(uint type, ulong data)
+    {
+        lock (_steamEventQueueLock)
+        {
+            _steamEventQueue.Enqueue(new SteamEvent { Type = type, Data = data });
+        }
+    }
+
     private readonly MelonLogger.Instance _logger;
     private IntPtr _currentScenePtr = IntPtr.Zero;
     private IntPtr _friendNamePtr = IntPtr.Zero;
@@ -1110,8 +1128,25 @@ public partial class GameAPIManager : IDisposable
 
     private uint SteamPollEventImpl(IntPtr outType, IntPtr outData)
     {
-        // TODO: implement event queue for lobby callbacks
-        return 0;
+        try
+        {
+            lock (_steamEventQueueLock)
+            {
+                if (_steamEventQueue.Count > 0)
+                {
+                    var evt = _steamEventQueue.Dequeue();
+                    if (outType != IntPtr.Zero) Marshal.WriteInt32(outType, (int)evt.Type);
+                    if (outData != IntPtr.Zero) Marshal.WriteInt64(outData, (long)evt.Data);
+                    return 1;
+                }
+            }
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException("SteamPollEvent", ex);
+            return 0;
+        }
     }
 
     private void GetPlayerPositionImpl(IntPtr outX, IntPtr outY, IntPtr outZ, IntPtr outRy)

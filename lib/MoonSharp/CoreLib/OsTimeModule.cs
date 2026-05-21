@@ -129,7 +129,9 @@ namespace MoonSharp.Interpreter.CoreLib
 				catch (TimeZoneNotFoundException)
 				{
 					// this catches a weird mono bug: https://bugzilla.xamarin.com/show_bug.cgi?id=11817
-					// however the behavior is definitely not correct. damn.
+					// fallback to ToLocalTime which doesn't rely on TimeZoneInfo.Local finding a proper timezone
+					reference = reference.ToLocalTime();
+					isDst = reference.IsDaylightSavingTime();
 				}
 			}
 

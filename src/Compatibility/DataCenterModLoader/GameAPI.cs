@@ -163,9 +163,29 @@ public struct GameAPITable
     public IntPtr ObjSetStringField;
 }
 
+
+public struct SteamLobbyEvent
+{
+    public uint EventType;
+    public ulong LobbyId;
+    public ulong MemberId;
+}
+
 public partial class GameAPIManager : IDisposable
 {
     public const uint API_VERSION = 19;
+
+    private static readonly System.Collections.Concurrent.ConcurrentQueue<SteamLobbyEvent> _steamEventQueue = new();
+
+    public static void EnqueueSteamEvent(uint eventType, ulong lobbyId, ulong memberId)
+    {
+        _steamEventQueue.Enqueue(new SteamLobbyEvent
+        {
+            EventType = eventType,
+            LobbyId = lobbyId,
+            MemberId = memberId
+        });
+    }
 
     private IntPtr _tablePtr;
     private GameAPITable _table;
@@ -1110,7 +1130,25 @@ public partial class GameAPIManager : IDisposable
 
     private uint SteamPollEventImpl(IntPtr outType, IntPtr outData)
     {
-        // TODO: implement event queue for lobby callbacks
+        try
+        {
+            if (_steamEventQueue.TryDequeue(out var ev))
+            {
+                if (outType != IntPtr.Zero)
+                    Marshal.WriteInt32(outType, (int)ev.EventType);
+
+                if (outData != IntPtr.Zero)
+                {
+                    Marshal.WriteInt64(outData, 0, (long)ev.LobbyId);
+                    Marshal.WriteInt64(outData, 8, (long)ev.MemberId);
+                }
+                return 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException("SteamPollEventImpl", ex);
+        }
         return 0;
     }
 

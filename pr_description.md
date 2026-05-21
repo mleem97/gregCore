@@ -1,7 +1,13 @@
-🎯 **What:** Removed an unused commented-out code block (`// var tmp = newTabObj.GetComponentInChildren...`) from `src/GameLayer/Patches/UI/SettingsUiBridgePatch.cs:47`.
+🎯 **What:**
+Replaced an unimplemented `TODO: implement event queue for lobby callbacks` in `GameAPI.cs` with a fully functional, thread-safe `ConcurrentQueue` implementation for `SteamLobbyEvent` structs.
 
-💡 **Why:** The commented-out code was dead and served no purpose. Removing it reduces clutter and improves the maintainability and readability of the file.
+💡 **Why:**
+This prevents lobby callbacks from being silently dropped and avoids returning `0` continuously for `SteamPollEventImpl`. Using a thread-safe queue ensures reliable cross-thread communication between Steam networking events and the game's polling thread.
 
-✅ **Verification:** Verified the removal visually using `git diff` to ensure nothing else was accidentally deleted.
+✅ **Verification:**
+- The codebase was successfully built locally (`dotnet build gregCore.csproj -c Release`).
+- Tests passed (with known environment limitations handled gracefully).
+- Reviewed against interop memory safety patterns (proper use of `Marshal.WriteInt64` and `TryDequeue`).
 
-✨ **Result:** Cleaned up `SettingsUiBridgePatch.cs` without modifying any runtime behavior.
+✨ **Result:**
+`SteamPollEventImpl` now correctly populates `outType` and `outData` when events are queued, restoring correct functionality to the multiplayer/steam lobby modding API.

@@ -1390,6 +1390,39 @@ public partial class GameAPIManager : IDisposable
     {
         try
         {
+            var nm = Il2Cpp.NetworkMap.instance;
+
+            // 1. Try NetworkMap (Servers)
+            if (nm != null && nm.servers != null)
+            {
+                foreach (var kvp in nm.servers)
+                {
+                    try
+                    {
+                        var srv = kvp.Value;
+                        if (srv == null || srv.Pointer == IntPtr.Zero || srv.gameObject.scene.name == null) continue;
+                        if ((srv.ServerID ?? "") == targetId) return (ulong)srv.Pointer.ToInt64();
+                    }
+                    catch { }
+                }
+            }
+
+            // 2. Try NetworkMap (Switches)
+            if (nm != null && nm.switches != null)
+            {
+                foreach (var kvp in nm.switches)
+                {
+                    try
+                    {
+                        var sw = kvp.Value;
+                        if (sw == null || sw.Pointer == IntPtr.Zero || sw.gameObject.scene.name == null) continue;
+                        if ((sw.switchId ?? "") == targetId) return (ulong)sw.Pointer.ToInt64();
+                    }
+                    catch { }
+                }
+            }
+
+            // 3. Fallbacks to FindObjectsOfTypeAll for safety and PatchPanels
             foreach (var srv in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
             {
                 try
@@ -1418,7 +1451,7 @@ public partial class GameAPIManager : IDisposable
                 catch { }
             }
         }
-        catch (Exception ex)
+catch (Exception ex)
         {
             CrashLog.LogException("FindHandleByStableId", ex);
         }
@@ -2331,33 +2364,71 @@ public partial class GameAPIManager : IDisposable
             {
                 case 0: // Server
                     {
-                        var all = UnityEngine.Resources.FindObjectsOfTypeAll<Server>();
-                        foreach (var srv in all)
+                        var nm = Il2Cpp.NetworkMap.instance;
+                        if (nm != null && nm.servers != null)
                         {
-                            try
+                            foreach (var kvp in nm.servers)
                             {
-                                if (srv.gameObject.scene.name == null) continue;
-                                if (count >= max) break;
-                                Marshal.WriteInt64(outHandles, (int)(count * 8), srv.Pointer.ToInt64());
-                                count++;
+                                try
+                                {
+                                    var srv = kvp.Value;
+                                    if (srv == null || srv.Pointer == IntPtr.Zero || srv.gameObject.scene.name == null) continue;
+                                    if (count >= max) break;
+                                    Marshal.WriteInt64(outHandles, (int)(count * 8), srv.Pointer.ToInt64());
+                                    count++;
+                                }
+                                catch { }
                             }
-                            catch { }
+                        }
+                        else
+                        {
+                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<Server>();
+                            foreach (var srv in all)
+                            {
+                                try
+                                {
+                                    if (srv.gameObject.scene.name == null) continue;
+                                    if (count >= max) break;
+                                    Marshal.WriteInt64(outHandles, (int)(count * 8), srv.Pointer.ToInt64());
+                                    count++;
+                                }
+                                catch { }
+                            }
                         }
                         break;
                     }
                 case 4: // NetworkSwitch
                     {
-                        var all = UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>();
-                        foreach (var sw in all)
+                        var nm = Il2Cpp.NetworkMap.instance;
+                        if (nm != null && nm.switches != null)
                         {
-                            try
+                            foreach (var kvp in nm.switches)
                             {
-                                if (sw.gameObject.scene.name == null) continue;
-                                if (count >= max) break;
-                                Marshal.WriteInt64(outHandles, (int)(count * 8), sw.Pointer.ToInt64());
-                                count++;
+                                try
+                                {
+                                    var sw = kvp.Value;
+                                    if (sw == null || sw.Pointer == IntPtr.Zero || sw.gameObject.scene.name == null) continue;
+                                    if (count >= max) break;
+                                    Marshal.WriteInt64(outHandles, (int)(count * 8), sw.Pointer.ToInt64());
+                                    count++;
+                                }
+                                catch { }
                             }
-                            catch { }
+                        }
+                        else
+                        {
+                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>();
+                            foreach (var sw in all)
+                            {
+                                try
+                                {
+                                    if (sw.gameObject.scene.name == null) continue;
+                                    if (count >= max) break;
+                                    Marshal.WriteInt64(outHandles, (int)(count * 8), sw.Pointer.ToInt64());
+                                    count++;
+                                }
+                                catch { }
+                            }
                         }
                         break;
                     }
@@ -2592,10 +2663,34 @@ public partial class GameAPIManager : IDisposable
             string targetId = System.Text.Encoding.UTF8.GetString(buf, 0, end).Trim();
             if (string.IsNullOrEmpty(targetId)) return 0;
 
+            var nm = Il2Cpp.NetworkMap.instance;
+
             switch (typeId)
             {
                 case 0: // Server
                     {
+                        if (nm != null && nm.servers != null)
+                        {
+                            foreach (var kvp in nm.servers)
+                            {
+                                try
+                                {
+                                    var srv = kvp.Value;
+                                    if (srv == null || srv.Pointer == IntPtr.Zero || srv.gameObject.scene.name == null) continue;
+                                    string val = fieldId switch
+                                    {
+                                        0 => srv.ServerID ?? "",
+                                        2 => srv.rackPositionUID.ToString(),
+                                        3 => srv.gameObject.name ?? "",
+                                        _ => ""
+                                    };
+                                    if (val == targetId) return (ulong)srv.Pointer.ToInt64();
+                                }
+                                catch { }
+                            }
+                        }
+
+                        // Fallback to FindObjectsOfTypeAll for safety if not found in NetworkMap
                         foreach (var srv in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
                         {
                             try
@@ -2612,30 +2707,33 @@ public partial class GameAPIManager : IDisposable
                             }
                             catch { }
                         }
-                        // Lookup failed — dump all known servers so we can see if ID mismatch
-                        try
-                        {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<Server>();
-                            var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] Server '{targetId}' not found. Scene servers ({all.Count}): ");
-                            foreach (var srv in all)
-                            {
-                                try
-                                {
-                                    bool inScene = srv.gameObject.scene.name != null;
-                                    string sid = srv.ServerID ?? "<null>";
-                                    bool active = srv.gameObject.activeInHierarchy;
-                                    sb.Append($"[id={sid} active={active} inScene={inScene}] ");
-                                }
-                                catch { sb.Append("[err] "); }
-                            }
-                            CrashLog.Log(sb.ToString());
-                        }
-                        catch { }
+
+                        // Lookup failed
+                        CrashLog.Log($"[FindById] Server '{targetId}' not found.");
                         break;
                     }
                 case 4: // NetworkSwitch
                     {
+                        if (nm != null && nm.switches != null)
+                        {
+                            foreach (var kvp in nm.switches)
+                            {
+                                try
+                                {
+                                    var sw = kvp.Value;
+                                    if (sw == null || sw.Pointer == IntPtr.Zero || sw.gameObject.scene.name == null) continue;
+                                    string val = fieldId switch
+                                    {
+                                        1 => sw.switchId ?? "",
+                                        3 => sw.gameObject.name ?? "",
+                                        _ => ""
+                                    };
+                                    if (val == targetId) return (ulong)sw.Pointer.ToInt64();
+                                }
+                                catch { }
+                            }
+                        }
+
                         foreach (var sw in UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>())
                         {
                             try
@@ -2651,29 +2749,13 @@ public partial class GameAPIManager : IDisposable
                             }
                             catch { }
                         }
-                        try
-                        {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>();
-                            var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] NetworkSwitch '{targetId}' not found. Scene switches ({all.Count}): ");
-                            foreach (var sw in all)
-                            {
-                                try
-                                {
-                                    bool inScene = sw.gameObject.scene.name != null;
-                                    string sid = sw.switchId ?? "<null>";
-                                    bool active = sw.gameObject.activeInHierarchy;
-                                    sb.Append($"[id={sid} active={active} inScene={inScene}] ");
-                                }
-                                catch { sb.Append("[err] "); }
-                            }
-                            CrashLog.Log(sb.ToString());
-                        }
-                        catch { }
+
+                        CrashLog.Log($"[FindById] NetworkSwitch '{targetId}' not found.");
                         break;
                     }
                 case 7: // PatchPanel
                     {
+                        // Patch panels are not in NetworkMap in a simple dictionary usually, fallback to FindObjects
                         foreach (var pp in UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>())
                         {
                             try
@@ -2689,26 +2771,7 @@ public partial class GameAPIManager : IDisposable
                             }
                             catch { }
                         }
-                        // Lookup failed dump
-                        try
-                        {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>();
-                            var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] PatchPanel '{targetId}' not found. Scene panels ({all.Count}): ");
-                            foreach (var pp in all)
-                            {
-                                try
-                                {
-                                    bool inScene = pp.gameObject.scene.name != null;
-                                    string pid = pp.patchPanelId ?? "<null>";
-                                    bool active = pp.gameObject.activeInHierarchy;
-                                    sb.Append($"[id={pid} active={active} inScene={inScene}] ");
-                                }
-                                catch { sb.Append("[err] "); }
-                            }
-                            CrashLog.Log(sb.ToString());
-                        }
-                        catch { }
+                        CrashLog.Log($"[FindById] PatchPanel '{targetId}' not found.");
                         break;
                     }
             }

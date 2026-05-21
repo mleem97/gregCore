@@ -165,6 +165,57 @@ public struct GameAPITable
 
 public partial class GameAPIManager : IDisposable
 {
+
+    public static class DeviceRegistry
+    {
+        public static readonly System.Collections.Generic.Dictionary<string, global::Il2Cpp.Server> Servers = new();
+        public static readonly System.Collections.Generic.Dictionary<string, global::Il2Cpp.NetworkSwitch> Switches = new();
+        public static readonly System.Collections.Generic.Dictionary<string, global::Il2Cpp.PatchPanel> PatchPanels = new();
+
+        public static readonly System.Collections.Generic.HashSet<global::Il2Cpp.Server> AllServers = new();
+        public static readonly System.Collections.Generic.HashSet<global::Il2Cpp.NetworkSwitch> AllSwitches = new();
+        public static readonly System.Collections.Generic.HashSet<global::Il2Cpp.PatchPanel> AllPatchPanels = new();
+
+        public static void Register(global::Il2Cpp.Server s)
+        {
+            if (s == null || s.Pointer == IntPtr.Zero) return;
+            AllServers.Add(s);
+            if (!string.IsNullOrEmpty(s.ServerID)) Servers[s.ServerID] = s;
+        }
+        public static void Unregister(global::Il2Cpp.Server s)
+        {
+            if (s == null) return;
+            AllServers.Remove(s);
+            if (!string.IsNullOrEmpty(s.ServerID)) Servers.Remove(s.ServerID);
+        }
+
+        public static void Register(global::Il2Cpp.NetworkSwitch sw)
+        {
+            if (sw == null || sw.Pointer == IntPtr.Zero) return;
+            AllSwitches.Add(sw);
+            if (!string.IsNullOrEmpty(sw.switchId)) Switches[sw.switchId] = sw;
+        }
+        public static void Unregister(global::Il2Cpp.NetworkSwitch sw)
+        {
+            if (sw == null) return;
+            AllSwitches.Remove(sw);
+            if (!string.IsNullOrEmpty(sw.switchId)) Switches.Remove(sw.switchId);
+        }
+
+        public static void Register(global::Il2Cpp.PatchPanel pp)
+        {
+            if (pp == null || pp.Pointer == IntPtr.Zero) return;
+            AllPatchPanels.Add(pp);
+            if (!string.IsNullOrEmpty(pp.patchPanelId)) PatchPanels[pp.patchPanelId] = pp;
+        }
+        public static void Unregister(global::Il2Cpp.PatchPanel pp)
+        {
+            if (pp == null) return;
+            AllPatchPanels.Remove(pp);
+            if (!string.IsNullOrEmpty(pp.patchPanelId)) PatchPanels.Remove(pp.patchPanelId);
+        }
+    }
+
     public const uint API_VERSION = 19;
 
     private IntPtr _tablePtr;
@@ -1390,32 +1441,65 @@ public partial class GameAPIManager : IDisposable
     {
         try
         {
-            foreach (var srv in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
+            if (DeviceRegistry.Servers.TryGetValue(targetId, out var srv) && srv != null && srv.Pointer != IntPtr.Zero && srv.ServerID == targetId)
+                return (ulong)srv.Pointer.ToInt64();
+
+            if (DeviceRegistry.Switches.TryGetValue(targetId, out var sw) && sw != null && sw.Pointer != IntPtr.Zero && sw.switchId == targetId)
+                return (ulong)sw.Pointer.ToInt64();
+
+            if (DeviceRegistry.PatchPanels.TryGetValue(targetId, out var pp) && pp != null && pp.Pointer != IntPtr.Zero && pp.patchPanelId == targetId)
+                return (ulong)pp.Pointer.ToInt64();
+
+            // Cache miss fallback (e.g. ID changed but dictionary wasn't updated)
+            foreach (var s in DeviceRegistry.AllServers)
             {
-                try
-                {
-                    if (srv.gameObject.scene.name == null) continue;
-                    if ((srv.ServerID ?? "") == targetId) return (ulong)srv.Pointer.ToInt64();
-                }
-                catch { }
+                try {
+                    if (s != null && s.Pointer != IntPtr.Zero && s.gameObject.scene.name != null && (s.ServerID ?? "") == targetId)
+                    {
+                        DeviceRegistry.Servers[targetId] = s;
+                        return (ulong)s.Pointer.ToInt64();
+                    }
+                } catch { }
             }
-            foreach (var sw in UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>())
+            foreach (var s in DeviceRegistry.AllSwitches)
             {
-                try
-                {
-                    if (sw.gameObject.scene.name == null) continue;
-                    if ((sw.switchId ?? "") == targetId) return (ulong)sw.Pointer.ToInt64();
-                }
-                catch { }
+                try {
+                    if (s != null && s.Pointer != IntPtr.Zero && s.gameObject.scene.name != null && (s.switchId ?? "") == targetId)
+                    {
+                        DeviceRegistry.Switches[targetId] = s;
+                        return (ulong)s.Pointer.ToInt64();
+                    }
+                } catch { }
             }
-            foreach (var pp in UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>())
+            foreach (var p in DeviceRegistry.AllPatchPanels)
             {
-                try
-                {
-                    if (pp.gameObject.scene.name == null) continue;
-                    if ((pp.patchPanelId ?? "") == targetId) return (ulong)pp.Pointer.ToInt64();
-                }
-                catch { }
+                try {
+                    if (p != null && p.Pointer != IntPtr.Zero && p.gameObject.scene.name != null && (p.patchPanelId ?? "") == targetId)
+                    {
+                        DeviceRegistry.PatchPanels[targetId] = p;
+                        return (ulong)p.Pointer.ToInt64();
+                    }
+                } catch { }
+            }
+
+            // Absolute fallback just in case object was completely missed by Awake/Start (very rare)
+            foreach (var s in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
+            {
+                try {
+                    if (s.gameObject.scene.name != null && (s.ServerID ?? "") == targetId) { DeviceRegistry.Register(s); return (ulong)s.Pointer.ToInt64(); }
+                } catch { }
+            }
+            foreach (var s in UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>())
+            {
+                try {
+                    if (s.gameObject.scene.name != null && (s.switchId ?? "") == targetId) { DeviceRegistry.Register(s); return (ulong)s.Pointer.ToInt64(); }
+                } catch { }
+            }
+            foreach (var p in UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>())
+            {
+                try {
+                    if (p.gameObject.scene.name != null && (p.patchPanelId ?? "") == targetId) { DeviceRegistry.Register(p); return (ulong)p.Pointer.ToInt64(); }
+                } catch { }
             }
         }
         catch (Exception ex)
@@ -2331,12 +2415,11 @@ public partial class GameAPIManager : IDisposable
             {
                 case 0: // Server
                     {
-                        var all = UnityEngine.Resources.FindObjectsOfTypeAll<Server>();
-                        foreach (var srv in all)
+                        foreach (var srv in DeviceRegistry.AllServers)
                         {
                             try
                             {
-                                if (srv.gameObject.scene.name == null) continue;
+                                if (srv == null || srv.Pointer == IntPtr.Zero || srv.gameObject.scene.name == null) continue;
                                 if (count >= max) break;
                                 Marshal.WriteInt64(outHandles, (int)(count * 8), srv.Pointer.ToInt64());
                                 count++;
@@ -2347,12 +2430,11 @@ public partial class GameAPIManager : IDisposable
                     }
                 case 4: // NetworkSwitch
                     {
-                        var all = UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>();
-                        foreach (var sw in all)
+                        foreach (var sw in DeviceRegistry.AllSwitches)
                         {
                             try
                             {
-                                if (sw.gameObject.scene.name == null) continue;
+                                if (sw == null || sw.Pointer == IntPtr.Zero || sw.gameObject.scene.name == null) continue;
                                 if (count >= max) break;
                                 Marshal.WriteInt64(outHandles, (int)(count * 8), sw.Pointer.ToInt64());
                                 count++;
@@ -2596,11 +2678,11 @@ public partial class GameAPIManager : IDisposable
             {
                 case 0: // Server
                     {
-                        foreach (var srv in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
+                        foreach (var srv in DeviceRegistry.AllServers)
                         {
                             try
                             {
-                                if (srv.gameObject.scene.name == null) continue;
+                                if (srv == null || srv.Pointer == IntPtr.Zero || srv.gameObject.scene.name == null) continue;
                                 string val = fieldId switch
                                 {
                                     0 => srv.ServerID ?? "",
@@ -2612,16 +2694,15 @@ public partial class GameAPIManager : IDisposable
                             }
                             catch { }
                         }
-                        // Lookup failed — dump all known servers so we can see if ID mismatch
                         try
                         {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<Server>();
                             var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] Server '{targetId}' not found. Scene servers ({all.Count}): ");
-                            foreach (var srv in all)
+                            sb.Append($"[FindById] Server '{targetId}' not found. Scene servers ({DeviceRegistry.AllServers.Count}): ");
+                            foreach (var srv in DeviceRegistry.AllServers)
                             {
                                 try
                                 {
+                                    if (srv == null || srv.Pointer == IntPtr.Zero) continue;
                                     bool inScene = srv.gameObject.scene.name != null;
                                     string sid = srv.ServerID ?? "<null>";
                                     bool active = srv.gameObject.activeInHierarchy;
@@ -2636,11 +2717,11 @@ public partial class GameAPIManager : IDisposable
                     }
                 case 4: // NetworkSwitch
                     {
-                        foreach (var sw in UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>())
+                        foreach (var sw in DeviceRegistry.AllSwitches)
                         {
                             try
                             {
-                                if (sw.gameObject.scene.name == null) continue;
+                                if (sw == null || sw.Pointer == IntPtr.Zero || sw.gameObject.scene.name == null) continue;
                                 string val = fieldId switch
                                 {
                                     1 => sw.switchId ?? "",
@@ -2653,13 +2734,13 @@ public partial class GameAPIManager : IDisposable
                         }
                         try
                         {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>();
                             var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] NetworkSwitch '{targetId}' not found. Scene switches ({all.Count}): ");
-                            foreach (var sw in all)
+                            sb.Append($"[FindById] NetworkSwitch '{targetId}' not found. Scene switches ({DeviceRegistry.AllSwitches.Count}): ");
+                            foreach (var sw in DeviceRegistry.AllSwitches)
                             {
                                 try
                                 {
+                                    if (sw == null || sw.Pointer == IntPtr.Zero) continue;
                                     bool inScene = sw.gameObject.scene.name != null;
                                     string sid = sw.switchId ?? "<null>";
                                     bool active = sw.gameObject.activeInHierarchy;
@@ -2674,11 +2755,11 @@ public partial class GameAPIManager : IDisposable
                     }
                 case 7: // PatchPanel
                     {
-                        foreach (var pp in UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>())
+                        foreach (var pp in DeviceRegistry.AllPatchPanels)
                         {
                             try
                             {
-                                if (pp.gameObject.scene.name == null) continue;
+                                if (pp == null || pp.Pointer == IntPtr.Zero || pp.gameObject.scene.name == null) continue;
                                 string val = fieldId switch
                                 {
                                     4 => pp.patchPanelId ?? "",
@@ -2689,16 +2770,15 @@ public partial class GameAPIManager : IDisposable
                             }
                             catch { }
                         }
-                        // Lookup failed dump
                         try
                         {
-                            var all = UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>();
                             var sb = new System.Text.StringBuilder();
-                            sb.Append($"[FindById] PatchPanel '{targetId}' not found. Scene panels ({all.Count}): ");
-                            foreach (var pp in all)
+                            sb.Append($"[FindById] PatchPanel '{targetId}' not found. Scene panels ({DeviceRegistry.AllPatchPanels.Count}): ");
+                            foreach (var pp in DeviceRegistry.AllPatchPanels)
                             {
                                 try
                                 {
+                                    if (pp == null || pp.Pointer == IntPtr.Zero) continue;
                                     bool inScene = pp.gameObject.scene.name != null;
                                     string pid = pp.patchPanelId ?? "<null>";
                                     bool active = pp.gameObject.activeInHierarchy;

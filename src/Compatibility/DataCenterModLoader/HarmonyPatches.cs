@@ -263,6 +263,47 @@ internal static class Patch_PatchPanel_InsertedInRack
     }
 }
 
+    #region DEVICE CACHE PATCHES
+    [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.Start))]
+    internal static class Patch_Server_Start_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.Server __instance) => GameAPIManager.DeviceRegistry.Register(__instance);
+    }
+    [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.OnDestroy))]
+    internal static class Patch_Server_OnDestroy_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.Server __instance) => GameAPIManager.DeviceRegistry.Unregister(__instance);
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.Start))]
+    internal static class Patch_NetworkSwitch_Start_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance) => GameAPIManager.DeviceRegistry.Register(__instance);
+    }
+    [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.OnDestroy))]
+    internal static class Patch_NetworkSwitch_OnDestroy_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance) => GameAPIManager.DeviceRegistry.Unregister(__instance);
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.Start))]
+    internal static class Patch_PatchPanel_Start_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.PatchPanel __instance) => GameAPIManager.DeviceRegistry.Register(__instance);
+    }
+    [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.OnDestroy))]
+    internal static class Patch_PatchPanel_OnDestroy_Cache
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.PatchPanel __instance) => GameAPIManager.DeviceRegistry.Unregister(__instance);
+    }
+    #endregion
+
 [HarmonyPatch(typeof(Rack), nameof(Rack.MarkPositionAsUsed))]
 internal static class Patch_Rack_MarkPositionAsUsed
 {

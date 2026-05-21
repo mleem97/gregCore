@@ -12,10 +12,7 @@ namespace greg.Multiplayer.Patches
     [HarmonyPatch]
     internal static class RackPatch
     {
-        // TODO: Replace "Rack" and "PlaceDevice" with actual class/method
-        // names found via ILSpy on Assembly-CSharp.dll of Unity 6000.4.2f.
-        // Use [HarmonyPatch(typeof(Rack), nameof(Rack.PlaceDevice))] once confirmed.
-        [HarmonyPatch("Rack", "PlaceDevice")]
+        [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.PlaceDevice))]
         [HarmonyPostfix]
         private static void PlaceDevice_Postfix(object __instance, object device)
         {
@@ -42,7 +39,7 @@ namespace greg.Multiplayer.Patches
             }
         }
 
-        [HarmonyPatch("Rack", "RemoveDevice")]
+        [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.RemoveDevice))]
         [HarmonyPostfix]
         private static void RemoveDevice_Postfix(object __instance, object device)
         {

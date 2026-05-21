@@ -14,7 +14,7 @@ namespace gregCore.GameLayer.Hooks
 
         public static void Apply(HarmonyLib.Harmony harmony)
         {
-            try 
+            try
             {
                 var playerType = AccessTools.TypeByName("Player") ?? AccessTools.TypeByName("Il2Cpp.Player");
                 if (playerType != null)

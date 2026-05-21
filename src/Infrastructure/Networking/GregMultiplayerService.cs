@@ -22,12 +22,12 @@ public sealed class GregMultiplayerService : IDisposable
 {
     private readonly GregEventBus _eventBus;
     private readonly IGregLogger _logger;
-    
+
     // Netzwerk-Sync-Layer
     private GregNetworkRack? _networkRack;
     private GregNetworkServer? _networkServer;
     private GregNetworkCables? _networkCables;
-    
+
     private bool _isFishNetAvailable;
     private bool _isInitialized;
     private bool _disposed;
@@ -44,11 +44,11 @@ public sealed class GregMultiplayerService : IDisposable
     public void Initialize()
     {
         if (_isInitialized) return;
-        
+
         try
         {
             _isFishNetAvailable = CheckFishNetAvailability();
-            
+
             if (_isFishNetAvailable)
             {
                 _logger.Success("FishNet assembly detected – Multiplayer-Sync aktiviert.");
@@ -57,12 +57,12 @@ public sealed class GregMultiplayerService : IDisposable
             {
                 _logger.Warning("FishNet assembly not found – Multiplayer-Sync läuft im Offline-Modus.");
             }
-            
+
             // Initialize sync layers (they work in offline mode too, just without network broadcast)
             _networkRack = new GregNetworkRack(_eventBus, _logger);
             _networkServer = new GregNetworkServer(_eventBus, _logger);
             _networkCables = new GregNetworkCables(_eventBus, _logger);
-            
+
             _isInitialized = true;
             _logger.Success($"GregMultiplayerService initialized. FishNet={_isFishNetAvailable}");
         }
@@ -116,7 +116,7 @@ public sealed class GregMultiplayerService : IDisposable
     public void ProcessIncomingMessage(string channel, byte[] data)
     {
         if (_disposed || data == null) return;
-        
+
         try
         {
             switch (channel)
@@ -125,17 +125,17 @@ public sealed class GregMultiplayerService : IDisposable
                     // Deserialize und ApplyRemotePositionUpdate
                     _logger.Info($"Incoming rack sync: {data.Length} bytes");
                     break;
-                    
+
                 case "ServerSync":
                     // Deserialize und ApplyRemotePowerUpdate
                     _logger.Info($"Incoming server sync: {data.Length} bytes");
                     break;
-                    
+
                 case "CableSync":
                     // Deserialize und ApplyRemoteCableSync
                     _logger.Info($"Incoming cable sync: {data.Length} bytes");
                     break;
-                    
+
                 default:
                     _logger.Warning($"Unknown multiplayer channel: {channel}");
                     break;
@@ -161,15 +161,15 @@ public sealed class GregMultiplayerService : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
-        
+
         _networkRack?.Dispose();
         _networkServer?.Dispose();
         _networkCables?.Dispose();
-        
+
         _networkRack = null;
         _networkServer = null;
         _networkCables = null;
-        
+
         _logger.Info("GregMultiplayerService disposed.");
     }
 }

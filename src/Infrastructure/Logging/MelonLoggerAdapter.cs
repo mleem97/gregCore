@@ -30,6 +30,6 @@ public sealed class MelonLoggerAdapter : IGregLogger
         else _melonLogger.Error($"{_prefix}{message}");
     }
 
-    public IGregLogger ForContext(string context) => 
+    public IGregLogger ForContext(string context) =>
         new MelonLoggerAdapter(_melonLogger, string.IsNullOrEmpty(_prefix) ? context : $"{_prefix.Trim('[', ']')}::{context}");
 }

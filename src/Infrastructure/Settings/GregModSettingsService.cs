@@ -26,7 +26,7 @@ public class GregModSettingsService
     public void Register<T>(SettingEntry<T> entry)
     {
         var id = entry.GetFullId();
-        
+
         if (_settings.TryGetValue(id, out var existingBase) && existingBase is SettingEntry<T> existing)
         {
             existing.DisplayName = entry.DisplayName;
@@ -43,10 +43,10 @@ public class GregModSettingsService
             {
                 entry.Value = entry.DefaultValue;
             }
-            
+
             _persistence?.ApplyLoadedSettingsTo(entry);
         }
-        
+
         _logger.Info($"Setting registriert: {entry.DisplayName} [Mod: {entry.ModId}, Wert: {entry.Value}]");
     }
 
@@ -80,19 +80,19 @@ public class GregModSettingsService
             var entryType = entry.GetType();
             var defaultValueField = entryType.GetProperty("DefaultValue");
             var valueField = entryType.GetProperty("Value");
-            
+
             if (defaultValueField != null && valueField != null)
             {
                 var defaultValue = defaultValueField.GetValue(entry);
                 valueField.SetValue(entry, defaultValue);
-                
+
                 var onValueChangedField = entryType.GetProperty("OnValueChanged");
                 if (onValueChangedField != null)
                 {
                     var callback = onValueChangedField.GetValue(entry) as Delegate;
                     callback?.DynamicInvoke(defaultValue);
                 }
-                
+
                 _persistence?.SaveAll();
                 _logger.Info($"Setting auf Default zurückgesetzt: {id}");
             }
@@ -106,10 +106,10 @@ public class GregModSettingsService
     public IEnumerable<BaseSettingEntry> Search(string query)
     {
         if (string.IsNullOrEmpty(query)) return _settings.Values;
-        
+
         var q = query.ToLowerInvariant();
-        return _settings.Values.Where(s => 
-            s.DisplayName.ToLowerInvariant().Contains(q) || 
+        return _settings.Values.Where(s =>
+            s.DisplayName.ToLowerInvariant().Contains(q) ||
             s.ModId.ToLowerInvariant().Contains(q) ||
             (s.Category != null && s.Category.ToLowerInvariant().Contains(q)));
     }

@@ -11,7 +11,7 @@ namespace gregCore.UI;
 public static class OverlayManager
 {
     private static readonly HashSet<string> _visibleOverlays = new();
-    
+
     /// <summary>
     /// Returns true if any framework overlay is currently visible.
     /// </summary>

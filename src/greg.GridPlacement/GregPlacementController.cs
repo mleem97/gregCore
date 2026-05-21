@@ -37,7 +37,7 @@ namespace greg.GridPlacement
             {
                 var col = _previewRack.UnityGameObject.GetComponent<UnityEngine.Collider>();
                 if (col != null) UnityEngine.Object.Destroy(col);
-                
+
                 var renderer = _previewRack.UnityGameObject.GetComponent<UnityEngine.Renderer>();
                 if (renderer != null)
                 {

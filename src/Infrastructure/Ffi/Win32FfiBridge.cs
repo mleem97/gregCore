@@ -19,7 +19,7 @@ public sealed class Win32FfiBridge : IGregFfiBridge, IDisposable
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
-    
+
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool FreeLibrary(IntPtr hModule);
@@ -46,7 +46,7 @@ public sealed class Win32FfiBridge : IGregFfiBridge, IDisposable
         lock (_syncRoot)
         {
             if (_disposed) throw new ObjectDisposedException(nameof(Win32FfiBridge));
-            
+
             try
             {
                 var hModule = LoadLibrary(dllPath);
@@ -75,7 +75,7 @@ public sealed class Win32FfiBridge : IGregFfiBridge, IDisposable
     private void Dispose(bool disposing)
     {
         if (_disposed) return;
-        
+
         lock (_syncRoot)
         {
             foreach (var hModule in _loadedModules)
@@ -84,7 +84,7 @@ public sealed class Win32FfiBridge : IGregFfiBridge, IDisposable
             }
             _loadedModules.Clear();
         }
-        
+
         _disposed = true;
     }
 }

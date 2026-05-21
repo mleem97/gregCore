@@ -26,7 +26,7 @@ public class PythonFFIBridge
     public float get_time_of_day() => GregAPI.GetTimeOfDay();
     public uint get_day() => GregAPI.GetDay();
     public int trigger_save() => GregAPI.TriggerSave();
-    
+
     public PyObject get_player_position()
     {
         var p = GregAPI.GetPlayerPosition();
@@ -42,14 +42,16 @@ public class PythonFFIBridge
 
     public void subscribe_event(string eventId, PyObject callback)
     {
-        GregAPI.Subscribe(eventId, data => {
+        GregAPI.Subscribe(eventId, data =>
+        {
             using (Py.GIL()) { callback.Invoke(); }
         });
     }
 
     public void on(string hookName, PyObject callback)
     {
-        GregAPI.Hooks.On(hookName, (Action<object>)(payloadObj => {
+        GregAPI.Hooks.On(hookName, (Action<object>)(payloadObj =>
+        {
             var payload = (gregCore.API.HookEventArgs)payloadObj;
             using (Py.GIL())
             {

@@ -44,22 +44,24 @@ namespace greg.Mods.AutoBuilder
             _uiBuilder = GregUIBuilder.CreateTablet("AutoRack Builder v3.5")
                 .AddHeadline("Fleet Automation")
                 .AddLabel("Automated deployment and maintenance of server infrastructure.")
-                
+
                 .AddHeadline("Wall Management")
-                .AddPrimaryButton("OPEN ALL WALLS", () => {
+                .AddPrimaryButton("OPEN ALL WALLS", () =>
+                {
                     OpenAllWalls();
                 })
-                
+
                 .AddHeadline("Batch Deployment")
                 .AddLabel("Automatically place racks on detected grid points.")
-                .AddPrimaryButton("AUTO-FILL CURRENT ROOM", () => {
+                .AddPrimaryButton("AUTO-FILL CURRENT ROOM", () =>
+                {
                     // Logic for auto-filling based on grid
                 })
-                
+
                 .AddHeadline("Maintenance Relief")
                 .AddToggle("Auto-Repair broken servers", true, (v) => { })
                 .AddToggle("Optimize cooling distribution", false, (v) => { })
-                
+
                 .AddSecondaryButton("CLOSE", () => _isVisible = false);
 
             _uiBuilder.Build();

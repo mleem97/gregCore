@@ -22,10 +22,10 @@ namespace greg.Furniture
         {
             _isActive = true;
             _ghost = UnityEngine.Object.Instantiate(prefab);
-            
+
             // Strip colliders from ghost
             foreach (var col in _ghost.GetComponentsInChildren<Collider>()) col.enabled = false;
-            
+
             // Set layer to ignore raycast
             _ghost.layer = 2; // Ignore Raycast
         }

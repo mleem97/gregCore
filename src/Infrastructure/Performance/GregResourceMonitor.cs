@@ -43,14 +43,16 @@ internal sealed class GregResourceMonitor : IDisposable
     private void MeasureAndReport()
     {
         if (_isDisposed) return;
-        try {
+        try
+        {
             _currentProcess.Refresh();
-            var snapshot = new ResourceSnapshot {
+            var snapshot = new ResourceSnapshot
+            {
                 TimestampUtc = DateTime.UtcNow,
                 RamUsedMb = (int)(_currentProcess.WorkingSet64 / 1024 / 1024),
                 PrivateMemoryMb = (int)(_currentProcess.PrivateMemorySize64 / 1024 / 1024),
                 GcTotalMemoryMb = (int)(GC.GetTotalMemory(false) / 1024 / 1024),
-                
+
                 UnityAllocatedMb = _lastUnityStats.UnityAllocatedMb,
                 UnityReservedMb = _lastUnityStats.UnityReservedMb,
                 UnityUnusedMb = _lastUnityStats.UnityUnusedMb,
@@ -61,14 +63,16 @@ internal sealed class GregResourceMonitor : IDisposable
                 ThreadCount = _currentProcess.Threads.Count
             };
             _lastSnapshot = snapshot;
-            
-            _bus.Publish("greg.performance.ResourceSnapshot", new EventPayload { 
-                OccurredAtUtc = snapshot.TimestampUtc, 
-                Data = new Dictionary<string, object> { ["ramMb"] = snapshot.RamUsedMb, ["unityMb"] = snapshot.UnityAllocatedMb } 
+
+            _bus.Publish("greg.performance.ResourceSnapshot", new EventPayload
+            {
+                OccurredAtUtc = snapshot.TimestampUtc,
+                Data = new Dictionary<string, object> { ["ramMb"] = snapshot.RamUsedMb, ["unityMb"] = snapshot.UnityAllocatedMb }
             });
-            
+
             CheckThresholds(snapshot);
-        } catch (Exception ex) { _logger.Warning($"[Monitor] Messfehler: {ex.Message}"); }
+        }
+        catch (Exception ex) { _logger.Warning($"[Monitor] Messfehler: {ex.Message}"); }
     }
 
     private void CheckThresholds(ResourceSnapshot s)

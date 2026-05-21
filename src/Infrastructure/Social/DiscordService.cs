@@ -26,10 +26,11 @@ namespace gregCore.Infrastructure.Social
         {
             if (!_isEnabled) return;
             if (_connected) return;
-            
+
             _startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            
-            new Thread(() => {
+
+            new Thread(() =>
+            {
                 try { Connect(clientId); }
                 catch (Exception ex) { MelonLogger.Error($"[Discord] Connection failed: {ex.Message}"); }
             }).Start();
@@ -44,7 +45,7 @@ namespace gregCore.Infrastructure.Social
                     _pipe = new NamedPipeClientStream(".", $"discord-ipc-{i}", PipeDirection.InOut);
                     _pipe.Connect(500);
                     _connected = true;
-                    
+
                     SendHandshake(clientId);
                     UpdatePresence("Starting Data Center...", "Main Menu");
                     MelonLogger.Msg($"[Discord] Connected to local client (pipe {i}).");

@@ -25,7 +25,7 @@ public sealed class GregNetworkRack : IDisposable
 {
     private readonly GregEventBus _eventBus;
     private readonly IGregLogger _logger;
-    
+
     /// <summary>
     /// Lokaler State-Cache: RackId → Set von belegten Positionen.
     /// Wird über RPCs zwischen Clients synchronisiert.
@@ -38,11 +38,11 @@ public sealed class GregNetworkRack : IDisposable
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _logger = logger?.ForContext("NetworkRack") ?? throw new ArgumentNullException(nameof(logger));
-        
+
         // Subscribe to local rack events to broadcast
         _eventBus.Subscribe("greg.RACK.PositionMarkedUsed", OnLocalPositionChanged);
         _eventBus.Subscribe("greg.RACK.PositionMarkedFree", OnLocalPositionFreed);
-        
+
         _logger.Success("GregNetworkRack initialized – listening for rack sync events.");
     }
 
@@ -55,12 +55,12 @@ public sealed class GregNetworkRack : IDisposable
         try
         {
             if (payload.Data == null) return;
-            
+
             var rackId = payload.Data.TryGetValue("RackId", out var r) ? Convert.ToInt32(r) : 0;
             var position = payload.Data.TryGetValue("Position", out var p) ? Convert.ToInt32(p) : -1;
-            
+
             if (rackId == 0 || position < 0) return;
-            
+
             // Update local sync cache
             lock (_lock)
             {
@@ -71,10 +71,10 @@ public sealed class GregNetworkRack : IDisposable
                 }
                 positions.Add(position);
             }
-            
+
             // TODO: When FishNet is loaded, broadcast via ServerRpc
             // FishNetBridge.SendServerRpc("RackPositionUsed", rackId, position);
-            
+
             _logger.Info($"Rack position synced: Rack={rackId}, Pos={position}, State=Used");
         }
         catch (Exception ex)
@@ -92,20 +92,20 @@ public sealed class GregNetworkRack : IDisposable
         try
         {
             if (payload.Data == null) return;
-            
+
             var rackId = payload.Data.TryGetValue("RackId", out var r) ? Convert.ToInt32(r) : 0;
             var position = payload.Data.TryGetValue("Position", out var p) ? Convert.ToInt32(p) : -1;
-            
+
             if (rackId == 0 || position < 0) return;
-            
+
             lock (_lock)
             {
                 if (_syncedPositions.TryGetValue(rackId, out var positions))
                     positions.Remove(position);
             }
-            
+
             // TODO: FishNetBridge.SendServerRpc("RackPositionFreed", rackId, position);
-            
+
             _logger.Info($"Rack position synced: Rack={rackId}, Pos={position}, State=Free");
         }
         catch (Exception ex)
@@ -131,7 +131,7 @@ public sealed class GregNetworkRack : IDisposable
             {
                 RackPatch.MarkPositionFree(rackId, position);
             }
-            
+
             _logger.Info($"Remote rack update applied: Rack={rackId}, Pos={position}, Used={isUsed}");
         }
         catch (Exception ex)
@@ -157,10 +157,10 @@ public sealed class GregNetworkRack : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
-        
+
         _eventBus.Unsubscribe("greg.RACK.PositionMarkedUsed", OnLocalPositionChanged);
         _eventBus.Unsubscribe("greg.RACK.PositionMarkedFree", OnLocalPositionFreed);
-        
+
         lock (_lock)
         {
             _syncedPositions.Clear();

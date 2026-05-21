@@ -18,7 +18,7 @@ internal static class TimePatch
                     { "Day", currentDay },
                     { "PreviousDay", _lastDay }
                 });
-                
+
                 // Emit for both canonical and legacy
                 HookIntegration.Emit(HookName.Create("lifecycle", "DayEnded").ToString(), payload);
                 HookIntegration.Emit(HookName.Create("system", "GameDayAdvanced").ToString(), payload);

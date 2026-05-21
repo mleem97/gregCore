@@ -24,7 +24,8 @@ namespace greg.WallRack.Integration
                     if (slot.isOccupied && slot.mountedDevice != null)
                     {
                         var dev = slot.mountedDevice;
-                        mounted.Add(new MountedDoc {
+                        mounted.Add(new MountedDoc
+                        {
                             deviceId = dev.deviceId,
                             slotCoordX = dev.mountedAt.x,
                             slotCoordY = dev.mountedAt.y,
@@ -37,7 +38,8 @@ namespace greg.WallRack.Integration
                     }
                 }
 
-                wallsList.Add(new WallDoc {
+                wallsList.Add(new WallDoc
+                {
                     wallId = grid.wallId,
                     worldPosX = grid.wallOrigin.x,
                     worldPosY = grid.wallOrigin.y,
@@ -51,7 +53,8 @@ namespace greg.WallRack.Integration
                 });
             }
 
-            col.Insert(new WallRackStateDoc {
+            col.Insert(new WallRackStateDoc
+            {
                 sessionId = Guid.NewGuid().ToString(),
                 savedAt = DateTime.UtcNow,
                 walls = wallsList
@@ -69,14 +72,15 @@ namespace greg.WallRack.Integration
             foreach (var w in doc.walls)
             {
                 var grid = new GregWallGrid();
-                grid.Initialize(w.wallId, 
+                grid.Initialize(w.wallId,
                     new UnityEngine.Vector3(w.worldPosX, w.worldPosY, w.worldPosZ),
                     new UnityEngine.Vector3(w.wallNormalX, w.wallNormalY, w.wallNormalZ),
                     UnityEngine.Vector3.up, w.columns, w.rows);
 
                 foreach (var m in w.mountedDevices)
                 {
-                    var dev = new GregWallDevice {
+                    var dev = new GregWallDevice
+                    {
                         deviceId = m.deviceId,
                         deviceLabel = m.deviceLabel,
                         customerId = m.customerId,

@@ -21,13 +21,13 @@ public sealed class ConsoleLogger : IGregLogger
 
     public void Info(string message) => greg.Logging.GregLogger.Msg(message, _context);
     public void Warning(string message) => greg.Logging.GregLogger.Warn(message, _context);
-    public void Error(string message, Exception? ex = null) 
+    public void Error(string message, Exception? ex = null)
     {
         greg.Logging.GregLogger.Error(message, ex, _context);
     }
     public void Debug(string message) => greg.Logging.GregLogger.Debug(message, _context);
     public void Success(string message) => greg.Logging.GregLogger.Msg(message, _context);
-    
+
     public void Bridge(string bridgeName, string message) => greg.Logging.GregLogger.Msg(message, bridgeName);
 
     public IGregLogger ForContext(string context)

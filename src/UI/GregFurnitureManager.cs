@@ -27,7 +27,7 @@ namespace greg.Furniture
         public void ToggleBuildMode(GameObject? prefab = null)
         {
             _isBuildModeActive = !_isBuildModeActive;
-            
+
             if (_isBuildModeActive && prefab != null)
             {
                 CreateGhost(prefab);
@@ -45,7 +45,7 @@ namespace greg.Furniture
             _ghostObject = UnityEngine.Object.Instantiate(prefab);
             // Disable colliders for ghost
             foreach (var col in _ghostObject.GetComponentsInChildren<Collider>()) col.enabled = false;
-            
+
             // Apply semi-transparent material
             if (_ghostMaterial == null)
             {
@@ -58,7 +58,7 @@ namespace greg.Furniture
                 _ghostMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
                 _ghostMaterial.renderQueue = 3000;
             }
-            
+
             foreach (var renderer in _ghostObject.GetComponentsInChildren<Renderer>())
             {
                 renderer.material = _ghostMaterial;

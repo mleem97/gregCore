@@ -78,7 +78,7 @@ namespace gregCore.Infrastructure.Settings.Services
 
             // Search bar
             AddSearchBar();
-            
+
             // Populate mods
             RefreshUi();
         }

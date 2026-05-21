@@ -34,12 +34,12 @@ public class GregInputBindingService
 
         var oldKey = entry.CurrentKey;
         entry.CurrentKey = newKey;
-        
+
         _logger.Info($"Keybind geändert: {modId}.{actionId} von {oldKey} zu {newKey}");
-        
+
         _keybindRegistry.CheckConflicts();
         _persistence?.SaveAll();
-        
+
         return true;
     }
 

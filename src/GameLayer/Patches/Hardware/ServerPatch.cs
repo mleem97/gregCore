@@ -14,10 +14,10 @@ internal static class ServerPatch
     {
         try
         {
-            var payload = new EventPayload 
-            { 
-                HookName = "hardware.ServerStatusChanged", 
-                Data = new System.Collections.Generic.Dictionary<string, object> { { "status", "broken" } } 
+            var payload = new EventPayload
+            {
+                HookName = "hardware.ServerStatusChanged",
+                Data = new System.Collections.Generic.Dictionary<string, object> { { "status", "broken" } }
             };
             HookIntegration.Emit(HookName.Create("hardware", "ServerStatusChanged").ToString(), payload);
             GregAPI.FireEvent(GregEventId.ServerBroken.ToString());

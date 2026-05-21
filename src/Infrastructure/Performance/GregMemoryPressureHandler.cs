@@ -57,7 +57,7 @@ internal sealed class GregMemoryPressureHandler
 
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         GC.WaitForPendingFinalizers();
-        
+
         _bus.Publish("greg.performance.PressureCleanup", new EventPayload { OccurredAtUtc = DateTime.UtcNow, Data = new Dictionary<string, object>() });
     }
 }

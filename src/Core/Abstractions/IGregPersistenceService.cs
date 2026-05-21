@@ -1,4 +1,5 @@
 namespace gregCore.Core.Abstractions;
+
 public interface IGregPersistenceService
 {
     void Set<T>(string key, T value) where T : notnull;

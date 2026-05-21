@@ -50,7 +50,8 @@ public sealed class GregAPI : IGregAPI
     {
         if (!_validationService.ValidateHookName(hookName)) return;
 
-        _hookBus.On(hookName, (payload) => {
+        _hookBus.On(hookName, (payload) =>
+        {
             // Umwandlung in SDK-Payload für saubere Abstraktion
             var trigger = "unknown";
             if (payload.Data != null && payload.Data.TryGetValue("Trigger", out var triggerObj))
@@ -58,7 +59,8 @@ public sealed class GregAPI : IGregAPI
                 trigger = triggerObj?.ToString() ?? "unknown";
             }
 
-            var sdkPayload = new GregPayload(payload.HookName ?? hookName, trigger) {
+            var sdkPayload = new GregPayload(payload.HookName ?? hookName, trigger)
+            {
                 Data = payload.Data?.ToDictionary(kv => kv.Key, kv => kv.Value!) ?? new Dictionary<string, object>()
             };
             handler(sdkPayload);
@@ -72,7 +74,8 @@ public sealed class GregAPI : IGregAPI
             ["Trigger"] = payload.Trigger
         };
 
-        var corePayload = new Core.Models.EventPayload {
+        var corePayload = new Core.Models.EventPayload
+        {
             HookName = hookName,
             OccurredAtUtc = DateTime.UtcNow,
             Data = data,
@@ -87,32 +90,58 @@ public sealed class GregAPI : IGregAPI
     {
         if (!_validationService.ValidateModId(modId)) return;
 
-        _pluginRegistry.RegisterMod(new ModMetadata {
-            ModId = modId, Name = name, Version = version, ApiObject = apiObject!
+        _pluginRegistry.RegisterMod(new ModMetadata
+        {
+            ModId = modId,
+            Name = name,
+            Version = version,
+            ApiObject = apiObject!
         });
     }
 
     // --- Settings & Input ---
     public void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "")
     {
-        var entry = new Infrastructure.Settings.Models.SettingEntry<bool> {
-            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged!, Category = category, Description = description
+        var entry = new Infrastructure.Settings.Models.SettingEntry<bool>
+        {
+            ModId = modId,
+            SettingId = settingId,
+            DisplayName = displayName,
+            DefaultValue = defaultValue,
+            OnValueChanged = onChanged!,
+            Category = category,
+            Description = description
         };
         _settingsService.Register(entry);
     }
 
     public void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged = null, string category = "General", string description = "")
     {
-        var entry = new Infrastructure.Settings.Models.SettingEntry<float> {
-            ModId = modId, SettingId = settingId, DisplayName = displayName, DefaultValue = defaultValue, OnValueChanged = onChanged!, Category = category, Description = description
+        var entry = new Infrastructure.Settings.Models.SettingEntry<float>
+        {
+            ModId = modId,
+            SettingId = settingId,
+            DisplayName = displayName,
+            DefaultValue = defaultValue,
+            OnValueChanged = onChanged!,
+            Category = category,
+            Description = description
         };
         _settingsService.Register(entry);
     }
 
     public void RegisterKeybind(string modId, string actionId, string displayName, UnityEngine.KeyCode defaultKey, Action onPress, string category = "Controls", string description = "")
     {
-        var entry = new Infrastructure.Settings.Models.KeybindEntry {
-            ModId = modId, ActionId = actionId, DisplayName = displayName, DefaultKey = defaultKey, CurrentKey = defaultKey, Category = category, OnPress = onPress, Description = description
+        var entry = new Infrastructure.Settings.Models.KeybindEntry
+        {
+            ModId = modId,
+            ActionId = actionId,
+            DisplayName = displayName,
+            DefaultKey = defaultKey,
+            CurrentKey = defaultKey,
+            Category = category,
+            OnPress = onPress,
+            Description = description
         };
         _keybindRegistry.Register(entry);
     }

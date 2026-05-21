@@ -116,10 +116,10 @@ internal sealed class GregFrameRateLimiter : IDisposable
     {
         if (_isDisposed) return;
         if (!_profile.ThrottleWhenUnfocused) return;
-        
+
         var isFocused = global::UnityEngine.Application.isFocused;
         if (isFocused == _wasFocused) return;
-        
+
         _wasFocused = isFocused;
         if (!isFocused)
         {

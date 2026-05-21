@@ -42,7 +42,7 @@ namespace greg.WallRack
             // For now, pseudo-code behavior
             targetGrid = null;
             hoveredSlot = null;
-            
+
             // Vector3 hitPos = ...
             // targetGrid = GregWallRegistry.Instance.GetGridAtWorldPos(hitPos, 2.0f);
             // if (targetGrid != null) {
@@ -103,7 +103,7 @@ namespace greg.WallRack
                     new SwapAction(grid.wallId, slot.coord, oldDev, newDev)
                 );
                 _log.Msg($"Swapped device at {slot.coord}");
-                
+
                 gregCore.Core.Events.GregEventDispatcher.Emit(gregCore.GameLayer.Hooks.GregNativeEventHooks.WorldWallDeviceSwapped, slot.coord);
             }
         }
@@ -124,14 +124,16 @@ namespace greg.WallRack
                 .SetSize(250, 150)
                 .AddHeadline("Device Context")
                 .AddLabel($"ID: {slot.mountedDevice?.deviceId}")
-                .AddPrimaryButton("UNMOUNT", () => {
+                .AddPrimaryButton("UNMOUNT", () =>
+                {
                     TryUnmount(worldPos);
                     gregCore.UI.GregUIManager.SetPanelActive($"Rack_{slot.coord}", false);
                 })
-                .AddSecondaryButton("CLOSE", () => {
+                .AddSecondaryButton("CLOSE", () =>
+                {
                     gregCore.UI.GregUIManager.SetPanelActive($"Rack_{slot.coord}", false);
                 });
-            
+
             builder.Build();
         }
     }

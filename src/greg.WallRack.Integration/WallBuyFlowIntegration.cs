@@ -46,7 +46,7 @@ namespace greg.WallRack.Integration
             GregWallRegistry.Instance.RegisterWall(wallId, grid);
 
             _log.Msg($"Wall registered: {wallId} at {wallPos} -- 4x3 slots");
-            
+
             // Push Undo Action
             GregWallUndoRedoService.Instance.PushAction(
                 new BuyWallAction(wallId, wallPos, wallNormal)
@@ -60,7 +60,7 @@ namespace greg.WallRack.Integration
         {
             if (string.IsNullOrEmpty(str)) return Vector3.zero;
             var parts = str.Split(',');
-            if (parts.Length == 3 && 
+            if (parts.Length == 3 &&
                 float.TryParse(parts[0], out float x) &&
                 float.TryParse(parts[1], out float y) &&
                 float.TryParse(parts[2], out float z))
@@ -80,7 +80,7 @@ namespace greg.WallRack.Integration
         private static void Postfix()
         {
             if (!frameworkSdk.GregFeatureGuard.IsEnabled("WallRack")) return;
-            
+
             _log.Debug("ButtonBuyWall Postfix executed.");
             // If the hook payload was missing data, we can extract from instances here
         }

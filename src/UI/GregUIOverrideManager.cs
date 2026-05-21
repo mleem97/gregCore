@@ -19,9 +19,9 @@ namespace gregCore.UI
             {
                 // Skip our own UI
                 if (canvas.gameObject.name.StartsWith("gregCore")) continue;
-                
+
                 // Hide persistent HUD elements
-                if (canvas.gameObject.name.Contains("HUD") || 
+                if (canvas.gameObject.name.Contains("HUD") ||
                     canvas.gameObject.name.Contains("PlayerStatus") ||
                     canvas.gameObject.name.Contains("MiniMap"))
                 {

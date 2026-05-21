@@ -26,15 +26,18 @@ public class LuaCoroutineScheduler
     /// </summary>
     public void Register(Table greg)
     {
-        greg["wait"] = (Action<double, Closure>)((seconds, callback) => {
+        greg["wait"] = (Action<double, Closure>)((seconds, callback) =>
+        {
             RegisterTimer(seconds, callback, false);
         });
 
-        greg["every"] = (Action<double, Closure>)((seconds, callback) => {
+        greg["every"] = (Action<double, Closure>)((seconds, callback) =>
+        {
             RegisterTimer(seconds, callback, true);
         });
 
-        greg["start_coroutine"] = (Func<Closure, DynValue>)(coroutineFn => {
+        greg["start_coroutine"] = (Func<Closure, DynValue>)(coroutineFn =>
+        {
             return StartCoroutine(coroutineFn);
         });
 
@@ -95,12 +98,12 @@ public class LuaCoroutineScheduler
                     }
 
                     var result = co.Coroutine.Resume();
-                    
+
                     // Check if yielded with WAIT + time
                     if (co.Coroutine.State != CoroutineState.Dead && result.Type == DataType.Tuple)
                     {
                         var tuple = result.Tuple;
-                        if (tuple.Length >= 2 
+                        if (tuple.Length >= 2
                             && tuple[0].String == "__WAIT__"
                             && tuple[1].Type == DataType.Number)
                         {
@@ -138,16 +141,16 @@ public class LuaCoroutineScheduler
         var coroutine = coDynVal.Coroutine;
         var entry = new LuaCoroutine { Coroutine = coroutine };
         _coroutines.Add(entry);
-        
+
         try
         {
             var result = coroutine.Resume();
-            
+
             // Handle initial yield
             if (coroutine.State != CoroutineState.Dead && result.Type == DataType.Tuple)
             {
                 var tuple = result.Tuple;
-                if (tuple.Length >= 2 
+                if (tuple.Length >= 2
                     && tuple[0].String == "__WAIT__"
                     && tuple[1].Type == DataType.Number)
                 {

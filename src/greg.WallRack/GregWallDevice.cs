@@ -20,7 +20,7 @@ namespace greg.WallRack
         public void MountTo(GregWallSlot slot, Vector3 worldPos, Quaternion rotation)
         {
             if (slot == null || slot.isOccupied) return;
-            
+
             mountedAt = slot.coord;
             slot.isOccupied = true;
             slot.mountedDevice = this;

@@ -18,7 +18,7 @@ namespace greg.WallRack.Integration
 
                 // Sync Vanilla Ref
                 // _log.Debug($"NetworkSwitch {__instance.name} initialized. Binding vanillaRef.");
-                
+
             }
             catch (Exception ex)
             {

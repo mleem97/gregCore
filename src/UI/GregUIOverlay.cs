@@ -81,7 +81,7 @@ namespace gregCore.UI
             txt.alignment = TextAlignmentOptions.MidlineLeft;
             txt.overflowMode = TextOverflowModes.Truncate;
             txt.enableWordWrapping = true;
-            
+
             txt.enabled = true;
             try { txt.ForceMeshUpdate(); } catch { }
 

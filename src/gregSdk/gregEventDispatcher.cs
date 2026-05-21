@@ -17,7 +17,7 @@ namespace greg.Sdk
         {
             GregEventDispatcher.Emit(hookName, data);
         }
-        
+
         public static void UnregisterAll(string modId)
         {
             GregEventDispatcher.UnregisterAll(modId);

@@ -59,7 +59,7 @@ namespace greg.NoMoreEOL
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "auto_repair_servers", "Auto Repair Servers", true, val => _autoRepairBrokenServers = val, "Maintenance", "Automatically repairs broken servers.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_switches_eol", "Disable Switches EOL", true, val => _disableSwitchesEOL = val, "Maintenance", "Prevents switches from reaching End-Of-Life.");
             gregCore.API.GregAPI.Settings.RegisterToggle(modId, "disable_servers_eol", "Disable Servers EOL", true, val => _disableServersEOL = val, "Maintenance", "Prevents servers from reaching End-Of-Life.");
-            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "show_warning_signs", "Show Warning Signs", true, val => 
+            gregCore.API.GregAPI.Settings.RegisterToggle(modId, "show_warning_signs", "Show Warning Signs", true, val =>
             {
                 WarningsVisible = val;
                 UpdateWarningSignsVisibility();
@@ -113,7 +113,7 @@ namespace greg.NoMoreEOL
                 {
                     var map = NetworkMap.instance;
                     var gm = MainGameManager.instance;
-                    
+
                     if (map == null || gm == null) return;
 
                     _networkMap = map;

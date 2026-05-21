@@ -10,7 +10,7 @@ namespace greg.SaveEngine
     public class GregSaveEngine
     {
         public static GregSaveEngine Instance { get; private set; } = null!;
-        
+
         private LiteDatabase? _db;
         public string DbPath { get; private set; } = string.Empty;
 
@@ -25,17 +25,17 @@ namespace greg.SaveEngine
         {
             DbPath = Path.Combine(saveDir, $"gregSave_{Guid.NewGuid():N}.greg.db");
             _db = new LiteDatabase(DbPath);
-            
+
             var metaCol = _db.GetCollection<MetaDocument>("greg_meta");
-            metaCol.Upsert(new MetaDocument 
-            { 
-                Id = "header", 
+            metaCol.Upsert(new MetaDocument
+            {
+                Id = "header",
                 Value = "greg.SaveEngine.v1",
                 CreatedAt = DateTime.UtcNow,
                 LastSavedAt = DateTime.UtcNow,
                 IsVanillaSave = false
             });
-            
+
             _log.Section("Init");
             _log.Msg($"LiteDB initialized at {DbPath}");
             _log.FeatureState("SaveEngine", true);
@@ -45,12 +45,12 @@ namespace greg.SaveEngine
         public void SaveAll()
         {
             if (!frameworkSdk.GregFeatureGuard.IsEnabled("SaveEngine.Write")) return;
-            
+
             var watch = System.Diagnostics.Stopwatch.StartNew();
             SaveGridState(GregGridManager.Instance);
             // SaveServerState(...)
             // SaveNetworkState(...)
-            
+
             var metaCol = _db?.GetCollection<MetaDocument>("greg_meta");
             if (metaCol != null)
             {
@@ -62,10 +62,10 @@ namespace greg.SaveEngine
                 }
             }
             watch.Stop();
-            
+
             _log.Section("Save");
             _log.Saved(1, watch.ElapsedMilliseconds);
-            
+
             GregSaveNotifier.NotifySave("Auto-saved complete state.");
         }
 
@@ -84,10 +84,10 @@ namespace greg.SaveEngine
         public void SaveGridState(GregGridManager grid)
         {
             if (grid == null || _db == null) return;
-            
+
             var col = _db.GetCollection<GridStateDocument>("grid_state");
             col.DeleteAll();
-            
+
             var doc = new GridStateDocument
             {
                 GridOriginX = grid.GridOrigin.x,
@@ -97,7 +97,7 @@ namespace greg.SaveEngine
                 CellSizeZ = grid.CellSizeZ,
                 SavedAt = DateTime.UtcNow
             };
-            
+
             col.Insert(doc);
         }
 
@@ -116,7 +116,7 @@ namespace greg.SaveEngine
         {
             if (!File.Exists(filePath)) return false;
             if (!filePath.EndsWith(".greg.db")) return false;
-            
+
             try
             {
                 using var db = new LiteDatabase(filePath);

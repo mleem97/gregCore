@@ -85,24 +85,28 @@ public static class GoFFIBridge
         _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => { GregAPI.TriggerSave(); return 0; });
         _apiTable.get_difficulty = AddDelegate<GetIntDelegate>(() => GregAPI.GetDifficulty());
 
-        _apiTable.get_player_position = AddDelegate<GetPlayerPosDelegate>((out float x, out float y, out float z, out float ry) => {
+        _apiTable.get_player_position = AddDelegate<GetPlayerPosDelegate>((out float x, out float y, out float z, out float ry) =>
+        {
             var pos = GregAPI.GetPlayerPosition();
             x = pos.x; y = pos.y; z = pos.z; ry = pos.y; // ry mapped to y
         });
 
         _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
 
-        _apiTable.subscribe_event = AddDelegate<SubscribeDelegate>((eventId, cbPtr) => {
+        _apiTable.subscribe_event = AddDelegate<SubscribeDelegate>((eventId, cbPtr) =>
+        {
             var callback = Marshal.GetDelegateForFunctionPointer<EventActionDelegate>(cbPtr);
             GregAPI.Subscribe(((GregEventId)eventId).ToString(), data => callback(eventId, (ulong)data));
         });
         _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
 
         // Hook API (New)
-        _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => {
+        _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) =>
+        {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
             var callback = Marshal.GetDelegateForFunctionPointer<HookActionDelegate>(cbPtr);
-            GregAPI.Hooks.On(hookName, payloadObj => {
+            GregAPI.Hooks.On(hookName, payloadObj =>
+            {
                 var payload = (gregCore.Sdk.Models.GregPayload)payloadObj;
                 string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload.Data);
                 IntPtr hPtr = Marshal.StringToHGlobalAnsi(payload.HookName);
@@ -114,7 +118,8 @@ public static class GoFFIBridge
                 Marshal.FreeHGlobal(jPtr);
             });
         });
-        _apiTable.fire_hook = AddDelegate<FireHookDelegate>((hookPtr, jsonPtr) => {
+        _apiTable.fire_hook = AddDelegate<FireHookDelegate>((hookPtr, jsonPtr) =>
+        {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
             string json = Marshal.PtrToStringAnsi(jsonPtr) ?? "{}";
             var data = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json) ?? new();

@@ -110,12 +110,12 @@ public sealed class GregNativeEventHooks : SafePatch
     }
 
     // --- WallRack Hook Constants ---
-    public const string WorldWallRegistered    = "greg.WORLD.WallRegistered";
-    public const string WorldWallRemoved       = "greg.WORLD.WallRemoved";
-    public const string WorldWallPlaced        = "greg.WORLD.WallPlaced";
-    public const string WorldWallDeviceMounted  = "greg.WORLD.WallDeviceMounted";
+    public const string WorldWallRegistered = "greg.WORLD.WallRegistered";
+    public const string WorldWallRemoved = "greg.WORLD.WallRemoved";
+    public const string WorldWallPlaced = "greg.WORLD.WallPlaced";
+    public const string WorldWallDeviceMounted = "greg.WORLD.WallDeviceMounted";
     public const string WorldWallDeviceUnmounted = "greg.WORLD.WallDeviceUnmounted";
-    public const string WorldWallDeviceSwapped   = "greg.WORLD.WallDeviceSwapped";
-    public const string WorldWallDeviceLabelSet  = "greg.WORLD.WallDeviceLabelSet";
-    public const string SystemButtonBuyWall      = "greg.SYSTEM.ButtonBuyWall";
+    public const string WorldWallDeviceSwapped = "greg.WORLD.WallDeviceSwapped";
+    public const string WorldWallDeviceLabelSet = "greg.WORLD.WallDeviceLabelSet";
+    public const string SystemButtonBuyWall = "greg.SYSTEM.ButtonBuyWall";
 }

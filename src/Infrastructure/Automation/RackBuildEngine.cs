@@ -18,7 +18,7 @@ internal sealed class RackBuildEngine
     {
         _logger.Info($"Baue Rack {config.RackId}...");
         yield return null;
-        
+
         // Placeholder for installation logic
         int count = config.Servers.Length;
         onComplete(AutomationResult.Success(count, $"Rack {config.RackId} erfolgreich bestückt."));

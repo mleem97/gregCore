@@ -20,17 +20,17 @@ public sealed class GregNetworkServer : IDisposable
 {
     private readonly GregEventBus _eventBus;
     private readonly IGregLogger _logger;
-    
+
     /// <summary>
     /// Lokaler State-Cache: ServerId → Power-State.
     /// </summary>
     private readonly Dictionary<string, bool> _serverPowerStates = new();
-    
+
     /// <summary>
     /// Lokaler State-Cache: ServerId → Liste verbundener Ports.
     /// </summary>
     private readonly Dictionary<string, List<string>> _serverPortConnections = new();
-    
+
     private readonly object _lock = new();
     private bool _disposed;
 
@@ -38,10 +38,10 @@ public sealed class GregNetworkServer : IDisposable
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _logger = logger?.ForContext("NetworkServer") ?? throw new ArgumentNullException(nameof(logger));
-        
+
         // Subscribe to server events
         _eventBus.Subscribe("greg.HARDWARE.ServerStatusChanged", OnServerStatusChanged);
-        
+
         _logger.Success("GregNetworkServer initialized – listening for server sync events.");
     }
 
@@ -51,13 +51,13 @@ public sealed class GregNetworkServer : IDisposable
         try
         {
             if (payload.Data == null) return;
-            
+
             var status = payload.Data.TryGetValue("status", out var s) ? s?.ToString() : null;
             if (string.IsNullOrEmpty(status)) return;
-            
+
             // TODO: Broadcast via FishNet ServerRpc
             // FishNetBridge.SendServerRpc("ServerStatusChanged", serverId, status);
-            
+
             _logger.Info($"Server status change queued for sync: {status}");
         }
         catch (Exception ex)
@@ -72,14 +72,14 @@ public sealed class GregNetworkServer : IDisposable
     public void SetPowerState(string serverId, bool isOn)
     {
         if (_disposed || string.IsNullOrEmpty(serverId)) return;
-        
+
         try
         {
             lock (_lock)
             {
                 _serverPowerStates[serverId] = isOn;
             }
-            
+
             _eventBus.Publish("greg.NET.ServerPowerChanged", new EventPayload
             {
                 HookName = "greg.NET.ServerPowerChanged",
@@ -91,7 +91,7 @@ public sealed class GregNetworkServer : IDisposable
                 },
                 IsCancelable = false
             });
-            
+
             _logger.Info($"Server power state: {serverId} → {(isOn ? "ON" : "OFF")}");
         }
         catch (Exception ex)
@@ -106,7 +106,7 @@ public sealed class GregNetworkServer : IDisposable
     public void ConnectPort(string serverId, string portId)
     {
         if (_disposed || string.IsNullOrEmpty(serverId) || string.IsNullOrEmpty(portId)) return;
-        
+
         try
         {
             lock (_lock)
@@ -119,9 +119,9 @@ public sealed class GregNetworkServer : IDisposable
                 if (!ports.Contains(portId))
                     ports.Add(portId);
             }
-            
+
             // TODO: FishNetBridge.SendServerRpc("PortConnected", serverId, portId);
-            
+
             _logger.Info($"Port connected: Server={serverId}, Port={portId}");
         }
         catch (Exception ex)
@@ -136,7 +136,7 @@ public sealed class GregNetworkServer : IDisposable
     public void DisconnectPort(string serverId, string portId)
     {
         if (_disposed || string.IsNullOrEmpty(serverId) || string.IsNullOrEmpty(portId)) return;
-        
+
         try
         {
             lock (_lock)
@@ -144,9 +144,9 @@ public sealed class GregNetworkServer : IDisposable
                 if (_serverPortConnections.TryGetValue(serverId, out var ports))
                     ports.Remove(portId);
             }
-            
+
             // TODO: FishNetBridge.SendServerRpc("PortDisconnected", serverId, portId);
-            
+
             _logger.Info($"Port disconnected: Server={serverId}, Port={portId}");
         }
         catch (Exception ex)
@@ -187,9 +187,9 @@ public sealed class GregNetworkServer : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
-        
+
         _eventBus.Unsubscribe("greg.HARDWARE.ServerStatusChanged", OnServerStatusChanged);
-        
+
         lock (_lock)
         {
             _serverPowerStates.Clear();

@@ -51,7 +51,7 @@ public class GregSettingsConflictService
                 _logger.Error($"[Registrierungsfehler] Setting ohne ModId oder SettingId gefunden: {setting.DisplayName}");
             }
         }
-        
+
         _logger.Info("Validierung abgeschlossen.");
     }
 }

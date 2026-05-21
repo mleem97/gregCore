@@ -33,7 +33,7 @@ public sealed class GregPayload
         {
             return p.GetValue<T>(fieldName) ?? fallback;
         }
-        
+
         if (payload is gregCore.Core.Models.EventPayload ep && ep.Data.TryGetValue(fieldName, out var val))
         {
             try { return (T)System.Convert.ChangeType(val, typeof(T)); } catch { }

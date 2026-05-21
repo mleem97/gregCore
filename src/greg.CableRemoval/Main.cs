@@ -14,7 +14,7 @@ namespace greg.CableRemoval
     {
         private GregModLogger _log = null!;
         private bool _enabled = true;
-        
+
         private const float WorldPurgeHoldSeconds = 10f;
         private bool _showMassRemoveHint;
         private bool _showWorldPurgeHint;
@@ -259,8 +259,8 @@ namespace greg.CableRemoval
 
         private void TryDisconnectOnPatchPanel(PatchPanel p)
         {
-            try 
-            { 
+            try
+            {
                 if (p.cableLinkPorts == null) return;
                 foreach (var port in p.cableLinkPorts)
                 {
@@ -269,18 +269,18 @@ namespace greg.CableRemoval
                         port.SecondActionOnClick();
                     }
                 }
-            } 
+            }
             catch { }
         }
 
         private void TryDisconnectAllInWorld()
         {
-            foreach (var sw in Resources.FindObjectsOfTypeAll<NetworkSwitch>()) 
+            foreach (var sw in Resources.FindObjectsOfTypeAll<NetworkSwitch>())
                 if (sw.gameObject.scene.isLoaded) TryDisconnectOnNetworkSwitch(sw);
-            
-            foreach (var p in Resources.FindObjectsOfTypeAll<PatchPanel>()) 
+
+            foreach (var p in Resources.FindObjectsOfTypeAll<PatchPanel>())
                 if (p.gameObject.scene.isLoaded) TryDisconnectOnPatchPanel(p);
-                
+
             _log.Msg("World purge finished.");
         }
     }

@@ -74,7 +74,7 @@ namespace gregCore.UI
         public static void SearchFonts()
         {
             if (_hasFoundGameFont && _defaultTMPMaterial != null) return;
-            
+
             _lastSearchTime = Time.time;
             _searchAttempt++;
             if (_searchAttempt > 20) return;
@@ -86,7 +86,7 @@ namespace gregCore.UI
                 if (!_reflectionInitialized) InitializeReflection();
                 LoadTMPFontAssetDirect();
                 FindFontsFromTMPText();
-                
+
                 // Only do heavy searches if still not found
                 if (!_hasFoundGameFont)
                 {
@@ -106,7 +106,7 @@ namespace gregCore.UI
         public static void Tick()
         {
             if (_hasFoundGameFont && _defaultTMPMaterial != null) return;
-            if (_searchAttempt >= 20) return; 
+            if (_searchAttempt >= 20) return;
 
             if (Time.time - _lastSearchTime > 5.0f)
                 SearchFonts();
@@ -223,7 +223,7 @@ namespace gregCore.UI
 
                     if (_defaultUGUIFont == null && fontAsset.sourceFontFile != null)
                         _defaultUGUIFont = fontAsset.sourceFontFile;
-                        
+
                     // If we have both now, we can stop iterating
                     if (_defaultTMPFontAsset != null && _defaultTMPMaterial != null) break;
                 }

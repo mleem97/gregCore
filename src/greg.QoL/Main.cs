@@ -29,7 +29,7 @@ namespace greg.QoL
             }
 
             _log = new GregModLogger("QoL");
-            
+
             RegisterSettings();
 
             _log.FeatureState("QoL", true);
@@ -94,13 +94,13 @@ namespace greg.QoL
             foreach (var box in UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.SFPBox>())
             {
                 if (box == null || box.objectInHands || box.isOnTrolley || box.currentRackPosition != null) continue;
-                
+
                 bool isEmpty = true;
                 if (box.usedPositions != null)
                 {
                     foreach (var pos in box.usedPositions) if (pos != 0) { isEmpty = false; break; }
                 }
-                
+
                 if (isEmpty)
                 {
                     foreach (var module in box.GetComponentsInChildren<global::Il2Cpp.SFPModule>(true))
@@ -135,11 +135,11 @@ namespace greg.QoL
             GameObject gameObject = GameObject.Find("Player/vCam/holdingPos/holdingPosChangedFromObject");
             if (gameObject == null || gameObject.transform.childCount == 0)
                 return;
-                
+
             Transform child = gameObject.transform.GetChild(0);
             bool isUsable = false;
             bool isHardware = false;
-            
+
             foreach (Component component in child.GetComponents<Component>())
             {
                 if (component != null)
@@ -153,16 +153,16 @@ namespace greg.QoL
                     catch { }
                 }
             }
-            
+
             if (!isUsable && !isHardware) return;
 
             Camera main = Camera.main;
             if (main == null) return;
-            
+
             RaycastHit hitInfo;
             if (!Physics.Raycast(main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0.0f)), out hitInfo, 3f))
                 return;
-                
+
             if (hitInfo.collider == null || hitInfo.collider.gameObject.name != "Dumpster_body")
                 return;
 
@@ -174,7 +174,7 @@ namespace greg.QoL
         {
             GameObject gameObject = hGroup.gameObject;
             UnityEngine.Object.DestroyImmediate(hGroup);
-            
+
             GridLayoutGroup gridLayoutGroup = gameObject.AddComponent<GridLayoutGroup>();
             if (gridLayoutGroup == null)
             {
@@ -189,7 +189,7 @@ namespace greg.QoL
             gridLayoutGroup.childAlignment = TextAnchor.UpperLeft;
             gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayoutGroup.constraintCount = 5;
-            
+
             try
             {
                 ContentSizeFitter contentSizeFitter = gameObject.AddComponent<ContentSizeFitter>();
@@ -203,7 +203,7 @@ namespace greg.QoL
             {
                 _log.Msg("ContentSizeFitter skipped");
             }
-            
+
             _hasFixedLayout = true;
             _log.Msg($"Grid fix applied! {gameObject.transform.childCount} items arranged in rows of 5.");
         }

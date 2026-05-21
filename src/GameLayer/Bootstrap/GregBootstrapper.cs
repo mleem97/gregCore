@@ -25,16 +25,20 @@ internal static class GregBootstrapper
     public static GregServiceContainer Build(global::MelonLoader.MelonLogger.Instance melonLogger)
     {
         // Initialize Assembly Resolver for subfolder dependencies
-        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-            try {
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+        {
+            try
+            {
                 var name = new AssemblyName(args.Name).Name;
                 var depDir = Path.Combine(global::MelonLoader.Utils.MelonEnvironment.ModsDirectory, "gregDependencies");
                 var targetPath = Path.Combine(depDir, name + ".dll");
-                
-                if (File.Exists(targetPath)) {
+
+                if (File.Exists(targetPath))
+                {
                     return Assembly.LoadFrom(targetPath);
                 }
-            } catch { }
+            }
+            catch { }
             return null;
         };
 
@@ -114,7 +118,8 @@ internal static class GregBootstrapper
         gregCore.API.GregAPI._modSettingsService = modSettingsService;
         // --------------------------
 
-        var apiContext = new global::gregCore.PublicApi.GregApiContext {
+        var apiContext = new global::gregCore.PublicApi.GregApiContext
+        {
             Logger = logger,
             EventBus = bus,
             HookBus = hookBus,

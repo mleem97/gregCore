@@ -95,7 +95,7 @@ namespace greg.UI.Settings
                     .AddSlider("UI Scale (Beta)", 0.5f, 2.0f, 1.0f, v => { })
                     .AddButton("Reset UI State", () => { })
                     .AddButton("Dump Scene Hierarchy", () => { });
-                    }));
+            }));
         }
 
         private static void InjectPanelBuilder(GregUIBuilder legacyBuilder, GregPanelBuilder panelBuilder)

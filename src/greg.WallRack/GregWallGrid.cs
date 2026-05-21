@@ -63,7 +63,7 @@ namespace greg.WallRack
 
             Vector3 wPos = SlotToWorldPos(coord);
             Quaternion rot = Quaternion.LookRotation(wallNormal, wallUp);
-            
+
             device.MountTo(slot, wPos, rot);
             return true;
         }
@@ -109,7 +109,7 @@ namespace greg.WallRack
         public void DrawDebugGrid()
         {
             if (!gregCore.Infrastructure.Config.GregCoreConfig.DebugMode) return;
-            
+
             // Draw Grid Lines via GL or Debug.DrawLine
             Vector3 right = Vector3.Cross(wallUp, wallNormal).normalized;
             for (int x = 0; x <= columns; x++)

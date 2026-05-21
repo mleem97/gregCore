@@ -12,12 +12,12 @@ namespace gregCore.UI
         public static readonly Color TertiaryColor = ParseHex("#0ac4fd");  // Vivid blue (Badges)
         public static readonly Color NeutralBorder = ParseHex("#47817c"); // Desaturated teal (Borders)
         public static Color NeutralPalette => NeutralBorder;
-        public static readonly Color BackgroundDark = new Color(0.07f, 0.07f, 0.07f, 0.96f); 
-        public static readonly Color SurfaceDark = new Color(0.12f, 0.12f, 0.12f, 0.98f);    
+        public static readonly Color BackgroundDark = new Color(0.07f, 0.07f, 0.07f, 0.96f);
+        public static readonly Color SurfaceDark = new Color(0.12f, 0.12f, 0.12f, 0.98f);
         public static Color PanelBackground => SurfaceDark;
 
         // --- Layout & Geometry ---
-        public static readonly float CornerRadius = 8f; 
+        public static readonly float CornerRadius = 8f;
         public static readonly float Padding = 16f;
         public static readonly float Spacing = 12f;
         public static readonly float HeaderHeight = 40f;

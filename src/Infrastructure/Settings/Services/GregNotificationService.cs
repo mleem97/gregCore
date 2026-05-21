@@ -19,14 +19,14 @@ namespace gregCore.Infrastructure.Settings.Services
 
         public void Show(string title, string message, float duration = 5f)
         {
-            _activeNotifications.Add(new Notification 
-            { 
-                Title = title, 
-                Message = message, 
-                Expiration = Time.time + duration 
+            _activeNotifications.Add(new Notification
+            {
+                Title = title,
+                Message = message,
+                Expiration = Time.time + duration
             });
             _logger.Info($"Notification: {title} - {message}");
-            
+
             BuildNotificationUI(title, message, duration);
         }
 
@@ -85,7 +85,7 @@ namespace gregCore.Infrastructure.Settings.Services
             notification.Add(messageLabel);
 
             GregUIManager.RegisterPanel(notification.name, notification);
-            
+
             // Auto-remove after duration
             _logger.Info($"Notification UI built: {notification.name}");
         }

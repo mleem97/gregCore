@@ -21,6 +21,51 @@ public static class RackPatch
     private static readonly Dictionary<int, HashSet<int>> _usedPositions = new();
     private static readonly object _lock = new();
 
+    private static readonly HashSet<global::Il2Cpp.Rack> _cachedRacks = new();
+
+    public static HashSet<global::Il2Cpp.Rack> GetCachedRacks()
+    {
+        lock (_lock)
+        {
+            _cachedRacks.RemoveWhere(r => r == null || r.Pointer == IntPtr.Zero || !r.gameObject.activeInHierarchy);
+            return new HashSet<global::Il2Cpp.Rack>(_cachedRacks);
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "Awake")]
+    [HarmonyPostfix]
+    private static void AwakePostfix(global::Il2Cpp.Rack __instance)
+    {
+        if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+        lock (_lock)
+        {
+            _cachedRacks.Add(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Rack), "OnDestroy")]
+    [HarmonyPostfix]
+    private static void OnDestroyPostfix(global::Il2Cpp.Rack __instance)
+    {
+        if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+        lock (_lock)
+        {
+            _cachedRacks.Remove(__instance);
+            int hash = __instance.GetHashCode();
+            _usedPositions.Remove(hash);
+        }
+    }
+
+    public static void ClearCache()
+    {
+        lock (_lock)
+        {
+            _cachedRacks.Clear();
+            _usedPositions.Clear();
+        }
+    }
+
+
     [HarmonyPatch(typeof(global::Il2Cpp.Rack), nameof(global::Il2Cpp.Rack.IsPositionAvailable))]
     [HarmonyPrefix]
     [HarmonyPriority(Priority.High)]

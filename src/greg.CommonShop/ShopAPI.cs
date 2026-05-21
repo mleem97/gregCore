@@ -31,11 +31,11 @@ namespace greg.CommonShop
                     return;
                 }
             }
-            
+
             _registeredItems.Add(item);
             _log.Msg($"Registered: {item.Name} in {item.Category}");
         }
-        
+
         internal static void InjectAll(ComputerShop shop)
         {
             if (_registeredItems.Count == 0) return;
@@ -66,9 +66,9 @@ namespace greg.CommonShop
                         if (HasExternalModConflict(shop, data))
                         {
                             _log.Error($"External Conflict: Another mod is using '{data.Name}'. Skipping injection.");
-                            continue;     
+                            continue;
                         }
-                        
+
                         ShopItem? template = CustomShopItem.FindTemplate(shop, data.TemplateType, data.TemplateID);
                         if (template != null)
                         {
@@ -84,20 +84,20 @@ namespace greg.CommonShop
             if (sr?.content != null)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(sr.content);
         }
-        
+
         private static bool HasExternalModConflict(ComputerShop shop, CustomShopItem data)
         {
             int targetID = data.ResultItemID ?? data.TemplateID;
             var allUIItems = shop.shopItemParent.GetComponentsInChildren<ShopItem>(true);
-            
+
             foreach (var uiItem in allUIItems)
             {
                 if (uiItem?.shopItemSO != null)
                 {
                     if (uiItem.shopItemSO.itemName == data.Name) return true;
 
-                    if (data.ResultItemID.HasValue && 
-                        uiItem.shopItemSO.itemType == data.TemplateType && 
+                    if (data.ResultItemID.HasValue &&
+                        uiItem.shopItemSO.itemType == data.TemplateType &&
                         uiItem.shopItemSO.itemID == targetID)
                     {
                         return true;
@@ -130,10 +130,10 @@ namespace greg.CommonShop
                 newSo.itemType = data.TemplateType;
                 newSo.itemID = data.ResultItemID ?? data.TemplateID;
                 if (data.Icon != null) newSo.sprite = data.Icon;
-                
+
                 si.shopItemSO = newSo;
                 si.Start(); // Force update UI texts based on new SO
-                
+
                 // Invoke callback
                 data.OnUIReady?.Invoke(clone);
             }

@@ -41,7 +41,7 @@ internal static class GregPerformancePatches
         // are NOT patchable via Harmony when they're not explicitly defined in Il2Cpp types.
         // These are virtual methods from the base class and don't appear in decompiled code.
         // Disabling these patches to prevent harmless but noisy warning spam.
-        
+
         // TryPatch(typeof(WorldCanvasCuller), "Update", typeof(WorldCanvasCullerPatch));
         // TryPatch(typeof(WorldCanvasCuller), "OnDestroy", typeof(WorldCanvasCullerCleanupPatch));
 

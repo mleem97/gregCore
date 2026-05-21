@@ -18,7 +18,7 @@ namespace greg.Furniture
                 .AddSpacer(5)
                 .AddSwitch("Show Snap Points", true, v => { })
                 .Build();
-                
+
             _uiBuilder.IsVisible = false;
         }
 

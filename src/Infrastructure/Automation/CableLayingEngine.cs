@@ -24,11 +24,14 @@ internal sealed class CableLayingEngine
             yield break;
         }
 
-        try {
+        try
+        {
             map.Connect(src, tgt);
             _logger.Info($"Kabel verlegt: {src} -> {tgt} ({type})");
             onComplete(AutomationResult.Success(1));
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             onComplete(AutomationResult.Failure("Fehler beim Verlegen", ex.Message));
         }
     }

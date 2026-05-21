@@ -17,7 +17,8 @@ internal sealed class GregOperationQueue : IDisposable
     internal async Task<T> EnqueueAsync<T>(string name, Func<Task<T>> operation, OperationPriority priority = OperationPriority.Normal, CancellationToken ct = default)
     {
         var tcs = new TaskCompletionSource<T>();
-        var op = new QueuedOperation(name, async () => {
+        var op = new QueuedOperation(name, async () =>
+        {
             try { tcs.SetResult(await _throttler.ExecuteOperationAsync(name, operation, priority, ct)); }
             catch (Exception ex) { tcs.SetException(ex); }
         }, (int)priority);
@@ -30,14 +31,17 @@ internal sealed class GregOperationQueue : IDisposable
     private async Task ProcessQueueAsync(CancellationToken ct)
     {
         if (!await _processLock.WaitAsync(0)) return;
-        try {
-            while (true) {
+        try
+        {
+            while (true)
+            {
                 QueuedOperation? op;
                 lock (_queue) { if (!_queue.TryDequeue(out op, out _)) break; }
                 if (ct.IsCancellationRequested) break;
                 try { await op.Execute(); } catch (Exception ex) { _logger.Error($"[Queue] Fehlgeschlagen: {op.Name}", ex); }
             }
-        } finally { _processLock.Release(); }
+        }
+        finally { _processLock.Release(); }
     }
 
     internal int QueueDepth { get { lock (_queue) return _queue.Count; } }

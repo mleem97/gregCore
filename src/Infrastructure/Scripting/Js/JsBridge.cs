@@ -17,7 +17,8 @@ public sealed class JsBridge : IGregLanguageBridge
     {
         _logger = logger.ForContext("JsBridge");
         _eventBus = eventBus;
-        _engine = new Engine(options => {
+        _engine = new Engine(options =>
+        {
             options.AllowClr();
         });
     }
@@ -25,7 +26,7 @@ public sealed class JsBridge : IGregLanguageBridge
     public void Initialize()
     {
         _logger.Info("JS Bridge initializing...");
-        
+
         // Register API
         var greg = new Dictionary<string, object>();
         RegisterApi(greg);
@@ -47,13 +48,16 @@ public sealed class JsBridge : IGregLanguageBridge
         greg["logWarning"] = (Action<string>)GregAPI.LogWarning;
         greg["logError"] = (Action<string>)GregAPI.LogError;
 
-        greg["on"] = (Action<string, Jint.Native.JsValue>)((hookName, callback) => {
-            GregAPI.Hooks.On(hookName, payload => {
+        greg["on"] = (Action<string, Jint.Native.JsValue>)((hookName, callback) =>
+        {
+            GregAPI.Hooks.On(hookName, payload =>
+            {
                 callback.Call(Jint.Native.JsValue.FromObject(_engine, payload));
             });
         });
 
-        greg["fire"] = (Action<string, IDictionary<string, object>>)((hookName, data) => {
+        greg["fire"] = (Action<string, IDictionary<string, object>>)((hookName, data) =>
+        {
             var payload = new gregCore.Sdk.Models.GregPayload(hookName, "JsMod");
             foreach (var kvp in data) payload.Data[kvp.Key] = kvp.Value;
             GregAPI.Hooks.Fire(hookName, payload);

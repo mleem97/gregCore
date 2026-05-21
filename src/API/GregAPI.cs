@@ -201,7 +201,7 @@ namespace gregCore.API
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
+                var racks = gregCore.GameLayer.Patches.Hardware.RackPatch.GetCachedRacks();
                 return racks != null ? (uint)racks.Count : 0u;
             }
             catch { return 0u; }

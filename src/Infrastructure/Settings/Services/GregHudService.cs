@@ -20,7 +20,7 @@ namespace gregCore.Infrastructure.Settings.Services
             _keybindRegistry = keybindRegistry;
         }
 
-        public void Toggle() 
+        public void Toggle()
         {
             _showHud = !_showHud;
             if (_showHud && _hudPanel == null)
@@ -63,7 +63,7 @@ namespace gregCore.Infrastructure.Settings.Services
             };
 
             var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
-            
+
             var titleLabel = new Label("gregCore: Keybind-Konflikte!")
             {
                 style =

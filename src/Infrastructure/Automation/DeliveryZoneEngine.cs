@@ -32,7 +32,7 @@ internal sealed class DeliveryZoneEngine
         {
             progress?.Report(new AutomationProgress { CurrentTask = $"Verarbeite {item.name}", Current = processed, Total = items.Count });
             yield return null; // Spread over frames
-            
+
             // Logic placeholder: Move item
             _logger.Debug($"Verschiebe Item: {item.name}");
             processed++;
@@ -46,7 +46,7 @@ internal sealed class DeliveryZoneEngine
         var result = new List<global::Il2Cpp.Item>();
         var objects = global::UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Item>();
         if (objects == null) return result;
-        
+
         foreach (var obj in objects)
         {
             // Simple logic: Items near certain coords or with certain names

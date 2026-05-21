@@ -23,11 +23,14 @@ internal sealed class GregRequestThrottler : IDisposable
         Interlocked.Increment(ref _totalQueued);
         await _opSemaphore.WaitAsync(ct);
         Interlocked.Increment(ref _currentActive);
-        
-        try {
+
+        try
+        {
             _logger.Debug($"[Throttle] START '{operationName}' (aktiv: {_currentActive}/{_profile.MaxConcurrentOps})");
             return await operation();
-        } finally {
+        }
+        finally
+        {
             Interlocked.Decrement(ref _currentActive);
             Interlocked.Increment(ref _totalCompleted);
             _opSemaphore.Release();

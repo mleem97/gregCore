@@ -30,23 +30,23 @@ public class GregHookRegistry : IGregHookRegistry
         try
         {
             string hooksFile = ResolveHooksFilePath();
-            
+
             if (File.Exists(hooksFile))
             {
                 _logger.Debug($"Lade Hooks von: {hooksFile}");
                 var content = File.ReadAllText(hooksFile);
                 var manifest = JsonConvert.DeserializeObject<GregHooksManifest>(content);
-                
+
                 if (manifest?.Hooks != null)
                 {
                     _hooks.AddRange(manifest.Hooks);
-                    
+
                     foreach (var hook in manifest.Hooks)
                     {
                         if (string.IsNullOrEmpty(hook.Name)) continue;
-                        
+
                         _hookByName[hook.Name] = hook;
-                        
+
                         if (!string.IsNullOrEmpty(hook.FriendlyAlias))
                         {
                             _hookByName[hook.FriendlyAlias] = hook;
@@ -57,7 +57,7 @@ public class GregHookRegistry : IGregHookRegistry
                         _hookToId[hook.Name] = eventId;
                         _idToHook[eventId] = hook.Name;
                     }
-                    
+
                     _logger.Info($"Erfolgreich {_hooks.Count} Hooks aus greg_hooks.json geladen.");
                 }
             }

@@ -17,17 +17,17 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
     {
         _logger = ctx.Logger.ForContext(nameof(GregPerformanceGovernor));
         _profile = profile ?? PerformanceProfile.Balanced;
-        
+
         _fpsLimiter = new GregFrameRateLimiter(ctx.Logger, _profile);
         _throttler = new GregRequestThrottler(ctx.Logger, _profile);
         _monitor = new GregResourceMonitor(ctx.Logger, ctx.EventBus, _profile);
         _memHandler = new GregMemoryPressureHandler(ctx.Logger, ctx.EventBus, _profile);
         _queue = new GregOperationQueue(_throttler, ctx.Logger);
-        
+
         // Performance-Patches initialisieren (Throttle, Cleanup, etc.)
         GregPerformancePatches.Initialize();
         ApplyPatchSettings(_profile);
-        
+
         _monitor.Start(5000);
         _logger.Info($"[Governor] Initialisiert mit Prefix-Architektur + Performance-Patches.");
     }
@@ -72,11 +72,12 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
         GregPerformancePatches.AsyncRouteEvalEnabled = false;
     }
 
-    internal PerformanceStats GetStats() => new PerformanceStats { 
-        Profile = _profile, 
-        Resources = _monitor.GetLatest(), 
-        Throttle = _throttler.GetMetrics(), 
-        QueueDepth = _queue.QueueDepth 
+    internal PerformanceStats GetStats() => new PerformanceStats
+    {
+        Profile = _profile,
+        Resources = _monitor.GetLatest(),
+        Throttle = _throttler.GetMetrics(),
+        QueueDepth = _queue.QueueDepth
     };
 
     public void Dispose()

@@ -8,7 +8,8 @@ public sealed class GregTimeModule
     public float GetTimeOfDay() => global::Il2Cpp.TimeController.instance?.currentTimeOfDay ?? 0f;
     public int GetDay() => global::Il2Cpp.TimeController.instance?.day ?? 1;
     public float GetSecondsInFullDay() => global::Il2Cpp.TimeController.instance?.secondsInFullDay ?? 1200f;
-    public void SetSecondsInFullDay(float s) {
+    public void SetSecondsInFullDay(float s)
+    {
         if (global::Il2Cpp.TimeController.instance != null) global::Il2Cpp.TimeController.instance.secondsInFullDay = s;
     }
     public bool IsPaused() => global::UnityEngine.Time.timeScale == 0;

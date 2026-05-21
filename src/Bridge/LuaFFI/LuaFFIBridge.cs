@@ -34,15 +34,15 @@ public sealed class LuaFFIBridge
         MelonLogger.Msg("[LuaFFI] Initializing modernized Lua environment...");
 
         UserData.RegisterType<gregCore.UI.GregUIBuilder>();
-        
+
         string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
         string luaDir = Path.Combine(gameRoot, "UserData", "gregCore", "Mods", "Lua");
         string sharedDir = Path.Combine(luaDir, "@shared");
         string hooksFile = Path.Combine(gameRoot, "UserData", "gregCore", "game_hooks.json");
-        
+
         if (!Directory.Exists(luaDir)) Directory.CreateDirectory(luaDir);
         if (!Directory.Exists(sharedDir)) Directory.CreateDirectory(sharedDir);
-        
+
         // Infrastructure
         _profiler = new LuaProfiler(2.0f); // 2ms per frame budget
         _errorOverlay = new LuaErrorOverlay();
@@ -69,14 +69,14 @@ public sealed class LuaFFIBridge
 
             string mainFile = Path.Combine(dir, "main.lua");
             string manifestFile = Path.Combine(dir, "mod.json");
-            
+
             if (!File.Exists(mainFile)) continue;
 
             try
             {
                 string id = Path.GetFileName(dir);
                 var script = new Script(CoreModules.Preset_SoftSandbox);
-                
+
                 // 1. Module Loader (require support)
                 var loader = new LuaModuleLoader(script, dir, Path.Combine(luaDir, "@shared"));
                 loader.Register();
@@ -88,7 +88,7 @@ public sealed class LuaFFIBridge
                 // 3. Register Core Modules
                 GregEventLuaModule.Register(gregTable, script, API.GregAPI.EventBus!, id);
                 GregIoLuaModule.Register(gregTable, script, id, Path.Combine(dir, "data"));
-                
+
                 // 4. Register Domain Modules
                 LuaPlayerModule.Register(gregTable, script, id);
                 LuaWorldModule.Register(gregTable, script, id);
@@ -188,7 +188,7 @@ public sealed class LuaFFIBridge
     private static void OnPluginNeedsReload(LuaPluginReloadInfo info)
     {
         MelonLogger.Msg($"[LuaFFI] Hot-reloading mod: {info.ModId}");
-        
+
         // Find existing plugin
         var existing = _plugins.Find(p => p.Id == info.ModId);
         if (existing != null)

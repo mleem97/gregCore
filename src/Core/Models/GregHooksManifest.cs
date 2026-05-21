@@ -21,7 +21,7 @@ public class GregHookDef
     public string ClassName { get; set; } = string.Empty;
     public string MethodName { get; set; } = string.Empty;
     public string FriendlyAlias { get; set; } = string.Empty;
-    
+
     public GregHookPayloadSchema? PayloadSchema { get; set; }
 }
 

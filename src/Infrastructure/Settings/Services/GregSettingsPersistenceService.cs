@@ -13,13 +13,13 @@ public class GregSettingsPersistenceService
     private readonly IGregLogger _logger;
     private readonly GregKeybindRegistry _keybindRegistry;
     private readonly GregModSettingsService _modSettingsService;
-    
+
     private readonly string _keybindsFile;
     private readonly string _settingsFile;
 
     public GregSettingsPersistenceService(
-        IGregLogger logger, 
-        GregKeybindRegistry keybindRegistry, 
+        IGregLogger logger,
+        GregKeybindRegistry keybindRegistry,
         GregModSettingsService modSettingsService,
         IGregEventBus? eventBus = null)
     {
@@ -100,7 +100,7 @@ public class GregSettingsPersistenceService
     public void ApplyLoadedSettingsTo(BaseSettingEntry newEntry)
     {
         // When a mod registers a setting AFTER load, we inject the Value from the JSON.
-        try 
+        try
         {
             if (File.Exists(_settingsFile))
             {
@@ -119,8 +119,8 @@ public class GregSettingsPersistenceService
                     }
                 }
             }
-        } 
-        catch (Exception ex) 
+        }
+        catch (Exception ex)
         {
             _logger.Error($"[Settings] Failed to apply delayed setting: {newEntry?.GetFullId()}", ex);
         }

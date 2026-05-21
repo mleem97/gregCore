@@ -9,7 +9,7 @@ public abstract class BaseSettingEntry
     public string DisplayName { get; set; } = null!;
     public string Description { get; set; } = null!;
     public string Category { get; set; } = null!;
-    
+
     public string TypeName { get; set; } = null!;
 
     public string GetFullId() => $"{ModId}.{SettingId}";

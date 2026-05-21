@@ -64,7 +64,7 @@ namespace greg.WallRack
 
             var registry = GregWallRegistry.Instance;
             var grid = registry.GetGrid(action.WallId);
-            
+
             switch (action)
             {
                 case MountAction m:

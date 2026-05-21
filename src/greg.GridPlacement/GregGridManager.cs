@@ -13,7 +13,7 @@ namespace greg.GridPlacement
         public float CellSizeX { get; private set; } = 2.0f;
         public float CellSizeZ { get; private set; } = 2.0f;
         public Vector3 GridOrigin { get; private set; } = Vector3.zero;
-        
+
         public bool ShowGridLines { get; set; } = false;
         public bool ShowSubGrid { get; set; } = false;
 
@@ -117,7 +117,7 @@ namespace greg.GridPlacement
                 }
             }
         }
-        
+
         public IReadOnlyDictionary<Vector2Int, GregGridCell> GetCells() => _cells;
     }
 }

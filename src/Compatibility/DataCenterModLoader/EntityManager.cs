@@ -306,7 +306,7 @@ public static class EntityManager
             }
 
             // Find all UsableObject instances and log their offsets
-            var usableObjects = UnityEngine.Object.FindObjectsOfType<UsableObject>();
+            var usableObjects = SpawnedObjectTracker.GetActiveUsableObjects();
             if (usableObjects != null)
             {
                 CrashLog.Log($"[CarryDebug] Found {usableObjects.Length} UsableObject instances in scene");

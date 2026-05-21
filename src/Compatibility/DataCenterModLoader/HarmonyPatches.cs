@@ -537,24 +537,92 @@ internal static class Patch_ComputerShop_ButtonCheckOut
     }
 }
 
+
+[HarmonyPatch(typeof(UsableObject), nameof(UsableObject.Awake))]
+internal static class Patch_UsableObject_Awake
+{
+    internal static void Postfix(UsableObject __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                SpawnedObjectTracker.RegisterUsableObject(__instance);
+            }
+        }
+        catch (Exception ex) { CrashLog.Log($"[WorldSync] UsableObject.Awake error: {ex.Message}"); }
+    }
+}
+
+[HarmonyPatch(typeof(UsableObject), nameof(UsableObject.OnDestroy))]
+internal static class Patch_UsableObject_OnDestroy
+{
+    internal static void Prefix(UsableObject __instance)
+    {
+        try
+        {
+            if (__instance != null && __instance.Pointer != IntPtr.Zero)
+            {
+                SpawnedObjectTracker.UnregisterUsableObject(__instance);
+            }
+        }
+        catch (Exception ex) { CrashLog.Log($"[WorldSync] UsableObject.OnDestroy error: {ex.Message}"); }
+    }
+}
+
 internal static class SpawnedObjectTracker
+
 {
     internal static bool SuppressEvents = false;
 
     private static readonly HashSet<int> _knownInstances = new();
     private static readonly HashSet<string> _knownIds = new();
 
+    // Cached UsableObjects managed by Awake/OnDestroy patches
+    private static readonly HashSet<UsableObject> _activeUsableObjects = new();
+    private static readonly object _lock = new();
+
+    internal static void RegisterUsableObject(UsableObject uo)
+    {
+        lock (_lock)
+        {
+            _activeUsableObjects.Add(uo);
+        }
+    }
+
+    internal static void UnregisterUsableObject(UsableObject uo)
+    {
+        lock (_lock)
+        {
+            _activeUsableObjects.Remove(uo);
+        }
+    }
+
+    internal static UsableObject[] GetActiveUsableObjects()
+    {
+        lock (_lock)
+        {
+            return _activeUsableObjects.ToArray();
+        }
+    }
+
     internal static void DetectNewObjects()
     {
         if (SuppressEvents) return;
         try
         {
-            foreach (var uo in UnityEngine.Object.FindObjectsOfType<UsableObject>())
+            lock (_lock)
             {
-                int instId = uo.GetInstanceID();
-                if (!_knownInstances.Add(instId)) continue; // already tracked
+                // To avoid "collection was modified" exceptions if active objects change during enumeration
+                foreach (var uo in _activeUsableObjects.ToArray())
+                {
+                    if (uo == null || uo.Pointer == IntPtr.Zero) continue;
 
-                ProcessNewObject(uo, instId);
+                    int instId = uo.GetInstanceID();
+                    if (!_knownInstances.Add(instId)) continue; // already tracked
+
+                    ProcessNewObject(uo, instId);
+                }
             }
         }
         catch (Exception ex) { CrashLog.Log($"[WorldSync] DetectNewObjects error: {ex.Message}"); }

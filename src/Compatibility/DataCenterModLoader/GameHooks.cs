@@ -271,8 +271,8 @@ public static class GameHooks
     {
         try
         {
-            var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
-            return racks != null ? (uint)racks.Length : 0;
+            var counts = GetDeviceCounts();
+            return counts.Length > 2 ? (uint)Math.Max(0, counts[2]) : 0;
         }
         catch { return 0; }
     }

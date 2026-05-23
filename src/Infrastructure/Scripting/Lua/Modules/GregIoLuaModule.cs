@@ -134,14 +134,22 @@ public static class GregIoLuaModule
     {
         if (string.IsNullOrWhiteSpace(relativePath))
             throw new InvalidOperationException("Path cannot be empty");
-
-        // Prevent path traversal
         string normalized = relativePath.Replace('/', Path.DirectorySeparatorChar);
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
         string dataDirFull = Path.GetFullPath(dataDir);
 
-        if (!fullPath.StartsWith(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        string dataDirWithSlash = dataDirFull;
+        if (!dataDirWithSlash.EndsWith(Path.DirectorySeparatorChar.ToString()))
+        {
+            dataDirWithSlash += Path.DirectorySeparatorChar;
+        }
+
+        if (!fullPath.StartsWith(dataDirWithSlash, StringComparison.OrdinalIgnoreCase) &&
+            !fullPath.Equals(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        {
             throw new UnauthorizedAccessException($"Access denied: path escapes sandbox ('{relativePath}')");
+        }
+
 
         return fullPath;
     }

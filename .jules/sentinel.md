@@ -11,3 +11,7 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+## 2024-05-24 - Path Traversal Bypass in Sandbox Module
+**Vulnerability:** Path Traversal bypass in `GregIoLuaModule.cs`. The module used `fullPath.StartsWith(dataDirFull)` to verify paths. A malicious relative path resolving to an adjacent directory with the same prefix (e.g., `/my/app/data-secret` vs `/my/app/data`) would bypass the sandbox check.
+**Learning:** `String.StartsWith` is insufficient for path containment checks unless the prefix string is guaranteed to end with a directory separator (`Path.DirectorySeparatorChar`).
+**Prevention:** When validating sandboxed file paths, append a directory separator to the base directory before using `StartsWith()`, and ensure an exact string match check (`Equals()`) is available if the root directory itself must be accessed.

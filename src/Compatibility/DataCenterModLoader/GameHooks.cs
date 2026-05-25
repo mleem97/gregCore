@@ -9,6 +9,7 @@ namespace DataCenterModLoader;
 // safe game state accessors, returns defaults when singletons are null
 public static class GameHooks
 {
+    private const int DEVICE_INDEX_RACKS = 2;
     public static int EnsureAllRackPositionUIDs()
     {
         try
@@ -271,8 +272,8 @@ public static class GameHooks
     {
         try
         {
-            var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
-            return racks != null ? (uint)racks.Length : 0;
+            var counts = GetDeviceCounts();
+            return counts.Length > DEVICE_INDEX_RACKS ? (uint)Math.Max(0, counts[DEVICE_INDEX_RACKS]) : 0;
         }
         catch { return 0; }
     }

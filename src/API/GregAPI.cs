@@ -25,6 +25,7 @@ namespace gregCore.API
     /// </summary>
     public static class GregAPI
     {
+        private const int DEVICE_INDEX_RACKS = 2;
         private static IGregLogger _logger = null!;
 
         internal static void Initialize(IGregLogger logger)
@@ -201,8 +202,8 @@ namespace gregCore.API
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks != null ? (uint)racks.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                return nm != null ? (uint)nm.GetNumberOfDevices()[DEVICE_INDEX_RACKS] : 0u;
             }
             catch { return 0u; }
         }

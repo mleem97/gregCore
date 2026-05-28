@@ -140,7 +140,15 @@ public static class GregIoLuaModule
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
         string dataDirFull = Path.GetFullPath(dataDir);
 
-        if (!fullPath.StartsWith(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        // Ensure dataDirFull ends with a directory separator to prevent prefix-matching traversal
+        // e.g., if dataDir is "/app/data/mod/data", we want to prevent accessing "/app/data/mod/data_secret"
+        string dataDirPrefix = dataDirFull;
+        if (!dataDirPrefix.EndsWith(Path.DirectorySeparatorChar.ToString()))
+        {
+            dataDirPrefix += Path.DirectorySeparatorChar;
+        }
+
+        if (!fullPath.StartsWith(dataDirPrefix, StringComparison.OrdinalIgnoreCase) && !fullPath.Equals(dataDirFull, StringComparison.OrdinalIgnoreCase))
             throw new UnauthorizedAccessException($"Access denied: path escapes sandbox ('{relativePath}')");
 
         return fullPath;

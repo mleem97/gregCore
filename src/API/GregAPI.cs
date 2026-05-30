@@ -197,12 +197,16 @@ namespace gregCore.API
             catch { return 0u; }
         }
 
+        private const int DEVICE_INDEX_RACKS = 2; // 0 = servers, 1 = switches, 2 = racks
+
         public static uint GetRackCount()
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks != null ? (uint)racks.Count : 0u;
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null) return 0u;
+                var arr = nm.GetNumberOfDevices();
+                return arr != null && arr.Length > DEVICE_INDEX_RACKS ? (uint)Math.Max(0, arr[DEVICE_INDEX_RACKS]) : 0u;
             }
             catch { return 0u; }
         }

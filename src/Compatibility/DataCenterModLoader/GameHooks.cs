@@ -267,12 +267,14 @@ public static class GameHooks
         return counts.Length > 1 ? (uint)Math.Max(0, counts[1]) : 0;
     }
 
+    private const int DEVICE_INDEX_RACKS = 2; // 0 = servers, 1 = switches, 2 = racks
+
     public static uint GetRackCount()
     {
         try
         {
-            var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
-            return racks != null ? (uint)racks.Length : 0;
+            var counts = GetDeviceCounts();
+            return counts != null && counts.Length > DEVICE_INDEX_RACKS ? (uint)Math.Max(0, counts[DEVICE_INDEX_RACKS]) : 0;
         }
         catch { return 0; }
     }

@@ -51,13 +51,22 @@ public static class LuaRackModule
             }
         });
 
+        // index 0 = servers, 1 = switches, 2 = racks
+        const int DEVICE_INDEX_RACKS = 2;
+
         // greg.rack.count() → number
         rackTable["count"] = (Func<int>)(() =>
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks?.Count ?? 0;
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null) return 0;
+                var arr = nm.GetNumberOfDevices();
+                if (arr != null && arr.Length > DEVICE_INDEX_RACKS)
+                {
+                    return Math.Max(0, arr[DEVICE_INDEX_RACKS]);
+                }
+                return 0;
             }
             catch { return 0; }
         });

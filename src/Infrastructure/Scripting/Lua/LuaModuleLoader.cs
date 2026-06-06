@@ -112,8 +112,8 @@ public class LuaModuleLoader
         string modNormalized = Path.GetFullPath(_modRoot);
         string sharedNormalized = Path.GetFullPath(_sharedRoot);
 
-        if (!normalized.StartsWith(modNormalized, StringComparison.OrdinalIgnoreCase)
-            && !normalized.StartsWith(sharedNormalized, StringComparison.OrdinalIgnoreCase))
+        if (!gregCore.Infrastructure.Scripting.GregSandboxHelper.IsPathInsideDirectory(normalized, modNormalized)
+            && !gregCore.Infrastructure.Scripting.GregSandboxHelper.IsPathInsideDirectory(normalized, sharedNormalized))
         {
             throw new UnauthorizedAccessException(
                 $"Sandbox violation: Cannot load module outside mod directories: {fullPath}");

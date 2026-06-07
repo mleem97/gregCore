@@ -138,9 +138,8 @@ public static class GregIoLuaModule
         // Prevent path traversal
         string normalized = relativePath.Replace('/', Path.DirectorySeparatorChar);
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
-        string dataDirFull = Path.GetFullPath(dataDir);
 
-        if (!fullPath.StartsWith(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        if (!GregSandboxHelper.IsPathInsideDirectory(fullPath, dataDir))
             throw new UnauthorizedAccessException($"Access denied: path escapes sandbox ('{relativePath}')");
 
         return fullPath;

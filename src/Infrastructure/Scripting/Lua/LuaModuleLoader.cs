@@ -109,11 +109,9 @@ public class LuaModuleLoader
     private void ValidateSandbox(string fullPath)
     {
         string normalized = Path.GetFullPath(fullPath);
-        string modNormalized = Path.GetFullPath(_modRoot);
-        string sharedNormalized = Path.GetFullPath(_sharedRoot);
 
-        if (!normalized.StartsWith(modNormalized, StringComparison.OrdinalIgnoreCase)
-            && !normalized.StartsWith(sharedNormalized, StringComparison.OrdinalIgnoreCase))
+        if (!GregSandboxHelper.IsPathInsideDirectory(normalized, _modRoot)
+            && !GregSandboxHelper.IsPathInsideDirectory(normalized, _sharedRoot))
         {
             throw new UnauthorizedAccessException(
                 $"Sandbox violation: Cannot load module outside mod directories: {fullPath}");

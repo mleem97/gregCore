@@ -11,3 +11,7 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+## 2024-06-10 - Sandbox Bypass via Prefix Matching Path Traversal
+**Vulnerability:** Raw `String.StartsWith` was used to check if a resolved file path is inside a sandbox directory. This allowed a path like `mod_secret` to bypass a check for `mod` due to the lack of trailing slash validation.
+**Learning:** Checking directory boundaries with basic string prefix matching is inherently flawed because it matches arbitrary extensions or sibling directories sharing the same prefix.
+**Prevention:** Always use `gregCore.Infrastructure.Scripting.GregSandboxHelper.IsPathInsideDirectory(fullPath, baseDir)` which correctly handles directory separators and boundary checks, instead of `String.StartsWith`.

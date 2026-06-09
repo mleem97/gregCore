@@ -127,12 +127,12 @@ namespace gregCore.GameLayer.Hooks
         private MethodBase? ResolveMethod(GameHookJsonDef hook)
         {
             var fullTypeName = $"{hook.Namespace}.{hook.ClassName}";
-            var type = AccessTools.TypeByName(fullTypeName);
+            var type = SafeTypeByName(fullTypeName);
 
             if (type == null)
             {
                 // Try without namespace prefix for Il2Cpp types
-                type = AccessTools.TypeByName(hook.ClassName);
+                type = SafeTypeByName(hook.ClassName);
             }
 
             if (type == null) return null;
@@ -146,7 +146,59 @@ namespace gregCore.GameLayer.Hooks
                     .ToArray()!;
             }
 
-            return AccessTools.Method(type, hook.MethodName, paramTypes);
+            return SafeGetMethod(type, hook.MethodName, paramTypes);
+        }
+
+        private static MethodBase? SafeGetMethod(Type type, string methodName, Type[]? paramTypes)
+        {
+            try
+            {
+                const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
+
+                if (paramTypes == null || paramTypes.Length == 0)
+                {
+                    // GetMethod(name, flags) is safe and doesn't log warnings
+                    return type.GetMethod(methodName, flags);
+                }
+
+                // GetMethod(name, flags, binder, types, modifiers) is also safe
+                return type.GetMethod(methodName, flags, null, paramTypes, null);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Type?> _typeCache = new();
+
+        private static Type? SafeTypeByName(string typeName)
+        {
+            if (string.IsNullOrWhiteSpace(typeName)) return null;
+
+            if (_typeCache.TryGetValue(typeName, out var cached)) return cached;
+
+            // Fast path: fully qualified or simple type in current/mscorlib
+            var t = Type.GetType(typeName);
+            if (t != null) 
+            {
+                _typeCache[typeName] = t;
+                return t;
+            }
+
+            // Manual search to avoid Assembly.GetTypes() which throws TypeLoadException on dummy DLLs
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                t = asm.GetType(typeName, throwOnError: false, ignoreCase: false);
+                if (t != null) 
+                {
+                    _typeCache[typeName] = t;
+                    return t;
+                }
+            }
+
+            _typeCache[typeName] = null;
+            return null;
         }
 
         private static Type? ParseParameterType(string typeName)
@@ -171,16 +223,16 @@ namespace gregCore.GameLayer.Hooks
 
             if (result != null) return result;
 
-            // Try direct type resolution via AccessTools
-            result = AccessTools.TypeByName(typeName);
+            // Try direct type resolution safely
+            result = SafeTypeByName(typeName);
             if (result != null) return result;
 
             // Try Il2Cpp prefix for game types
-            result = AccessTools.TypeByName($"Il2Cpp.{typeName}");
+            result = SafeTypeByName($"Il2Cpp.{typeName}");
             if (result != null) return result;
 
             // Try UnityEngine prefix for Unity types
-            result = AccessTools.TypeByName($"UnityEngine.{typeName}");
+            result = SafeTypeByName($"UnityEngine.{typeName}");
             if (result != null) return result;
 
             return null;

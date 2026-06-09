@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using MelonLoader;
@@ -16,22 +17,56 @@ namespace gregCore.GameLayer.Hooks
         {
             try 
             {
-                var playerType = AccessTools.TypeByName("Player") ?? AccessTools.TypeByName("Il2Cpp.Player");
+                var playerType = SafeTypeByName("Player") ?? SafeTypeByName("Il2Cpp.Player");
                 if (playerType != null)
                 {
-                    harmony.Patch(AccessTools.Method(playerType, "UpdateCoin"), postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
+                    var m = SafeGetMethod(playerType, "UpdateCoin");
+                    if (m != null) harmony.Patch(m, postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
                 }
 
-                var saveManagerType = AccessTools.TypeByName("SaveManager") ?? AccessTools.TypeByName("Il2Cpp.SaveManager");
+                var saveManagerType = SafeTypeByName("SaveManager") ?? SafeTypeByName("Il2Cpp.SaveManager");
                 if (saveManagerType != null)
                 {
-                    harmony.Patch(AccessTools.Method(saveManagerType, "SaveGame"), postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
+                    var m = SafeGetMethod(saveManagerType, "SaveGame");
+                    if (m != null) harmony.Patch(m, postfix: new HarmonyMethod(typeof(HookIntegration), nameof(Postfix_Generic)));
                 }
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gC-Hooks] Dynamic patch failed: {ex.Message}");
             }
+        }
+
+        private static MethodBase? SafeGetMethod(Type type, string methodName)
+        {
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy;
+            return type.GetMethod(methodName, flags);
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<string, Type?> _typeCache = new();
+
+        private static Type? SafeTypeByName(string typeName)
+        {
+            if (_typeCache.TryGetValue(typeName, out var cached)) return cached;
+
+            var t = Type.GetType(typeName);
+            if (t != null) 
+            {
+                _typeCache[typeName] = t;
+                return t;
+            }
+
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                t = asm.GetType(typeName, false, false);
+                if (t != null) 
+                {
+                    _typeCache[typeName] = t;
+                    return t;
+                }
+            }
+            _typeCache[typeName] = null;
+            return null;
         }
 
         public static void Postfix_Generic()

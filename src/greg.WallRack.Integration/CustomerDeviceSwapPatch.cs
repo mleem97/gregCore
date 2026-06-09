@@ -14,6 +14,7 @@ namespace greg.WallRack.Integration
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 if (!frameworkSdk.GregFeatureGuard.IsEnabled("WallRack")) return;
 
                 // Sync Vanilla Ref

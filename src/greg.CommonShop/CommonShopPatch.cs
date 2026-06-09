@@ -14,6 +14,7 @@ namespace greg.CommonShop
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 ShopAPI.InjectAll(__instance);
             }
             catch (Exception ex)
@@ -28,6 +29,7 @@ namespace greg.CommonShop
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 if (__instance.cartUIItems == null) return;
 
                 foreach (var cartItem in __instance.cartUIItems)

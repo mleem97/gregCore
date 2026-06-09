@@ -45,6 +45,7 @@ public static class HardwareIdPersistencePatch
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.switchId;
                 if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(SwitchPrefix, StringComparison.OrdinalIgnoreCase))
                 {
@@ -72,10 +73,15 @@ public static class HardwareIdPersistencePatch
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance, ref string __result)
         {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(SwitchPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            try
+            {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                if (string.IsNullOrEmpty(__result)) return;
+                int instanceKey = __instance.GetHashCode();
+                __result = CleanId(SwitchPrefix, __result, instanceKey);
+                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueSwitchIdPatch), ex); }
         }
     }
 
@@ -91,6 +97,7 @@ public static class HardwareIdPersistencePatch
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.patchPanelId;
                 if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(PatchPanelPrefix, StringComparison.OrdinalIgnoreCase))
                 {
@@ -116,10 +123,15 @@ public static class HardwareIdPersistencePatch
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.PatchPanel __instance, ref string __result)
         {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(PatchPanelPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            try
+            {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                if (string.IsNullOrEmpty(__result)) return;
+                int instanceKey = __instance.GetHashCode();
+                __result = CleanId(PatchPanelPrefix, __result, instanceKey);
+                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniquePatchPanelIdPatch), ex); }
         }
     }
 
@@ -135,6 +147,7 @@ public static class HardwareIdPersistencePatch
         {
             try
             {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.ServerID;
                 if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(ServerPrefix, StringComparison.OrdinalIgnoreCase))
                 {
@@ -163,10 +176,15 @@ public static class HardwareIdPersistencePatch
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.Server __instance, ref string __result)
         {
-            if (string.IsNullOrEmpty(__result)) return;
-            int instanceKey = __instance.GetHashCode();
-            __result = CleanId(ServerPrefix, __result, instanceKey);
-            if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            try
+            {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                if (string.IsNullOrEmpty(__result)) return;
+                int instanceKey = __instance.GetHashCode();
+                __result = CleanId(ServerPrefix, __result, instanceKey);
+                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+            }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueServerIdPatch), ex); }
         }
     }
 
@@ -181,12 +199,15 @@ public static class MapDataHealing
     private const string ServerPrefix = "gregID:Server:";
 
     [HarmonyPrefix]
-    public static void Prefix(object[] __args)
+    public static void Prefix(
+        global::Il2Cpp.NetworkSaveData networkData,
+        List<global::Il2Cpp.RackPosition> allRackPositions,
+        int saveVersion)
     {
         try
         {
-            if (__args == null || __args.Length < 3) return;
-            global::Il2Cpp.NetworkSaveData data = (global::Il2Cpp.NetworkSaveData)__args[0];
+            if (networkData == null || networkData.Pointer == IntPtr.Zero) return;
+            var data = networkData;
 
             greg.Logging.GregLogger.Msg("Checking for legacy IDs in map data...", "PersistentID");
 

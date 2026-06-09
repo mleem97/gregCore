@@ -84,38 +84,44 @@ namespace greg.FasterSFP
         [HarmonyPostfix]
         public static void SetupRegistry(global::Il2Cpp.MainGameManager __instance)
         {
-            // Expand sfpPrefabs to hold our new modules
-            if (__instance.sfpPrefabs == null) return;
-            
-            int maxId = 106;
-            if (__instance.sfpPrefabs.Length <= maxId)
+            try
             {
-                var newArr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameObject>(maxId + 1);
-                for (int i = 0; i < __instance.sfpPrefabs.Length; i++) newArr[i] = __instance.sfpPrefabs[i];
+                if (__instance == null || __instance.Pointer == System.IntPtr.Zero) return;
+                if (__instance.sfpPrefabs == null) return;
                 
-                // Clone vanilla SFP for each new type
-                var basePrefab = __instance.sfpPrefabs[0]; 
-                if (basePrefab != null)
+                int maxId = 106;
+                if (__instance.sfpPrefabs.Length <= maxId)
                 {
-                    foreach (var mod in Main.Modules)
+                    var newArr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameObject>(maxId + 1);
+                    for (int i = 0; i < __instance.sfpPrefabs.Length; i++) newArr[i] = __instance.sfpPrefabs[i];
+                    
+                    var basePrefab = __instance.sfpPrefabs[0]; 
+                    if (basePrefab != null)
                     {
-                        var clone = UnityEngine.Object.Instantiate(basePrefab);
-                        clone.name = "CustomSFP_" + mod.Name;
-                        clone.SetActive(false);
-                        UnityEngine.Object.DontDestroyOnLoad(clone);
-                        
-                        var comp = clone.GetComponent<SFPModule>();
-                        if (comp != null) comp.speed = mod.SpeedInternal;
-                        
-                        var usable = clone.GetComponent<UsableObject>();
-                        if (usable != null) usable.prefabID = mod.ResultID;
+                        foreach (var mod in Main.Modules)
+                        {
+                            var clone = UnityEngine.Object.Instantiate(basePrefab);
+                            clone.name = "CustomSFP_" + mod.Name;
+                            clone.SetActive(false);
+                            UnityEngine.Object.DontDestroyOnLoad(clone);
+                            
+                            var comp = clone.GetComponent<SFPModule>();
+                            if (comp != null) comp.speed = mod.SpeedInternal;
+                            
+                            var usable = clone.GetComponent<UsableObject>();
+                            if (usable != null) usable.prefabID = mod.ResultID;
 
-                        newArr[mod.ResultID] = clone;
+                            newArr[mod.ResultID] = clone;
+                        }
                     }
+                    
+                    __instance.sfpPrefabs = newArr;
+                    greg.Logging.GregLogger.Msg("FasterSFP modules injected into MainGameManager.", "FasterSFP");
                 }
-                
-                __instance.sfpPrefabs = newArr;
-                greg.Logging.GregLogger.Msg("FasterSFP modules injected into MainGameManager.", "FasterSFP");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[FasterSFP] SetupRegistry failed: {ex.Message}");
             }
         }
 
@@ -123,34 +129,50 @@ namespace greg.FasterSFP
         [HarmonyPrefix]
         public static bool GetPrefabForItemPatch(int itemID, PlayerManager.ObjectInHand itemType, ref GameObject __result)
         {
-            var mgm = MainGameManager.instance;
-            if (mgm == null || mgm.sfpPrefabs == null) return true;
-
-            if (itemType == PlayerManager.ObjectInHand.SFPModule && itemID >= 100 && itemID <= 106)
+            try
             {
-                if (itemID < mgm.sfpPrefabs.Length && mgm.sfpPrefabs[itemID] != null)
+                var mgm = MainGameManager.instance;
+                if (mgm == null || mgm.Pointer == System.IntPtr.Zero || mgm.sfpPrefabs == null) return true;
+
+                if (itemType == PlayerManager.ObjectInHand.SFPModule && itemID >= 100 && itemID <= 106)
                 {
-                    __result = mgm.sfpPrefabs[itemID];
-                    return false;
+                    if (itemID < mgm.sfpPrefabs.Length && mgm.sfpPrefabs[itemID] != null)
+                    {
+                        __result = mgm.sfpPrefabs[itemID];
+                        return false;
+                    }
                 }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[FasterSFP] GetPrefabForItemPatch failed: {ex.Message}");
             }
             return true;
         }
 
         [HarmonyPatch(typeof(global::Il2Cpp.CableLink), nameof(global::Il2Cpp.CableLink.InsertSFP))]
         [HarmonyPrefix]
-        public static void InsertSFPPatch(float speed, SFPModule module)
+        public static void InsertSFPPatch(float speed, int type, SFPModule module)
         {
-            var usableObj = module?.GetComponent<UsableObject>();
-            if (usableObj == null) return;
-            
-            foreach (var def in Main.Modules)
+            try
             {
-                if (Mathf.Approximately(speed, def.SpeedInternal))
+                if (module == null || module.Pointer == System.IntPtr.Zero) return;
+
+                var usableObj = module.GetComponent<UsableObject>();
+                if (usableObj == null) return;
+                
+                foreach (var def in Main.Modules)
                 {
-                    usableObj.prefabID = def.ResultID;
-                    break;
+                    if (Mathf.Approximately(speed, def.SpeedInternal))
+                    {
+                        usableObj.prefabID = def.ResultID;
+                        break;
+                    }
                 }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[FasterSFP] InsertSFPPatch failed: {ex.Message}");
             }
         }
     }

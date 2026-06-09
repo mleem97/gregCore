@@ -113,9 +113,9 @@ namespace gregCore.UI
         {
             if (element == null || string.IsNullOrEmpty(tooltipText)) return;
 
-            element.RegisterCallback<MouseEnterEvent>(new Action<MouseEnterEvent>(_ =>
+            element.RegisterCallback<MouseEnterEvent>(new Action<MouseEnterEvent>(evt =>
             {
-                Show(tooltipText, Input.mousePosition);
+                Show(tooltipText, evt.mousePosition);
             }));
 
             element.RegisterCallback<MouseLeaveEvent>(new Action<MouseLeaveEvent>(_ =>

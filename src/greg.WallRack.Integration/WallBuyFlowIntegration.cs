@@ -79,10 +79,17 @@ namespace greg.WallRack.Integration
         [HarmonyPostfix]
         private static void Postfix()
         {
-            if (!frameworkSdk.GregFeatureGuard.IsEnabled("WallRack")) return;
-            
-            _log.Debug("ButtonBuyWall Postfix executed.");
-            // If the hook payload was missing data, we can extract from instances here
+            try
+            {
+                if (!frameworkSdk.GregFeatureGuard.IsEnabled("WallRack")) return;
+                
+                _log.Debug("ButtonBuyWall Postfix executed.");
+                // If the hook payload was missing data, we can extract from instances here
+            }
+            catch (Exception ex)
+            {
+                _log.Error("ButtonBuyWall postfix failed.", ex);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ internal static class ServerPatch
     {
         try
         {
+            if (__instance == null || __instance.Pointer == System.IntPtr.Zero) return;
             var payload = new EventPayload 
             { 
                 HookName = "hardware.ServerStatusChanged", 
@@ -36,6 +37,7 @@ internal static class ServerPatch
     {
         try
         {
+            if (__instance == null || __instance.Pointer == System.IntPtr.Zero) return;
             GregAPI.FireEvent(GregEventId.ServerRepaired.ToString());
         }
         catch (System.Exception ex)

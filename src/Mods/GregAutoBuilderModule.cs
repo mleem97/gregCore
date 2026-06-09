@@ -28,15 +28,9 @@ namespace greg.Mods.AutoBuilder
             if (kb != null && kb.f4Key.wasPressedThisFrame)
             {
                 _isVisible = !_isVisible;
-                if (_isVisible) BuildUI();
+                if (_uiBuilder == null) BuildUI();
+                if (_uiBuilder != null) _uiBuilder.IsVisible = _isVisible;
             }
-        }
-
-        private void OnGUI()
-        {
-            if (!_isVisible) return;
-            if (_uiBuilder == null) BuildUI();
-            _uiBuilder?.Draw();
         }
 
         private void BuildUI()
@@ -60,9 +54,14 @@ namespace greg.Mods.AutoBuilder
                 .AddToggle("Auto-Repair broken servers", true, (v) => { })
                 .AddToggle("Optimize cooling distribution", false, (v) => { })
                 
-                .AddSecondaryButton("CLOSE", () => _isVisible = false);
+                .AddSecondaryButton("CLOSE", () =>
+                {
+                    _isVisible = false;
+                    if (_uiBuilder != null) _uiBuilder.IsVisible = false;
+                });
 
             _uiBuilder.Build();
+            _uiBuilder.IsVisible = _isVisible;
         }
 
         private void OpenAllWalls()

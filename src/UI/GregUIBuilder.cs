@@ -15,10 +15,13 @@ namespace gregCore.UI
         private readonly string _title;
         private GregPanelBuilder? _panelBuilder;
         private bool _isVisible;
+        private float _width = 500f;
+        private float _height = 600f;
 
         private GregUIBuilder(string title)
         {
             _title = title;
+            _panelBuilder = GregPanelBuilder.Create(title);
         }
 
         public static GregUIBuilder Create(string title)
@@ -31,7 +34,8 @@ namespace gregCore.UI
         public static GregUIBuilder CreateWidget(string title, float x = 50, float y = 50)
         {
             var builder = new GregUIBuilder(title);
-            builder._panelBuilder = GregPanelBuilder.Create(title)
+            builder._panelBuilder!
+                .Build()
                 .SetSize(320, 220)
                 .SetPosition(x, y);
             return builder;
@@ -39,19 +43,22 @@ namespace gregCore.UI
 
         public GregUIBuilder SetSize(float width, float height)
         {
-            _panelBuilder?.SetSize(width, height);
+            _width = width;
+            _height = height;
+            EnsurePanelBuilt().SetSize(width, height);
             return this;
         }
 
         public void SetContentArea(Rect area)
         {
-            _panelBuilder?.SetPosition(area.x, area.y);
-            _panelBuilder?.SetSize(area.width, area.height);
+            EnsurePanelBuilt()
+                .SetPosition(area.x, area.y)
+                .SetSize(area.width, area.height);
         }
 
         public void ResetActions()
         {
-            _panelBuilder?.ClearContent();
+            EnsurePanelBuilt().ClearContent();
         }
 
         public void Draw()
@@ -66,54 +73,50 @@ namespace gregCore.UI
 
         public GregUIBuilder Build()
         {
-            if (_panelBuilder == null)
-            {
-                _panelBuilder = GregPanelBuilder.Create(_title).SetSize(500, 600);
-            }
-            _panelBuilder.Build();
-            GregUIManager.RegisterPanel(_panelBuilder);
+            var panel = EnsurePanelBuilt().SetSize(_width, _height);
+            GregUIManager.RegisterPanel(panel);
             return this;
         }
 
         public GregUIBuilder AddHeadline(string text)
         {
-            _panelBuilder?.AddHeadline(text);
+            EnsurePanelBuilt().AddHeadline(text);
             return this;
         }
 
         public GregUIBuilder AddLabel(string text)
         {
-            _panelBuilder?.AddLabel(text);
+            EnsurePanelBuilt().AddLabel(text);
             return this;
         }
 
         public GregUIBuilder AddButton(string label, Action onClick)
         {
-            _panelBuilder?.AddButton(label, onClick);
+            EnsurePanelBuilt().AddButton(label, onClick);
             return this;
         }
 
         public GregUIBuilder AddToggle(string label, bool currentValue, Action<bool> onChanged)
         {
-            _panelBuilder?.AddToggle(label, currentValue, onChanged);
+            EnsurePanelBuilt().AddToggle(label, currentValue, onChanged);
             return this;
         }
 
         public GregUIBuilder AddSwitch(string label, bool currentValue, Action<bool> onChanged)
         {
-            _panelBuilder?.AddSwitch(label, currentValue, onChanged);
+            EnsurePanelBuilt().AddSwitch(label, currentValue, onChanged);
             return this;
         }
 
         public GregUIBuilder AddSlider(string label, float min, float max, float currentValue, Action<float> onChanged)
         {
-            _panelBuilder?.AddSlider(label, min, max, currentValue, onChanged);
+            EnsurePanelBuilt().AddSlider(label, min, max, currentValue, onChanged);
             return this;
         }
 
         public GregUIBuilder AddSpacer(float height = 20f)
         {
-            _panelBuilder?.AddSpacer(height);
+            EnsurePanelBuilt().AddSpacer(height);
             return this;
         }
 
@@ -137,9 +140,16 @@ namespace gregCore.UI
 
         public void Toggle()
         {
-            if (_panelBuilder == null) Build();
+            EnsurePanelBuilt();
             _panelBuilder?.Toggle();
             _isVisible = _panelBuilder?.IsVisible ?? !_isVisible;
+        }
+
+        private GregPanelBuilder EnsurePanelBuilt()
+        {
+            _panelBuilder ??= GregPanelBuilder.Create(_title);
+            _panelBuilder.Build();
+            return _panelBuilder;
         }
     }
 }

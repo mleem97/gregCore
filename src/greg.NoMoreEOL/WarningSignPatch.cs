@@ -33,7 +33,7 @@ namespace greg.NoMoreEOL
         {
             try
             {
-                if (__instance != null)
+                if (__instance != null && __instance.Pointer != IntPtr.Zero)
                 {
                     Main.Indicators.Add(__instance);
 

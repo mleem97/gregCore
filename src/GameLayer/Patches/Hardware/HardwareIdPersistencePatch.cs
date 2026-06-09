@@ -201,7 +201,7 @@ public static class MapDataHealing
     [HarmonyPrefix]
     public static void Prefix(
         global::Il2Cpp.NetworkSaveData networkData,
-        List<global::Il2Cpp.RackPosition> allRackPositions,
+        Il2CppSystem.Collections.Generic.List<global::Il2Cpp.RackPosition> allRackPositions,
         int saveVersion)
     {
         try

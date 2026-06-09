@@ -62,15 +62,6 @@
   </ItemGroup>
 
   <!-- Automatic ILRepack disabled due to IL2CPP reference conflicts. Use deploy/unify-core.ps1 instead. -->
-  <Target Name="CleanupAfterBuild" AfterTargets="Build">
-    <Delete Files="$(OutputPath)Acornima.dll;$(OutputPath)Python.Runtime.dll" />
-  </Target>
-
-  <!--
-    Deploys the built DLL to the game's Mods folder.
-    Override path via env var GREG_GAME_MODS or MSBuild property GameModsPath.
-    Skipped silently if the target directory does not exist (CI / non-dev machines).
-  -->
   <PropertyGroup>
     <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(GREG_GAME_MODS)' != ''">$(GREG_GAME_MODS)</GameModsPath>
     <GameModsPath Condition="'$(GameModsPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods</GameModsPath>

@@ -13,9 +13,9 @@ public static class HardwareIdPersistencePatch
     private const string PatchPanelPrefix = "gregID:PatchPanel:";
     private const string ServerPrefix = "gregID:Server:";
 
-    private static string? CleanId(string prefix, string? deviceId, int hashCode)
+    private static string CleanId(string prefix, string deviceId, int hashCode)
     {
-        if (deviceId != null && deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        if (deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
         {
             if (deviceId.Contains('_'))
             {

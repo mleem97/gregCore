@@ -1,5 +1,4 @@
 using HarmonyLib;
-using UnityEngine;
 
 namespace gregCore.GameLayer.Patches.Input;
 
@@ -11,19 +10,6 @@ namespace gregCore.GameLayer.Patches.Input;
 [HarmonyPatch]
 internal static class KeybindPatches
 {
-    /*
-    // Must specify ArgumentTypes to disambiguate GetKeyDown(KeyCode) from GetKeyDown(string)
-    [HarmonyPatch(typeof(UnityEngine.Input), nameof(UnityEngine.Input.GetKeyDown),
-        argumentTypes: new[] { typeof(UnityEngine.KeyCode) })]
-    [HarmonyPrefix]
-    private static bool BlockPWhenConsoleOpen(ref bool __result, KeyCode key)
-    {
-        if (key == KeyCode.P && global::gregCore.Infrastructure.UI.GregDevConsole.Instance.IsOpen)
-        {
-            __result = false;
-            return false;
-        }
-        return true;
-    }
-    */
+    // Placeholder only. Use GregInputBindingService / UnityEngine.InputSystem
+    // for keybind logic; do not patch Legacy Input methods in IL2CPP.
 }

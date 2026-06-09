@@ -5,10 +5,7 @@
 /// Maintainer:   Requires rewrite against actual InputAction map structure.
 /// </file-summary>
 
-using System;
 using HarmonyLib;
-using MelonLoader;
-using UnityEngine;
 
 namespace gregCore.GameLayer.Patches.Input;
 
@@ -25,73 +22,7 @@ internal static class InputControllerPatch
     // Consequently, Harmony cannot resolve the patch targets and throws:
     //   "Could not find property for type Il2Cpp.InputController and name Move"
     //
-    // Repair strategy:
-    //   1. Inspect the generated InputController dummy-DLL to locate the actual
-    //      InputAction properties (likely under InputController.Player.Move etc.).
-    //   2. Patch the ReadValue<Vector2>() / ReadValue<float>() / WasPressedThisFrame()
-    //      methods of the specific InputAction instances, OR
-    //   3. Implement a non-Harmony input-polling layer that intercepts at the
-    //      application level without patching non-existent properties.
-    //
-    // Until then, this file remains a placeholder to prevent HarmonyInit exceptions.
-
-    /*
-    [HarmonyPatch(typeof(global::Il2Cpp.InputController), "Move", MethodType.Getter)]
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.High)]
-    private static bool MovePrefix(global::Il2Cpp.InputController __instance, ref Vector2 __result)
-    {
-        try
-        {
-            if (__instance == null) return true;
-            __result = new Vector2(UnityEngine.Input.GetAxis("Horizontal"), UnityEngine.Input.GetAxis("Vertical"));
-            return false;
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[InputPatch] Move override failed: {ex.Message}");
-            return true;
-        }
-    }
-    */
-
-    /*
-    [HarmonyPatch(typeof(global::Il2Cpp.InputController), "Look", MethodType.Getter)]
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.High)]
-    private static bool LookPrefix(global::Il2Cpp.InputController __instance, ref Vector2 __result)
-    {
-        try
-        {
-            if (__instance == null) return true;
-            __result = new Vector2(UnityEngine.Input.GetAxis("Mouse X"), UnityEngine.Input.GetAxis("Mouse Y"));
-            return false;
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[InputPatch] Look override failed: {ex.Message}");
-            return true;
-        }
-    }
-    */
-
-    /*
-    [HarmonyPatch(typeof(global::Il2Cpp.InputController), "Interact", MethodType.Getter)]
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.High)]
-    private static bool InteractPrefix(global::Il2Cpp.InputController __instance, ref bool __result)
-    {
-        try
-        {
-            if (__instance == null) return true;
-            __result = UnityEngine.Input.GetMouseButtonDown(0);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            MelonLogger.Error($"[InputPatch] Interact override failed: {ex.Message}");
-            return true;
-        }
-    }
-    */
+    // Placeholder only. Do not add Legacy Input fallbacks here; Data Center uses
+    // Unity's Input System package, and the dummy DLL must be re-inspected before
+    // patching any generated InputAction accessors.
 }

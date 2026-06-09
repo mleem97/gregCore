@@ -483,7 +483,7 @@ namespace gregCore.UI
             // 1) unityFontDefinition (preferred — UI Toolkit's primary font slot in Unity 2022+)
             try
             {
-                FontDefinition fd = default;
+                FontDefinition? fd = null;
                 bool fdValid = false;
                 string fdSource = "";
 
@@ -497,12 +497,13 @@ namespace gregCore.UI
                 // TMP fallback (rarely works because TryCast<FontAsset> typically fails on IL2CPP)
                 else if (_defaultTMPFontAsset != null)
                 {
-                    var asFontAsset = _defaultTMPFontAsset?.TryCast<FontAsset>();
+                    var tmpFontAsset = _defaultTMPFontAsset;
+                    var asFontAsset = tmpFontAsset.TryCast<FontAsset>();
                     if (asFontAsset != null)
                     {
                         fd = FontDefinition.FromSDFFont(asFontAsset);
                         fdValid = true;
-                        fdSource = $"TMP cast '{_defaultTMPFontAsset.name}'";
+                        fdSource = $"TMP cast '{tmpFontAsset.name}'";
                     }
                 }
                 // Last resort: legacy Font (may render blank in Unity 6 UIElements)
@@ -513,7 +514,7 @@ namespace gregCore.UI
                     fdSource = $"legacy Font '{_defaultUGUIFont.name}'";
                 }
 
-                if (fdValid)
+                if (fdValid && fd != null)
                 {
                     element.style.unityFontDefinition = new StyleFontDefinition(fd);
                     MelonLogger.Msg($"[FontLoader] ApplyFontTo: unityFontDefinition set via {fdSource}.");

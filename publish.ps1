@@ -23,8 +23,9 @@ Write-Host "[Publish] Building gregCore (Release)..."
 dotnet publish $projectPath -c Release --self-contained false -o $tempDir
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed." }
 
-# 3. Strip assemblies that must NOT ship (see CleanupAfterBuild in .csproj)
-$unwanted = @("Acornima.dll", "Python.Runtime.dll")
+# 3. Strip assemblies that must NOT ship
+# (Acornima and Python.Runtime are now kept as they are needed at runtime)
+$unwanted = @()
 foreach ($file in $unwanted) {
     $path = Join-Path $tempDir $file
     if (Test-Path $path) {

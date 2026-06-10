@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MoonSharp.Interpreter;
 using MelonLoader;
+using gregCore.Infrastructure.Scripting;
 
 namespace gregCore.Infrastructure.Scripting.Lua;
 
@@ -112,8 +113,8 @@ public class LuaModuleLoader
         string modNormalized = Path.GetFullPath(_modRoot);
         string sharedNormalized = Path.GetFullPath(_sharedRoot);
 
-        if (!normalized.StartsWith(modNormalized, StringComparison.OrdinalIgnoreCase)
-            && !normalized.StartsWith(sharedNormalized, StringComparison.OrdinalIgnoreCase))
+        if (!GregSandboxHelper.IsPathInsideDirectory(normalized, modNormalized)
+            && !GregSandboxHelper.IsPathInsideDirectory(normalized, sharedNormalized))
         {
             throw new UnauthorizedAccessException(
                 $"Sandbox violation: Cannot load module outside mod directories: {fullPath}");

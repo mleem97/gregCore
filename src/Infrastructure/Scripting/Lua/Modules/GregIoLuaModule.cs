@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using MoonSharp.Interpreter;
 using MelonLoader;
+using gregCore.Infrastructure.Scripting;
 
 namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
@@ -140,7 +141,7 @@ public static class GregIoLuaModule
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
         string dataDirFull = Path.GetFullPath(dataDir);
 
-        if (!fullPath.StartsWith(dataDirFull, StringComparison.OrdinalIgnoreCase))
+        if (!GregSandboxHelper.IsPathInsideDirectory(fullPath, dataDirFull))
             throw new UnauthorizedAccessException($"Access denied: path escapes sandbox ('{relativePath}')");
 
         return fullPath;

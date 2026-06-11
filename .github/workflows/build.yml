@@ -18,7 +18,7 @@ jobs:
       version: ${{ steps.bump.outputs.version }}
       tag: ${{ steps.bump.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2.2.2
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -87,13 +87,13 @@ jobs:
             label: linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2.2.2
         with:
           ref: ${{ needs.version-bump.outputs.tag || github.sha }}
           fetch-depth: 0
 
       - name: Setup .NET 6
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v4.1.0.1.0
         with:
           dotnet-version: 6.0.x
 
@@ -111,7 +111,7 @@ jobs:
           mkdir -p "$OUT/Mods"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
           cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
+          cp unknown_hooks.json "$OUT/Mods/"
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -129,7 +129,7 @@ jobs:
           mkdir -p "$OUT/BepInEx/plugins/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
           cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
+          cp unknown_hooks.json "$OUT/BepInEx/plugins/gregCore/"
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -151,7 +151,7 @@ jobs:
     if: always() && needs.version-bump.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2.2.2
         with:
           ref: ${{ needs.version-bump.outputs.tag }}
           fetch-depth: 2
@@ -168,7 +168,7 @@ jobs:
         run: |
           python3 scripts/generate_api_docs.py \
             --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
+            --greg-hooks unknown_hooks.json \
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION)"
 
@@ -188,7 +188,7 @@ jobs:
       needs.build.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2.2.2
         with:
           ref: ${{ needs.version-bump.outputs.tag }}
 
@@ -226,4 +226,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

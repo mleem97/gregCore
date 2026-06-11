@@ -6,7 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'game_hooks.json'
-      - 'framework/greg_hooks.json'
+      - 'unknown_hooks.json'
 
 permissions:
   contents: write
@@ -15,7 +15,7 @@ jobs:
   generate-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2.2.2
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 scripts/generate_api_docs.py \
             --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
+            --greg-hooks unknown_hooks.json \
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION | tr -d '[:space:]')"
 
@@ -39,4 +39,3 @@ jobs:
           else
             echo "FrameworkAPI.md unchanged – skipping commit."
           fi
-

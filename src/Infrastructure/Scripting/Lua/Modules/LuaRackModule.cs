@@ -56,6 +56,19 @@ public static class LuaRackModule
         {
             try
             {
+                if (global::Il2Cpp.NetworkMap.instance != null)
+                {
+                    var deviceCounts = global::Il2Cpp.NetworkMap.instance.GetNumberOfDevices();
+                    if (deviceCounts != null && deviceCounts.Length > 2)
+                    {
+                        return deviceCounts[2];
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 return racks?.Count ?? 0;
             }

@@ -111,7 +111,6 @@ jobs:
           mkdir -p "$OUT/Mods"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
           cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -129,7 +128,6 @@ jobs:
           mkdir -p "$OUT/BepInEx/plugins/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
           cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -159,7 +157,7 @@ jobs:
       - name: Check if hook files changed
         id: changed
         run: |
-          git diff HEAD~1 --name-only 2>/dev/null | grep -E '(game_hooks\.json|framework/greg_hooks\.json)' \
+          git diff HEAD~1 --name-only 2>/dev/null | grep -E '(game_hooks\.json)' \
             && echo "changed=true" >> "$GITHUB_OUTPUT" \
             || echo "changed=false" >> "$GITHUB_OUTPUT"
 
@@ -168,7 +166,6 @@ jobs:
         run: |
           python3 scripts/generate_api_docs.py \
             --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION)"
 
@@ -226,4 +223,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

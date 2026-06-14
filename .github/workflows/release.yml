@@ -6,7 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'game_hooks.json'
-      - 'framework/greg_hooks.json'
+
 
 permissions:
   contents: write
@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 scripts/generate_api_docs.py \
             --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
+
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION | tr -d '[:space:]')"
 

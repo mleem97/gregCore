@@ -90,13 +90,13 @@ def render_greg_hooks(data: dict) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate FrameworkAPI.md from hook JSON files.")
     parser.add_argument("--game-hooks", required=True, help="Path to game_hooks.json")
-    parser.add_argument("--greg-hooks", required=True, help="Path to framework/greg_hooks.json")
+    parser.add_argument("--greg-hooks", required=False, help="Path to framework/greg_hooks.json")
     parser.add_argument("--output", required=True, help="Output markdown file path")
     parser.add_argument("--version", default="?", help="Current framework version")
     args = parser.parse_args()
 
     game_hooks = load_json(args.game_hooks)
-    greg_hooks = load_json(args.greg_hooks)
+    greg_hooks = load_json(args.greg_hooks) if args.greg_hooks else {}
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
 

@@ -21,3 +21,6 @@
 ## 2024-05-21 - Expensive Polling for Count Check in API
 **Learning:** `UnityEngine.Object.FindObjectsOfType<T>` was being used in several global counts check via `GregAPI`, `GregServerModule`, `GregNetworkModule` and `GregNpcModule`. Finding objects of a type across the entire hierarchy is very expensive, especially as the number of devices or objects grow over time.
 **Action:** Always prefer using global singleton collections managed by the game over calling `FindObjectsOfType<T>`. For example, use `Il2Cpp.NetworkMap.instance.servers` to get servers, `Il2Cpp.NetworkMap.instance.switches` for switches and `Il2Cpp.TechnicianManager.instance.technicians` to get technicians. Ensure null checks are present.
+## 2026-06-14 - Optimize IL2CPP Game Object Counting
+**Learning:** In gregCore, `UnityEngine.Object.FindObjectsOfType<T>` causes slow native heap traversals. O(1) device counts can be retrieved from `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()`, but singletons might be null during the main menu, and array indices must be bounded safely.
+**Action:** Use the `NetworkMap` singleton arrays for device counts but always include a null check and a fallback to `FindObjectsOfType` to preserve correctness during uninitialized states.

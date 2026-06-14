@@ -54,8 +54,18 @@ public static class LuaRackModule
         // greg.rack.count() → number
         rackTable["count"] = (Func<int>)(() =>
         {
+            const int DEVICE_INDEX_RACKS = 2;
             try
             {
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null)
+                {
+                    var arr = nm.GetNumberOfDevices();
+                    if (arr != null && arr.Length > DEVICE_INDEX_RACKS)
+                    {
+                        return System.Math.Max(0, arr[DEVICE_INDEX_RACKS]);
+                    }
+                }
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 return racks?.Count ?? 0;
             }

@@ -558,7 +558,7 @@ public static class CustomEmployeeManager
 
             bool hasText = false;
             try { if (child.GetComponent<TextMeshProUGUI>() != null) hasText = true; } catch { }
-            
+
             if (hasText) result.Add(child);
 
             CollectTextTransforms(child, result);
@@ -882,6 +882,16 @@ public static class CustomEmployeeManager
         {
             var portraitTransform = card.Find("Image");
             if (portraitTransform == null) return;
+
+            if (string.IsNullOrWhiteSpace(employeeId) ||
+                employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                employeeId.Contains(Path.DirectorySeparatorChar) ||
+                employeeId.Contains(Path.AltDirectorySeparatorChar) ||
+                employeeId.Contains(".."))
+            {
+                CrashLog.Log($"[Security] Attempted path traversal detected with employeeId: {employeeId}");
+                return;
+            }
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;

@@ -203,6 +203,7 @@ namespace gregCore.API
         {
             try
             {
+                // Optimization: NetworkMap natively tracks device counts, bypassing expensive FindObjectsOfType hierarchy scans
                 var nm = Il2Cpp.NetworkMap.instance;
                 if (nm != null)
                 {

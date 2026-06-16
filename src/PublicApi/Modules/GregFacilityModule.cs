@@ -11,6 +11,7 @@ public sealed class GregFacilityModule
 
     public int GetRackCount()
     {
+        // Optimization: Use cached NetworkMap counts rather than traversing the entire Unity hierarchy
         var nm = global::Il2Cpp.NetworkMap.instance;
         if (nm != null)
         {

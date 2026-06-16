@@ -56,6 +56,7 @@ public static class LuaRackModule
         {
             try
             {
+                // Optimization: Avoid FindObjectsOfType O(N) hierarchy scan by using game's NetworkMap cache
                 var nm = Il2Cpp.NetworkMap.instance;
                 if (nm != null)
                 {

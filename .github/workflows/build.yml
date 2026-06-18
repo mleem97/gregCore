@@ -110,10 +110,10 @@ jobs:
           OUT="dist/melonloader-${{ matrix.label }}"
           mkdir -p "$OUT/Mods"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
-          cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
-          cp README.md "$OUT/"
-          cp CHANGELOG.md "$OUT/"
+          if [ -f "game_hooks.json" ]; then cp game_hooks.json "$OUT/Mods/"; fi
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/Mods/"; fi
+          if [ -f "README.md" ]; then cp README.md "$OUT/"; fi
+          if [ -f "CHANGELOG.md" ]; then cp CHANGELOG.md "$OUT/"; fi
           cd dist
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             powershell -Command "Compress-Archive -Path 'melonloader-${{ matrix.label }}/*' -DestinationPath 'gregCore-v${V}-melonloader-${{ matrix.label }}.zip'"
@@ -128,10 +128,10 @@ jobs:
           OUT="dist/bepinex-${{ matrix.label }}"
           mkdir -p "$OUT/BepInEx/plugins/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
-          cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp README.md "$OUT/"
-          cp CHANGELOG.md "$OUT/"
+          if [ -f "game_hooks.json" ]; then cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"; fi
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"; fi
+          if [ -f "README.md" ]; then cp README.md "$OUT/"; fi
+          if [ -f "CHANGELOG.md" ]; then cp CHANGELOG.md "$OUT/"; fi
           cd dist
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             powershell -Command "Compress-Archive -Path 'bepinex-${{ matrix.label }}/*' -DestinationPath 'gregCore-v${V}-bepinex-${{ matrix.label }}.zip'"
@@ -226,4 +226,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

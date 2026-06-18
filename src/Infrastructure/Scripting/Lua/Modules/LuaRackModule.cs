@@ -14,6 +14,8 @@ namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
 public static class LuaRackModule
 {
+    private const int DEVICE_INDEX_RACKS = 2; // index 0: servers, index 1: switches, index 2: racks
+
     public static void Register(Table greg, Script script, string modId)
     {
         var rackTable = new Table(script);
@@ -56,6 +58,13 @@ public static class LuaRackModule
         {
             try
             {
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null) {
+                    var counts = nm.GetNumberOfDevices();
+                    if (counts != null && counts.Length > DEVICE_INDEX_RACKS) {
+                        return Math.Max(0, counts[DEVICE_INDEX_RACKS]);
+                    }
+                }
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 return racks?.Count ?? 0;
             }

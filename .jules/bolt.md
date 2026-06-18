@@ -25,3 +25,6 @@
 
 **Learning:** `NetworkMap.instance.GetNumberOfDevices()` returns an array tracking the global count of deployed hardware units [servers, switches, racks].
 **Action:** Access this indexed array for O(1) performance instead of relying on `UnityEngine.Object.FindObjectsOfType<T>()`, which traverses the native heap and blocks the main thread. Always provide a safe fallback in case `NetworkMap` or the array isn't fully initialized during load states.
+## 2024-06-18 - CI Build Missing Artifact
+**Learning:** `framework/greg_hooks.json` may not be present during some CI workflows, causing `cp` commands to fail and fail the build step.
+**Action:** Wrap shell commands looking for optional artifacts in existence checks (e.g. `if [ -f "path" ]; then cp... fi`) to avoid CI failures.

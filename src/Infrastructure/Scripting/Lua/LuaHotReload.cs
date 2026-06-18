@@ -51,13 +51,13 @@ public class LuaHotReload : IDisposable
             Id = modId,
             Script = script,
             MainFilePath = mainFilePath,
-            OnInit = script.Globals.Get("on_init").Type == DataType.Function 
+            OnInit = script.Globals.Get("on_init").Type == DataType.Function
                 ? script.Globals.Get("on_init").Function : null,
-            OnUpdate = script.Globals.Get("on_update").Type == DataType.Function 
+            OnUpdate = script.Globals.Get("on_update").Type == DataType.Function
                 ? script.Globals.Get("on_update").Function : null,
-            OnReload = script.Globals.Get("on_reload").Type == DataType.Function 
+            OnReload = script.Globals.Get("on_reload").Type == DataType.Function
                 ? script.Globals.Get("on_reload").Function : null,
-            OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function 
+            OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function
                 ? script.Globals.Get("on_shutdown").Function : null,
         };
         _pluginMap[modId] = entry;
@@ -120,8 +120,9 @@ public class LuaHotReload : IDisposable
     {
         string fullPath = Path.GetFullPath(filePath);
         string rootPath = Path.GetFullPath(_watchRoot);
+        if (!rootPath.EndsWith(Path.DirectorySeparatorChar.ToString())) rootPath += Path.DirectorySeparatorChar;
 
-        if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+        if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase) && fullPath != rootPath.TrimEnd(Path.DirectorySeparatorChar))
             return null;
 
         // Walk up to find the mod directory (parent containing main.lua)
@@ -161,7 +162,7 @@ public class LuaHotReload : IDisposable
             if (!File.Exists(mainFile)) return;
 
             var newScript = new Script(CoreModules.Preset_SoftSandbox);
-            
+
             // Re-register API (assumes LuaFFIBridge.RegisterApi equivalent)
             // This needs to be called from the bridge context
             _onReload(new LuaPluginReloadInfo

@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-05-15 - Prefix-Matching Path Traversal Bypass in Lua Sandbox
+**Vulnerability:** The Lua sandbox used `String.StartsWith` to check if resolved paths were within the allowed sandbox directories (`GregIoLuaModule.cs`, `LuaModuleLoader.cs`, `LuaHotReload.cs`). This allowed a prefix-matching path traversal bypass. For example, if the sandbox directory is `/mods/modA`, a path like `/mods/modA_secret/secret.txt` would pass the `StartsWith` check, allowing unauthorized access outside the sandbox.
+**Learning:** Using `String.StartsWith` on file paths without ensuring the base directory ends with a directory separator character is a common security pitfall that allows bypassing directory boundary checks.
+**Prevention:** When validating sandbox paths using string prefixes, always ensure the base directory string ends with `Path.DirectorySeparatorChar` before performing the `String.StartsWith` check, and handle exact directory matches if necessary.

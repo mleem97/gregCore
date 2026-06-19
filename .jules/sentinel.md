@@ -16,3 +16,8 @@
 **Vulnerability:** The Lua sandbox used `String.StartsWith` to check if resolved paths were within the allowed sandbox directories (`GregIoLuaModule.cs`, `LuaModuleLoader.cs`, `LuaHotReload.cs`). This allowed a prefix-matching path traversal bypass. For example, if the sandbox directory is `/mods/modA`, a path like `/mods/modA_secret/secret.txt` would pass the `StartsWith` check, allowing unauthorized access outside the sandbox.
 **Learning:** Using `String.StartsWith` on file paths without ensuring the base directory ends with a directory separator character is a common security pitfall that allows bypassing directory boundary checks.
 **Prevention:** When validating sandbox paths using string prefixes, always ensure the base directory string ends with `Path.DirectorySeparatorChar` before performing the `String.StartsWith` check, and handle exact directory matches if necessary.
+
+## 2024-05-16 - CI Build Failure due to Missing Artifact
+**Vulnerability:** The CI workflow `.github/workflows/build.yml` failed because it unconditionally attempted to copy `framework/greg_hooks.json`, which was not always present in the build environment. While not a security vulnerability in the code, fragile CI pipelines can impede the rapid deployment of security fixes.
+**Learning:** Hardcoding file copies in CI pipelines without checking for file existence can lead to unexpected build failures when artifact generation is conditional or environments differ.
+**Prevention:** Always wrap file operations (like `cp`) for potentially missing artifacts in existence checks (e.g., `if [ -f "file" ]; then cp ...; fi`) within CI scripts.

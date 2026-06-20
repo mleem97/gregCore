@@ -111,7 +111,7 @@ jobs:
           mkdir -p "$OUT/Mods"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
           cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/Mods/"; fi
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -129,7 +129,7 @@ jobs:
           mkdir -p "$OUT/BepInEx/plugins/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
           cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"; fi
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -226,4 +226,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

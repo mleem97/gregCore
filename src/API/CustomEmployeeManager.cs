@@ -885,6 +885,16 @@ public static class CustomEmployeeManager
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
+
+            if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                employeeId.Contains(Path.DirectorySeparatorChar) ||
+                employeeId.Contains(Path.AltDirectorySeparatorChar) ||
+                employeeId.Contains(".."))
+            {
+                CrashLog.Log($"[Security] Attempted path traversal detected with employeeId: {employeeId}");
+                return;
+            }
+
             foreach (var ext in new[] { ".jpg", ".png" })
             {
                 string candidate = Path.Combine(assetsDir, employeeId + ext);

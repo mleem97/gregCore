@@ -120,6 +120,8 @@ public class LuaHotReload : IDisposable
     {
         string fullPath = Path.GetFullPath(filePath);
         string rootPath = Path.GetFullPath(_watchRoot);
+        if (!rootPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            rootPath += Path.DirectorySeparatorChar;
 
         if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
             return null;

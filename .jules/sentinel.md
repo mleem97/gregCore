@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-05-05 - String.StartsWith Path Traversal Bypass
+**Vulnerability:** Use of `String.StartsWith` to ensure a file path falls within an allowed directory can be bypassed if the base directory path does not end with a trailing directory separator. For example, if the base path is `C:\mod\data`, an attacker could supply `C:\mod\data_secret\file.txt`, and `StartsWith` would return true.
+**Learning:** Checking directory bounds using `StartsWith` on strings is insufficient without ensuring the base boundary explicitly terminates with a directory separator (`Path.DirectorySeparatorChar`). The same issue also existed where `employeeId` inputs were concatenated directly without sanitizing traversal characters (`..`, `/`, `\`).
+**Prevention:** Always ensure the target base directory string ends with `Path.DirectorySeparatorChar` before performing a `StartsWith` bounds check, and filter any dynamic identifiers like `employeeId` for `Path.GetInvalidFileNameChars()` and `..` before combining them into paths.

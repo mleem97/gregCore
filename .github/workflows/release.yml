@@ -22,9 +22,9 @@ jobs:
 
       - name: Generate FrameworkAPI.md
         run: |
-          python3 scripts/generate_api_docs.py \
-            --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
+          HOOK_ARGS="--game-hooks game_hooks.json"
+          if [ -f "framework/greg_hooks.json" ]; then HOOK_ARGS="$HOOK_ARGS --greg-hooks framework/greg_hooks.json"; fi
+          python3 scripts/generate_api_docs.py $HOOK_ARGS \
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION | tr -d '[:space:]')"
 

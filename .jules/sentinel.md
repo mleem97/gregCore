@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-05-15 - Path Traversal in CustomEmployeeManager
+**Vulnerability:** Path traversal vulnerability due to unsanitized `employeeId` when building portrait paths in `src/API/CustomEmployeeManager.cs`.
+**Learning:** Concatenating user-supplied input directly into `Path.Combine` when dynamically constructing paths allows directory traversal attacks (`../`, etc.) which could lead to arbitrary file reads (e.g. `../../../Windows/System32/cmd.png`).
+**Prevention:** Validate input strings before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).

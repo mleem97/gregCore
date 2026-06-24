@@ -7,5 +7,24 @@ public sealed class GregFacilityModule
     private readonly GregApiContext _ctx;
     internal GregFacilityModule(GregApiContext ctx) => _ctx = ctx;
 
-    public int GetRackCount() => UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Rack>().Length;
+    private const int DEVICE_INDEX_RACKS = 2;
+
+    public int GetRackCount()
+    {
+        try
+        {
+            var nm = global::Il2Cpp.NetworkMap.instance;
+            if (nm != null)
+            {
+                var arr = nm.GetNumberOfDevices();
+                if (arr != null && arr.Length > DEVICE_INDEX_RACKS)
+                {
+                    return System.Math.Max(0, arr[DEVICE_INDEX_RACKS]);
+                }
+            }
+            var racks = UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.Rack>();
+            return racks != null ? racks.Length : 0;
+        }
+        catch { return 0; }
+    }
 }

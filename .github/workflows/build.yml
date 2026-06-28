@@ -49,8 +49,8 @@ jobs:
       - name: Update version in GregCoreMod.cs
         run: |
           V="${{ steps.bump.outputs.version }}"
-          sed -i "s|\"gregCore\", \"[^\"]*\"|\"gregCore\", \"$V\"|g" src/Core/GregCoreMod.cs
-          sed -i "s|Framework Boot v[^\-\"]*|Framework Boot v$V|g" src/Core/GregCoreMod.cs
+          sed -i 's|"gregCore", "[^"]*"|"gregCore", "'"$V"'"|g' src/Core/GregCoreMod.cs
+          sed -i 's|Framework Boot v[^-"]*|Framework Boot v'"$V"'|g' src/Core/GregCoreMod.cs
 
       - name: Update CHANGELOG
         run: |

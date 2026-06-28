@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2025-02-12 - Prefix-Matching Path Traversal Vulnerability
+**Vulnerability:** A path traversal vulnerability existed when `String.StartsWith` was used to boundary-check file paths within sandbox directories without ensuring the base directory ended with a directory separator (`Path.DirectorySeparatorChar`). If a sandbox path was `/mods/modA`, an attacker could provide `../modA_secret/file.txt`, resulting in an absolute path `/mods/modA_secret/file.txt`, which successfully bypasses the `StartsWith` check because `/mods/modA_secret` begins with `/mods/modA`.
+**Learning:** Checking that a normalized user path starts with a base path is insufficient for sandbox validation unless the base path strictly ends with a directory separator. This issue occurred in multiple I/O and module loading functions across the codebase.
+**Prevention:** Before validating directory boundaries with `StartsWith`, always ensure the base path string ends with a directory separator. For example, append `Path.DirectorySeparatorChar` to the sandbox boundary path string before the comparison.

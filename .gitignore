@@ -1,4 +1,4 @@
-# Build output
+# Build outputs
 bin/
 obj/
 out/
@@ -11,6 +11,10 @@ out_*/
 *.user
 *.suo
 *.swp
+.cursor/
+.claude/
+.gemini/
+.jules/
 
 # NuGet
 packages/
@@ -24,17 +28,19 @@ coverage/
 *.log
 logs/
 
-# Misc
-*.tmp
-*.bak
-MISSING.md
-**/MISSING.md
-
 # Build artifacts
 publish/
 publish_out/
 publish_full/
 build/artifacts/
+Releases/
+*.zip
+*.pdb
+
+# Temp / scratch
+_temp_inspect*
+dump.csx
+pr_description.md
 
 # System
 .DS_Store

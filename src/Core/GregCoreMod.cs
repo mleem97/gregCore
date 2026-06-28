@@ -16,7 +16,7 @@ using gregCore.GameLayer.Hooks;
 using gregCore.Core.Abstractions;
 using Il2CppInterop.Runtime.Injection;
 
-[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.2.0", "TeamGreg")]
+[assembly: MelonInfo(typeof(gregCore.Core.GregCoreMod), "gregCore", "1.2.1", "TeamGreg")]
 [assembly: MelonColor(255, 0, 191, 165)] // Teal
 [assembly: MelonPriority(-1000)] // Load first!
 
@@ -40,7 +40,7 @@ namespace gregCore.Core
         public override void OnInitializeMelon()
         {
             Instance = this;
-            MelonLogger.Msg("--- Framework Boot v1.2.0-UI-Toolkit ---");
+            MelonLogger.Msg("--- Framework Boot v1.2.1-UI-Toolkit ---");
 
             // Initialize Social Services
             try

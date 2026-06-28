@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1] - 2026-06-28
+
+### Changed
+
+- Auto-release: chore: sync all versions to 1.2.0
+
+
 <!-- markdownlint-disable MD024 -->
 
 All notable changes to this project are documented in this file.

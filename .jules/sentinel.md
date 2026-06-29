@@ -11,3 +11,13 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-07-01 - Prefix-Matching Sandbox Escape
+**Vulnerability:** In `GregIoLuaModule.cs`, sandbox path validation used `fullPath.StartsWith(dataDirFull)` without ensuring `dataDirFull` had a trailing directory separator. This allowed escaping the intended `Mods/MyMod/data` directory into paths like `Mods/MyMod/data_secret`.
+**Learning:** Prefix matching for paths is vulnerable if boundaries are not strictly defined by directory separators.
+**Prevention:** Always append a trailing directory separator to the base directory before using `String.StartsWith` for path validation, and explicitly allow exact matches to the base directory itself.
+
+## 2024-07-01 - Path Traversal in Mod Entity Registration
+**Vulnerability:** `CustomEmployeeManager.Register` accepted arbitrary employee IDs without validation, which were later used directly in `Path.Combine` to construct image loading paths, enabling path traversal (CWE-22).
+**Learning:** Identifiers provided by mods or external sources must be treated as untrusted input and validated before being used in file system operations.
+**Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).

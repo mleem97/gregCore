@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-07-06 - Path Traversal Vulnerability in LuaHotReload
+**Vulnerability:** The `LuaHotReload.cs` class used a naive `StartsWith` method without directory separator padding (`Path.DirectorySeparatorChar`) to verify that an uploaded/changed file resided within the designated mod watch root directory (`_watchRoot`). This allowed a prefix-matching directory traversal attack, e.g., if `_watchRoot` was `/mods/modA`, a file in `/mods/modA_secret` could bypass the check.
+**Learning:** Checking directory boundaries purely with string prefixes (e.g. `String.StartsWith`) without accounting for directory boundaries (the separator character) leads to path traversal vulnerabilities.
+**Prevention:** Always append a `Path.DirectorySeparatorChar` to both the directory string and the path being checked, or explicitly allow an exact match against the base directory itself before evaluating prefixes.

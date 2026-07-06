@@ -121,7 +121,12 @@ public class LuaHotReload : IDisposable
         string fullPath = Path.GetFullPath(filePath);
         string rootPath = Path.GetFullPath(_watchRoot);
 
-        if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+        string rootWithSlash = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString())
+            ? rootPath
+            : rootPath + Path.DirectorySeparatorChar;
+
+        if (!fullPath.Equals(rootPath, StringComparison.OrdinalIgnoreCase) &&
+            !fullPath.StartsWith(rootWithSlash, StringComparison.OrdinalIgnoreCase))
             return null;
 
         // Walk up to find the mod directory (parent containing main.lua)

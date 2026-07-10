@@ -11,3 +11,8 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-05-18 - Path Traversal bypass using prefix matching
+**Vulnerability:** A directory traversal vulnerability existed where an attacker could bypass a boundary check by using a prefix that matched the base directory's name without a trailing slash (e.g. `mods/modA_secret` starting with `mods/modA`).
+**Learning:** `String.StartsWith` on file paths is insufficient for boundary checks if the base directory doesn't have a trailing slash.
+**Prevention:** Ensure the base directory string ends with `Path.DirectorySeparatorChar` before performing a `String.StartsWith` check, and allow exact matches to the base directory itself.

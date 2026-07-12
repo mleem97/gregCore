@@ -11,3 +11,7 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+## 2024-07-13 - Prevent Path Traversal in CustomEmployeeManager
+**Vulnerability:** The CustomEmployeeManager.Register method accepted arbitrary `id` strings, which were later used unvalidated in file paths (e.g. `Path.Combine(assetsDir, employeeId + ext);`), leading to a path traversal vulnerability.
+**Learning:** In gregCore mod APIs that accept arbitrary string identifiers (like `employeeId`), these identifiers are often used directly for file I/O operations (like loading portraits from disk), creating dangerous path traversal vectors if not validated.
+**Prevention:** Always validate arbitrary string identifiers against directory traversal characters (e.g., `id.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || id.Contains("..")`) when they are used in file paths, rather than using `string.Contains(char)` which is unsupported in the target .NET framework.

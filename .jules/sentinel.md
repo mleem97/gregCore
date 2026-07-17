@@ -11,3 +11,7 @@
 **Vulnerability:** Path traversal vulnerability due to unsanitized `modId` in `GetConfigPath` in `src/Compatibility/DataCenterModLoader/ModConfigSystem.cs`.
 **Learning:** Concatenating user input (like a `modId`) directly into `Path.Combine` allows for directory traversal attacks (`../`, etc.) leading to arbitrary file read/write issues.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+## 2024-07-16 - Prevent Path Traversal Prefix Bypass
+**Vulnerability:** In `GregIoLuaModule.cs`, the sandbox check `!fullPath.StartsWith(dataDirFull)` was vulnerable to a path traversal prefix bypass. An attacker could access `modA_secret` while the intended path was `modA/data`.
+**Learning:** `StartsWith` does not ensure that the matched prefix is a complete directory name. Without appending a trailing slash to `dataDirFull`, paths like `/mods/modA/data_secret` are incorrectly evaluated as being inside `/mods/modA/data`.
+**Prevention:** When validating paths to ensure they stay within a specific directory, ensure the base directory ends with a directory separator character before performing a `StartsWith` check, and explicitly allow exact matches to the base directory itself.

@@ -201,6 +201,17 @@ namespace gregCore.API
         {
             try
             {
+                // ⚡ Bolt: Fast O(1) rack count lookup using NetworkMap instead of O(N) FindObjectsOfType.
+                var netMap = Il2Cpp.NetworkMap.instance;
+                if (netMap != null)
+                {
+                    var counts = netMap.GetNumberOfDevices();
+                    if (counts != null && counts.Length > 2)
+                    {
+                        return (uint)counts[2];
+                    }
+                }
+
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 return racks != null ? (uint)racks.Count : 0u;
             }

@@ -42,6 +42,13 @@ public static class CustomEmployeeManager
     public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation = false)
     {
         if (string.IsNullOrEmpty(id)) return 0;
+
+        if (id.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || id.Contains(".."))
+        {
+            CrashLog.Log($"[Security] CustomEmployee: Invalid characters in employee ID '{id}'");
+            return 0;
+        }
+
         if (_employeeIndex.ContainsKey(id))
         {
             CrashLog.Log($"CustomEmployee: duplicate registration rejected for id={id}");
@@ -558,7 +565,7 @@ public static class CustomEmployeeManager
 
             bool hasText = false;
             try { if (child.GetComponent<TextMeshProUGUI>() != null) hasText = true; } catch { }
-            
+
             if (hasText) result.Add(child);
 
             CollectTextTransforms(child, result);

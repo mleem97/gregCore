@@ -112,8 +112,16 @@ public class LuaModuleLoader
         string modNormalized = Path.GetFullPath(_modRoot);
         string sharedNormalized = Path.GetFullPath(_sharedRoot);
 
-        if (!normalized.StartsWith(modNormalized, StringComparison.OrdinalIgnoreCase)
-            && !normalized.StartsWith(sharedNormalized, StringComparison.OrdinalIgnoreCase))
+        // Security: Prevent prefix-matching path traversal bypasses by ensuring the base directory
+        // ends with a directory separator, or allowing an exact match.
+        // This prevents an access to a sibling directory like /mods/mod_Secret when restricted to /mods/mod.
+        string modDir = modNormalized.EndsWith(Path.DirectorySeparatorChar.ToString()) ? modNormalized : modNormalized + Path.DirectorySeparatorChar;
+        string sharedDir = sharedNormalized.EndsWith(Path.DirectorySeparatorChar.ToString()) ? sharedNormalized : sharedNormalized + Path.DirectorySeparatorChar;
+
+        bool inMod = normalized.StartsWith(modDir, StringComparison.OrdinalIgnoreCase) || normalized.Equals(modNormalized, StringComparison.OrdinalIgnoreCase);
+        bool inShared = normalized.StartsWith(sharedDir, StringComparison.OrdinalIgnoreCase) || normalized.Equals(sharedNormalized, StringComparison.OrdinalIgnoreCase);
+
+        if (!inMod && !inShared)
         {
             throw new UnauthorizedAccessException(
                 $"Sandbox violation: Cannot load module outside mod directories: {fullPath}");

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>gregCore.Shared</AssemblyName>
+    <RootNamespace>gregCore.Shared</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../gregCore.Abstractions/gregCore.Abstractions.csproj" />
+    <Compile Include="../../build/ProjectScaffolding/AssemblyMarker.cs" Link="AssemblyMarker.cs" />
+  </ItemGroup>
+</Project>

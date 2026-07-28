@@ -1,0 +1,72 @@
+{
+  "$schema": "game_hooks.schema.v2.json",
+  "schemaVersion": 2,
+  "profileId": "datacenter-1.0.50.15-unity6000.5",
+  "generatedFrom": {
+    "assemblyCSharpSha256": null,
+    "metadataSha256": null,
+    "generatorVersion": "2.0.0"
+  },
+  "hooks": [
+    {
+      "id": "greg.PLAYER.CoinChanged",
+      "group": "Player",
+      "required": false,
+      "highFrequency": false,
+      "captureArguments": true,
+      "patchKind": "postfix",
+      "candidates": [
+        {
+          "profiles": ["datacenter-1.0.50.15-unity6000.5"],
+          "assembly": "Assembly-CSharp",
+          "type": "Il2Cpp.Player",
+          "method": "UpdateCoin",
+          "genericArity": 0,
+          "static": false,
+          "returnType": "System.Void",
+          "parameterTypes": ["System.Single"]
+        }
+      ]
+    },
+    {
+      "id": "greg.SYSTEM.GameSaved",
+      "group": "System",
+      "required": true,
+      "highFrequency": false,
+      "captureArguments": false,
+      "patchKind": "postfix",
+      "candidates": [
+        {
+          "profiles": ["datacenter-1.0.50.15-unity6000.5"],
+          "assembly": "Assembly-CSharp",
+          "type": "Il2Cpp.SaveSystem",
+          "method": "SaveGame",
+          "genericArity": 0,
+          "static": false,
+          "returnType": "System.Void",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "id": "greg.UI.PauseMenu.Opened",
+      "group": "Ui",
+      "required": false,
+      "highFrequency": false,
+      "captureArguments": false,
+      "patchKind": "postfix",
+      "candidates": [
+        {
+          "profiles": ["datacenter-1.0.50.15-unity6000.5"],
+          "assembly": "Assembly-CSharp",
+          "type": "Il2Cpp.PauseMenu",
+          "method": "OnEnable",
+          "genericArity": 0,
+          "static": false,
+          "returnType": "System.Void",
+          "parameterTypes": []
+        }
+      ]
+    }
+  ]
+}

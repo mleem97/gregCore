@@ -56,8 +56,10 @@ jobs:
             echo "VERSION contains $REPOSITORY_VERSION, requested ${{ inputs.version }}" >&2
             exit 1
           }
-          grep -q "<Version>${{ inputs.version }}</Version>" gregCore.csproj
-          grep -q "<FileVersion>${{ inputs.version }}.0</FileVersion>" gregCore.csproj
+          grep -Fq "<Version>${{ inputs.version }}</Version>" gregCore.csproj
+          grep -Fq "<FileVersion>${{ inputs.version }}.0</FileVersion>" gregCore.csproj
+          grep -Fq '"gregCore", "${{ inputs.version }}", "TeamGreg"' src/Core/GregCoreMod.cs
+          grep -Fq "Framework Boot v${{ inputs.version }}" src/Core/GregCoreMod.cs
       - name: Require exact verified profile and resolve refs
         id: profile
         env:

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>gregCore.Patches</AssemblyName>
+    <RootNamespace>gregCore.Patches</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../gregCore.Hooks/gregCore.Hooks.csproj" />
+    <Compile Include="../../build/ProjectScaffolding/AssemblyMarker.cs" Link="AssemblyMarker.cs" />
+  </ItemGroup>
+</Project>

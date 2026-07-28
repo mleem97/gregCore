@@ -43,7 +43,7 @@
                 "type": { "type": "string" },
                 "method": { "type": "string" },
                 "genericArity": { "type": "integer", "minimum": 0 },
-                "static": { "type": "boolean" },
+                "static": { "type": ["boolean", "null"] },
                 "returnType": { "type": "string" },
                 "parameterTypes": { "type": "array", "items": { "type": "string" } }
               }

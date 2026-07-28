@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "profile": "profiles/datacenter-1.0.50.15-unity6000.5.json",
+  "policy": {
+    "unknownRuntime": "safe-mode",
+    "missingRequiredReference": "disable-game-adapters",
+    "hashMismatch": "disable-game-adapters",
+    "sizeMismatch": "warn-and-disable-critical-hooks"
+  }
+}

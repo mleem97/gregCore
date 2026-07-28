@@ -31,7 +31,7 @@
     {
       "id": "greg.SYSTEM.GameSaved",
       "group": "System",
-      "required": true,
+      "required": false,
       "highFrequency": false,
       "captureArguments": false,
       "patchKind": "postfix",

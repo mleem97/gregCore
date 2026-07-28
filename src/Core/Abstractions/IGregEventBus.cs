@@ -10,5 +10,6 @@ public interface IGregEventBus
 {
     void Subscribe(string hookName, Action<EventPayload> handler);
     void Unsubscribe(string hookName, Action<EventPayload> handler);
+    bool HasSubscribers(string hookName);
     bool Publish(string hookName, EventPayload payload);
 }

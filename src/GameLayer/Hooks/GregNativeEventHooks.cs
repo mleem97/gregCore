@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using gregCore.Core.Abstractions;
@@ -48,12 +49,8 @@ public sealed class GregNativeEventHooks : SafePatch
 
             IReadOnlyList<string> manifests = FindHookManifests();
             if (manifests.Count == 0)
-            {
                 _logger?.Warning("No hook manifest found. The managed framework remains available without game hooks.");
-            }
 
-            // V2 is loaded first. The legacy manifest then fills gaps; duplicate
-            // hook IDs are ignored by GregDynamicHookPatcher.
             foreach (string manifest in manifests)
                 _dynamicPatcher.InstallFromFile(manifest, activeProfileId);
 

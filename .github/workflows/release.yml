@@ -45,7 +45,8 @@ jobs:
       - name: Validate repository metadata
         run: |
           python scripts/validate_compat_profiles.py
-          python scripts/validate_hook_manifest.py game_hooks.json framework/game_hooks.v2.json
+          python scripts/validate_hook_manifest.py framework/game_hooks.v2.json
+          python -m json.tool game_hooks.json > /dev/null
       - name: Require committed version
         shell: bash
         run: |
@@ -56,19 +57,51 @@ jobs:
             exit 1
           }
           grep -q "<Version>${{ inputs.version }}</Version>" gregCore.csproj
-      - name: Resolve profile and branch names
+          grep -q "<FileVersion>${{ inputs.version }}.0</FileVersion>" gregCore.csproj
+      - name: Require exact verified profile and resolve refs
         id: profile
         env:
           PROFILE_PATH: ${{ inputs.profile }}
           RELEASE_VERSION: ${{ inputs.version }}
         run: |
           python - <<'PY'
-          import json, os, re
+          import hashlib
+          import json
+          import os
+          import re
           from pathlib import Path
-          profile = json.loads(Path(os.environ['PROFILE_PATH']).read_text(encoding='utf-8'))
+
+          profile_path = Path(os.environ['PROFILE_PATH']).resolve()
+          repository = Path.cwd().resolve()
+          if repository not in profile_path.parents:
+              raise SystemExit('profile path escapes the repository')
+
+          profile = json.loads(profile_path.read_text(encoding='utf-8'))
           version = os.environ['RELEASE_VERSION']
           if not re.fullmatch(r'\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?', version):
               raise SystemExit(f'invalid semantic version: {version}')
+          if profile.get('status') not in {'current', 'supported'}:
+              raise SystemExit('release profiles must have current or supported status')
+          if profile.get('unity', {}).get('exactVersionKnown') is not True:
+              raise SystemExit('release blocked: exact Unity patch version is not verified')
+
+          missing_hashes = [
+              ref.get('path', '<unknown>')
+              for ref in profile.get('referenceFiles', [])
+              if ref.get('required') and not ref.get('sha256')
+          ]
+          if missing_hashes:
+              raise SystemExit('release blocked: missing required SHA-256 values: ' + ', '.join(missing_hashes))
+
+          hook = profile.get('hookManifest') or {}
+          hook_path = repository / hook.get('path', '')
+          expected_hook_hash = hook.get('sha256')
+          if not expected_hook_hash:
+              raise SystemExit('release blocked: hook manifest SHA-256 is missing')
+          actual_hook_hash = hashlib.sha256(hook_path.read_bytes()).hexdigest()
+          if actual_hook_hash.lower() != expected_hook_hash.lower():
+              raise SystemExit('release blocked: hook manifest SHA-256 mismatch')
+
           unity = profile['unity']['version']
           game = profile['game']['version']
           profile_id = profile['profileId']
@@ -105,14 +138,15 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
-      - run: dotnet restore gregCore.sln
-      - run: dotnet build gregCore.sln -c Release --no-restore -p:CI=true -p:DeployToGameOnBuild=false
+      - run: dotnet restore gregCore.sln --verbosity minimal
+      - run: dotnet build gregCore.sln -c Release --no-restore -p:CI=true -p:DeployToGameOnBuild=false --verbosity minimal
       - run: dotnet test tests/gregCore.Tests.csproj -c Release --no-build
       - name: Package verified MelonLoader build
         shell: bash
         run: |
           set -euo pipefail
           OUT="dist/gregCore-${{ inputs.version }}-${{ needs.validate.outputs.profile_id }}-melonloader-${{ matrix.label }}"
+          NAME="$(basename "$OUT")"
           mkdir -p "$OUT/Mods/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/gregCore/"
           cp game_hooks.json "$OUT/Mods/gregCore/"
@@ -122,9 +156,9 @@ jobs:
           cp README.md CHANGELOG.md "$OUT/"
           cd dist
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            powershell -NoProfile -Command "Compress-Archive -Path '$(basename "$OUT")/*' -DestinationPath '$(basename "$OUT").zip'"
+            powershell -NoProfile -Command "Compress-Archive -Path '${NAME}/*' -DestinationPath '${NAME}.zip'"
           else
-            zip -qr "$(basename "$OUT").zip" "$(basename "$OUT")"
+            zip -qr "${NAME}.zip" "$NAME"
           fi
       - uses: actions/upload-artifact@v4
         with:
@@ -144,7 +178,7 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: release-assets
-      - name: Create immutable tag and compatibility branches
+      - name: Create immutable tag and compatibility branches atomically
         env:
           TAG: ${{ needs.validate.outputs.tag }}
           MAINTENANCE: ${{ needs.validate.outputs.maintenance_branch }}
@@ -153,10 +187,21 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag already exists: $TAG" >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --heads origin "refs/heads/$ARCHIVE" >/dev/null 2>&1; then
+            echo "Immutable archive branch already exists: $ARCHIVE" >&2
+            exit 1
+          fi
+
           git tag --annotate "$TAG" --message "gregCore ${{ inputs.version }} for ${{ needs.validate.outputs.profile_id }}"
-          git push origin "$TAG"
-          git push origin "HEAD:refs/heads/$MAINTENANCE" --force-with-lease || git push origin "HEAD:refs/heads/$MAINTENANCE"
-          git push origin "HEAD:refs/heads/$ARCHIVE"
+          git push --atomic origin \
+            "$TAG" \
+            "HEAD:refs/heads/$MAINTENANCE" \
+            "HEAD:refs/heads/$ARCHIVE"
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:

@@ -79,7 +79,10 @@ public sealed class Il2CppTypeRegistry
 
         try
         {
-            ClassInjector.RegisterTypeInIl2Cpp<T>();
+            // The non-generic overload is present across the supported
+            // Il2CppInterop 1.x line and avoids coupling this wrapper to
+            // changing generic constraints.
+            ClassInjector.RegisterTypeInIl2Cpp(managedType);
             return Store(new Il2CppRegistrationResult(
                 managedType,
                 Il2CppRegistrationStatus.Registered,

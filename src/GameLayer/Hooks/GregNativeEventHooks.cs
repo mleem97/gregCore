@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using HarmonyLib;
 using gregCore.Core.Abstractions;
 using gregCore.Core.Events;
@@ -6,53 +9,57 @@ using gregCore.Core.Events;
 namespace gregCore.GameLayer.Hooks;
 
 /// <summary>
-/// Die Harmony-Brücke zwischen dem Spiel und gregCore.
-/// Delegiert an GregDynamicHookPatcher für alle 1771+ Hooks.
+/// Loader-to-Harmony bridge. Game methods are resolved exclusively from
+/// compatibility manifests so this assembly no longer needs compile-time
+/// Harmony attributes for individual Assembly-CSharp types.
 /// </summary>
 [HarmonyPatch]
 public sealed class GregNativeEventHooks : SafePatch
 {
-    private static bool _isInstalled = false;
+    private static bool _isInstalled;
     private static GregDynamicHookPatcher? _dynamicPatcher;
 
-    public static void Install(IGregLogger logger, GregHookBus hookBus, GregEventBus eventBus, HarmonyLib.Harmony harmony)
+    public static GregDynamicHookPatcher? DynamicPatcher => _dynamicPatcher;
+
+    public static void Install(
+        IGregLogger logger,
+        GregHookBus hookBus,
+        GregEventBus eventBus,
+        HarmonyLib.Harmony harmony,
+        string? activeProfileId = null,
+        bool safeMode = false)
     {
         if (_isInstalled) return;
 
         Setup(logger, hookBus);
 
+        if (safeMode)
+        {
+            _logger?.Warning("Compatibility safe mode is active. Game Harmony hooks were not installed.");
+            _isInstalled = true;
+            return;
+        }
+
         try
         {
-            // Initialize dynamic patcher for all 1771+ hooks from game_hooks.json
             _dynamicPatcher = new GregDynamicHookPatcher(harmony, eventBus, logger);
             GregDynamicHookPatcher.SetGlobalBus(eventBus);
             GregDynamicHookPatcher.SetGlobalLogger(logger);
 
-            string hooksFile = System.IO.Path.Combine(
-                global::MelonLoader.Utils.MelonEnvironment.ModsDirectory,
-                "game_hooks.json");
-
-            if (!System.IO.File.Exists(hooksFile))
+            IReadOnlyList<string> manifests = FindHookManifests();
+            if (manifests.Count == 0)
             {
-                // Fallback: look in assembly directory
-                var asmDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                if (!string.IsNullOrEmpty(asmDir))
-                {
-                    hooksFile = System.IO.Path.Combine(asmDir, "game_hooks.json");
-                }
+                _logger?.Warning("No hook manifest found. The managed framework remains available without game hooks.");
             }
 
-            if (!System.IO.File.Exists(hooksFile))
-            {
-                // Final fallback: project root
-                hooksFile = System.IO.Path.Combine(
-                    global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory,
-                    "game_hooks.json");
-            }
+            // V2 is loaded first. The legacy manifest then fills gaps; duplicate
+            // hook IDs are ignored by GregDynamicHookPatcher.
+            foreach (string manifest in manifests)
+                _dynamicPatcher.InstallFromFile(manifest, activeProfileId);
 
-            _dynamicPatcher.InstallFromFile(hooksFile);
-
-            _logger?.Success($"GregNativeEventHooks Harmony Bridge installiert. Patched {_dynamicPatcher.InstalledCount} methods.");
+            _logger?.Success(
+                $"GregNativeEventHooks installed {_dynamicPatcher.InstalledCount} hooks; " +
+                $"{_dynamicPatcher.FailedCount} definitions could not be resolved.");
         }
         catch (Exception ex)
         {
@@ -62,60 +69,46 @@ public sealed class GregNativeEventHooks : SafePatch
         _isInstalled = true;
     }
 
-    // --- Domäne: Economy ---
-    [HarmonyPatch(typeof(global::Il2Cpp.Player), nameof(global::Il2Cpp.Player.UpdateCoin))]
-    [HarmonyPostfix]
-    public static void Postfix_PlayerCoinChanged(global::Il2Cpp.Player __instance, float _coinChhangeAmount)
+    private static IReadOnlyList<string> FindHookManifests()
     {
-        try
+        var result = new List<string>();
+        string modsDirectory = global::MelonLoader.Utils.MelonEnvironment.ModsDirectory;
+        string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
+        string? assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        AddFirstExisting(result,
+            Path.Combine(modsDirectory, "game_hooks.v2.json"),
+            assemblyDirectory == null ? null : Path.Combine(assemblyDirectory, "game_hooks.v2.json"),
+            Path.Combine(gameRoot, "framework", "game_hooks.v2.json"),
+            Path.Combine(gameRoot, "game_hooks.v2.json"));
+
+        AddFirstExisting(result,
+            Path.Combine(modsDirectory, "game_hooks.json"),
+            assemblyDirectory == null ? null : Path.Combine(assemblyDirectory, "game_hooks.json"),
+            Path.Combine(gameRoot, "game_hooks.json"));
+
+        return result;
+    }
+
+    private static void AddFirstExisting(List<string> result, params string?[] candidates)
+    {
+        foreach (string? candidate in candidates)
         {
-            if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
-            TriggerHook("greg.PLAYER.CoinChanged", "Amount", _coinChhangeAmount, "Total", _coinChhangeAmount);
-        }
-        catch (Exception ex)
-        {
-            _logger?.Error("Hook PlayerCoinChanged failed", ex);
+            if (string.IsNullOrWhiteSpace(candidate) || !File.Exists(candidate))
+                continue;
+
+            if (!result.Contains(candidate, StringComparer.OrdinalIgnoreCase))
+                result.Add(candidate);
+            return;
         }
     }
 
-    // --- Domäne: Persistence ---
-    [HarmonyPatch(typeof(global::Il2Cpp.SaveSystem), nameof(global::Il2Cpp.SaveSystem.SaveGame))]
-    [HarmonyPostfix]
-    public static void Postfix_GameSaved()
-    {
-        try
-        {
-            TriggerHook("greg.SYSTEM.GameSaved", "Timestamp", DateTime.Now.ToString());
-        }
-        catch (Exception ex)
-        {
-            _logger?.Error("Hook GameSaved failed", ex);
-        }
-    }
-
-    // --- Domäne: UI ---
-    [HarmonyPatch(typeof(global::Il2Cpp.PauseMenu), nameof(global::Il2Cpp.PauseMenu.OnEnable))]
-    [HarmonyPostfix]
-    public static void Postfix_PauseMenuOpened()
-    {
-        try
-        {
-            greg.Logging.GregLogger.Msg("Pause Menu Opened", "NativeHooks");
-            TriggerHook("greg.UI.PauseMenu.Opened", "InstanceId", 1);
-        }
-        catch (Exception ex)
-        {
-            _logger?.Error("Hook PauseMenuOpened failed", ex);
-        }
-    }
-
-    // --- WallRack Hook Constants ---
-    public const string WorldWallRegistered    = "greg.WORLD.WallRegistered";
-    public const string WorldWallRemoved       = "greg.WORLD.WallRemoved";
-    public const string WorldWallPlaced        = "greg.WORLD.WallPlaced";
-    public const string WorldWallDeviceMounted  = "greg.WORLD.WallDeviceMounted";
+    public const string WorldWallRegistered = "greg.WORLD.WallRegistered";
+    public const string WorldWallRemoved = "greg.WORLD.WallRemoved";
+    public const string WorldWallPlaced = "greg.WORLD.WallPlaced";
+    public const string WorldWallDeviceMounted = "greg.WORLD.WallDeviceMounted";
     public const string WorldWallDeviceUnmounted = "greg.WORLD.WallDeviceUnmounted";
-    public const string WorldWallDeviceSwapped   = "greg.WORLD.WallDeviceSwapped";
-    public const string WorldWallDeviceLabelSet  = "greg.WORLD.WallDeviceLabelSet";
-    public const string SystemButtonBuyWall      = "greg.SYSTEM.ButtonBuyWall";
+    public const string WorldWallDeviceSwapped = "greg.WORLD.WallDeviceSwapped";
+    public const string WorldWallDeviceLabelSet = "greg.WORLD.WallDeviceLabelSet";
+    public const string SystemButtonBuyWall = "greg.SYSTEM.ButtonBuyWall";
 }

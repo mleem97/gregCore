@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gregframework.eu/schemas/greg-compat-profile.schema.json",
+  "title": "gregCore compatibility profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profileId", "framework", "game", "unity", "runtime", "referenceFiles", "features"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "profileId": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["current", "supported", "legacy", "experimental", "retired"] },
+    "framework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["versionLine", "minimumVersion"],
+      "properties": {
+        "versionLine": { "type": "string" },
+        "minimumVersion": { "type": "string" },
+        "maximumVersionExclusive": { "type": ["string", "null"] }
+      }
+    },
+    "game": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "buildId": { "type": ["string", "null"] }
+      }
+    },
+    "unity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "exactVersionKnown", "backend"],
+      "properties": {
+        "version": { "type": "string" },
+        "exactVersionKnown": { "type": "boolean" },
+        "backend": { "const": "IL2CPP" },
+        "metadataVersion": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loader", "loaderVersion", "interop", "interopVersion", "architectures"],
+      "properties": {
+        "loader": { "enum": ["MelonLoader", "BepInEx.IL2CPP"] },
+        "loaderVersion": { "type": "string" },
+        "interop": { "type": "string" },
+        "interopVersion": { "type": ["string", "null"] },
+        "architectures": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["x64", "arm64"] }
+        },
+        "platforms": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["windows", "linux", "macos"] }
+        }
+      }
+    },
+    "referenceFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "required"],
+        "properties": {
+          "path": { "type": "string" },
+          "required": { "type": "boolean" },
+          "size": { "type": ["integer", "null"], "minimum": 0 },
+          "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" },
+          "assemblyVersion": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "hookManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "integer", "minimum": 1 },
+        "path": { "type": "string" },
+        "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  }
+}

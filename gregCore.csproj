@@ -96,16 +96,13 @@
              Text="gregCore reference root does not exist: $(GregReferenceRoot). Set GREG_REFERENCE_ROOT or GregReferenceRoot." />
   </Target>
 
+  <!-- Content deployment is handled by publish/release scripts; this opt-in target only hot-deploys the rebuilt host DLL. -->
   <Target Name="DeployToGame"
           AfterTargets="Build"
           Condition="'$(DeployToGameOnBuild)' == 'true' AND '$(GameModsPath)' != '' AND Exists('$(GameModsPath)')">
     <Copy SourceFiles="$(TargetPath)"
           DestinationFolder="$(GameModsPath)"
           OverwriteReadOnlyFiles="true" />
-    <Copy SourceFiles="@(None->WithMetadataValue('CopyToOutputDirectory', 'PreserveNewest')->'%(FullPath)')"
-          DestinationFolder="$(GameModsPath)"
-          SkipUnchangedFiles="true"
-          Condition="'@(None->WithMetadataValue('CopyToOutputDirectory', 'PreserveNewest'))' != ''" />
     <Message Text="[Deploy] $(TargetPath) -> $(GameModsPath)" Importance="high" />
   </Target>
 

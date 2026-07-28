@@ -86,9 +86,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
             {
                 list.Remove(handler);
                 if (list.Count == 0)
-                {
                     _handlers.Remove(hookName);
-                }
                 _isDirty = true;
             }
         }
@@ -98,10 +96,28 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         }
     }
 
+    public bool HasSubscribers(string hookName)
+    {
+        if (_disposed || string.IsNullOrWhiteSpace(hookName)) return false;
+
+        _rwLock.EnterReadLock();
+        try
+        {
+            return _handlers.TryGetValue(hookName, out var handlers) && handlers.Count > 0;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
     public bool Publish(string hookName, EventPayload payload)
     {
         if (_disposed) return true;
         ArgumentNullException.ThrowIfNull(hookName);
+
+        if (!HasSubscribers(hookName))
+            return true;
 
         if (_governor != null && !_governor.CanDispatchEvent())
         {
@@ -145,9 +161,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
                     {
                         _cachedHandlers.Clear();
                         foreach (var kvp in _handlers)
-                        {
                             _cachedHandlers[kvp.Key] = kvp.Value.ToArray();
-                        }
                         _isDirty = false;
                     }
                 }
@@ -168,18 +182,14 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (handlersToInvoke == null || handlersToInvoke.Length == 0) return true;
 
         var currentPayload = payload with { HookName = hookName };
-        int handlersExecuted = 0;
 
         foreach (var handler in handlersToInvoke)
         {
             try
             {
                 handler(currentPayload);
-                handlersExecuted++;
                 if (currentPayload.IsCancelable && currentPayload.IsCancelled)
-                {
                     return false;
-                }
             }
             catch (Exception ex)
             {
@@ -191,9 +201,6 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         return true;
     }
 
-    /// <summary>
-    /// Returns statistics about event processing.
-    /// </summary>
     public (long processed, long deferred, int handlerCount) GetStats()
     {
         _rwLock.EnterReadLock();
@@ -201,9 +208,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         {
             int handlerCount = 0;
             foreach (var kvp in _handlers)
-            {
                 handlerCount += kvp.Value.Count;
-            }
             return (_totalEventsProcessed, _totalEventsDeferred, handlerCount);
         }
         finally
@@ -223,7 +228,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         if (_disposed) return;
         if (disposing)
         {
-            _disposed = true; // Set flag BEFORE disposing lock
+            _disposed = true;
             _rwLock.Dispose();
         }
         _disposed = true;

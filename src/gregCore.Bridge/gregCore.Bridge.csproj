@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>gregCore.Bridge</AssemblyName>
+    <RootNamespace>gregCore.Bridge</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../gregCore.Core/gregCore.Core.csproj" />
+    <ProjectReference Include="../gregCore.SDK/gregCore.SDK.csproj" />
+    <Compile Include="../../build/ProjectScaffolding/AssemblyMarker.cs" Link="AssemblyMarker.cs" />
+  </ItemGroup>
+</Project>

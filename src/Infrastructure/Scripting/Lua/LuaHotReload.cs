@@ -34,9 +34,9 @@ public class LuaHotReload : IDisposable
 
     public LuaHotReload(string watchRoot, Action<LuaPluginReloadInfo> onReload)
     {
-        _watchRoot = watchRoot;
+        _watchRoot = Path.GetFullPath(watchRoot);
         _onReload = onReload;
-        _debounceTimer = new Timer(500); // 500ms debounce
+        _debounceTimer = new Timer(500);
         _debounceTimer.Elapsed += (s, e) =>
         {
             _debounceTimer.Stop();
@@ -51,13 +51,13 @@ public class LuaHotReload : IDisposable
             Id = modId,
             Script = script,
             MainFilePath = mainFilePath,
-            OnInit = script.Globals.Get("on_init").Type == DataType.Function 
+            OnInit = script.Globals.Get("on_init").Type == DataType.Function
                 ? script.Globals.Get("on_init").Function : null,
-            OnUpdate = script.Globals.Get("on_update").Type == DataType.Function 
+            OnUpdate = script.Globals.Get("on_update").Type == DataType.Function
                 ? script.Globals.Get("on_update").Function : null,
-            OnReload = script.Globals.Get("on_reload").Type == DataType.Function 
+            OnReload = script.Globals.Get("on_reload").Type == DataType.Function
                 ? script.Globals.Get("on_reload").Function : null,
-            OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function 
+            OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function
                 ? script.Globals.Get("on_shutdown").Function : null,
         };
         _pluginMap[modId] = entry;
@@ -105,65 +105,74 @@ public class LuaHotReload : IDisposable
         {
             if (!File.Exists(file)) continue;
 
-            // Find which mod this file belongs to
             string? modId = FindModForFile(file);
             if (modId == null) continue;
 
             if (_pluginMap.TryGetValue(modId, out var entry))
-            {
                 ReloadPlugin(entry, file);
-            }
         }
     }
 
     private string? FindModForFile(string filePath)
     {
         string fullPath = Path.GetFullPath(filePath);
-        string rootPath = Path.GetFullPath(_watchRoot);
+        string rootPath = _watchRoot;
 
-        if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+        if (!IsPathWithin(fullPath, rootPath))
             return null;
 
-        // Walk up to find the mod directory (parent containing main.lua)
         string? current = Path.GetDirectoryName(fullPath);
-        while (current != null && current.Length >= rootPath.Length)
+        while (current != null && IsPathWithin(current, rootPath))
         {
             if (File.Exists(Path.Combine(current, "main.lua")))
-            {
                 return Path.GetFileName(current);
-            }
+
+            if (current.Equals(rootPath, PathComparison))
+                break;
+
             current = Path.GetDirectoryName(current);
         }
 
         return null;
     }
 
+    private static StringComparison PathComparison => OperatingSystem.IsWindows()
+        ? StringComparison.OrdinalIgnoreCase
+        : StringComparison.Ordinal;
+
+    private static bool IsPathWithin(string candidatePath, string rootPath)
+    {
+        if (candidatePath.Equals(rootPath, PathComparison))
+            return true;
+
+        string rootWithSeparator = Path.EndsInDirectorySeparator(rootPath)
+            ? rootPath
+            : rootPath + Path.DirectorySeparatorChar;
+
+        return candidatePath.StartsWith(rootWithSeparator, PathComparison);
+    }
+
     private void ReloadPlugin(LuaPluginEntry entry, string changedFile)
     {
         try
         {
-            // Call on_reload if defined
             if (entry.OnReload != null)
             {
                 try { entry.OnReload.Call(); }
                 catch (Exception ex) { MelonLogger.Error($"[LuaHotReload] {entry.Id} on_reload error: {ex.Message}"); }
             }
 
-            // Call on_shutdown if defined
             if (entry.OnShutdown != null)
             {
                 try { entry.OnShutdown.Call(); }
                 catch (Exception ex) { MelonLogger.Error($"[LuaHotReload] {entry.Id} on_shutdown error: {ex.Message}"); }
             }
 
-            // Reload script
             string mainFile = entry.MainFilePath;
             if (!File.Exists(mainFile)) return;
 
             var newScript = new Script(CoreModules.Preset_SoftSandbox);
-            
-            // Re-register API (assumes LuaFFIBridge.RegisterApi equivalent)
-            // This needs to be called from the bridge context
+
             _onReload(new LuaPluginReloadInfo
             {
                 ModId = entry.Id,
@@ -183,7 +192,7 @@ public class LuaHotReload : IDisposable
     public void Dispose()
     {
         _watcher?.Dispose();
-        _debounceTimer?.Dispose();
+        _debounceTimer.Dispose();
     }
 }
 

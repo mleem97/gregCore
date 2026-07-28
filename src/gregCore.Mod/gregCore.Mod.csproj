@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>gregCore.Mod</AssemblyName>
+    <RootNamespace>gregCore.Mod</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../gregCore.Core/gregCore.Core.csproj" />
+    <Compile Include="../../build/ProjectScaffolding/AssemblyMarker.cs" Link="AssemblyMarker.cs" />
+  </ItemGroup>
+</Project>

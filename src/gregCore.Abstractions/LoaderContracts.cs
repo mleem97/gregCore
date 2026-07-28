@@ -19,13 +19,13 @@ public interface IGregLogSink
 
 public sealed class LoaderRuntimeInfo
 {
-    public string LoaderId { get; init; } = string.Empty;
-    public string LoaderVersion { get; init; } = string.Empty;
-    public string RuntimeId { get; init; } = string.Empty;
-    public string Platform { get; init; } = string.Empty;
-    public string Architecture { get; init; } = string.Empty;
-    public string GameRootDirectory { get; init; } = string.Empty;
-    public string ModsDirectory { get; init; } = string.Empty;
+    public string LoaderId { get; set; } = string.Empty;
+    public string LoaderVersion { get; set; } = string.Empty;
+    public string RuntimeId { get; set; } = string.Empty;
+    public string Platform { get; set; } = string.Empty;
+    public string Architecture { get; set; } = string.Empty;
+    public string GameRootDirectory { get; set; } = string.Empty;
+    public string ModsDirectory { get; set; } = string.Empty;
 }
 
 /// <summary>

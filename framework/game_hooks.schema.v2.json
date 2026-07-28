@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gregframework.eu/schemas/game-hooks.v2.json",
+  "title": "gregCore game hook manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profileId", "hooks"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "profileId": { "type": "string", "minLength": 1 },
+    "generatedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assemblyCSharpSha256": { "type": ["string", "null"] },
+        "metadataSha256": { "type": ["string", "null"] },
+        "generatorVersion": { "type": ["string", "null"] }
+      }
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "group", "required", "patchKind", "candidates"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "group": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean" },
+          "highFrequency": { "type": "boolean" },
+          "captureArguments": { "type": "boolean" },
+          "patchKind": { "enum": ["prefix", "postfix"] },
+          "candidates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["assembly", "type", "method", "genericArity", "static", "returnType", "parameterTypes"],
+              "properties": {
+                "profiles": { "type": "array", "items": { "type": "string" } },
+                "assembly": { "type": "string" },
+                "type": { "type": "string" },
+                "method": { "type": "string" },
+                "genericArity": { "type": "integer", "minimum": 0 },
+                "static": { "type": "boolean" },
+                "returnType": { "type": "string" },
+                "parameterTypes": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

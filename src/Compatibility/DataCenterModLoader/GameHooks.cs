@@ -271,6 +271,14 @@ public static class GameHooks
     {
         try
         {
+            // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) FindObjectsOfType
+            var counts = GetDeviceCounts();
+            if (counts.Length > 2)
+            {
+                return (uint)Math.Max(0, counts[2]);
+            }
+
+            // Fallback for uninitialized game states
             var racks = UnityEngine.Object.FindObjectsOfType<Rack>();
             return racks != null ? (uint)racks.Length : 0;
         }

@@ -1,0 +1,167 @@
+name: gregCore Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact gregCore version already committed to VERSION and project files
+        required: true
+        type: string
+      profile:
+        description: Compatibility profile path
+        required: true
+        default: compat/profiles/datacenter-1.0.50.15-unity6000.5.json
+        type: string
+      prerelease:
+        description: Mark the GitHub release as prerelease
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gregcore-release-${{ inputs.version }}-${{ inputs.profile }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      profile_id: ${{ steps.profile.outputs.profile_id }}
+      unity: ${{ steps.profile.outputs.unity }}
+      game: ${{ steps.profile.outputs.game }}
+      tag: ${{ steps.profile.outputs.tag }}
+      maintenance_branch: ${{ steps.profile.outputs.maintenance_branch }}
+      archive_branch: ${{ steps.profile.outputs.archive_branch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate repository metadata
+        run: |
+          python scripts/validate_compat_profiles.py
+          python scripts/validate_hook_manifest.py game_hooks.json framework/game_hooks.v2.json
+      - name: Require committed version
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPOSITORY_VERSION="$(tr -d '[:space:]' < VERSION)"
+          test "$REPOSITORY_VERSION" = "${{ inputs.version }}" || {
+            echo "VERSION contains $REPOSITORY_VERSION, requested ${{ inputs.version }}" >&2
+            exit 1
+          }
+          grep -q "<Version>${{ inputs.version }}</Version>" gregCore.csproj
+      - name: Resolve profile and branch names
+        id: profile
+        env:
+          PROFILE_PATH: ${{ inputs.profile }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          profile = json.loads(Path(os.environ['PROFILE_PATH']).read_text(encoding='utf-8'))
+          version = os.environ['RELEASE_VERSION']
+          if not re.fullmatch(r'\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?', version):
+              raise SystemExit(f'invalid semantic version: {version}')
+          unity = profile['unity']['version']
+          game = profile['game']['version']
+          profile_id = profile['profileId']
+          major, minor = version.split('.', 2)[:2]
+          tag = f'u{unity}-game{game}-gc{version}'
+          maintenance = f'compat/u{unity}/game-{game}/gc-{major}.{minor}.x'
+          archive = f'archive/u{unity}/game-{game}/gc-{version}'
+          output = Path(os.environ['GITHUB_OUTPUT'])
+          with output.open('a', encoding='utf-8') as stream:
+              stream.write(f'profile_id={profile_id}\n')
+              stream.write(f'unity={unity}\n')
+              stream.write(f'game={game}\n')
+              stream.write(f'tag={tag}\n')
+              stream.write(f'maintenance_branch={maintenance}\n')
+              stream.write(f'archive_branch={archive}\n')
+          PY
+
+  build:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows-x64
+          - os: ubuntu-latest
+            label: linux-x64
+    runs-on: ${{ matrix.os }}
+    env:
+      CI: 'true'
+      DeployToGameOnBuild: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet restore gregCore.sln
+      - run: dotnet build gregCore.sln -c Release --no-restore -p:CI=true -p:DeployToGameOnBuild=false
+      - run: dotnet test tests/gregCore.Tests.csproj -c Release --no-build
+      - name: Package verified MelonLoader build
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="dist/gregCore-${{ inputs.version }}-${{ needs.validate.outputs.profile_id }}-melonloader-${{ matrix.label }}"
+          mkdir -p "$OUT/Mods/gregCore"
+          cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/gregCore/"
+          cp game_hooks.json "$OUT/Mods/gregCore/"
+          cp framework/game_hooks.v2.json "$OUT/Mods/gregCore/"
+          cp framework/game_hooks.schema.v2.json "$OUT/Mods/gregCore/"
+          cp -R compat "$OUT/Mods/gregCore/compat"
+          cp README.md CHANGELOG.md "$OUT/"
+          cd dist
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            powershell -NoProfile -Command "Compress-Archive -Path '$(basename "$OUT")/*' -DestinationPath '$(basename "$OUT").zip'"
+          else
+            zip -qr "$(basename "$OUT").zip" "$(basename "$OUT")"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.label }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+  publish:
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: release-assets
+      - name: Create immutable tag and compatibility branches
+        env:
+          TAG: ${{ needs.validate.outputs.tag }}
+          MAINTENANCE: ${{ needs.validate.outputs.maintenance_branch }}
+          ARCHIVE: ${{ needs.validate.outputs.archive_branch }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --annotate "$TAG" --message "gregCore ${{ inputs.version }} for ${{ needs.validate.outputs.profile_id }}"
+          git push origin "$TAG"
+          git push origin "HEAD:refs/heads/$MAINTENANCE" --force-with-lease || git push origin "HEAD:refs/heads/$MAINTENANCE"
+          git push origin "HEAD:refs/heads/$ARCHIVE"
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate.outputs.tag }}
+          name: gregCore ${{ inputs.version }} (${{ needs.validate.outputs.profile_id }})
+          prerelease: ${{ inputs.prerelease }}
+          generate_release_notes: true
+          files: release-assets/*.zip

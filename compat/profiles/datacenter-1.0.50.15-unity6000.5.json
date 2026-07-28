@@ -1,0 +1,78 @@
+{
+  "$schema": "../schema/greg-compat-profile.schema.json",
+  "schemaVersion": 2,
+  "profileId": "datacenter-1.0.50.15-unity6000.5",
+  "status": "current",
+  "framework": {
+    "versionLine": "1.2.x",
+    "minimumVersion": "1.2.1",
+    "maximumVersionExclusive": "2.0.0"
+  },
+  "game": {
+    "id": "data-center",
+    "version": "1.0.50.15",
+    "buildId": null
+  },
+  "unity": {
+    "version": "6000.5",
+    "exactVersionKnown": false,
+    "backend": "IL2CPP",
+    "metadataVersion": null
+  },
+  "runtime": {
+    "loader": "MelonLoader",
+    "loaderVersion": "0.7.x",
+    "interop": "Il2CppInterop",
+    "interopVersion": null,
+    "architectures": ["x64"],
+    "platforms": ["windows", "linux"]
+  },
+  "referenceFiles": [
+    {
+      "path": "Assembly-CSharp.dll",
+      "required": true,
+      "size": 1759744,
+      "sha256": null,
+      "assemblyVersion": null
+    },
+    {
+      "path": "UnityEngine.CoreModule.dll",
+      "required": true,
+      "size": 4641792,
+      "sha256": null,
+      "assemblyVersion": null
+    },
+    {
+      "path": "Il2CppInterop.Runtime.dll",
+      "required": true,
+      "size": 285184,
+      "sha256": null,
+      "assemblyVersion": null
+    },
+    {
+      "path": "MelonLoader.dll",
+      "required": true,
+      "size": 2010624,
+      "sha256": null,
+      "assemblyVersion": null
+    }
+  ],
+  "features": {
+    "classInjection": true,
+    "dynamicHarmonyHooks": true,
+    "uiToolkit": true,
+    "entities": true,
+    "hdrp": true,
+    "fishNet": false,
+    "bepInExHost": false
+  },
+  "hookManifest": {
+    "schemaVersion": 2,
+    "path": "framework/game_hooks.v2.json",
+    "sha256": null
+  },
+  "notes": [
+    "Unity patch version and binary SHA-256 values must be filled from a verified local installation before this profile can be promoted from size-verified to hash-verified.",
+    "BepInEx packaging is not considered supported until a dedicated IL2CPP host assembly passes the compatibility matrix."
+  ]
+}

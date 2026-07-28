@@ -53,26 +53,39 @@ public sealed class GregDynamicHookPatcher
         try
         {
             HookManifestV2 manifest = LoadManifest(hooksFilePath);
-            ManifestProfileId = manifest.ProfileId;
-            TotalHooks = manifest.Hooks.Count;
+            if (!string.IsNullOrWhiteSpace(manifest.ProfileId))
+                ManifestProfileId ??= manifest.ProfileId;
+            TotalHooks += manifest.Hooks.Count;
 
-            if (!string.IsNullOrWhiteSpace(activeProfileId) &&
+            bool profileMismatch =
+                !string.IsNullOrWhiteSpace(activeProfileId) &&
                 !string.IsNullOrWhiteSpace(manifest.ProfileId) &&
-                !manifest.ProfileId.Equals(activeProfileId, StringComparison.OrdinalIgnoreCase))
+                !manifest.ProfileId.Equals(activeProfileId, StringComparison.OrdinalIgnoreCase);
+
+            if (profileMismatch)
             {
                 _logger.Warning(
-                    $"Hook manifest profile '{manifest.ProfileId}' does not match active profile '{activeProfileId}'. Required hooks are disabled.");
+                    $"Hook manifest profile '{manifest.ProfileId}' does not match active profile '{activeProfileId}'. Required hooks from this manifest are disabled.");
             }
 
-            foreach (HookDefinitionV2 definition in manifest.Hooks)
+            foreach (HookDefinitionV2 incomingDefinition in manifest.Hooks)
             {
-                if (string.IsNullOrWhiteSpace(definition.Id))
+                if (string.IsNullOrWhiteSpace(incomingDefinition.Id))
                 {
                     _failedCount++;
                     continue;
                 }
 
-                _definitions[definition.Id] = definition;
+                // The first definition wins. This preserves v2 definitions when
+                // the legacy fallback manifest is loaded afterwards.
+                if (!_definitions.TryGetValue(incomingDefinition.Id, out HookDefinitionV2? definition))
+                {
+                    definition = incomingDefinition;
+                    _definitions.Add(definition.Id, definition);
+                }
+
+                if (profileMismatch && definition.Required)
+                    continue;
 
                 if (enabledGroups != null && enabledGroups.Count > 0 &&
                     !enabledGroups.Contains(definition.Group, StringComparer.OrdinalIgnoreCase))
@@ -87,7 +100,7 @@ public sealed class GregDynamicHookPatcher
 
             _logger.Info(
                 $"[DynamicPatcher] Manifest v{manifest.SchemaVersion}, profile={manifest.ProfileId ?? "legacy"}, " +
-                $"installed={_installedCount}, failed={_failedCount}, total={TotalHooks}.");
+                $"installed={_installedCount}, failed={_failedCount}, declared={TotalHooks}.");
         }
         catch (Exception ex)
         {
@@ -135,13 +148,16 @@ public sealed class GregDynamicHookPatcher
             return false;
         }
 
+        string patchKind = NormalizePatchKind(definition.PatchKind);
+        var binding = new HookRuntimeBinding(
+            definition.Id,
+            definition.CaptureArguments,
+            definition.HighFrequency);
+        bool bindingAdded = false;
+        bool patchReserved = false;
+
         try
         {
-            var binding = new HookRuntimeBinding(
-                definition.Id,
-                definition.CaptureArguments,
-                definition.HighFrequency);
-
             lock (RuntimeSync)
             {
                 if (!RuntimeBindings.TryGetValue(resolved, out List<HookRuntimeBinding>? bindings))
@@ -152,19 +168,34 @@ public sealed class GregDynamicHookPatcher
                 }
 
                 if (!bindings.Any(existing => existing.HookId.Equals(definition.Id, StringComparison.Ordinal)))
+                {
                     bindings.Add(binding);
+                    bindingAdded = true;
+                }
+
+                if (!RuntimePatchKinds.TryGetValue(resolved, out HashSet<string>? patchKinds))
+                {
+                    patchKinds = new HashSet<string>(StringComparer.Ordinal);
+                    RuntimePatchKinds[resolved] = patchKinds;
+                }
+
+                // Several stable greg hook IDs may map to one game method. Harmony
+                // is installed only once per method and patch kind; dispatch fans
+                // out to all runtime bindings.
+                patchReserved = patchKinds.Add(patchKind);
             }
 
-            var patchMethod = new HarmonyMethod(
-                typeof(GregDynamicHookPatcher),
-                definition.PatchKind.Equals("prefix", StringComparison.OrdinalIgnoreCase)
-                    ? nameof(GenericPrefix)
-                    : nameof(GenericPostfix));
+            if (patchReserved)
+            {
+                var patchMethod = new HarmonyMethod(
+                    typeof(GregDynamicHookPatcher),
+                    patchKind == "prefix" ? nameof(GenericPrefix) : nameof(GenericPostfix));
 
-            if (definition.PatchKind.Equals("prefix", StringComparison.OrdinalIgnoreCase))
-                _harmony.Patch(resolved, prefix: patchMethod);
-            else
-                _harmony.Patch(resolved, postfix: patchMethod);
+                if (patchKind == "prefix")
+                    _harmony.Patch(resolved, prefix: patchMethod);
+                else
+                    _harmony.Patch(resolved, postfix: patchMethod);
+            }
 
             _installedHookIds.Add(definition.Id);
             _installedCount++;
@@ -172,6 +203,26 @@ public sealed class GregDynamicHookPatcher
         }
         catch (Exception ex)
         {
+            lock (RuntimeSync)
+            {
+                if (bindingAdded && RuntimeBindings.TryGetValue(resolved, out List<HookRuntimeBinding>? bindings))
+                {
+                    bindings.RemoveAll(existing => existing.HookId.Equals(definition.Id, StringComparison.Ordinal));
+                    if (bindings.Count == 0)
+                    {
+                        RuntimeBindings.Remove(resolved);
+                        ParameterCache.Remove(resolved);
+                    }
+                }
+
+                if (patchReserved && RuntimePatchKinds.TryGetValue(resolved, out HashSet<string>? patchKinds))
+                {
+                    patchKinds.Remove(patchKind);
+                    if (patchKinds.Count == 0)
+                        RuntimePatchKinds.Remove(resolved);
+                }
+            }
+
             _failedCount++;
             _logger.Warning($"Failed to patch {FormatMethod(resolved)} for {definition.Id}: {ex.Message}");
             return false;
@@ -280,7 +331,7 @@ public sealed class GregDynamicHookPatcher
             return MethodResolution.Fail($"unable to enumerate methods: {ex.Message}");
         }
 
-        var matching = namedMethods
+        MethodBase[] matching = namedMethods
             .Where(method => !candidate.Static.HasValue || method.IsStatic == candidate.Static.Value)
             .Where(method => GetGenericArity(method) == candidate.GenericArity)
             .Where(method => ParametersMatch(method.GetParameters(), parameterTypes))
@@ -480,15 +531,19 @@ public sealed class GregDynamicHookPatcher
     private static bool IsHighFrequencyMethod(string methodName) =>
         methodName is "Update" or "FixedUpdate" or "LateUpdate" or "OnUpdate";
 
+    private static string NormalizePatchKind(string patchKind) =>
+        patchKind.Equals("prefix", StringComparison.OrdinalIgnoreCase) ? "prefix" : "postfix";
+
     private static string FormatCandidate(HookCandidateV2 candidate) =>
         $"{candidate.Type}.{candidate.Method}({string.Join(", ", candidate.ParameterTypes)})";
 
     private static string FormatMethod(MethodBase method) =>
-        $"{method.DeclaringType?.FullName}.{method.Name}({string.Join(", ", method.GetParameters().Select(p => p.ParameterType.FullName))})";
+        $"{method.DeclaringType?.FullName}.{method.Name}({string.Join(", ", method.GetParameters().Select(parameter => parameter.ParameterType.FullName))})";
 
     private static readonly object RuntimeSync = new();
     private static readonly Dictionary<MethodBase, List<HookRuntimeBinding>> RuntimeBindings = new();
     private static readonly Dictionary<MethodBase, ParameterInfo[]> ParameterCache = new();
+    private static readonly Dictionary<MethodBase, HashSet<string>> RuntimePatchKinds = new();
     private static readonly Dictionary<string, Type?> TypeCache = new(StringComparer.Ordinal);
     private static GregEventBus? GlobalEventBus;
     private static IGregLogger? GlobalLogger;
@@ -585,6 +640,7 @@ public sealed class GregDynamicHookPatcher
     }
 
     private sealed record HookRuntimeBinding(string HookId, bool CaptureArguments, bool HighFrequency);
+
     private sealed record MethodResolution(MethodBase? Method, string? Reason)
     {
         public static MethodResolution Success(MethodBase method) => new(method, null);

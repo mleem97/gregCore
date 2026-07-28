@@ -1,160 +1,202 @@
 # gregCore
 
-> Modular .NET 6 IL2CPP mod framework for **Data Center** — Harmony patching, UI overlays, save engine, scripting, and multi-mod architecture.
+> Profile-driven .NET 6 IL2CPP mod framework for **Data Center** with Harmony hooks, UI, persistence, scripting and stable mod APIs.
 
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/greg)
 [![gregFramework](https://img.shields.io/badge/gregFramework-Website-blue?style=for-the-badge)](https://gregframework.eu)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](./LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=for-the-badge)]()
-[![GameVersion](https://img.shields.io/badge/Game%20Version-1.0.50.15-yellow?style=for-the-badge)]()
-[![Unity](https://img.shields.io/badge/Unity-6000.5-black?style=for-the-badge&logo=unity&logoColor=white)]()
+[![Version](https://img.shields.io/badge/Version-1.2.1-orange?style=for-the-badge)](./VERSION)
+[![GameVersion](https://img.shields.io/badge/Game%20Version-1.0.50.15-yellow?style=for-the-badge)](./compat/current.json)
+[![Unity](https://img.shields.io/badge/Unity-6000.5%20profile-black?style=for-the-badge&logo=unity&logoColor=white)](./compat/current.json)
 
-## Links
+## Status
 
-- **Repository:** [github.com/mleem97/gregCore](https://github.com/mleem97/gregCore)
-- **Discord / Support:** [discord.gg/greg](https://discord.gg/greg)
-- **Website:** [gregframework.eu](https://gregframework.eu)
+`main` represents the newest tested reference profile. Compatibility is not inferred from the Unity major/minor version alone. gregCore records and verifies the complete runtime tuple:
 
-## Overview
+```text
+gregCore version
++ game build
++ Unity version
++ IL2CPP/reference fingerprint
++ loader and Il2CppInterop version
++ platform and architecture
+```
 
-**gregCore** is a modular .NET 6 framework for **Data Center** that provides Harmony-based runtime patching, UI overlay management, save engine with versioning, multi-mod architecture with dependency resolution, scripting bridges (Lua, JS, Python), and more.
+The current development profile is:
 
-## Compatibility
+```text
+Data Center 1.0.50.15
+Unity 6000.5 line
+MelonLoader 0.7.x
+Windows/Linux x64
+```
 
-| Loader | Platform | Status |
-|--------|----------|--------|
-| MelonLoader 0.7+ | Windows x64 | Supported |
-| MelonLoader 0.7+ | Linux x64 | Supported |
-| BepInEx 6+ | Windows x64 | Supported |
-| BepInEx 6+ | Linux x64 | Supported |
+The exact Unity patch version and SHA-256 values must still be captured from a verified local installation before the profile can be promoted to hash-verified/runtime-verified status. An unknown or mismatched runtime starts in **safe mode**: managed services, logging, configuration and diagnostics remain available while class injection and game-specific Harmony adapters are disabled.
+
+## Loader support
+
+| Loader | Status | Notes |
+|---|---|---|
+| MelonLoader 0.7.x | Current reference | Dedicated host currently shipped and tested by CI |
+| BepInEx IL2CPP | Adapter planned | Not packaged or advertised as supported until a dedicated pinned host passes the same profile matrix |
+
+A MelonLoader DLL placed under a BepInEx directory is not considered BepInEx support.
 
 ## Features
 
-- Harmony-based runtime patching system (Prefix / Postfix)
-- UI overlay and widget management (UI Toolkit / UGUI)
-- Save engine with versioning and migration (LiteDB)
-- Multi-mod architecture with dependency resolution
-- Wall rack and grid placement systems
-- Custom shop and employee management APIs
-- Logging and diagnostic infrastructure
-- Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer (optional)
+- Versioned compatibility profiles and runtime safe mode
+- Full-signature, profile-aware Harmony hook resolution
+- Lazy activation for high-frequency hooks
+- Stable greg hook IDs independent of changing game method signatures
+- Centralized, idempotent IL2CPP class injection
+- UI Toolkit and UGUI integration
+- Save engine with migrations
+- Multi-mod dependency and event architecture
+- Lua, JavaScript and Python bridges
+- Custom shop, employee, rack and grid APIs
+- Logging, diagnostics and performance governance
+- Optional multiplayer integration
 
 ## Installation
 
 ### MelonLoader
 
-1. Download `gregCore-vX.Y.Z-melonloader-windows.zip` (or `-linux.zip`)
-2. Extract into your game's root folder
-3. Your `Mods/` folder will contain `gregCore.dll`
+1. Install the MelonLoader version declared by the selected compatibility profile.
+2. Download the matching `gregCore-<version>-<profile>-melonloader-<platform>.zip` release.
+3. Extract it into the game root.
+4. Keep `gregCore.dll`, `game_hooks*.json` and `compat/` together under `Mods/gregCore/`.
 
-### BepInEx
+Do not mix a DLL from one profile with hook manifests or compatibility files from another profile.
 
-1. Download `gregCore-vX.Y.Z-bepinex-windows.zip` (or `-linux.zip`)
-2. Extract into your game's root folder
-3. `BepInEx/plugins/gregCore/gregCore.dll` is placed automatically
-
-## Dependencies
-
-### Runtime
-
-- **MelonLoader** (v0.7.2+) or **BepInEx** (v6+)
-
-### NuGet packages (bundled in release)
-
-- Jint 4.8.0, LiteDB 5.0.21, Mono.Cecil 0.11.6, MoonSharp 2.0.0, Newtonsoft.Json 13.0.3, pythonnet 3.0.5
-
-### Build only
-
-- .NET 6 SDK
-- Game reference assemblies in `lib/references/MelonLoader/`
-
-## Build from Source
+## Build from source
 
 Requirements:
 
 - .NET 6 SDK
-- local Data Center / MelonLoader installation
+- a legal local Data Center installation
+- generated MelonLoader/Il2CppInterop reference assemblies
 
-> **Note:** This framework was built on Linux using Proton-GE 10-34. Populate `lib/references/MelonLoader/` from your local game install (run the game once with MelonLoader, then copy `MelonLoader/Il2CppAssemblies/` and `MelonLoader/net6/`).
-
-Build:
+Set the reference root explicitly:
 
 ```bash
-git clone https://github.com/mleem97/gregCore.git
-cd gregCore
-dotnet build -c Release
+export GREG_REFERENCE_ROOT="/path/to/reference-pack"
+dotnet restore gregCore.sln
+dotnet build gregCore.sln -c Release -p:DeployToGameOnBuild=false
 ```
 
-Release output:
+PowerShell:
 
-```
-bin/Release/net6.0/gregCore.dll
-```
-
-## Repository Layout
-
-```
-gregCore.Framework/
-├── src/                    # Framework + mod source code
-│   ├── Core/               # GregCoreMod.cs — entry point
-│   ├── Infrastructure/     # Config, logging, persistence
-│   ├── GameLayer/          # Harmony patches for game classes
-│   ├── UI/                 # UI Toolkit overlay
-│   ├── API/                # Public API surface
-│   └── ...                 # 27 modules total
-├── framework/              # greg_hooks.json — canonical hook registry
-├── game_hooks.json         # Patchable methods from IL2CPP dump
-├── lib/                    # Reference assemblies (game stubs, MelonLoader)
-├── docs/                   # Auto-generated API docs
-├── scripts/                # Build and code-generation helpers
-├── tests/                  # Unit tests
-├── sdk/                    # SDK packs
-├── examples/               # Example mods (C#, Go, JS, Lua, Python, Rust)
-├── .github/workflows/      # CI pipeline
-├── VERSION                 # Single source of truth for version
-├── gregCore.csproj         # Project file
-├── LICENSE                 # Apache 2.0
-└── README.md
+```powershell
+$env:GREG_REFERENCE_ROOT = "C:\path\to\reference-pack"
+dotnet restore gregCore.sln
+dotnet build gregCore.sln -c Release -p:DeployToGameOnBuild=false
 ```
 
-## API Documentation
+The reference root must contain the assemblies named in `gregCore.csproj`, including `MelonLoader.dll`, `Il2CppInterop.Runtime.dll`, `Assembly-CSharp.dll` and the required Unity modules.
 
-See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the auto-generated hook reference.
+To capture sizes and SHA-256 hashes into a profile:
 
-## Credits
+```bash
+python scripts/capture_compat_profile.py \
+  compat/profiles/datacenter-1.0.50.15-unity6000.5.json \
+  --root /path/to/MelonLoader/Il2CppAssemblies \
+  --root /path/to/MelonLoader/net6
+```
 
-| Role | Contributor |
-|------|-------------|
-| **Codebase** | [mleem97](https://github.com/mleem97) ([TeamGreg Modding](https://github.com/teamGregModding)) |
+Validate metadata without starting the game:
+
+```bash
+python scripts/validate_compat_profiles.py
+python scripts/validate_hook_manifest.py game_hooks.json framework/game_hooks.v2.json
+dotnet test tests/gregCore.Tests.csproj -c Release
+```
+
+## Architecture
+
+```text
+stable contracts
+  gregCore.Abstractions (netstandard2.0)
+  gregCore.SDK          (netstandard2.0)
+
+managed framework
+  gregCore.Core         (netstandard2.0 migration boundary)
+  gregCore.Shared       (netstandard2.0 migration boundary)
+
+runtime adapters
+  gregCore.Mod
+  gregCore.Hooks
+  gregCore.Patches
+  gregCore.Compatibility
+  gregCore.Bridge
+  gregCore.UI
+
+legacy host
+  gregCore.dll          (net6.0, retained during staged extraction)
+```
+
+The existing `gregCore.dll` remains the executable MelonLoader host while production types are moved gradually into the new assemblies. This avoids a flag-day namespace or binary break.
+
+## Hook manifests
+
+`framework/game_hooks.v2.json` maps stable greg hook IDs to one or more complete IL2CPP method candidates. Candidates include assembly, full type, method name, generic arity, static/instance state, return type and every parameter type. Unresolvable parameters invalidate the complete candidate; they are never silently removed.
+
+The legacy `game_hooks.json` array remains readable during migration. Convert it deterministically with:
+
+```bash
+python scripts/convert_hook_manifest_v2.py \
+  game_hooks.json framework/game_hooks.v2.generated.json \
+  --profile-id datacenter-1.0.50.15-unity6000.5
+```
+
+## Version and branch policy
+
+Normal pushes do not bump versions, create tags, publish releases or generate branches. Releases use the manual, profile-driven workflow.
+
+- Current development: `main`
+- Maintained line: `compat/u<unity>/game-<game>/gc-<major>.<minor>.x`
+- Exact archive branch: `archive/u<unity>/game-<game>/gc-<version>`
+- Immutable tag: `u<unity>-game<game>-gc<version>`
+
+See:
+
+- [`docs/VERSIONING_AND_BRANCHES.md`](docs/VERSIONING_AND_BRANCHES.md)
+- [`docs/BACKWARD_COMPATIBILITY.md`](docs/BACKWARD_COMPATIBILITY.md)
+- [`compat/README.md`](compat/README.md)
+
+## Backward compatibility
+
+The 1.x line keeps `AssemblyVersion` at `1.0.0.0`, treats the public API baseline as append-only, keeps stable hook IDs, uses additive payload/DTO changes and replaces broad assembly redirects with exact legacy facades or type forwarding.
+
+## Repository layout
+
+```text
+compat/                      compatibility profiles and schema
+framework/                   hook manifests and schemas
+src/Core/                    current managed core and MelonLoader host
+src/GameLayer/               IL2CPP/Harmony adapters
+src/gregCore.*/              staged assembly boundaries
+eng/PublicApi.Shipped.txt    1.x API baseline
+scripts/                     profile, hook, release and branch tools
+tests/                       managed compatibility and framework tests
+.github/workflows/build.yml  validation/build CI only
+.github/workflows/release.yml manual profile-driven release
+```
+
+## API documentation
+
+See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the generated hook reference.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Changes that affect game types or hooks must update or add a compatibility profile and pass the metadata validation jobs.
 
 ## License
 
-This project is licensed under the **Apache License 2.0**. See [`LICENSE`](./LICENSE).
+Apache License 2.0. See [`LICENSE`](LICENSE).
 
-## 🚀 Join the gregFramework Team!
+## Contact
 
-Building the ultimate modding framework for Data Center is a massive undertaking. gregFramework is currently maintained by a passionate core team of three, and we are looking for fellow creators to help us scale this mission!
-
-**Your place in the team:** We won't throw you into the deep end. Depending on your individual strengths and skills, we will match you with the right areas of the project so you can contribute exactly where you have the most fun.
-
-**🌍 Language Requirement:** A solid grasp of written English is required (without relying on machine translation). Being comfortable speaking English in voice chats is a huge plus, but we completely respect those who prefer to stick to text!
-
-**We are looking for motivated volunteers to join our crew across several roles:**
-
-- 💻 **Code Wizards** (C#, Rust, Lua, TS, GO) — Build and expand the core framework and mod packages
-- 🎨 **Asset Creators** (3D Models, hardware assets) — Bring the framework to life visually
-- 📚 **Technical Writers** — Craft wiki entries, maintain documentation, and write user guides
-- 🎮 **Alpha Testers** — Hunt down bugs, stress-test the framework, and provide critical feedback
-- ⚙️ **System Guardians** — Maintain our Linux servers, Docker containers, and infrastructure
-- 🤝 **Community Managers** — Foster our Discord community, gather feedback, and keep the energy high
-
-Interested in joining the project? Everyone is absolutely welcome! Send us an email at **apply@gregframework.eu**, shoot a quick DM, or drop a message on [Discord](https://discord.gg/greg).
-
----
-
-**gregFramework — powered by the community.**
+- Repository: [github.com/mleem97/gregCore](https://github.com/mleem97/gregCore)
+- Discord: [discord.gg/greg](https://discord.gg/greg)
+- Website: [gregframework.eu](https://gregframework.eu)
+- Team applications: **apply@gregframework.eu**

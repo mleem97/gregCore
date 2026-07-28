@@ -2,54 +2,84 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>gregCore</AssemblyName>
-    <NoWarn>CS1701;CS1702;MSB3243;MSB3245</NoWarn>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+
     <Version>1.2.1</Version>
-    <FileVersion>1.2.1</FileVersion>
-    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <FileVersion>1.2.1.0</FileVersion>
+    <InformationalVersion>1.2.1</InformationalVersion>
+    <!-- Keep stable for every binary-compatible 1.x release. -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+
+    <GregReferenceRoot Condition="'$(GregReferenceRoot)' == '' AND '$(GREG_REFERENCE_ROOT)' != ''">$(GREG_REFERENCE_ROOT)</GregReferenceRoot>
+    <GregReferenceRoot Condition="'$(GregReferenceRoot)' == ''">$(MSBuildProjectDirectory)\references</GregReferenceRoot>
+    <DeployToGameOnBuild Condition="'$(DeployToGameOnBuild)' == ''">false</DeployToGameOnBuild>
+    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(GREG_GAME_MODS)' != ''">$(GREG_GAME_MODS)</GameModsPath>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="src\**\*.cs" />
+    <Compile Remove="src\CI_Stubs.cs" />
+    <Compile Remove="tests\**" />
+    <Compile Remove="plugins\**" />
+    <Compile Remove="mods\**" />
+    <Compile Remove="lib\MoonSharp\**" />
+    <Compile Remove="temp_dump\**" />
+    <Compile Remove="src\greg.Multiplayer\**" />
+    <Compile Remove="src\Compatibility\DataCenterModLoader\**" />
+    <Compile Remove="src\API\CustomEmployeeManager.cs" />
+    <!-- Migration projects compile independently and are not folded into the legacy host. -->
+    <Compile Remove="src\gregCore.Abstractions\**" />
+    <Compile Remove="src\gregCore.SDK\**" />
+    <Compile Remove="src\gregCore.Core\**" />
+    <Compile Remove="src\gregCore.Mod\**" />
+    <Compile Remove="src\gregCore.Hooks\**" />
+    <Compile Remove="src\gregCore.Patches\**" />
+    <Compile Remove="src\gregCore.Compatibility\**" />
+    <Compile Remove="src\gregCore.Bridge\**" />
+    <Compile Remove="src\gregCore.UI\**" />
+    <Compile Remove="src\gregCore.Shared\**" />
+
     <None Include="README.md" />
+    <None Include="compat\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="game_hooks.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="framework\game_hooks.v2.json" Link="game_hooks.v2.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="framework\game_hooks.schema.v2.json" Link="game_hooks.schema.v2.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="MelonLoader"><HintPath>references/MelonLoader.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="0Harmony"><HintPath>references/0Harmony.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppInterop.Runtime"><HintPath>references/Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppInterop.Common"><HintPath>references/Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2Cppmscorlib"><HintPath>references/Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppSystem"><HintPath>references/Il2CppSystem.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppSystem.Core"><HintPath>references/Il2CppSystem.Core.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Assembly-CSharp"><HintPath>references/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.CoreModule"><HintPath>references/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.UI"><HintPath>references/UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.UIModule"><HintPath>references/UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.AIModule"><HintPath>references/UnityEngine.AIModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.AnimationModule"><HintPath>references/UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>references/UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.PhysicsModule"><HintPath>references/UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>references/UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.UIElementsModule"><HintPath>references/UnityEngine.UIElementsModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>references/UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.TextCoreTextEngineModule"><HintPath>references/UnityEngine.TextCoreTextEngineModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.TextCoreFontEngineModule"><HintPath>references/UnityEngine.TextCoreFontEngineModule.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Unity.InputSystem"><HintPath>references/Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Unity.TextMeshPro"><HintPath>references/Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Unity.Entities"><HintPath>references/Unity.Entities.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime"><HintPath>references/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime"><HintPath>references/Unity.RenderPipelines.Core.Runtime.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="Il2CppUMA_Core"><HintPath>references/Il2CppUMA_Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MelonLoader"><HintPath>$(GregReferenceRoot)\MelonLoader.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(GregReferenceRoot)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(GregReferenceRoot)\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>$(GregReferenceRoot)\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><HintPath>$(GregReferenceRoot)\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppSystem"><HintPath>$(GregReferenceRoot)\Il2CppSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppSystem.Core"><HintPath>$(GregReferenceRoot)\Il2CppSystem.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(GregReferenceRoot)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GregReferenceRoot)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(GregReferenceRoot)\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(GregReferenceRoot)\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AIModule"><HintPath>$(GregReferenceRoot)\UnityEngine.AIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AnimationModule"><HintPath>$(GregReferenceRoot)\UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(GregReferenceRoot)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(GregReferenceRoot)\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(GregReferenceRoot)\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIElementsModule"><HintPath>$(GregReferenceRoot)\UnityEngine.UIElementsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>$(GregReferenceRoot)\UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextCoreTextEngineModule"><HintPath>$(GregReferenceRoot)\UnityEngine.TextCoreTextEngineModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextCoreFontEngineModule"><HintPath>$(GregReferenceRoot)\UnityEngine.TextCoreFontEngineModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(GregReferenceRoot)\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(GregReferenceRoot)\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><HintPath>$(GregReferenceRoot)\Unity.Entities.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime"><HintPath>$(GregReferenceRoot)\Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime"><HintPath>$(GregReferenceRoot)\Unity.RenderPipelines.Core.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppUMA_Core"><HintPath>$(GregReferenceRoot)\Il2CppUMA_Core.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -61,30 +91,22 @@
     <PackageReference Include="pythonnet" Version="3.0.5" />
   </ItemGroup>
 
-  <!-- Automatic ILRepack disabled due to IL2CPP reference conflicts. Use deploy/unify-core.ps1 instead. -->
-  <PropertyGroup>
-    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(GREG_GAME_MODS)' != ''">$(GREG_GAME_MODS)</GameModsPath>
-    <GameModsPath Condition="'$(GameModsPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods</GameModsPath>
-  </PropertyGroup>
-  <Target Name="DeployToGame" AfterTargets="CleanupAfterBuild" Condition="Exists('$(GameModsPath)')">
-    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
-          DestinationFolder="$(GameModsPath)"
-          OverwriteReadOnlyFiles="true"
-          ContinueOnError="ErrorAndContinue" />
-    <Error Condition="!Exists('$(GameModsPath)\$(AssemblyName).dll') OR '$([System.IO.File]::GetLastWriteTime(&quot;$(GameModsPath)\$(AssemblyName).dll&quot;).Ticks)' &lt; '$([System.IO.File]::GetLastWriteTime(&quot;$(OutputPath)$(AssemblyName).dll&quot;).Ticks)'"
-           Text="[Deploy FAILED] Could not copy $(AssemblyName).dll to $(GameModsPath) — is the game running and has the DLL locked? Close the game and rebuild." />
-    <Message Text="[Deploy] $(AssemblyName).dll → $(GameModsPath)" Importance="high" />
+  <Target Name="ValidateGregReferenceRoot" BeforeTargets="ResolveReferences" Condition="'$(CI)' != 'true'">
+    <Warning Condition="!Exists('$(GregReferenceRoot)')"
+             Text="gregCore reference root does not exist: $(GregReferenceRoot). Set GREG_REFERENCE_ROOT or GregReferenceRoot." />
   </Target>
 
-  <ItemGroup>
-    <Compile Remove="src\CI_Stubs.cs" />
-    <Compile Remove="tests\**" />
-    <Compile Remove="plugins\**" />
-    <Compile Remove="mods\**" />
-    <Compile Remove="lib\MoonSharp\**" />
-    <Compile Remove="temp_dump\**" />
-    <Compile Remove="src\greg.Multiplayer\**" />
-    <Compile Remove="src\Compatibility\DataCenterModLoader\**" />
-    <Compile Remove="src\API\CustomEmployeeManager.cs" />
-  </ItemGroup>
+  <Target Name="DeployToGame"
+          AfterTargets="Build"
+          Condition="'$(DeployToGameOnBuild)' == 'true' AND '$(GameModsPath)' != '' AND Exists('$(GameModsPath)')">
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="$(GameModsPath)"
+          OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="@(None->WithMetadataValue('CopyToOutputDirectory', 'PreserveNewest')->'%(FullPath)')"
+          DestinationFolder="$(GameModsPath)"
+          SkipUnchangedFiles="true"
+          Condition="'@(None->WithMetadataValue('CopyToOutputDirectory', 'PreserveNewest'))' != ''" />
+    <Message Text="[Deploy] $(TargetPath) -> $(GameModsPath)" Importance="high" />
+  </Target>
+
 </Project>

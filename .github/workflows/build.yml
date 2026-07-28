@@ -2,236 +2,116 @@ name: gregCore CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'refactor/**'
+      - 'compat/**'
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: gregcore-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # ─── 1. Auto-bump version on every push to main ───────────────────────────
-  version-bump:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  metadata:
+    name: Validate compatibility metadata
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.bump.outputs.version }}
-      tag: ${{ steps.bump.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.12'
+      - name: Validate compatibility profiles
+        run: python scripts/validate_compat_profiles.py
+      - name: Validate hook manifests
+        run: >-
+          python scripts/validate_hook_manifest.py
+          game_hooks.json
+          framework/game_hooks.v2.json
 
-      - name: Bump patch version
-        id: bump
-        run: |
-          CURRENT=$(cat VERSION | tr -d '[:space:]')
-          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
-          MINOR=$(echo "$CURRENT" | cut -d. -f2)
-          PATCH=$(echo "$CURRENT" | cut -d. -f3)
-          # Strip any pre-release suffix from patch
-          PATCH=$(echo "$PATCH" | grep -oE '^[0-9]+')
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-          echo "$NEW_VERSION" > VERSION
-          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Bumped $CURRENT → $NEW_VERSION"
-
-      - name: Update version in .csproj
-        run: |
-          V="${{ steps.bump.outputs.version }}"
-          sed -i "s|<Version>.*</Version>|<Version>$V</Version>|g" gregCore.csproj
-          sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$V</FileVersion>|g" gregCore.csproj
-          sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$V.0</AssemblyVersion>|g" gregCore.csproj
-
-      - name: Update version in GregCoreMod.cs
-        run: |
-          V="${{ steps.bump.outputs.version }}"
-          sed -i 's|"gregCore", "[^"]*"|"gregCore", "'"$V"'"|g' src/Core/GregCoreMod.cs
-          sed -i 's|Framework Boot v[^-"]*|Framework Boot v'"$V"'|g' src/Core/GregCoreMod.cs
-
-      - name: Update CHANGELOG
-        run: |
-          V="${{ steps.bump.outputs.version }}"
-          DATE=$(date +%Y-%m-%d)
-          PREV=$(git log --format="%s" HEAD~1 -1 2>/dev/null || echo "patch update")
-          ENTRY="## [${V}] - ${DATE}\n\n### Changed\n\n- Auto-release: ${PREV}\n\n"
-          # Insert after first line (# Changelog)
-          awk -v entry="$ENTRY" 'NR==1{print; print ""; printf "%s", entry; next} /^## \[/{if(!done){done=1} print; next} {print}' CHANGELOG.md > CHANGELOG.tmp
-          mv CHANGELOG.tmp CHANGELOG.md
-
-      - name: Commit version bump
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add VERSION gregCore.csproj src/Core/GregCoreMod.cs CHANGELOG.md
-          git commit -m "chore(release): bump version to ${{ steps.bump.outputs.version }} [skip ci]" || echo "Nothing to commit"
-          git tag "${{ steps.bump.outputs.tag }}"
-          git push origin main --tags
-
-  # ─── 2. Build for Windows & Linux ─────────────────────────────────────────
   build:
-    needs: [ version-bump ]
-    if: always() && (needs.version-bump.result == 'success' || github.event_name == 'pull_request')
+    name: Build and test (${{ matrix.label }})
+    needs: metadata
     strategy:
+      fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
         include:
           - os: windows-latest
-            rid: win-x64
-            label: windows
+            label: windows-x64
           - os: ubuntu-latest
-            rid: linux-x64
-            label: linux
+            label: linux-x64
     runs-on: ${{ matrix.os }}
+    env:
+      CI: 'true'
+      DeployToGameOnBuild: 'false'
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.version-bump.outputs.tag || github.sha }}
           fetch-depth: 0
-
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
-
-      - name: Restore
-        run: dotnet restore gregCore.csproj
-
-      - name: Build Release
-        run: dotnet build gregCore.csproj -c Release -p:CI=true
-
+          cache: true
+          cache-dependency-path: |
+            **/*.csproj
+            **/packages.lock.json
+      - name: Restore solution
+        run: dotnet restore gregCore.sln
+      - name: Build solution
+        run: dotnet build gregCore.sln -c Release --no-restore -p:CI=true -p:DeployToGameOnBuild=false
+      - name: Run managed tests
+        run: dotnet test tests/gregCore.Tests.csproj -c Release --no-build --logger "trx;LogFileName=gregCore-${{ matrix.label }}.trx"
       - name: Stage MelonLoader artifact
         shell: bash
         run: |
-          V=$(cat VERSION | tr -d '[:space:]')
-          OUT="dist/melonloader-${{ matrix.label }}"
-          mkdir -p "$OUT/Mods"
-          cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
-          cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
-          cp README.md "$OUT/"
-          cp CHANGELOG.md "$OUT/"
+          set -euo pipefail
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          OUT="dist/gregCore-${VERSION}-melonloader-${{ matrix.label }}"
+          mkdir -p "$OUT/Mods/gregCore"
+          cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/gregCore/"
+          cp game_hooks.json "$OUT/Mods/gregCore/"
+          cp framework/game_hooks.v2.json "$OUT/Mods/gregCore/"
+          cp framework/game_hooks.schema.v2.json "$OUT/Mods/gregCore/"
+          cp -R compat "$OUT/Mods/gregCore/compat"
+          cp README.md CHANGELOG.md "$OUT/"
           cd dist
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            powershell -Command "Compress-Archive -Path 'melonloader-${{ matrix.label }}/*' -DestinationPath 'gregCore-v${V}-melonloader-${{ matrix.label }}.zip'"
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            powershell -NoProfile -Command "Compress-Archive -Path 'gregCore-${VERSION}-melonloader-${{ matrix.label }}/*' -DestinationPath 'gregCore-${VERSION}-melonloader-${{ matrix.label }}.zip'"
           else
-            zip -r "gregCore-v${V}-melonloader-${{ matrix.label }}.zip" "melonloader-${{ matrix.label }}"
+            zip -qr "gregCore-${VERSION}-melonloader-${{ matrix.label }}.zip" "gregCore-${VERSION}-melonloader-${{ matrix.label }}"
           fi
-
-      - name: Stage BepInEx artifact
-        shell: bash
-        run: |
-          V=$(cat VERSION | tr -d '[:space:]')
-          OUT="dist/bepinex-${{ matrix.label }}"
-          mkdir -p "$OUT/BepInEx/plugins/gregCore"
-          cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
-          cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp README.md "$OUT/"
-          cp CHANGELOG.md "$OUT/"
-          cd dist
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            powershell -Command "Compress-Archive -Path 'bepinex-${{ matrix.label }}/*' -DestinationPath 'gregCore-v${V}-bepinex-${{ matrix.label }}.zip'"
-          else
-            zip -r "gregCore-v${V}-bepinex-${{ matrix.label }}.zip" "bepinex-${{ matrix.label }}"
-          fi
-
-      - name: Upload artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gregCore-${{ matrix.label }}-zips
+          name: gregCore-${{ matrix.label }}
           path: dist/*.zip
-
-  # ─── 3. Generate API docs from hook JSONs ─────────────────────────────────
-  docs:
-    needs: [ version-bump ]
-    if: always() && needs.version-bump.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.version-bump.outputs.tag }}
-          fetch-depth: 2
-
-      - name: Check if hook files changed
-        id: changed
-        run: |
-          git diff HEAD~1 --name-only 2>/dev/null | grep -E '(game_hooks\.json|framework/greg_hooks\.json)' \
-            && echo "changed=true" >> "$GITHUB_OUTPUT" \
-            || echo "changed=false" >> "$GITHUB_OUTPUT"
-
-      - name: Generate FrameworkAPI docs
-        if: steps.changed.outputs.changed == 'true'
-        run: |
-          python3 scripts/generate_api_docs.py \
-            --game-hooks game_hooks.json \
-            --greg-hooks framework/greg_hooks.json \
-            --output docs/FrameworkAPI.md \
-            --version "$(cat VERSION)"
-
-      - name: Upload docs artifact
-        if: steps.changed.outputs.changed == 'true'
+          if-no-files-found: error
+      - name: Upload test results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: api-docs
-          path: docs/FrameworkAPI.md
+          name: test-results-${{ matrix.label }}
+          path: '**/*.trx'
+          if-no-files-found: ignore
 
-  # ─── 4. Publish release + create version branch ────────────────────────────
-  release:
-    needs: [ version-bump, build ]
-    if: >
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      needs.build.result == 'success'
+  public-api:
+    name: Public API compatibility baseline
+    needs: metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          ref: ${{ needs.version-bump.outputs.tag }}
-          fetch-depth: 0
-
-      - name: Create version branch
-        run: |
-          TAG="${{ needs.version-bump.outputs.tag }}"
-          BRANCH="release/${TAG}"
-          git checkout -b "$BRANCH"
-          git push origin "$BRANCH" || true
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: gregCore-*-zips
-          merge-multiple: true
-          path: release-assets
-
-      - name: Download API docs (if generated)
-        uses: actions/download-artifact@v4
-        with:
-          name: api-docs
-          path: release-assets
-        continue-on-error: true
-
-      - name: Extract changelog entry
-        id: changelog
-        run: |
-          V="${{ needs.version-bump.outputs.version }}"
-          # Extract the section for this version from CHANGELOG.md
-          NOTES=$(awk "/^## \[${V}\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md)
-          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$NOTES" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.version-bump.outputs.tag }}
-          name: "gregCore ${{ needs.version-bump.outputs.tag }}"
-          body: ${{ steps.changelog.outputs.notes }}
-          prerelease: false
-          files: release-assets/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          dotnet-version: 6.0.x
+      - name: Ensure shipped API baseline exists
+        run: test -s eng/PublicApi.Shipped.txt
+      - name: Build stable contract projects
+        run: >-
+          dotnet build gregCore.sln -c Release
+          -p:DeployToGameOnBuild=false
+          -p:CI=true

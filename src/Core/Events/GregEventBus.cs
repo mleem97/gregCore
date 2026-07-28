@@ -135,9 +135,15 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
         int flushed = 0;
         const int maxFlushPerFrame = 50;
 
-        while (_deferredEvents.TryDequeue(out var ev) && flushed < maxFlushPerFrame)
+        while (flushed < maxFlushPerFrame)
         {
-            if (_governor != null && !_governor.CanDispatchEvent()) break;
+            // Check the budget before dequeuing so a denied dispatch does not
+            // silently discard the oldest deferred event.
+            if (_governor != null && !_governor.CanDispatchEvent())
+                break;
+            if (!_deferredEvents.TryDequeue(out var ev))
+                break;
+
             PublishDirect(ev.hookName, ev.payload);
             flushed++;
         }

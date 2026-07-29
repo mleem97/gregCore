@@ -889,12 +889,17 @@ public static class CustomEmployeeManager
             var portraitTransform = card.Find("Image");
             if (portraitTransform == null) return;
 
-            string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
-            foreach (var ext in new[] { ".jpg", ".png" })
+
+            // Security: Prevent path traversal by ensuring the employeeId does not contain directory separators or invalid characters.
+            if (!string.IsNullOrEmpty(employeeId) && employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !employeeId.Contains(".."))
             {
-                string candidate = Path.Combine(assetsDir, employeeId + ext);
-                if (File.Exists(candidate)) { imagePath = candidate; break; }
+                string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
+                foreach (var ext in new[] { ".jpg", ".png" })
+                {
+                    string candidate = Path.Combine(assetsDir, employeeId + ext);
+                    if (File.Exists(candidate)) { imagePath = candidate; break; }
+                }
             }
 
             if (imagePath != null)

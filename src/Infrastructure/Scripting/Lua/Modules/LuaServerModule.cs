@@ -12,6 +12,21 @@ namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
 public static class LuaServerModule
 {
+    // Optimization: Helper to use O(1) game-managed collection with fallback to O(N) FindObjectsOfType
+    private static System.Collections.Generic.IEnumerable<Il2Cpp.Server> GetServers()
+    {
+        var nm = Il2Cpp.NetworkMap.instance;
+        if (nm != null && nm.servers != null)
+        {
+            foreach (var kvp in nm.servers) yield return kvp.Value;
+        }
+        else
+        {
+            var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+            foreach (var s in servers) yield return s;
+        }
+    }
+
     public static void Register(Table greg, Script script, string modId)
     {
         var serverTable = new Table(script);
@@ -21,10 +36,9 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 var result = new Table(script);
                 int i = 1;
-                foreach (var s in servers)
+                foreach (var s in GetServers())
                 {
                     try
                     {
@@ -80,8 +94,7 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                foreach (var s in GetServers())
                 {
                     try
                     {
@@ -104,8 +117,7 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                foreach (var s in GetServers())
                 {
                     try
                     {

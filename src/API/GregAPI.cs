@@ -192,6 +192,11 @@ namespace gregCore.API
             try
             {
                 var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null)
+                {
+                    var arr = nm.GetNumberOfDevices();
+                    if (arr != null && arr.Length > 0) return (uint)arr[0];
+                }
                 return nm != null && nm.servers != null ? (uint)nm.servers.Count : 0u;
             }
             catch { return 0u; }
@@ -208,7 +213,7 @@ namespace gregCore.API
                     if (arr != null && arr.Length > 2) return (uint)arr[2];
                 }
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks != null ? (uint)racks.Count : 0u;
+                return racks != null ? (uint)racks.Length : 0u;
             }
             catch { return 0u; }
         }
@@ -218,6 +223,11 @@ namespace gregCore.API
             try
             {
                 var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null)
+                {
+                    var arr = nm.GetNumberOfDevices();
+                    if (arr != null && arr.Length > 1) return (uint)arr[1];
+                }
                 return nm != null && nm.switches != null ? (uint)nm.switches.Count : 0u;
             }
             catch { return 0u; }

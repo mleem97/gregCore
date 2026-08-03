@@ -21,10 +21,10 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 var result = new Table(script);
                 int i = 1;
-                foreach (var s in servers)
+
+                Action<Il2Cpp.Server> processServer = (s) =>
                 {
                     try
                     {
@@ -42,6 +42,26 @@ public static class LuaServerModule
                         result[i++] = info;
                     }
                     catch { }
+                };
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers)
+                    {
+                        processServer(kvp.Value);
+                    }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (servers != null)
+                    {
+                        foreach (var s in servers)
+                        {
+                            processServer(s);
+                        }
+                    }
                 }
                 return result;
             }
@@ -58,12 +78,16 @@ public static class LuaServerModule
             try
             {
                 var nm = Il2Cpp.NetworkMap.instance;
-                if (nm != null && nm.servers != null)
+                if (nm != null)
                 {
-                    return nm.servers.Count;
+                    var counts = nm.GetNumberOfDevices();
+                    if (counts != null && counts.Length > 0)
+                    {
+                        return counts[0];
+                    }
                 }
                 var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers?.Count ?? 0;
+                return servers?.Length ?? 0;
             }
             catch { return 0; }
         });
@@ -80,20 +104,43 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                bool repaired = false;
+                Action<Il2Cpp.Server> processServer = (s) =>
                 {
+                    if (repaired) return;
                     try
                     {
                         if (s.GetHashCode() == hash && s.isBroken)
                         {
                             s.RepairDevice();
-                            return true;
+                            repaired = true;
                         }
                     }
                     catch { }
+                };
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers)
+                    {
+                        processServer(kvp.Value);
+                        if (repaired) return true;
+                    }
                 }
-                return false;
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (servers != null)
+                    {
+                        foreach (var s in servers)
+                        {
+                            processServer(s);
+                            if (repaired) return true;
+                        }
+                    }
+                }
+                return repaired;
             }
             catch { return false; }
         });
@@ -104,8 +151,7 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                Action<Il2Cpp.Server> processServer = (s) =>
                 {
                     try
                     {
@@ -116,6 +162,26 @@ public static class LuaServerModule
                         }
                     }
                     catch { }
+                };
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers)
+                    {
+                        processServer(kvp.Value);
+                    }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (servers != null)
+                    {
+                        foreach (var s in servers)
+                        {
+                            processServer(s);
+                        }
+                    }
                 }
                 return repaired;
             }

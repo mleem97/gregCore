@@ -69,9 +69,8 @@ public static class GameHooks
 
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 int updated = 0;
-                foreach (var srv in servers)
+                Action<Il2Cpp.Server> processServer = (srv) =>
                 {
                     try
                     {
@@ -87,6 +86,26 @@ public static class GameHooks
                         }
                     }
                     catch { }
+                };
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers)
+                    {
+                        processServer(kvp.Value);
+                    }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (servers != null)
+                    {
+                        foreach (var srv in servers)
+                        {
+                            processServer(srv);
+                        }
+                    }
                 }
                 if (updated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {updated} server rackPositionUID references");
@@ -98,9 +117,8 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
                 int swUpdated = 0;
-                foreach (var sw in switches)
+                Action<Il2Cpp.NetworkSwitch> processSwitch = (sw) =>
                 {
                     try
                     {
@@ -116,6 +134,26 @@ public static class GameHooks
                         }
                     }
                     catch { }
+                };
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.switches != null)
+                {
+                    foreach (var kvp in nm.switches)
+                    {
+                        processSwitch(kvp.Value);
+                    }
+                }
+                else
+                {
+                    var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                    if (switches != null)
+                    {
+                        foreach (var sw in switches)
+                        {
+                            processSwitch(sw);
+                        }
+                    }
                 }
                 if (swUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {swUpdated} switch rackPositionUID references");

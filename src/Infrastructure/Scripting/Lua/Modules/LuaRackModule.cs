@@ -63,7 +63,7 @@ public static class LuaRackModule
                     if (arr != null && arr.Length > 2) return arr[2];
                 }
                 var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
-                return racks?.Count ?? 0;
+                return racks?.Length ?? 0;
             }
             catch { return 0; }
         });

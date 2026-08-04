@@ -891,10 +891,16 @@ public static class CustomEmployeeManager
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
-            foreach (var ext in new[] { ".jpg", ".png" })
+
+            // SECURITY: Validate employeeId to prevent path traversal attacks during file system operations.
+            // If invalid, we skip file loading and let the UI fall back to its default state instead of returning early.
+            if (!string.IsNullOrEmpty(employeeId) && employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !employeeId.Contains(".."))
             {
-                string candidate = Path.Combine(assetsDir, employeeId + ext);
-                if (File.Exists(candidate)) { imagePath = candidate; break; }
+                foreach (var ext in new[] { ".jpg", ".png" })
+                {
+                    string candidate = Path.Combine(assetsDir, employeeId + ext);
+                    if (File.Exists(candidate)) { imagePath = candidate; break; }
+                }
             }
 
             if (imagePath != null)

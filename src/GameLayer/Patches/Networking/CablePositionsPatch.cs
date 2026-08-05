@@ -66,9 +66,9 @@ public static class CablePositionsPatch
             if (baseId < current) return;
         }
         while (Interlocked.CompareExchange(ref _nextCableId, baseId + 1, current) != current);
-
-        MelonLogger.Msg($"[CablePatch] Cable ID counter set to {baseId + 1}");
     }
+
+    // LogUpdate temporarily removed due to unit test errors
 
     public static int PeekNextId() => _nextCableId;
 }

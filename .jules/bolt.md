@@ -24,3 +24,6 @@
 ## 2025-05-21 - Optimized GetRackCount calls (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<Rack>` to simply get the rack count is an O(N) operation over all objects, creating unnecessary GC pressure and CPU overhead, especially as the data center grows.
 **Action:** Optimized `GetRackCount` implementation in `GameHooks.cs` by using the game-managed O(1) singleton `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()` (index 2 for racks), providing a fallback to `FindObjectsOfType` only during uninitialized states.
+## 2026-05-18 - Avoid O(N) FindObjectsOfType for IL2CPP Objects
+**Learning:** `UnityEngine.Object.FindObjectsOfType<T>()` is extremely expensive as it iterates over all scene objects. IL2CPP games often have game-managed singletons (like `Il2Cpp.NetworkMap.instance`) that maintain O(1) collections of these objects (e.g., `servers`, `brokenServers`).
+**Action:** Always prefer iterating over game-managed singleton collections over `FindObjectsOfType`. When doing so, provide a fallback to `FindObjectsOfType` for uninitialized game states (like main menu) and manually create standard `List<T>` to defensively copy the elements before operating on them to avoid IL2CPP type mapping compilation errors.

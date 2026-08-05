@@ -67,6 +67,30 @@ public static class CablePositionsPatch
         }
         while (Interlocked.CompareExchange(ref _nextCableId, baseId + 1, current) != current);
 
+        LogSetBaseId(baseId);
+    }
+
+    // We must avoid referencing MelonLogger types directly in methods that might be inlined
+    // or called during test environments where MelonLoader is missing.
+    // We isolate the entire logging mechanism and its usage to avoid JIT eagerly loading it.
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void LogSetBaseId(int baseId)
+    {
+        try
+        {
+            DoLog(baseId);
+        }
+        catch (System.IO.FileNotFoundException)
+        {
+            // Ignored in test environment
+        }
+        catch { }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void DoLog(int baseId)
+    {
         MelonLogger.Msg($"[CablePatch] Cable ID counter set to {baseId + 1}");
     }
 

@@ -77,11 +77,8 @@ jobs:
     if: always() && (needs.version-bump.result == 'success' || github.event_name == 'pull_request')
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
+        os: [ ubuntu-latest ]
         include:
-          - os: windows-latest
-            rid: win-x64
-            label: windows
           - os: ubuntu-latest
             rid: linux-x64
             label: linux

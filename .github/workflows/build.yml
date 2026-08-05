@@ -102,6 +102,8 @@ jobs:
 
       - name: Build Release
         run: dotnet build gregCore.csproj -c Release -p:CI=true
+        env:
+          DOTNET_ROLL_FORWARD: Major
 
       - name: Stage MelonLoader artifact
         shell: bash
@@ -110,8 +112,8 @@ jobs:
           OUT="dist/melonloader-${{ matrix.label }}"
           mkdir -p "$OUT/Mods"
           cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
-          cp game_hooks.json "$OUT/Mods/"
-          cp framework/greg_hooks.json "$OUT/Mods/"
+          if [ -f "game_hooks.json" ]; then cp game_hooks.json "$OUT/Mods/"; fi
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/Mods/"; fi
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -128,8 +130,8 @@ jobs:
           OUT="dist/bepinex-${{ matrix.label }}"
           mkdir -p "$OUT/BepInEx/plugins/gregCore"
           cp bin/Release/net6.0/gregCore.dll "$OUT/BepInEx/plugins/gregCore/"
-          cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"
-          cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"
+          if [ -f "game_hooks.json" ]; then cp game_hooks.json "$OUT/BepInEx/plugins/gregCore/"; fi
+          if [ -f "framework/greg_hooks.json" ]; then cp framework/greg_hooks.json "$OUT/BepInEx/plugins/gregCore/"; fi
           cp README.md "$OUT/"
           cp CHANGELOG.md "$OUT/"
           cd dist
@@ -234,4 +236,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

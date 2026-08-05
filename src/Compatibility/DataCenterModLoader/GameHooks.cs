@@ -69,25 +69,7 @@ public static class GameHooks
 
             try
             {
-                var servers = new System.Collections.Generic.List<Il2Cpp.Server>();
-                var nm = global::Il2Cpp.NetworkMap.instance;
-                if (nm != null && nm.servers != null)
-                {
-                    foreach (var kvp in nm.servers)
-                    {
-                        if (kvp.Value != null) servers.Add(kvp.Value);
-                    }
-                }
-                else
-                {
-                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                    if (found != null)
-                    {
-                        foreach (var srv in found)
-                            if (srv != null) servers.Add(srv);
-                    }
-                }
-
+                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 int updated = 0;
                 foreach (var srv in servers)
                 {
@@ -116,25 +98,7 @@ public static class GameHooks
 
             try
             {
-                var switches = new System.Collections.Generic.List<Il2Cpp.NetworkSwitch>();
-                var nm = global::Il2Cpp.NetworkMap.instance;
-                if (nm != null && nm.switches != null)
-                {
-                    foreach (var kvp in nm.switches)
-                    {
-                        if (kvp.Value != null) switches.Add(kvp.Value);
-                    }
-                }
-                else
-                {
-                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                    if (found != null)
-                    {
-                        foreach (var sw in found)
-                            if (sw != null) switches.Add(sw);
-                    }
-                }
-
+                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
                 int swUpdated = 0;
                 foreach (var sw in switches)
                 {

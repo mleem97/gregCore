@@ -21,3 +21,8 @@
 **Vulnerability:** `CustomEmployeeManager.Register` accepted arbitrary employee IDs without validation, which were later used directly in `Path.Combine` to construct image loading paths, enabling path traversal (CWE-22).
 **Learning:** Identifiers provided by mods or external sources must be treated as untrusted input and validated before being used in file system operations.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-10-24 - Defense-in-Depth for File Operations
+**Vulnerability:** Path traversal vulnerability in `SetPortrait` where `employeeId` was used directly in `Path.Combine` without validation, relying entirely on upstream validation during registration.
+**Learning:** Even when inputs like `employeeId` are validated at creation/registration, any subsequent methods that consume them for file system operations must independently validate them to protect against direct calls, missing validations, or deserialization bypasses. Additionally, security checks must not use early returns if fallback logic (like default UI colors) is present later in the method.
+**Prevention:** Always validate identifiers used in file paths at the point of use using `IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || Contains("..")`. Wrap vulnerable operations in conditional blocks rather than returning early to ensure fallback state is correctly applied.

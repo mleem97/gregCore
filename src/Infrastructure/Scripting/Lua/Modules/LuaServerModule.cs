@@ -21,7 +21,23 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var nm = Il2Cpp.NetworkMap.instance;
+                var servers = new System.Collections.Generic.List<Il2Cpp.Server>();
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers)
+                    {
+                        servers.Add(kvp.Value);
+                    }
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (found != null)
+                    {
+                        foreach (var s in found) servers.Add(s);
+                    }
+                }
                 var result = new Table(script);
                 int i = 1;
                 foreach (var s in servers)
@@ -80,6 +96,20 @@ public static class LuaServerModule
         {
             try
             {
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.brokenServers != null)
+                {
+                    foreach (var kvp in nm.brokenServers)
+                    {
+                        var s = kvp.Value;
+                        if (s != null && s.GetHashCode() == hash && s.isBroken)
+                        {
+                            s.RepairDevice();
+                            return true;
+                        }
+                    }
+                    return false;
+                }
                 var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 foreach (var s in servers)
                 {
@@ -104,6 +134,26 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.brokenServers != null)
+                {
+                    if (nm.brokenServers.Count == 0) return 0;
+                    var defensiveCopy = new System.Collections.Generic.List<Il2Cpp.Server>();
+                    foreach (var kvp in nm.brokenServers) defensiveCopy.Add(kvp.Value);
+                    foreach (var s in defensiveCopy)
+                    {
+                        try
+                        {
+                            if (s != null && s.isBroken)
+                            {
+                                s.RepairDevice();
+                                repaired++;
+                            }
+                        }
+                        catch { }
+                    }
+                    return repaired;
+                }
                 var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 foreach (var s in servers)
                 {

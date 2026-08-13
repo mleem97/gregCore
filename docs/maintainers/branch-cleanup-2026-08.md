@@ -34,9 +34,9 @@ these classes:
 - The proposed Steam callback queue was not adopted because its unbounded
   queue conflicts with the framework's bounded-work policy; it needs a
   bounded/coalescing design and an integration test first.
-- FishNet reflection/RPC proposals were not adopted because they add runtime
-  coupling and possible duplicate broadcasts; they need a dedicated
-  multiplayer contract review.
+- FishNet reflection/RPC proposals were not adopted because Data Center now
+  owns co-op natively. The complete custom multiplayer layer was removed in a
+  follow-up commit rather than retaining a competing synchronization path.
 - The timezone fallback and isolated test proposals were reviewed but left out
   of the integration commit because they are unrelated to the current
   security/performance scope and some depend on optional runtime assemblies.

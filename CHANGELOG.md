@@ -31,6 +31,14 @@
 - Erzeugte Template-Artefakte werden nicht mehr als Quellcode eingecheckt.
 - Nicht übernommene Nebenänderungen (unbegrenzte Steam-Queue, reflektive
   FishNet-RPCs und optionale Testvarianten) sind mit Begründung dokumentiert.
+- Die eigene FishNet-/Relay-/`greg.Multiplayer`-Schicht und die zugehörigen
+  Synchronisationswrapper wurden entfernt; Koop bleibt vollständig beim
+  nativen Data-Center-Spiel.
+- Die aktiven Steam-/P2P-Aufrufe aus dem alten FFI-Multiplayerpfad wurden
+  entfernt; die v7-ABI-Slots bleiben ausschließlich als stabile No-op-Slots.
+- Native Unity-/Steamworks-/Data-Center-Netzwerktypen wurden gegen die lokalen
+  Referenz-Assemblies geprüft und mit Hashes und reproduzierbaren Befehlen in
+  `docs/codebase/native-coop-assembly-audit.md` festgehalten.
 
 ### Verification
 
@@ -38,6 +46,8 @@
 - Hook-Vertragsprüfung: 2 kanonische Hooks aus Manifest v2 validiert.
 - Tests: 26/26 bestanden.
 - In-Game-Smoke-Test gegen eine reale Data-Center-Installation: noch offen.
+- Test-Build und VSTest-Lauf nach Entfernung der Eigenimplementierung:
+  26/26 bestanden.
 
 ## Committed history since v1.2.1
 

@@ -13,7 +13,7 @@ gregCore.Framework/
 │   ├── Shop/                       # Custom shop system
 │   ├── Employee/                   # Employee management
 │   ├── Rack/                       # Wall rack and grid placement
-│   ├── Network/                    # FishNet multiplayer sync (optional)
+│   ├── Network/                    # Native game-network read-only adapters
 │   ├── Diagnostics/                # Debug and logging infrastructure
 │   └── ...                         # 27 modules total
 ├── framework/                      # greg_hooks.json — canonical hook registry

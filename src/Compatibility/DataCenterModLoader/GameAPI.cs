@@ -70,7 +70,9 @@ public struct GameAPITable
     public IntPtr GetDifficulty;
     public IntPtr TriggerSave;
 
-    // v7 - Steam / Multiplayer
+    // v7 - Legacy ABI slots. Native Data Center co-op owns lobby/session state;
+    // these positions remain stable for older Rust plugins and are no-op where
+    // the old custom implementation had no native backing.
     public IntPtr SteamGetMyId;
     public IntPtr SteamGetFriendName;
     public IntPtr SteamCreateLobby;
@@ -309,37 +311,6 @@ public partial class GameAPIManager : IDisposable
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int RackGameUninstallDelegate(ulong objHandle, byte objectType);
 
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr SteamAPI_SteamNetworking_v006();
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr SteamAPI_SteamUser_v023();
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr SteamAPI_SteamFriends_v018();
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong SteamAPI_ISteamUser_GetSteamID(IntPtr self);
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr SteamAPI_ISteamFriends_GetFriendPersonaName(IntPtr self, ulong steamId);
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool SteamAPI_ISteamNetworking_SendP2PPacket(IntPtr self, ulong steamIDRemote, IntPtr pubData, uint cubData, int eP2PSendType, int nChannel);
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool SteamAPI_ISteamNetworking_IsP2PPacketAvailable(IntPtr self, out uint pcubMsgSize, int nChannel);
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool SteamAPI_ISteamNetworking_ReadP2PPacket(IntPtr self, IntPtr pubDest, uint cubDest, out uint pcubMsgSize, out ulong psteamIDRemote, int nChannel);
-
-    [DllImport("steam_api64", CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool SteamAPI_ISteamNetworking_AcceptP2PSessionWithUser(IntPtr instancePtr, ulong steamIDRemote);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int RegisterCustomEmployeeDelegate(IntPtr employeeId, IntPtr name, IntPtr description, float salary, float requiredReputation, uint confirmDialogs);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -467,13 +438,6 @@ public partial class GameAPIManager : IDisposable
 
     private readonly MelonLogger.Instance _logger;
     private IntPtr _currentScenePtr = IntPtr.Zero;
-    private IntPtr _friendNamePtr = IntPtr.Zero;
-    private IntPtr _lobbyDataPtr = IntPtr.Zero;
-
-    private IntPtr _steamNetworking = IntPtr.Zero;
-    private IntPtr _steamUser = IntPtr.Zero;
-    private IntPtr _steamFriends = IntPtr.Zero;
-
     public GameAPIManager(MelonLogger.Instance logger)
     {
         _logger = logger;
@@ -981,49 +945,10 @@ public partial class GameAPIManager : IDisposable
     }
 
 
-    private IntPtr GetSteamNetworking()
-    {
-        if (_steamNetworking == IntPtr.Zero)
-            _steamNetworking = SteamAPI_SteamNetworking_v006();
-        return _steamNetworking;
-    }
-
-    private IntPtr GetSteamUser()
-    {
-        if (_steamUser == IntPtr.Zero)
-            _steamUser = SteamAPI_SteamUser_v023();
-        return _steamUser;
-    }
-
-    private IntPtr GetSteamFriends()
-    {
-        if (_steamFriends == IntPtr.Zero)
-            _steamFriends = SteamAPI_SteamFriends_v018();
-        return _steamFriends;
-    }
-
-    private ulong SteamGetMyIdImpl()
-    {
-        try
-        {
-            var user = GetSteamUser();
-            if (user == IntPtr.Zero) return 0;
-            return SteamAPI_ISteamUser_GetSteamID(user);
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamGetMyId", ex); return 0; }
-    }
-
-    private IntPtr SteamGetFriendNameImpl(ulong steamId)
-    {
-        try
-        {
-            var friends = GetSteamFriends();
-            if (friends == IntPtr.Zero) return IntPtr.Zero;
-            return SteamAPI_ISteamFriends_GetFriendPersonaName(friends, steamId);
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamGetFriendName", ex); return IntPtr.Zero; }
-    }
-
+    // Legacy v7 ABI slots are intentionally inert. Data Center owns Steam,
+    // lobby and co-op lifecycle now; gregCore must not open a second session.
+    private ulong SteamGetMyIdImpl() => 0;
+    private IntPtr SteamGetFriendNameImpl(ulong steamId) => IntPtr.Zero;
     private int SteamCreateLobbyImpl(uint lobbyType, uint maxPlayers) { return 0; }
     private int SteamJoinLobbyImpl(ulong lobbyId) { return 0; }
     private void SteamLeaveLobbyImpl() { }
@@ -1034,83 +959,13 @@ public partial class GameAPIManager : IDisposable
     private int SteamSetLobbyDataImpl(IntPtr key, IntPtr value) { return 0; }
     private IntPtr SteamGetLobbyDataImpl(IntPtr key) { return IntPtr.Zero; }
 
-    private int SteamSendP2PImpl(ulong target, IntPtr data, uint len, uint reliable)
-    {
-        try
-        {
-            var networking = GetSteamNetworking();
-            if (networking == IntPtr.Zero)
-            {
-                CrashLog.Log("[Steam] SendP2P: ISteamNetworking not available");
-                return 0;
-            }
-
-            // k_EP2PSendUnreliable=0, k_EP2PSendReliable=2
-            int sendType = reliable != 0 ? 2 : 0;
-            bool ok = SteamAPI_ISteamNetworking_SendP2PPacket(networking, target, data, len, sendType, 0);
-            if (!ok)
-                CrashLog.Log($"[Steam] SendP2PPacket failed: target={target}, len={len}, reliable={reliable}");
-            return ok ? 1 : 0;
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamSendP2P", ex); return 0; }
-    }
-
-    private uint SteamIsP2PAvailableImpl(IntPtr outSize)
-    {
-        try
-        {
-            var networking = GetSteamNetworking();
-            if (networking == IntPtr.Zero) return 0;
-
-            bool available = SteamAPI_ISteamNetworking_IsP2PPacketAvailable(networking, out uint msgSize, 0);
-            if (available && msgSize > 0)
-            {
-                if (outSize != IntPtr.Zero)
-                    Marshal.WriteInt32(outSize, (int)msgSize);
-                return 1;
-            }
-            return 0;
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamIsP2PAvailable", ex); return 0; }
-    }
-
-    private uint SteamReadP2PImpl(IntPtr buf, uint bufLen, IntPtr outSender)
-    {
-        try
-        {
-            var networking = GetSteamNetworking();
-            if (networking == IntPtr.Zero) return 0;
-
-            bool ok = SteamAPI_ISteamNetworking_ReadP2PPacket(
-                networking, buf, bufLen, out uint bytesRead, out ulong sender, 0);
-
-            if (ok && bytesRead > 0)
-            {
-                if (outSender != IntPtr.Zero)
-                    Marshal.WriteInt64(outSender, (long)sender);
-                return bytesRead;
-            }
-            return 0;
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamReadP2P", ex); return 0; }
-    }
-
-    private void SteamAcceptP2PImpl(ulong remote)
-    {
-        try
-        {
-            var networking = GetSteamNetworking();
-            if (networking == IntPtr.Zero) return;
-
-            bool ok = SteamAPI_ISteamNetworking_AcceptP2PSessionWithUser(networking, remote);
-            CrashLog.Log($"[Steam] AcceptP2PSessionWithUser({remote}): {ok}");
-        }
-        catch (Exception ex) { CrashLog.LogException("SteamAcceptP2P", ex); }
-    }
-
+    private int SteamSendP2PImpl(ulong target, IntPtr data, uint len, uint reliable) => 0;
+    private uint SteamIsP2PAvailableImpl(IntPtr outSize) => 0;
+    private uint SteamReadP2PImpl(IntPtr buf, uint bufLen, IntPtr outSender) => 0;
+    private void SteamAcceptP2PImpl(ulong remote) { }
     private uint SteamPollEventImpl(IntPtr outType, IntPtr outData)
     {
-        // TODO: implement event queue for lobby callbacks
+        // Intentionally inert: native Data Center owns lobby callbacks.
         return 0;
     }
 
@@ -2964,8 +2819,6 @@ public partial class GameAPIManager : IDisposable
     {
         if (_tablePtr != IntPtr.Zero) { Marshal.FreeHGlobal(_tablePtr); _tablePtr = IntPtr.Zero; }
         if (_currentScenePtr != IntPtr.Zero) { Marshal.FreeHGlobal(_currentScenePtr); _currentScenePtr = IntPtr.Zero; }
-        if (_friendNamePtr != IntPtr.Zero) { Marshal.FreeHGlobal(_friendNamePtr); _friendNamePtr = IntPtr.Zero; }
-        if (_lobbyDataPtr != IntPtr.Zero) { Marshal.FreeHGlobal(_lobbyDataPtr); _lobbyDataPtr = IntPtr.Zero; }
         GC.SuppressFinalize(this);
     }
 }

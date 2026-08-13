@@ -10,7 +10,9 @@
 - Operation queues are bounded by `PerformanceProfile.MaxQueuedOperations`; event dispatch and UI notifications also have hard limits.
 - `GregPerformanceGovernor.OnUpdate` is now called from the real Melon update path, and quality profiles control throttle intervals.
 - `GregPerformanceModule.OnResourceUpdate` now removes the exact delegate registered by the caller.
-- Remaining TODOs include external in-game verification, exact multiplayer semantics, and validation of optional compatibility modules against the installed game build.
+- Remaining TODOs include external in-game verification and validation of native
+  co-op callbacks against the installed game build. gregCore deliberately does
+  not define or synchronize multiplayer state itself.
 
 ## Evidence
 
@@ -24,4 +26,3 @@
 - `src/Infrastructure/Performance/GregOperationQueue.cs`
 - `src/Infrastructure/Performance/GregPerformanceGovernor.cs`
 - `src/PublicApi/Modules/GregPerformanceModule.cs`
-

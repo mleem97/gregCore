@@ -38,7 +38,7 @@
 - Custom shop and employee management APIs
 - Logging and diagnostic infrastructure
 - Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer (optional)
+- Native Data Center co-op compatibility without a replacement networking stack
 
 ## Installation
 
@@ -136,6 +136,9 @@ Development follows `dev -> pre-release -> main`. See
 [the branch and release policy](docs/maintainers/branch-protection.md) before
 opening a pull request. Downloads are published on the GitHub Releases page;
 development builds are intentionally not presented as stable releases.
+Native Data Center co-op remains game-owned; mod authors should follow the
+[native co-op boundary](docs/modding/native-coop.md) and avoid adding a second
+transport or lobby implementation.
 
 ## License
 

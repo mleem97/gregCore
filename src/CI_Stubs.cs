@@ -42,24 +42,6 @@ namespace gregCore.Bridge.LuaFFI {
     }
 }
 
-namespace gregCore.Compatibility.FishNet { }
-
-namespace gregCore.Infrastructure.Networking {
-    public class GregNetworkRack : IDisposable {
-        public GregNetworkRack(GregEventBus bus, IGregLogger logger) { }
-        public void Dispose() { }
-    }
-    public class GregNetworkServer : IDisposable {
-        public GregNetworkServer(GregEventBus bus, IGregLogger logger) { }
-        public void Dispose() { }
-    }
-    public class GregNetworkCables : IDisposable {
-        public int CableCount = 0;
-        public GregNetworkCables(GregEventBus bus, IGregLogger logger) { }
-        public void Dispose() { }
-    }
-}
-
 namespace gregCore.Infrastructure.Scripting.Lua.Modules {
     public class LuaModuleLoader {
         public LuaModuleLoader(Script script, string dir, string shared) { }

@@ -43,7 +43,6 @@ if ([string]::IsNullOrWhiteSpace($GameDir) -or -not (Test-Path -LiteralPath $Gam
 
 $GameProjects = @(
     'framework\gregCore.csproj',
-    'plugins\greg.Plugin.Multiplayer\greg.Plugin.Multiplayer.csproj',
     'plugins\greg.Plugin.Sysadmin\greg.Plugin.Sysadmin.csproj',
     'plugins\greg.Plugin.AssetExporter\greg.Plugin.AssetExporter.csproj',
     'plugins\greg.Plugin.WebUIBridge\greg.Plugin.WebUIBridge.csproj',
@@ -88,7 +87,6 @@ Copy-Item -LiteralPath $RedirectorDll -Destination (Join-Path $MlPlugins 'greg.M
 Write-Host "[deploy] -> $MlPlugins\greg.ModPathRedirector.dll"
 
 $pluginNames = @(
-    'greg.Plugin.Multiplayer',
     'greg.Plugin.Sysadmin',
     'greg.Plugin.AssetExporter',
     'greg.Plugin.WebUIBridge',

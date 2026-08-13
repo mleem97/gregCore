@@ -1,1 +1,60 @@
-{}
+{
+  "manifestVersion": 2,
+  "schemaVersion": "2.0.0",
+  "generatedFrom": "coverage/build-UNKNOWN",
+  "gameBuild": "UNKNOWN",
+  "assemblyFingerprint": "UNKNOWN",
+  "unityVersion": "6000.4.12f1",
+  "melonLoaderVersion": "0.7.3",
+  "il2cppInteropVersion": "1.5.1",
+  "hooks": [
+    {
+      "id": "greg.lifecycle.scene-loaded",
+      "name": "gregMod.lifecycle.sceneLoaded",
+      "legacy": "greg.lifecycle.SceneLoaded",
+      "assembly": "MelonLoader.dll",
+      "namespace": "MelonLoader",
+      "type": "MelonMod",
+      "member": "OnSceneWasLoaded",
+      "signature": "void OnSceneWasLoaded(int buildIndex, string sceneName)",
+      "domain": "System",
+      "patchTarget": "MelonLoader.MelonMod.OnSceneWasLoaded",
+      "strategy": "dispatcher",
+      "description": "A Unity scene has finished loading.",
+      "payloadSchema": {
+        "buildIndex": "int",
+        "sceneName": "string"
+      },
+      "threading": "main-thread",
+      "cancellable": false,
+      "status": "implemented",
+      "supportedLanguages": ["CSharp", "Lua"],
+      "risk": "low",
+      "approvalReason": "Stable MelonLoader lifecycle callback used by the framework dispatcher."
+    },
+    {
+      "id": "greg.lifecycle.update",
+      "name": "gregMod.lifecycle.update",
+      "legacy": "greg.lifecycle.Update",
+      "assembly": "MelonLoader.dll",
+      "namespace": "MelonLoader",
+      "type": "MelonMod",
+      "member": "OnUpdate",
+      "signature": "void OnUpdate()",
+      "domain": "System",
+      "patchTarget": "MelonLoader.MelonMod.OnUpdate",
+      "strategy": "dispatcher",
+      "description": "Per-frame update callback for ready mods.",
+      "payloadSchema": {
+        "deltaTime": "float"
+      },
+      "threading": "main-thread",
+      "cancellable": false,
+      "status": "implemented",
+      "supportedLanguages": ["CSharp", "Lua"],
+      "risk": "medium",
+      "approvalReason": "Stable MelonLoader lifecycle callback used by the framework dispatcher."
+    }
+  ],
+  "excludedMembers": []
+}

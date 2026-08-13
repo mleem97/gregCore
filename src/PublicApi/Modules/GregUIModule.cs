@@ -1,3 +1,4 @@
+using System;
 using gregCore.UI;
 using UnityEngine;
 
@@ -12,8 +13,8 @@ namespace gregCore.PublicApi.Modules
 
         public void ShowNotification(string message, float duration = 3f)
         {
-            // Integration with notification service
-            // GregServiceContainer.Get<Infrastructure.Settings.Services.GregNotificationService>()?.Show(message, duration);
+            if (string.IsNullOrWhiteSpace(message)) return;
+            GregNotificationManager.Show(message, Math.Max(0.25f, duration));
         }
     }
 }

@@ -7,6 +7,8 @@ public sealed class GregPerformanceModule
     private readonly GregPerformanceGovernor _governor;
     private readonly IGregLogger _logger;
     private readonly IGregEventBus _bus;
+    private readonly object _resourceEventGate = new();
+    private readonly Dictionary<Action<ResourceSnapshot>, Action<EventPayload>> _resourceHandlers = new();
 
     internal GregPerformanceModule(GregApiContext ctx, GregPerformanceGovernor governor)
     {
@@ -21,6 +23,7 @@ public sealed class GregPerformanceModule
     public PerformanceStats GetStats() => _governor.GetStats();
     public ResourceSnapshot GetResourceSnapshot() => _governor.GetStats().Resources;
 
+    public PerformanceProfile Medium => PerformanceProfile.Balanced;
     public PerformanceProfile Balanced => PerformanceProfile.Balanced;
     public PerformanceProfile HighPerformance => PerformanceProfile.HighPerformance;
     public PerformanceProfile LowEnd => PerformanceProfile.LowEnd;
@@ -72,8 +75,28 @@ public sealed class GregPerformanceModule
     // ── Events ───────────────────────────────────────────────────────────────
     public event Action<ResourceSnapshot>? OnResourceUpdate
     {
-        add => _bus.Subscribe("greg.performance.ResourceSnapshot", p => value?.Invoke(_governor.GetStats().Resources));
-        remove => _bus.Unsubscribe("greg.performance.ResourceSnapshot", p => value?.Invoke(_governor.GetStats().Resources));
+        add
+        {
+            if (value == null) return;
+            Action<EventPayload> handler = _ => value(_governor.GetStats().Resources);
+            lock (_resourceEventGate)
+            {
+                _resourceHandlers[value] = handler;
+            }
+            _bus.Subscribe("greg.performance.ResourceSnapshot", handler);
+        }
+        remove
+        {
+            if (value == null) return;
+            Action<EventPayload>? handler = null;
+            lock (_resourceEventGate)
+            {
+                if (_resourceHandlers.TryGetValue(value, out handler))
+                    _resourceHandlers.Remove(value);
+            }
+            if (handler != null)
+                _bus.Unsubscribe("greg.performance.ResourceSnapshot", handler);
+        }
     }
 
     private PerformanceProfile GetProfile() => _governor.GetStats().Profile;

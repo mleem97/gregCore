@@ -934,7 +934,7 @@ internal static class Patch_HRSystem_OnEnable
 /// <summary>
 /// Detects when the local player picks up or drops a UsableObject (Server, Switch, etc.)
 /// by comparing PlayerManager state before/after InteractOnClick.
-/// Fires ObjectPickedUp / ObjectDropped events for multiplayer synchronization.
+/// Fires ObjectPickedUp / ObjectDropped events for native co-op-aware mods.
 /// </summary>
 [HarmonyPatch(typeof(UsableObject), nameof(UsableObject.InteractOnClick))]
 internal static class Patch_UsableObject_InteractOnClick

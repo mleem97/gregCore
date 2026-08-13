@@ -122,6 +122,8 @@ public class LuaHotReload : IDisposable
             return null;
 
         string? current = Path.GetDirectoryName(fullPath);
+        if (current != null && current.Equals(rootPath, PathComparison) && Path.GetExtension(fullPath).Equals(".lua", StringComparison.OrdinalIgnoreCase))
+            return Path.GetFileNameWithoutExtension(fullPath);
         while (current != null && IsPathWithin(current, rootPath))
         {
             if (File.Exists(Path.Combine(current, "main.lua")))

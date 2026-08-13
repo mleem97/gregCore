@@ -33,6 +33,7 @@ publish/
 publish_out/
 publish_full/
 build/artifacts/
+templates/**/artifacts/
 Releases/
 *.zip
 *.pdb

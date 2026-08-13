@@ -23,14 +23,15 @@ public sealed class GregNativeEventHooks : SafePatch
 
         try
         {
-            // Initialize dynamic patcher for all 1771+ hooks from game_hooks.json
+            // Load only the build-bound canonical manifest. The legacy static
+            // inventory is intentionally never a runtime patch source.
             _dynamicPatcher = new GregDynamicHookPatcher(harmony, eventBus, logger);
             GregDynamicHookPatcher.SetGlobalBus(eventBus);
             GregDynamicHookPatcher.SetGlobalLogger(logger);
 
             string hooksFile = System.IO.Path.Combine(
                 global::MelonLoader.Utils.MelonEnvironment.ModsDirectory,
-                "game_hooks.json");
+                "framework", "greg_hooks.json");
 
             if (!System.IO.File.Exists(hooksFile))
             {
@@ -38,7 +39,7 @@ public sealed class GregNativeEventHooks : SafePatch
                 var asmDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 if (!string.IsNullOrEmpty(asmDir))
                 {
-                    hooksFile = System.IO.Path.Combine(asmDir, "game_hooks.json");
+                    hooksFile = System.IO.Path.Combine(asmDir, "framework", "greg_hooks.json");
                 }
             }
 
@@ -47,10 +48,20 @@ public sealed class GregNativeEventHooks : SafePatch
                 // Final fallback: project root
                 hooksFile = System.IO.Path.Combine(
                     global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory,
-                    "game_hooks.json");
+                    "Mods", "framework", "greg_hooks.json");
             }
 
             _dynamicPatcher.InstallFromFile(hooksFile);
+
+            try
+            {
+                var reportPath = System.IO.Path.Combine(global::MelonLoader.Utils.MelonEnvironment.UserDataDirectory,
+                    "gregCore", "hook-install-report.json");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(reportPath)!);
+                System.IO.File.WriteAllText(reportPath, System.Text.Json.JsonSerializer.Serialize(_dynamicPatcher.InstallReport,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+            }
+            catch (Exception reportEx) { _logger?.Warning($"Could not write hook-install-report.json: {reportEx.Message}"); }
 
             _logger?.Success($"GregNativeEventHooks Harmony Bridge installiert. Patched {_dynamicPatcher.InstalledCount} methods.");
         }

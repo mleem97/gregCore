@@ -52,8 +52,19 @@ namespace gregCore.API
         public static void LogWarning(string msg) => Log(msg, "WARN");
         public static void LogError(string msg) => Log(msg, "ERROR");
 
-        public static void ShowNotification(string msg) { }
-        public static void ShowNotification(string msg, float duration) { }
+        public static void ShowNotification(string msg) => ShowNotification(msg, 3f);
+        public static void ShowNotification(string msg, float duration)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(msg))
+                    GregNotificationManager.Show(msg, Math.Max(0.25f, duration));
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[GregAPI] Notification failed: {ex.Message}");
+            }
+        }
 
         internal static GregHookBus? HookBus { get; set; }
 

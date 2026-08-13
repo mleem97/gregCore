@@ -23,10 +23,12 @@ namespace gregCore.GameLayer.Hooks
         private readonly IGregLogger _logger;
         private int _installedCount;
         private int _failedCount;
+        private readonly HookInstallReport _report = new();
 
         public int InstalledCount => _installedCount;
         public int FailedCount => _failedCount;
         public int TotalHooks { get; private set; }
+        public HookInstallReport InstallReport => _report;
 
         public GregDynamicHookPatcher(HarmonyLib.Harmony harmony, GregEventBus eventBus, IGregLogger logger)
         {
@@ -49,6 +51,20 @@ namespace gregCore.GameLayer.Hooks
             try
             {
                 var json = File.ReadAllText(hooksFilePath);
+                // The release manifest is deliberately an object. Refuse the legacy
+                // unbound inventory here: installing every discovered member is unsafe.
+                if (!json.TrimStart().StartsWith("{", StringComparison.Ordinal))
+                {
+                    _report.ManifestVersion = "legacy-rejected";
+                    _report.Skipped.Add(new HookInstallEntry { HookId = "legacy-inventory", Status = "skipped", ErrorClass = "ManifestNotBoundToBuild", TargetMember = hooksFilePath });
+                    _logger.Warning("Rejected legacy unbound hook inventory; use framework/greg_hooks.json.");
+                    return;
+                }
+                var manifest = JsonConvert.DeserializeObject<GregHooksManifest>(json);
+                InstallFromManifest(manifest, Path.GetDirectoryName(hooksFilePath) ?? Directory.GetCurrentDirectory());
+                return;
+
+#pragma warning disable CS0162
                 var hooks = JsonConvert.DeserializeObject<List<GameHookJsonDef>>(json);
 
                 if (hooks == null || hooks.Count == 0)
@@ -118,6 +134,51 @@ namespace gregCore.GameLayer.Hooks
                 _logger.Error("Failed to install dynamic hooks", ex);
             }
         }
+
+        public void InstallFromManifest(GregHooksManifest? manifest, string manifestDirectory)
+        {
+            if (manifest == null) { _report.Skipped.Add(new HookInstallEntry { Status="skipped", ErrorClass="InvalidManifest" }); return; }
+            _report.ManifestVersion = manifest.ManifestVersion > 0 ? manifest.ManifestVersion.ToString() : manifest.Version.ToString();
+            TotalHooks = manifest.Hooks.Count;
+            var gameRoot = Directory.GetParent(manifestDirectory)?.Parent?.FullName ?? manifestDirectory;
+            var fingerprint = Core.Diagnostics.GameFingerprint.Capture(gameRoot);
+            var fingerprintKnown = !string.IsNullOrWhiteSpace(manifest.AssemblyFingerprint) && manifest.AssemblyFingerprint != "UNKNOWN";
+            var fingerprintMatches = fingerprintKnown && string.Equals(manifest.AssemblyFingerprint, fingerprint.CombinedSha256, StringComparison.OrdinalIgnoreCase);
+            _report.FingerprintMatch = fingerprintMatches ? "match" : fingerprintKnown ? "mismatch" : "unknown";
+            if (!fingerprintMatches)
+            {
+                _report.SafeMode = true;
+                foreach (var hook in manifest.Hooks)
+                    _report.Disabled.Add(Entry(hook, "disabled", "UnknownOrMismatchedBuild", null));
+                _logger.Warning($"Hook manifest fingerprint {_report.FingerprintMatch}; risky hooks disabled.");
+                return;
+            }
+
+            foreach (var hook in manifest.Hooks)
+            {
+                if (!string.Equals(hook.Status, "implemented", StringComparison.OrdinalIgnoreCase)) { _report.Skipped.Add(Entry(hook, "skipped", "NotImplemented", null)); continue; }
+                try
+                {
+                    var method = ResolveManifestMethod(hook);
+                    if (method == null) { _report.Failed.Add(Entry(hook, "failed", "TargetNotFound", null)); continue; }
+                    lock (_globalMethodToHookNames) _globalMethodToHookNames[method] = new List<string> { hook.Name };
+                    _harmony.Patch(method, postfix: new HarmonyMethod(typeof(GregDynamicHookPatcher), nameof(GenericPostfix)));
+                    _installedCount++; _report.Installed.Add(Entry(hook, "installed", "", method));
+                }
+                catch (Exception ex) { _failedCount++; _report.Failed.Add(Entry(hook, "failed", ex.GetType().Name, null, ex)); _logger.Warning($"Hook {hook.Id} failed: {ex.Message}"); }
+            }
+        }
+
+        private MethodBase? ResolveManifestMethod(GregHookDef hook)
+        {
+            var typeName = string.IsNullOrWhiteSpace(hook.Type) ? hook.PatchTarget : (string.IsNullOrWhiteSpace(hook.Namespace) ? hook.Type : hook.Namespace + "." + hook.Type);
+            var type = SafeTypeByName(typeName) ?? SafeTypeByName(hook.Type);
+            return type == null ? null : SafeGetMethod(type, string.IsNullOrWhiteSpace(hook.Member) ? hook.MethodName : hook.Member, null);
+        }
+
+        private static HookInstallEntry Entry(GregHookDef hook, string status, string error, MethodBase? method, Exception? ex = null) => new() {
+            HookId=hook.Id, Status=status, ErrorClass=error, Exception=ex?.ToString() ?? "", TargetMember=method == null ? hook.Member : method.DeclaringType?.FullName + "." + method.Name
+        };
 
         private static string GetHookName(GameHookJsonDef hook)
         {
@@ -302,6 +363,26 @@ namespace gregCore.GameLayer.Hooks
                 }
             }
         }
+    }
+
+    public sealed class HookInstallReport
+    {
+        public string ManifestVersion { get; set; } = "UNKNOWN";
+        public string FingerprintMatch { get; set; } = "unknown";
+        public bool SafeMode { get; set; }
+        public List<HookInstallEntry> Installed { get; } = new();
+        public List<HookInstallEntry> Failed { get; } = new();
+        public List<HookInstallEntry> Skipped { get; } = new();
+        public List<HookInstallEntry> Disabled { get; } = new();
+    }
+
+    public sealed class HookInstallEntry
+    {
+        public string HookId { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string ErrorClass { get; set; } = "";
+        public string Exception { get; set; } = "";
+        public string TargetMember { get; set; } = "";
     }
 
     // ─── JSON Models ───────────────────────────────────────────────────

@@ -25,5 +25,5 @@ All notable changes to gregCore are documented here.
 - Save engine with versioning (LiteDB)
 - Multi-mod architecture with dependency resolution
 - Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer
+- Native Data Center co-op compatibility boundary
 - CI/CD pipeline with auto-versioning

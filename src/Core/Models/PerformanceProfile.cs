@@ -13,6 +13,7 @@ public sealed record PerformanceProfile
     public int MaxConcurrentOps { get; init; } = 3;
     public int MaxConcurrentRequests { get; init; } = 4;
     public int MaxEventsPerFrame { get; init; } = 20;
+    public int MaxQueuedOperations { get; init; } = 256;
 
     // Memory
     public int RamWarningMb { get; init; } = 3072;
@@ -54,6 +55,7 @@ public sealed record PerformanceProfile
         TargetFps = 144,
         UnfocusedFps = 30,
         MaxConcurrentOps = 8,
+        MaxQueuedOperations = 512,
         EnableVSync = false,
         QualityLevel = 4,
         GcIntervalSeconds = 60,
@@ -66,6 +68,7 @@ public sealed record PerformanceProfile
         UnfocusedFps = 10,
         MaxConcurrentOps = 1,
         MaxEventsPerFrame = 10,
+        MaxQueuedOperations = 64,
         RamWarningMb = 2048,
         RamCriticalMb = 3072,
         EnableVSync = true,
@@ -108,5 +111,6 @@ public sealed record PerformanceProfile
         StreamingMipmapBudgetMb = 512f,
         RouteEvalCooldownSeconds = 2.0f,
         AutoSaveIntervalMinutes = 10.0f,
+        MaxQueuedOperations = 128,
     };
 }

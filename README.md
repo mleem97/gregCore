@@ -5,7 +5,7 @@
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/greg)
 [![gregFramework](https://img.shields.io/badge/gregFramework-Website-blue?style=for-the-badge)](https://gregframework.eu)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](./LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=for-the-badge)]()
+[![Version](https://img.shields.io/badge/Version-1.2.2--dev.0-orange?style=for-the-badge)]()
 [![GameVersion](https://img.shields.io/badge/Game%20Version-1.0.50.15-yellow?style=for-the-badge)]()
 [![Unity](https://img.shields.io/badge/Unity-6000.5-black?style=for-the-badge&logo=unity&logoColor=white)]()
 
@@ -38,7 +38,7 @@
 - Custom shop and employee management APIs
 - Logging and diagnostic infrastructure
 - Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer (optional)
+- Native Data Center co-op compatibility without a replacement networking stack
 
 ## Installation
 
@@ -131,6 +131,14 @@ See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the auto-generated hook r
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+Development follows `dev -> pre-release -> main`. See
+[the branch and release policy](docs/maintainers/branch-protection.md) before
+opening a pull request. Downloads are published on the GitHub Releases page;
+development builds are intentionally not presented as stable releases.
+Native Data Center co-op remains game-owned; mod authors should follow the
+[native co-op boundary](docs/modding/native-coop.md) and avoid adding a second
+transport or lobby implementation.
 
 ## License
 

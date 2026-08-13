@@ -37,7 +37,11 @@ public class GregSettingsPersistenceService
         }
     }
 
-    public void SaveAll() => Save();
+    public void SaveAll()
+    {
+        Save();
+        _modSettingsService.MarkSaved();
+    }
 
     public void Load()
     {

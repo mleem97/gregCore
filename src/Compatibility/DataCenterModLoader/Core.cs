@@ -86,7 +86,6 @@ public class Core
     public MelonLogger.Instance LoggerInstance { get; }
 
     private FFIBridge? _ffiBridge;
-    private MultiplayerBridge? _mpBridge;
     private string _modsPath = string.Empty;
     private HarmonyLib.Harmony? _harmony;
 
@@ -134,13 +133,7 @@ public class Core
             CrashLog.Log("step: loading all mods");
             _ffiBridge.LoadAllMods();
 
-            var mpDllPath = Path.Combine(_modsPath, "dc_multiplayer.dll");
-            if (File.Exists(mpDllPath))
-            {
-                _mpBridge = new MultiplayerBridge(LoggerInstance);
-            }
-
-            LoggerInstance.Msg("Integrated Rust bridge initialization complete.");
+            LoggerInstance.Msg("Integrated Rust bridge initialization complete. Native co-op remains owned by Data Center.");
             CrashLog.Log("step: Initialize complete");
         }
         catch (Exception ex)
@@ -155,7 +148,6 @@ public class Core
         try
         {
             _ffiBridge?.OnSceneLoaded(sceneName);
-            _mpBridge?.OnSceneLoaded(sceneName);
             ModConfigSystem.OnSceneLoaded(sceneName);
             CustomEmployeeManager.ResetInjectionState();
         }
@@ -170,7 +162,6 @@ public class Core
         try
         {
             _ffiBridge?.OnUpdate(Time.deltaTime);
-            _mpBridge?.OnUpdate(Time.deltaTime);
             ModConfigSystem.OnUpdate(Time.deltaTime);
             CustomEmployeeManager.ReregisterSalariesIfNeeded();
             EntityManager.Update();
@@ -218,7 +209,6 @@ public class Core
             LoggerInstance.Msg("Shutting down integrated Rust bridge...");
             CrashLog.Log("step: OnApplicationQuit starting");
             EntityManager.DestroyAll();
-            _mpBridge?.Shutdown();
             ModConfigSystem.Shutdown();
             _ffiBridge?.Shutdown();
             _ffiBridge?.Dispose();

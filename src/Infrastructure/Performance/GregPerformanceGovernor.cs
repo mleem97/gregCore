@@ -22,7 +22,7 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
         _throttler = new GregRequestThrottler(ctx.Logger, _profile);
         _monitor = new GregResourceMonitor(ctx.Logger, ctx.EventBus, _profile);
         _memHandler = new GregMemoryPressureHandler(ctx.Logger, ctx.EventBus, _profile);
-        _queue = new GregOperationQueue(_throttler, ctx.Logger);
+        _queue = new GregOperationQueue(_throttler, ctx.Logger, _profile.MaxQueuedOperations);
         
         // Performance-Patches initialisieren (Throttle, Cleanup, etc.)
         GregPerformancePatches.Initialize();
@@ -55,20 +55,22 @@ public sealed class GregPerformanceGovernor : IGregPerformanceGovernor, IDisposa
         _profile = profile;
         _fpsLimiter.Apply(profile);
         _throttler.UpdateProfile(profile);
+        _queue.UpdateLimit(profile.MaxQueuedOperations);
         ApplyPatchSettings(profile);
     }
 
     private void ApplyPatchSettings(PerformanceProfile profile)
     {
-        GregPerformancePatches.CanvasThrottleEnabled = true;
-        GregPerformancePatches.CanvasUpdateInterval = 0.1f;
+        var quality = Math.Clamp(profile.QualityLevel, 0, 4);
+        GregPerformancePatches.CanvasThrottleEnabled = quality < 4;
+        GregPerformancePatches.CanvasUpdateInterval = quality switch { 0 => 0.25f, 1 => 0.15f, 2 => 0.1f, _ => 0.05f };
         GregPerformancePatches.IndicatorThrottleEnabled = true;
-        GregPerformancePatches.IndicatorUpdateInterval = 0.1f;
+        GregPerformancePatches.IndicatorUpdateInterval = quality <= 0 ? 0.2f : quality <= 2 ? 0.1f : 0.05f;
         GregPerformancePatches.PulsatingThrottleEnabled = true;
-        GregPerformancePatches.PulsatingUpdateInterval = 0.05f;
+        GregPerformancePatches.PulsatingUpdateInterval = quality <= 0 ? 0.15f : quality <= 2 ? 0.05f : 0.025f;
         GregPerformancePatches.NpcThrottleEnabled = true;
-        GregPerformancePatches.NpcThrottleDistance = 15f;
-        GregPerformancePatches.NpcThrottleInterval = 0.2f;
+        GregPerformancePatches.NpcThrottleDistance = quality <= 0 ? 10f : quality <= 2 ? 15f : 25f;
+        GregPerformancePatches.NpcThrottleInterval = quality <= 0 ? 0.35f : quality <= 2 ? 0.2f : 0.1f;
         GregPerformancePatches.AsyncRouteEvalEnabled = false;
     }
 

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>gregMod.Example</AssemblyName>
+    <OutputPath>artifacts/</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GregCorePath Condition="'$(GregCorePath)' == ''">../../bin/Release/net6.0/gregCore.dll</GregCorePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="gregCore" HintPath="$(GregCorePath)" Private="false" />
+  </ItemGroup>
+</Project>

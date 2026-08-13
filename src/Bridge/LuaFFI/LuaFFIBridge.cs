@@ -34,15 +34,15 @@ public sealed class LuaFFIBridge
         MelonLogger.Msg("[LuaFFI] Initializing modernized Lua environment...");
 
         UserData.RegisterType<gregCore.UI.GregUIBuilder>();
-        
+
         string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
         string luaDir = Path.Combine(gameRoot, "UserData", "gregCore", "Mods", "Lua");
         string sharedDir = Path.Combine(luaDir, "@shared");
         string hooksFile = Path.Combine(gameRoot, "UserData", "gregCore", "game_hooks.json");
-        
+
         if (!Directory.Exists(luaDir)) Directory.CreateDirectory(luaDir);
         if (!Directory.Exists(sharedDir)) Directory.CreateDirectory(sharedDir);
-        
+
         // Infrastructure
         _profiler = new LuaProfiler(2.0f); // 2ms per frame budget
         _errorOverlay = new LuaErrorOverlay();
@@ -63,20 +63,26 @@ public sealed class LuaFFIBridge
 
     private static void LoadPlugins(string luaDir)
     {
-        foreach (string dir in Directory.GetDirectories(luaDir))
+        foreach (string source in Directory.GetDirectories(luaDir).Concat(Directory.GetFiles(luaDir, "*.lua")))
         {
-            if (Path.GetFileName(dir).StartsWith("@")) continue; // Skip @shared and others
+            var isLegacyFile = File.Exists(source);
+            string dir = isLegacyFile ? Path.GetDirectoryName(source)! : source;
+            if (!isLegacyFile && Path.GetFileName(dir).StartsWith("@")) continue; // Skip @shared and others
 
-            string mainFile = Path.Combine(dir, "main.lua");
+            string mainFile = isLegacyFile ? source : Path.Combine(dir, "main.lua");
             string manifestFile = Path.Combine(dir, "mod.json");
-            
-            if (!File.Exists(mainFile)) continue;
+
+            if (!isLegacyFile && !File.Exists(mainFile)) continue;
 
             try
             {
-                string id = Path.GetFileName(dir);
+                var manifest = isLegacyFile
+                    ? new gregCore.Core.Models.ModManifest { Id = Path.GetFileNameWithoutExtension(source), Name = Path.GetFileNameWithoutExtension(source), Entrypoint = Path.GetFileName(source), Loader = "Lua" }
+                    : ReadManifest(manifestFile, Path.GetFileName(dir));
+                string id = manifest.Id;
+                mainFile = Path.Combine(dir, string.IsNullOrWhiteSpace(manifest.Entrypoint) ? "main.lua" : manifest.Entrypoint);
                 var script = new Script(CoreModules.Preset_SoftSandbox);
-                
+
                 // 1. Module Loader (require support)
                 var loader = new LuaModuleLoader(script, dir, Path.Combine(luaDir, "@shared"));
                 loader.Register();
@@ -88,7 +94,7 @@ public sealed class LuaFFIBridge
                 // 3. Register Core Modules
                 GregEventLuaModule.Register(gregTable, script, API.GregAPI.EventBus!, id);
                 GregIoLuaModule.Register(gregTable, script, id, Path.Combine(dir, "data"));
-                
+
                 // 4. Register Domain Modules
                 LuaPlayerModule.Register(gregTable, script, id);
                 LuaWorldModule.Register(gregTable, script, id);
@@ -105,11 +111,13 @@ public sealed class LuaFFIBridge
                 scheduler.Register(gregTable);
 
                 // 7. Load file
+                if (!File.Exists(mainFile)) throw new FileNotFoundException($"Lua entrypoint not found: {mainFile}");
                 script.DoFile(mainFile);
 
                 var plugin = new LuaPlugin
                 {
                     Id = id,
+                    Manifest = manifest,
                     Script = script,
                     MainFile = mainFile,
                     Scheduler = scheduler,
@@ -178,6 +186,7 @@ public sealed class LuaFFIBridge
         if (!_initialized) return;
         foreach (var plugin in _plugins)
         {
+            GregEventLuaModule.UnregisterAll(plugin.Id, API.GregAPI.EventBus!);
             try { plugin.OnShutdown?.Call(); } catch { }
         }
         _plugins.Clear();
@@ -188,11 +197,12 @@ public sealed class LuaFFIBridge
     private static void OnPluginNeedsReload(LuaPluginReloadInfo info)
     {
         MelonLogger.Msg($"[LuaFFI] Hot-reloading mod: {info.ModId}");
-        
+
         // Find existing plugin
         var existing = _plugins.Find(p => p.Id == info.ModId);
         if (existing != null)
         {
+            GregEventLuaModule.UnregisterAll(existing.Id, API.GregAPI.EventBus!);
             try { existing.OnShutdown?.Call(); } catch { }
             _plugins.Remove(existing);
         }
@@ -256,6 +266,7 @@ public sealed class LuaFFIBridge
             var plugin = new LuaPlugin
             {
                 Id = id,
+                Manifest = ReadManifest(Path.Combine(Path.GetDirectoryName(mainFile)!, "mod.json"), id),
                 Script = newScript,
                 MainFile = mainFile,
                 Scheduler = scheduler,
@@ -291,6 +302,18 @@ public sealed class LuaFFIBridge
             _errorOverlay?.ReportError(plugin.Id, ex.Message);
         }
     }
+
+    private static gregCore.Core.Models.ModManifest ReadManifest(string path, string fallbackId)
+    {
+        if (!File.Exists(path))
+            return new gregCore.Core.Models.ModManifest { Id = fallbackId, Name = fallbackId, Entrypoint = "main.lua", Loader = "Lua" };
+        var manifest = JsonSerializer.Deserialize<gregCore.Core.Models.ModManifest>(File.ReadAllText(path));
+        if (manifest == null || string.IsNullOrWhiteSpace(manifest.Id))
+            throw new InvalidDataException($"Lua manifest '{path}' has no id.");
+        if (!string.IsNullOrWhiteSpace(manifest.Entrypoint) && !File.Exists(Path.Combine(Path.GetDirectoryName(path)!, manifest.Entrypoint)))
+            throw new FileNotFoundException($"Lua entrypoint not found: {manifest.Entrypoint}");
+        return manifest;
+    }
 }
 
 public class LuaPlugin
@@ -298,6 +321,7 @@ public class LuaPlugin
     public string Id = "";
     public Script Script = null!;
     public string MainFile = "";
+    public gregCore.Core.Models.ModManifest Manifest = new();
     public LuaCoroutineScheduler Scheduler = null!;
     public Closure? OnInit;
     public Closure? OnUpdate;

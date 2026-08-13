@@ -51,6 +51,11 @@
 
 ## Committed history since v1.2.1
 
+### c6192214 — 2026-08-13 — `chore: remove obsolete FishNet agent instructions`
+
+- Veraltete `.gemini`-Anweisungen für den nicht mehr zulässigen FishNet-Eigenstack
+  entfernt.
+
 ### 77d4de32 — 2026-08-13 — `refactor(multiplayer): remove custom networking stack`
 
 - Eigene FishNet-, Relay-, `dc_multiplayer.dll`- und Steam/P2P-Synchronisation

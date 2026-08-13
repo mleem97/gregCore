@@ -66,6 +66,7 @@ internal static class GregBootstrapper
         var validationService = new Core.Services.GregValidationService(logger);
 
         container.Register<IGregEventBus>(bus);
+        container.Register<GregEventBus>(bus);
         container.Register<GregHookBus>(hookBus);
         container.Register<Sdk.Metadata.GregHookCatalog>(catalog);
         container.Register<Sdk.Services.GregHookCatalogService>(catalogService);
@@ -114,13 +115,21 @@ internal static class GregBootstrapper
         gregCore.API.GregAPI._modSettingsService = modSettingsService;
         // --------------------------
 
+        var lifetime = new CancellationTokenSource();
         var apiContext = new global::gregCore.PublicApi.GregApiContext {
             Logger = logger,
             EventBus = bus,
             HookBus = hookBus,
             Config = container.GetRequired<IGregConfigService>(),
-            Persist = container.GetRequired<IGregPersistenceService>()
+            Persist = container.GetRequired<IGregPersistenceService>(),
+            Events = new global::gregCore.PublicApi.GregEventBusPublic(bus),
+            MainThread = new global::gregCore.PublicApi.GregMainThreadDispatcher(),
+            Resources = new global::gregCore.PublicApi.GregResourceRegistry(),
+            CancellationToken = lifetime.Token,
+            LifetimeSource = lifetime
         };
+
+        pluginRegistry.Configure(apiContext);
 
         var governor = new gregCore.Infrastructure.Performance.GregPerformanceGovernor(apiContext);
         container.Register<gregCore.Infrastructure.Performance.GregPerformanceGovernor>(governor);

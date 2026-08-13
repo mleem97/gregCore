@@ -8,7 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**;obj\**" />
+    <EmbeddedResource Remove="bin\**;obj\**" />
+    <None Remove="bin\**;obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\gregCore.csproj" />
+    <Reference Include="MelonLoader" HintPath="..\references\MelonLoader.dll" Private="true" />
   </ItemGroup>
 
   <ItemGroup>

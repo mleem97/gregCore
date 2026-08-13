@@ -3,22 +3,19 @@ name: Generate FrameworkAPI Docs
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ dev, pre-release, main ]
     paths:
       - 'game_hooks.json'
       - 'framework/greg_hooks.json'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   generate-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate FrameworkAPI.md
         run: |
@@ -28,15 +25,6 @@ jobs:
             --output docs/FrameworkAPI.md \
             --version "$(cat VERSION | tr -d '[:space:]')"
 
-      - name: Commit updated docs
-        run: |
-          if [[ -n "$(git status --porcelain docs/FrameworkAPI.md)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add docs/FrameworkAPI.md
-            git commit -m "docs: regenerate FrameworkAPI from hook definitions [skip ci]"
-            git push
-          else
-            echo "FrameworkAPI.md unchanged – skipping commit."
-          fi
+      - name: Check generated docs are committed
+        run: git diff --exit-code -- docs/FrameworkAPI.md
 

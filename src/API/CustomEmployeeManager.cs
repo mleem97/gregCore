@@ -889,12 +889,11 @@ public static class CustomEmployeeManager
             var portraitTransform = card.Find("Image");
             if (portraitTransform == null) return;
 
-            string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
-            foreach (var ext in new[] { ".jpg", ".png" })
+            if (!TryResolvePortraitPath(employeeId, out imagePath))
             {
-                string candidate = Path.Combine(assetsDir, employeeId + ext);
-                if (File.Exists(candidate)) { imagePath = candidate; break; }
+                CrashLog.Log($"[Security] CustomEmployee: rejected portrait id='{employeeId}'");
+                return;
             }
 
             if (imagePath != null)
@@ -960,6 +959,42 @@ public static class CustomEmployeeManager
         {
             CrashLog.LogException("SetPortrait", ex);
         }
+    }
+
+    private static bool TryResolvePortraitPath(string employeeId, out string? imagePath)
+    {
+        imagePath = null;
+        if (string.IsNullOrWhiteSpace(employeeId) || Path.IsPathRooted(employeeId)) return false;
+
+        // IDs are logical names, never paths. Reject both separators so the
+        // same validation is safe on Windows and Linux.
+        if (employeeId.IndexOfAny(new[] { '/', '\\', '\0' }) >= 0 || employeeId.Contains("..", StringComparison.Ordinal))
+            return false;
+
+        try
+        {
+            var assetsRoot = Path.GetFullPath(Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets"));
+            var rootPrefix = assetsRoot.EndsWith(Path.DirectorySeparatorChar)
+                ? assetsRoot
+                : assetsRoot + Path.DirectorySeparatorChar;
+
+            foreach (var extension in new[] { ".jpg", ".png" })
+            {
+                var candidate = Path.GetFullPath(Path.Combine(assetsRoot, employeeId + extension));
+                if (!candidate.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase)) return false;
+                if (File.Exists(candidate))
+                {
+                    imagePath = candidate;
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException($"ResolvePortraitPath for '{employeeId}'", ex);
+        }
+
+        return true;
     }
 
     private static void RefreshAllCards()

@@ -12,6 +12,9 @@ public class GregModSettingsService
     private readonly Dictionary<string, BaseSettingEntry> _settings = new();
     private readonly IGregLogger _logger;
     private GregSettingsPersistenceService? _persistence;
+    private bool _savePending;
+    private DateTime _lastChangeUtc;
+    private const double SaveDebounceSeconds = 0.5;
 
     public GregModSettingsService(IGregLogger logger)
     {
@@ -66,7 +69,8 @@ public class GregModSettingsService
         {
             entry.Value = newValue;
             entry.OnValueChanged?.Invoke(newValue);
-            _persistence?.SaveAll();
+            _savePending = true;
+            _lastChangeUtc = DateTime.UtcNow;
             _logger.Info($"Setting aktualisiert: {modId}.{settingId} -> {newValue}");
         }
     }
@@ -93,7 +97,8 @@ public class GregModSettingsService
                     callback?.DynamicInvoke(defaultValue);
                 }
                 
-                _persistence?.SaveAll();
+                _savePending = true;
+                _lastChangeUtc = DateTime.UtcNow;
                 _logger.Info($"Setting auf Default zurückgesetzt: {id}");
             }
         }
@@ -113,4 +118,13 @@ public class GregModSettingsService
             s.ModId.ToLowerInvariant().Contains(q) ||
             (s.Category != null && s.Category.ToLowerInvariant().Contains(q)));
     }
+
+    public void FlushPendingSave()
+    {
+        if (!_savePending || (DateTime.UtcNow - _lastChangeUtc).TotalSeconds < SaveDebounceSeconds) return;
+        _savePending = false;
+        _persistence?.SaveAll();
+    }
+
+    internal void MarkSaved() => _savePending = false;
 }

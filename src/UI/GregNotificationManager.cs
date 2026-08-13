@@ -14,6 +14,8 @@ namespace gregCore.UI
         private static VisualElement? _container;
         private static readonly Queue<(string message, float duration)> _pending = new();
         private static readonly List<(VisualElement element, float expireTime)> _active = new();
+        private const int MaxPending = 64;
+        private const int MaxActive = 16;
         private static bool _initialized;
 
         public static void Initialize()
@@ -49,6 +51,7 @@ namespace gregCore.UI
 
             if (_container == null)
             {
+                if (_pending.Count >= MaxPending) _pending.Dequeue();
                 _pending.Enqueue((message, duration));
                 return;
             }
@@ -76,6 +79,13 @@ namespace gregCore.UI
         private static void CreateToast(string message, float duration)
         {
             if (_container == null) return;
+
+            while (_active.Count >= MaxActive)
+            {
+                var oldest = _active[0].element;
+                try { oldest?.RemoveFromHierarchy(); } catch { }
+                _active.RemoveAt(0);
+            }
 
             var toast = new VisualElement();
             toast.style.backgroundColor = GregUITheme.SurfaceDark;

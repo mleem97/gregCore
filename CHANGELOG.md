@@ -17,6 +17,8 @@
   `NetworkMap`-Serverregister.
 - Branch-Policy und Release-Dokumentation für `dev`, `pre-release`, `main` und
   unveränderliche `release/vX.Y.Z`-Snapshots.
+- Open-PR- und Remote-Branch-Audit mit Konsolidierung auf einen Integrations-PR;
+  222 redundante, nicht geschützte Branches wurden nach Prüfung entfernt.
 
 ### Fixed
 
@@ -27,6 +29,8 @@
 - Settings-Änderungen schreiben nicht mehr synchron bei jeder Änderung, sondern werden gedrosselt persistiert.
 - Testprojekt schließt generierte `bin/`-/`obj/`-Quellen aus.
 - Erzeugte Template-Artefakte werden nicht mehr als Quellcode eingecheckt.
+- Nicht übernommene Nebenänderungen (unbegrenzte Steam-Queue, reflektive
+  FishNet-RPCs und optionale Testvarianten) sind mit Begründung dokumentiert.
 
 ### Verification
 

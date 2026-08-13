@@ -51,6 +51,22 @@
 
 ## Committed history since v1.2.1
 
+### 77d4de32 — 2026-08-13 — `refactor(multiplayer): remove custom networking stack`
+
+- Eigene FishNet-, Relay-, `dc_multiplayer.dll`- und Steam/P2P-Synchronisation
+  entfernt; native Data-Center-Co-op-Grenze gegen die lokalen Assemblies
+  dokumentiert.
+
+### aed6b58c — 2026-08-13 — `docs: record branch consolidation and cleanup`
+
+- Branch-, PR- und Release-Bereinigung sowie die Maintainer-Dokumentation
+  festgehalten.
+
+### f9837f15 — 2026-08-13 — `feat: consolidate GregCore integration and release flow`
+
+- GregCore-Integration, Release-Flows, Versionierung, CI-Gates und die
+  konsolidierte Integrationsbasis umgesetzt.
+
 ### 9366b777 — 2026-07-28 — `docs: add macOS support notice`
 
 - Dokumentation um den macOS-Support-Hinweis ergänzt.

@@ -891,10 +891,19 @@ public static class CustomEmployeeManager
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
-            foreach (var ext in new[] { ".jpg", ".png" })
+
+            // [Security] Prevent path traversal attack in portrait image path construction
+            if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || employeeId.Contains(".."))
             {
-                string candidate = Path.Combine(assetsDir, employeeId + ext);
-                if (File.Exists(candidate)) { imagePath = candidate; break; }
+                CrashLog.Log($"[Security] CustomEmployee: Invalid characters in portrait employeeId={employeeId}");
+            }
+            else
+            {
+                foreach (var ext in new[] { ".jpg", ".png" })
+                {
+                    string candidate = Path.Combine(assetsDir, employeeId + ext);
+                    if (File.Exists(candidate)) { imagePath = candidate; break; }
+                }
             }
 
             if (imagePath != null)

@@ -891,10 +891,19 @@ public static class CustomEmployeeManager
 
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
-            foreach (var ext in new[] { ".jpg", ".png" })
+
+            // [Security] Prevent path traversal when loading portraits
+            if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !employeeId.Contains(".."))
             {
-                string candidate = Path.Combine(assetsDir, employeeId + ext);
-                if (File.Exists(candidate)) { imagePath = candidate; break; }
+                foreach (var ext in new[] { ".jpg", ".png" })
+                {
+                    string candidate = Path.Combine(assetsDir, employeeId + ext);
+                    if (File.Exists(candidate)) { imagePath = candidate; break; }
+                }
+            }
+            else
+            {
+                CrashLog.Log($"[Security] CustomEmployee: Rejecting portrait load for invalid id={employeeId}");
             }
 
             if (imagePath != null)

@@ -35,26 +35,38 @@ public static class CablePositionsPatch
 
             __result = Interlocked.Increment(ref _nextCableId);
 
-            HookIntegration.Emit("greg.CABLE.Created",
-                new gregCore.Core.Models.EventPayload
-                {
-                    HookName = "greg.CABLE.Created",
-                    OccurredAtUtc = DateTime.UtcNow,
-                    Data = new System.Collections.Generic.Dictionary<string, object>
-                    {
-                        { "CableId", __result },
-                        { "Source", "PrefixBypass" }
-                    }
-                });
+            try { EmitCreate(__result); } catch { }
 
             return false;
         }
         catch (Exception ex)
         {
-            MelonLogger.Error($"[CablePatch] CreateNewCable failed: {ex.Message}");
+            try { LogError(ex); } catch { }
             __result = Environment.TickCount & 0x7FFFFFFF;
             return false;
         }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void EmitCreate(int id)
+    {
+        HookIntegration.Emit("greg.CABLE.Created",
+            new gregCore.Core.Models.EventPayload
+            {
+                HookName = "greg.CABLE.Created",
+                OccurredAtUtc = DateTime.UtcNow,
+                Data = new System.Collections.Generic.Dictionary<string, object>
+                {
+                    { "CableId", id },
+                    { "Source", "PrefixBypass" }
+                }
+            });
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void LogError(Exception ex)
+    {
+        MelonLogger.Error($"[CablePatch] CreateNewCable failed: {ex.Message}");
     }
 
     public static void SetBaseId(int baseId)
@@ -67,8 +79,16 @@ public static class CablePositionsPatch
         }
         while (Interlocked.CompareExchange(ref _nextCableId, baseId + 1, current) != current);
 
+        try { LogBaseIdSync(baseId); } catch { }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void LogBaseIdSync(int baseId)
+    {
         MelonLogger.Msg($"[CablePatch] Cable ID counter set to {baseId + 1}");
     }
 
     public static int PeekNextId() => _nextCableId;
+
+
 }

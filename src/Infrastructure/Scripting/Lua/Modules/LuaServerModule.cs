@@ -16,12 +16,32 @@ public static class LuaServerModule
     {
         var serverTable = new Table(script);
 
+        // Helper for O(1) performance lookup via NetworkMap
+        System.Collections.Generic.IEnumerable<Il2Cpp.Server> GetServers()
+        {
+            try
+            {
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.Server>();
+                    foreach (var kvp in nm.servers)
+                    {
+                        if (kvp.Value != null) list.Add(kvp.Value);
+                    }
+                    return list;
+                }
+            }
+            catch { }
+            return UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>() ?? new Il2Cpp.Server[0];
+        }
+
         // greg.server.get_all() → table of server info
         serverTable["get_all"] = (Func<Table>)(() =>
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 var result = new Table(script);
                 int i = 1;
                 foreach (var s in servers)
@@ -80,7 +100,7 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 foreach (var s in servers)
                 {
                     try
@@ -104,7 +124,7 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 foreach (var s in servers)
                 {
                     try

@@ -889,6 +889,13 @@ public static class CustomEmployeeManager
             var portraitTransform = card.Find("Image");
             if (portraitTransform == null) return;
 
+            // [Security] Prevent path traversal on dynamically constructed image path
+            if (employeeId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || employeeId.Contains(".."))
+            {
+                CrashLog.Log($"[Security] SetPortrait: Invalid characters in employeeId={employeeId}");
+                return;
+            }
+
             string assetsDir = Path.Combine(MelonEnvironment.UserDataDirectory, "ModAssets");
             string? imagePath = null;
             foreach (var ext in new[] { ".jpg", ".png" })

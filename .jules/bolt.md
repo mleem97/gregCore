@@ -24,3 +24,6 @@
 ## 2025-05-21 - Optimized GetRackCount calls (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<Rack>` to simply get the rack count is an O(N) operation over all objects, creating unnecessary GC pressure and CPU overhead, especially as the data center grows.
 **Action:** Optimized `GetRackCount` implementation in `GameHooks.cs` by using the game-managed O(1) singleton `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()` (index 2 for racks), providing a fallback to `FindObjectsOfType` only during uninitialized states.
+## 2025-05-23 - Optimizing Harmony Patch Method Sizes
+**Learning:** Bulky Harmony patch methods (especially Prefixes) cause poor performance on heavily hit code paths because the JIT compiler declines to inline them due to their large IL size (e.g. from complex event emission and string formatting).
+**Action:** Move bulky logic (logging, event emission, etc.) out of the hot path into separate helper methods decorated with `[MethodImpl(MethodImplOptions.NoInlining)]`. This drastically reduces the IL size of the fast path, encouraging the JIT compiler to inline the patch method and improving overall execution speed.

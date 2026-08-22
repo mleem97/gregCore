@@ -12,6 +12,25 @@ namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
 public static class LuaServerModule
 {
+
+    private static System.Collections.Generic.IEnumerable<Il2Cpp.Server> GetServers()
+    {
+        var nm = Il2Cpp.NetworkMap.instance;
+        if (nm != null && nm.servers != null && nm.servers.Count > 0)
+        {
+            var list = new System.Collections.Generic.List<Il2Cpp.Server>();
+            foreach (var kvp in nm.servers)
+            {
+                if (kvp.Value != null)
+                {
+                    list.Add(kvp.Value);
+                }
+            }
+            return list;
+        }
+        return UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>() ?? new Il2Cpp.Server[0];
+    }
+
     public static void Register(Table greg, Script script, string modId)
     {
         var serverTable = new Table(script);
@@ -21,7 +40,7 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 var result = new Table(script);
                 int i = 1;
                 foreach (var s in servers)
@@ -62,8 +81,8 @@ public static class LuaServerModule
                 {
                     return nm.servers.Count;
                 }
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers?.Count ?? 0;
+                var servers = GetServers();
+                var count = 0; foreach (var _ in servers) { count++; } return count;
             }
             catch { return 0; }
         });
@@ -80,7 +99,7 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 foreach (var s in servers)
                 {
                     try
@@ -104,7 +123,7 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = GetServers();
                 foreach (var s in servers)
                 {
                     try

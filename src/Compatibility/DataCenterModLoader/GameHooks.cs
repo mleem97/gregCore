@@ -69,7 +69,21 @@ public static class GameHooks
 
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var servers = new List<Il2Cpp.Server>();
+                var nm = NetworkMap.instance;
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers) servers.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (found != null)
+                    {
+                        foreach (var srv in found) servers.Add(srv);
+                    }
+                }
+
                 int updated = 0;
                 foreach (var srv in servers)
                 {
@@ -98,7 +112,21 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                var switches = new List<Il2Cpp.NetworkSwitch>();
+                var nm = NetworkMap.instance;
+                if (nm != null && nm.switches != null)
+                {
+                    foreach (var kvp in nm.switches) switches.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                    if (found != null)
+                    {
+                        foreach (var sw in found) switches.Add(sw);
+                    }
+                }
+
                 int swUpdated = 0;
                 foreach (var sw in switches)
                 {

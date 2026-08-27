@@ -21,11 +21,15 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 var result = new Table(script);
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) return result;
+
                 int i = 1;
-                foreach (var s in servers)
+                foreach (var kvp in nm.servers)
                 {
+                    var s = kvp.Value;
+                    if (s == null) continue;
                     try
                     {
                         var info = new Table(script);
@@ -62,8 +66,7 @@ public static class LuaServerModule
                 {
                     return nm.servers.Count;
                 }
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                return servers?.Count ?? 0;
+                return 0; // Avoid expensive fallback
             }
             catch { return 0; }
         });
@@ -80,9 +83,13 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) return false;
+
+                foreach (var kvp in nm.servers)
                 {
+                    var s = kvp.Value;
+                    if (s == null) continue;
                     try
                     {
                         if (s.GetHashCode() == hash && s.isBroken)
@@ -104,8 +111,18 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm == null || nm.servers == null) return 0;
+
+                var serversToRepair = new System.Collections.Generic.List<Il2Cpp.Server>();
+                foreach (var kvp in nm.servers)
+                {
+                    if (kvp.Value != null && kvp.Value.isBroken) serversToRepair.Add(kvp.Value);
+                }
+
+                if (serversToRepair.Count == 0) return 0;
+
+                foreach (var s in serversToRepair)
                 {
                     try
                     {

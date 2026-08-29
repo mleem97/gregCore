@@ -381,38 +381,86 @@ internal static class Patch_Rack_MarkPositionAsUsed
             // ── Fallback: scan scene objects (legacy, less reliable) ──
             if (objectId == null)
             {
-                var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
-                foreach (var srv in allServers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                // ⚡ Bolt: Optimize O(N) scene query to O(1) collection lookup
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var kvp in nm.servers)
                     {
-                        if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
-                            || srv.rackPositionUID == rackPosUid)
+                        var srv = kvp.Value;
+                        if (srv == null) continue;
+                        try
                         {
-                            objectId = srv.ServerID ?? "";
-                            objectType = (byte)srv.serverType;
-                            break;
+                            if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || srv.rackPositionUID == rackPosUid)
+                            {
+                                objectId = srv.ServerID ?? "";
+                                objectType = (byte)srv.serverType;
+                                break;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
+                    foreach (var srv in allServers)
+                    {
+                        try
+                        {
+                            if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || srv.rackPositionUID == rackPosUid)
+                            {
+                                objectId = srv.ServerID ?? "";
+                                objectType = (byte)srv.serverType;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
                 }
             }
 
             if (objectId == null)
             {
-                foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
+                var nm = Il2Cpp.NetworkMap.instance;
+                // ⚡ Bolt: Optimize O(N) scene query to O(1) collection lookup
+                if (nm != null && nm.switches != null)
                 {
-                    try
+                    foreach (var kvp in nm.switches)
                     {
-                        if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
-                            || sw.rackPositionUID == rackPosUid)
+                        var sw = kvp.Value;
+                        if (sw == null) continue;
+                        try
                         {
-                            objectId = sw.switchId ?? "";
-                            objectType = 4;
-                            break;
+                            if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || sw.rackPositionUID == rackPosUid)
+                            {
+                                objectId = sw.switchId ?? "";
+                                objectType = 4;
+                                break;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
+                    {
+                        try
+                        {
+                            if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || sw.rackPositionUID == rackPosUid)
+                            {
+                                objectId = sw.switchId ?? "";
+                                objectType = 4;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
                 }
             }
 

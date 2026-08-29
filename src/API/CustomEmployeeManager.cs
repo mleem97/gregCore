@@ -42,6 +42,14 @@ public static class CustomEmployeeManager
     public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation = false)
     {
         if (string.IsNullOrEmpty(id)) return 0;
+
+        // [Security] Prevent DoS by limiting input lengths
+        if (id.Length > 64 || (name != null && name.Length > 128) || (description != null && description.Length > 1024))
+        {
+            CrashLog.Log($"[Security] CustomEmployee: Input exceeded maximum allowed length for id={id}");
+            return 0;
+        }
+
         if (id.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || id.Contains(".."))
         {
             CrashLog.Log($"[Security] CustomEmployee: Invalid characters in id={id}");

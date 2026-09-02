@@ -21,7 +21,20 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) FindObjectsOfType
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.Server> servers;
+                if (nm != null && nm.servers != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.Server>();
+                    foreach (var kvp in nm.servers) list.Add(kvp.Value);
+                    servers = list;
+                }
+                else
+                {
+                    servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                }
+
                 var result = new Table(script);
                 int i = 1;
                 foreach (var s in servers)
@@ -80,7 +93,20 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) FindObjectsOfType
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.Server> servers;
+                if (nm != null && nm.servers != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.Server>();
+                    foreach (var kvp in nm.servers) list.Add(kvp.Value);
+                    servers = list;
+                }
+                else
+                {
+                    servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                }
+
                 foreach (var s in servers)
                 {
                     try
@@ -104,7 +130,20 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) FindObjectsOfType
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.Server> servers;
+                if (nm != null && nm.servers != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.Server>();
+                    foreach (var kvp in nm.servers) list.Add(kvp.Value);
+                    servers = list;
+                }
+                else
+                {
+                    servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                }
+
                 foreach (var s in servers)
                 {
                     try

@@ -21,27 +21,54 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var nm = Il2Cpp.NetworkMap.instance;
                 var result = new Table(script);
                 int i = 1;
-                foreach (var s in servers)
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers)
                     {
-                        var info = new Table(script);
-                        info["id"] = s.ServerID ?? s.GetHashCode().ToString();
-                        info["hash"] = s.GetHashCode();
-                        info["is_on"] = s.isOn;
-                        info["is_broken"] = s.isBroken;
-                        info["server_type"] = (int)s.serverType;
-                        info["size_u"] = s.sizeInU;
-                        var pos = s.transform?.position ?? UnityEngine.Vector3.zero;
-                        info["x"] = (double)pos.x;
-                        info["y"] = (double)pos.y;
-                        info["z"] = (double)pos.z;
-                        result[i++] = info;
+                        try
+                        {
+                            var s = srv.Value;
+                            var info = new Table(script);
+                            info["id"] = s.ServerID ?? s.GetHashCode().ToString();
+                            info["hash"] = s.GetHashCode();
+                            info["is_on"] = s.isOn;
+                            info["is_broken"] = s.isBroken;
+                            info["server_type"] = (int)s.serverType;
+                            info["size_u"] = s.sizeInU;
+                            var pos = s.transform?.position ?? UnityEngine.Vector3.zero;
+                            info["x"] = (double)pos.x;
+                            info["y"] = (double)pos.y;
+                            info["z"] = (double)pos.z;
+                            result[i++] = info;
+                        }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    foreach (var s in servers)
+                    {
+                        try
+                        {
+                            var info = new Table(script);
+                            info["id"] = s.ServerID ?? s.GetHashCode().ToString();
+                            info["hash"] = s.GetHashCode();
+                            info["is_on"] = s.isOn;
+                            info["is_broken"] = s.isBroken;
+                            info["server_type"] = (int)s.serverType;
+                            info["size_u"] = s.sizeInU;
+                            var pos = s.transform?.position ?? UnityEngine.Vector3.zero;
+                            info["x"] = (double)pos.x;
+                            info["y"] = (double)pos.y;
+                            info["z"] = (double)pos.z;
+                            result[i++] = info;
+                        }
+                        catch { }
+                    }
                 }
                 return result;
             }
@@ -80,18 +107,38 @@ public static class LuaServerModule
         {
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers)
                     {
-                        if (s.GetHashCode() == hash && s.isBroken)
+                        try
                         {
-                            s.RepairDevice();
-                            return true;
+                            var s = srv.Value;
+                            if (s.GetHashCode() == hash && s.isBroken)
+                            {
+                                s.RepairDevice();
+                                return true;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    foreach (var s in servers)
+                    {
+                        try
+                        {
+                            if (s.GetHashCode() == hash && s.isBroken)
+                            {
+                                s.RepairDevice();
+                                return true;
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 return false;
             }
@@ -104,18 +151,38 @@ public static class LuaServerModule
             try
             {
                 int repaired = 0;
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                foreach (var s in servers)
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers)
                     {
-                        if (s.isBroken)
+                        try
                         {
-                            s.RepairDevice();
-                            repaired++;
+                            var s = srv.Value;
+                            if (s.isBroken)
+                            {
+                                s.RepairDevice();
+                                repaired++;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    foreach (var s in servers)
+                    {
+                        try
+                        {
+                            if (s.isBroken)
+                            {
+                                s.RepairDevice();
+                                repaired++;
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 return repaired;
             }

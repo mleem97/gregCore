@@ -67,26 +67,51 @@ public static class GameHooks
                 catch { /* field access can fail during teardown */ }
             }
 
+            var nm = Il2Cpp.NetworkMap.instance;
+
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
                 int updated = 0;
-                foreach (var srv in servers)
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers)
                     {
-                        if (srv.currentRackPosition != null)
+                        try
                         {
-                            int oldUid = srv.rackPositionUID;
-                            int newUid = srv.currentRackPosition.rackPosGlobalUID;
-                            if (oldUid != newUid)
+                            if (srv.Value.currentRackPosition != null)
                             {
-                                srv.rackPositionUID = newUid;
-                                updated++;
+                                int oldUid = srv.Value.rackPositionUID;
+                                int newUid = srv.Value.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    srv.Value.rackPositionUID = newUid;
+                                    updated++;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    foreach (var srv in servers)
+                    {
+                        try
+                        {
+                            if (srv.currentRackPosition != null)
+                            {
+                                int oldUid = srv.rackPositionUID;
+                                int newUid = srv.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    srv.rackPositionUID = newUid;
+                                    updated++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 if (updated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {updated} server rackPositionUID references");
@@ -98,24 +123,47 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
                 int swUpdated = 0;
-                foreach (var sw in switches)
+                if (nm != null && nm.switches != null)
                 {
-                    try
+                    foreach (var sw in nm.switches)
                     {
-                        if (sw.currentRackPosition != null)
+                        try
                         {
-                            int oldUid = sw.rackPositionUID;
-                            int newUid = sw.currentRackPosition.rackPosGlobalUID;
-                            if (oldUid != newUid)
+                            if (sw.Value.currentRackPosition != null)
                             {
-                                sw.rackPositionUID = newUid;
-                                swUpdated++;
+                                int oldUid = sw.Value.rackPositionUID;
+                                int newUid = sw.Value.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    sw.Value.rackPositionUID = newUid;
+                                    swUpdated++;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                    foreach (var sw in switches)
+                    {
+                        try
+                        {
+                            if (sw.currentRackPosition != null)
+                            {
+                                int oldUid = sw.rackPositionUID;
+                                int newUid = sw.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    sw.rackPositionUID = newUid;
+                                    swUpdated++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 if (swUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {swUpdated} switch rackPositionUID references");

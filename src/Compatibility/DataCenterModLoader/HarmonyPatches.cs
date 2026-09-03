@@ -379,40 +379,82 @@ internal static class Patch_Rack_MarkPositionAsUsed
             }
 
             // ── Fallback: scan scene objects (legacy, less reliable) ──
+            var nm = Il2Cpp.NetworkMap.instance;
+
             if (objectId == null)
             {
-                var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
-                foreach (var srv in allServers)
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers)
                     {
-                        if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
-                            || srv.rackPositionUID == rackPosUid)
+                        try
                         {
-                            objectId = srv.ServerID ?? "";
-                            objectType = (byte)srv.serverType;
-                            break;
+                            if ((srv.Value.currentRackPosition != null && srv.Value.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || srv.Value.rackPositionUID == rackPosUid)
+                            {
+                                objectId = srv.Value.ServerID ?? "";
+                                objectType = (byte)srv.Value.serverType;
+                                break;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
+                    foreach (var srv in allServers)
+                    {
+                        try
+                        {
+                            if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || srv.rackPositionUID == rackPosUid)
+                            {
+                                objectId = srv.ServerID ?? "";
+                                objectType = (byte)srv.serverType;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
                 }
             }
 
             if (objectId == null)
             {
-                foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
+                if (nm != null && nm.switches != null)
                 {
-                    try
+                    foreach (var sw in nm.switches)
                     {
-                        if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
-                            || sw.rackPositionUID == rackPosUid)
+                        try
                         {
-                            objectId = sw.switchId ?? "";
-                            objectType = 4;
-                            break;
+                            if ((sw.Value.currentRackPosition != null && sw.Value.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || sw.Value.rackPositionUID == rackPosUid)
+                            {
+                                objectId = sw.Value.switchId ?? "";
+                                objectType = 4;
+                                break;
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
+                    {
+                        try
+                        {
+                            if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                                || sw.rackPositionUID == rackPosUid)
+                            {
+                                objectId = sw.switchId ?? "";
+                                objectType = 4;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
                 }
             }
 

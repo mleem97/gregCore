@@ -103,6 +103,13 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal in search pattern
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains("/") || pattern.Contains("\\")))
+                {
+                    MelonLogger.Error($"[LuaMod:{modId}] io.list_files failed: Invalid characters in pattern");
+                    return new Table(script);
+                }
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

@@ -1390,6 +1390,14 @@ public partial class GameAPIManager : IDisposable
     {
         try
         {
+            var nm = global::Il2Cpp.NetworkMap.instance;
+            if (nm != null)
+            {
+                try { if (nm.servers != null) { foreach (var kvp in nm.servers) { var srv = kvp.Value; if (srv != null && (srv.ServerID ?? "") == targetId) return (ulong)srv.Pointer.ToInt64(); } } } catch { }
+                try { if (nm.switches != null) { foreach (var kvp in nm.switches) { var sw = kvp.Value; if (sw != null && (sw.switchId ?? "") == targetId) return (ulong)sw.Pointer.ToInt64(); } } } catch { }
+                try { if (nm.patchPanels != null) { foreach (var kvp in nm.patchPanels) { var pp = kvp.Value; if (pp != null && (pp.patchPanelId ?? "") == targetId) return (ulong)pp.Pointer.ToInt64(); } } } catch { }
+            }
+
             foreach (var srv in UnityEngine.Resources.FindObjectsOfTypeAll<Server>())
             {
                 try

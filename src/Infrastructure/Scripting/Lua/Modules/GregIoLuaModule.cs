@@ -103,6 +103,10 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal via pattern in Directory.GetFiles
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains("/") || pattern.Contains("\\")))
+                    throw new UnauthorizedAccessException("Search pattern contains invalid characters.");
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

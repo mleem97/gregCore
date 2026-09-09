@@ -69,7 +69,18 @@ public static class GameHooks
 
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.Server> servers;
+                if (nm != null && nm.servers != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.Server>(nm.servers.Count);
+                    foreach (var entry in nm.servers) list.Add(entry.Value);
+                    servers = list;
+                }
+                else
+                {
+                    servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                }
                 int updated = 0;
                 foreach (var srv in servers)
                 {
@@ -98,7 +109,18 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.NetworkSwitch> switches;
+                if (nm != null && nm.switches != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.NetworkSwitch>(nm.switches.Count);
+                    foreach (var entry in nm.switches) list.Add(entry.Value);
+                    switches = list;
+                }
+                else
+                {
+                    switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                }
                 int swUpdated = 0;
                 foreach (var sw in switches)
                 {
@@ -127,7 +149,18 @@ public static class GameHooks
 
             try
             {
-                var panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                var nm = Il2Cpp.NetworkMap.instance;
+                System.Collections.Generic.IEnumerable<Il2Cpp.PatchPanel> panels;
+                if (nm != null && nm.patchPanels != null)
+                {
+                    var list = new System.Collections.Generic.List<Il2Cpp.PatchPanel>(nm.patchPanels.Count);
+                    foreach (var entry in nm.patchPanels) list.Add(entry.Value);
+                    panels = list;
+                }
+                else
+                {
+                    panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                }
                 int ppUpdated = 0;
                 foreach (var pp in panels)
                 {

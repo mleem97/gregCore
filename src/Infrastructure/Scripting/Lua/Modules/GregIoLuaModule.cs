@@ -103,7 +103,15 @@ public static class GregIoLuaModule
         {
             try
             {
-                var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
+                string searchPattern = pattern ?? "*.*";
+                // [Security] Prevent path traversal in search pattern
+                if (searchPattern.Contains("..") || searchPattern.Contains(Path.DirectorySeparatorChar) || searchPattern.Contains(Path.AltDirectorySeparatorChar))
+                {
+                    MelonLogger.Error($"[LuaMod:{modId}] io.list_files failed: Invalid search pattern.");
+                    return new Table(script);
+                }
+
+                var files = Directory.GetFiles(dataDir, searchPattern, SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();
 

@@ -67,7 +67,13 @@ public static class CablePositionsPatch
         }
         while (Interlocked.CompareExchange(ref _nextCableId, baseId + 1, current) != current);
 
-        MelonLogger.Msg($"[CablePatch] Cable ID counter set to {baseId + 1}");
+        SafeLog($"[CablePatch] Cable ID counter set to {baseId + 1}");
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void SafeLog(string msg)
+    {
+        try { MelonLogger.Msg(msg); } catch { }
     }
 
     public static int PeekNextId() => _nextCableId;

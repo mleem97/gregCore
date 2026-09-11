@@ -21,3 +21,8 @@
 **Vulnerability:** `CustomEmployeeManager.Register` accepted arbitrary employee IDs without validation, which were later used directly in `Path.Combine` to construct image loading paths, enabling path traversal (CWE-22).
 **Learning:** Identifiers provided by mods or external sources must be treated as untrusted input and validated before being used in file system operations.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-09-11 - Path Traversal in Directory.GetFiles Search Pattern
+**Vulnerability:** In `GregIoLuaModule.cs`, the user-provided `pattern` parameter was passed directly to `Directory.GetFiles` without validation. This allowed callers to specify directory traversal characters (e.g., `..\..\`) in the pattern, bypassing the sandboxed directory restrictions and enabling arbitrary file enumeration on the filesystem.
+**Learning:** In .NET C#, `Directory.GetFiles` is vulnerable to path traversal if the `searchPattern` argument contains traversal characters like `..`, `/`, or `\`. Even if the base directory is strictly controlled, the search pattern itself can alter the execution context.
+**Prevention:** Always validate or sanitize user-provided search patterns before passing them to `Directory.GetFiles` (or similar enumeration methods). Ensure the pattern does not contain directory separators (`Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`) or traversal components (`..`).

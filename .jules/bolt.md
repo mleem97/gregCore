@@ -24,3 +24,6 @@
 ## 2025-05-21 - Optimized GetRackCount calls (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<Rack>` to simply get the rack count is an O(N) operation over all objects, creating unnecessary GC pressure and CPU overhead, especially as the data center grows.
 **Action:** Optimized `GetRackCount` implementation in `GameHooks.cs` by using the game-managed O(1) singleton `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()` (index 2 for racks), providing a fallback to `FindObjectsOfType` only during uninitialized states.
+## 2025-05-21 - Optimized LUA API Server Queries (FindObjectsOfType)
+**Learning:** LUA API methods like `greg.server.get_all()`, `repair()`, and `repair_all()` were invoking `UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>()`, which causes severe performance degradation and GC pressure due to O(N) scene scans, especially when called frequently by modders.
+**Action:** Replace `FindObjectsOfType` in LUA APIs with direct O(1) lookups via `Il2Cpp.NetworkMap.instance.servers` and `brokenServers`. Ensure defensive copies are made if the collection is mutated during iteration (like `RepairDevice` which removes servers from the `brokenServers` list).

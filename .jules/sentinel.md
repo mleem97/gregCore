@@ -21,3 +21,8 @@
 **Vulnerability:** `CustomEmployeeManager.Register` accepted arbitrary employee IDs without validation, which were later used directly in `Path.Combine` to construct image loading paths, enabling path traversal (CWE-22).
 **Learning:** Identifiers provided by mods or external sources must be treated as untrusted input and validated before being used in file system operations.
 **Prevention:** Validate input strings that form part of a file path before concatenating them. Reject them if they contain directory traversal characters like `..`, `Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`, or any invalid filename characters (using `Path.GetInvalidFileNameChars()`).
+
+## 2024-05-15 - Path Traversal in Directory.GetFiles Search Pattern
+**Vulnerability:** The `greg.io.list_files` method accepted an unsanitized `pattern` string that was passed directly to `Directory.GetFiles`. Even if the base directory was safe, `Directory.GetFiles(baseDir, "../secret.txt", ...)` would result in directory traversal and list files outside of the sandbox directory.
+**Learning:** `Directory.GetFiles` uses the second parameter (`searchPattern`) to resolve paths. This parameter is vulnerable to path traversal if it contains directory separators (`/`, `\`) or traversal sequences (`..`). Validating only the base directory is not sufficient when user input is used as a search pattern.
+**Prevention:** Always validate or sanitize user-provided search patterns before passing them to `Directory.GetFiles`. Ensure that the input does not contain directory separators (`Path.DirectorySeparatorChar`, `Path.AltDirectorySeparatorChar`) or the traversal sequence (`..`).

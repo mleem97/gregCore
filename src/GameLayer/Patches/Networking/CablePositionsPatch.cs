@@ -67,6 +67,12 @@ public static class CablePositionsPatch
         }
         while (Interlocked.CompareExchange(ref _nextCableId, baseId + 1, current) != current);
 
+        try { LogBaseIdSet(baseId); } catch { }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void LogBaseIdSet(int baseId)
+    {
         MelonLogger.Msg($"[CablePatch] Cable ID counter set to {baseId + 1}");
     }
 

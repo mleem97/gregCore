@@ -103,6 +103,12 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal via search pattern
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains("/") || pattern.Contains("\\")))
+                {
+                    throw new UnauthorizedAccessException("Search pattern contains path traversal characters");
+                }
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

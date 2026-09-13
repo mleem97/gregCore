@@ -23,9 +23,20 @@ public static class LuaRackModule
         {
             try
             {
-                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 var result = new Table(script);
                 int i = 1;
+
+                var nm = Il2Cpp.NetworkMap.instance;
+                if (nm != null)
+                {
+                    var countArr = nm.GetNumberOfDevices();
+                    if (countArr != null && countArr.Length > 2 && countArr[2] == 0)
+                    {
+                        return result; // Empty return early
+                    }
+                }
+
+                var racks = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Rack>();
                 foreach (var rack in racks)
                 {
                     try

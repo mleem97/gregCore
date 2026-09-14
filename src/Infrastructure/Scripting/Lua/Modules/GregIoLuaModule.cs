@@ -101,6 +101,13 @@ public static class GregIoLuaModule
         // greg.io.list_files(pattern?) → table of strings
         ioTable["list_files"] = (Func<string?, Table>)(pattern =>
         {
+            // [Security] Prevent path traversal in search pattern
+            if (pattern != null && (pattern.Contains("..") || pattern.Contains(Path.DirectorySeparatorChar.ToString()) || pattern.Contains(Path.AltDirectorySeparatorChar.ToString())))
+            {
+                MelonLogger.Error($"[LuaMod:{modId}] io.list_files blocked traversal attempt: {pattern}");
+                return new Table(script);
+            }
+
             try
             {
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)

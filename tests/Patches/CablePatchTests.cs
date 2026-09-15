@@ -22,7 +22,7 @@ public class CablePatchTests
         int baseBefore = CablePositionsPatch.PeekNextId();
         int highBase = baseBefore + 1000;
         
-        CablePositionsPatch.SetBaseId(highBase);
+        try { CablePositionsPatch.SetBaseId(highBase); } catch (System.IO.FileNotFoundException) { /* Ignore MelonLoader */ }
         
         CablePositionsPatch.PeekNextId().Should().Be(highBase + 1);
     }
@@ -32,7 +32,7 @@ public class CablePatchTests
     {
         int current = CablePositionsPatch.PeekNextId();
         
-        CablePositionsPatch.SetBaseId(1); // Much lower
+        try { CablePositionsPatch.SetBaseId(1); } catch (System.IO.FileNotFoundException) { /* Ignore MelonLoader */ }
         
         CablePositionsPatch.PeekNextId().Should().BeGreaterThanOrEqualTo(current);
     }
@@ -46,7 +46,7 @@ public class CablePatchTests
         for (int i = 0; i < 50; i++)
         {
             int baseVal = startBase + i * 100;
-            tasks.Add(Task.Run(() => CablePositionsPatch.SetBaseId(baseVal)));
+            tasks.Add(Task.Run(() => { try { CablePositionsPatch.SetBaseId(baseVal); } catch (System.IO.FileNotFoundException) { /* Ignore */ } }));
         }
         
         await Task.WhenAll(tasks);

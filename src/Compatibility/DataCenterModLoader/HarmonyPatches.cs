@@ -381,7 +381,19 @@ internal static class Patch_Rack_MarkPositionAsUsed
             // ── Fallback: scan scene objects (legacy, less reliable) ──
             if (objectId == null)
             {
-                var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
+                // ⚡ Bolt: Replace O(N) scene query with O(1) NetworkMap dictionary lookup
+                var nm = NetworkMap.instance;
+                var allServers = new System.Collections.Generic.List<Server>();
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers) allServers.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Server>();
+                    if (found != null) foreach (var s in found) allServers.Add(s);
+                }
+
                 foreach (var srv in allServers)
                 {
                     try
@@ -400,7 +412,20 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
             if (objectId == null)
             {
-                foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
+                // ⚡ Bolt: Replace O(N) scene query with O(1) NetworkMap dictionary lookup
+                var nm = NetworkMap.instance;
+                var allSwitches = new System.Collections.Generic.List<NetworkSwitch>();
+                if (nm != null && nm.switches != null)
+                {
+                    foreach (var kvp in nm.switches) allSwitches.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<NetworkSwitch>();
+                    if (found != null) foreach (var s in found) allSwitches.Add(s);
+                }
+
+                foreach (var sw in allSwitches)
                 {
                     try
                     {
@@ -418,7 +443,20 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
             if (objectId == null)
             {
-                foreach (var pp in UnityEngine.Object.FindObjectsOfType<PatchPanel>())
+                // ⚡ Bolt: Replace O(N) scene query with O(1) NetworkMap dictionary lookup
+                var nm = NetworkMap.instance;
+                var allPanels = new System.Collections.Generic.List<PatchPanel>();
+                if (nm != null && nm.patchPanels != null)
+                {
+                    foreach (var kvp in nm.patchPanels) allPanels.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<PatchPanel>();
+                    if (found != null) foreach (var p in found) allPanels.Add(p);
+                }
+
+                foreach (var pp in allPanels)
                 {
                     try
                     {

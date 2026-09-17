@@ -69,9 +69,21 @@ public static class GameHooks
 
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                // ⚡ Bolt: Replace O(N) scene query with O(1) dictionary lookup for servers
+                var nm = Il2Cpp.NetworkMap.instance;
+                var serverList = new System.Collections.Generic.List<Il2Cpp.Server>();
+                if (nm != null && nm.servers != null)
+                {
+                    foreach (var kvp in nm.servers) serverList.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    if (found != null) foreach (var s in found) serverList.Add(s);
+                }
+
                 int updated = 0;
-                foreach (var srv in servers)
+                foreach (var srv in serverList)
                 {
                     try
                     {
@@ -98,9 +110,21 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                // ⚡ Bolt: Replace O(N) scene query with O(1) dictionary lookup for switches
+                var nm = Il2Cpp.NetworkMap.instance;
+                var switchList = new System.Collections.Generic.List<Il2Cpp.NetworkSwitch>();
+                if (nm != null && nm.switches != null)
+                {
+                    foreach (var kvp in nm.switches) switchList.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                    if (found != null) foreach (var s in found) switchList.Add(s);
+                }
+
                 int swUpdated = 0;
-                foreach (var sw in switches)
+                foreach (var sw in switchList)
                 {
                     try
                     {
@@ -127,9 +151,21 @@ public static class GameHooks
 
             try
             {
-                var panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                // ⚡ Bolt: Replace O(N) scene query with O(1) dictionary lookup for patch panels
+                var nm = Il2Cpp.NetworkMap.instance;
+                var panelList = new System.Collections.Generic.List<Il2Cpp.PatchPanel>();
+                if (nm != null && nm.patchPanels != null)
+                {
+                    foreach (var kvp in nm.patchPanels) panelList.Add(kvp.Value);
+                }
+                else
+                {
+                    var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                    if (found != null) foreach (var p in found) panelList.Add(p);
+                }
+
                 int ppUpdated = 0;
-                foreach (var pp in panels)
+                foreach (var pp in panelList)
                 {
                     try
                     {

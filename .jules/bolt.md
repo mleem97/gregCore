@@ -24,3 +24,6 @@
 ## 2025-05-21 - Optimized GetRackCount calls (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<Rack>` to simply get the rack count is an O(N) operation over all objects, creating unnecessary GC pressure and CPU overhead, especially as the data center grows.
 **Action:** Optimized `GetRackCount` implementation in `GameHooks.cs` by using the game-managed O(1) singleton `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()` (index 2 for racks), providing a fallback to `FindObjectsOfType` only during uninitialized states.
+## 2024-05-21 - Optimized Hardware Lookups (FindObjectsOfType)
+**Learning:** Using `UnityEngine.Object.FindObjectsOfType<T>` to fetch servers, switches, and patch panels is an O(N) operation that scales poorly and blocks the main thread. This was a critical performance bottleneck in heavily used code paths.
+**Action:** Optimized hardware lookups by leveraging the game-managed O(1) singletons (e.g., `Il2Cpp.NetworkMap.instance.servers`, `switches`, and `patchPanels`), significantly reducing CPU overhead and GC pressure. Only fallback to `FindObjectsOfType` in uninitialized states.

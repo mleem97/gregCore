@@ -1,4 +1,4 @@
-/// <file-summary>
+﻿/// <file-summary>
 /// Schicht:      Infrastructure
 /// Zweck:        Sandboxed IO Funktionen für Lua.
 /// Maintainer:   Darf nur auf {modDir}/data/ zugreifen.
@@ -103,6 +103,10 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal via search pattern
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains("/") || pattern.Contains("\\")))
+                    throw new UnauthorizedAccessException("Search pattern cannot contain path traversal characters");
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

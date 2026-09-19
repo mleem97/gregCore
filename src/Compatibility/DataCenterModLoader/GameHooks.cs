@@ -69,24 +69,49 @@ public static class GameHooks
 
             try
             {
-                var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                // [Bolt Performance] O(1) dictionary lookup via NetworkMap prevents expensive O(N) FindObjectsOfType scene traversal
+                var nm = Il2Cpp.NetworkMap.instance;
                 int updated = 0;
-                foreach (var srv in servers)
+                if (nm != null && nm.servers != null)
                 {
-                    try
+                    foreach (var srv in nm.servers.Values)
                     {
-                        if (srv.currentRackPosition != null)
+                        try
                         {
-                            int oldUid = srv.rackPositionUID;
-                            int newUid = srv.currentRackPosition.rackPosGlobalUID;
-                            if (oldUid != newUid)
+                            if (srv.currentRackPosition != null)
                             {
-                                srv.rackPositionUID = newUid;
-                                updated++;
+                                int oldUid = srv.rackPositionUID;
+                                int newUid = srv.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    srv.rackPositionUID = newUid;
+                                    updated++;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
+                    foreach (var srv in servers)
+                    {
+                        try
+                        {
+                            if (srv.currentRackPosition != null)
+                            {
+                                int oldUid = srv.rackPositionUID;
+                                int newUid = srv.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    srv.rackPositionUID = newUid;
+                                    updated++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 if (updated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {updated} server rackPositionUID references");
@@ -98,24 +123,49 @@ public static class GameHooks
 
             try
             {
-                var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                // [Bolt Performance] O(1) dictionary lookup via NetworkMap prevents expensive O(N) FindObjectsOfType scene traversal
+                var nm = Il2Cpp.NetworkMap.instance;
                 int swUpdated = 0;
-                foreach (var sw in switches)
+                if (nm != null && nm.switches != null)
                 {
-                    try
+                    foreach (var sw in nm.switches.Values)
                     {
-                        if (sw.currentRackPosition != null)
+                        try
                         {
-                            int oldUid = sw.rackPositionUID;
-                            int newUid = sw.currentRackPosition.rackPosGlobalUID;
-                            if (oldUid != newUid)
+                            if (sw.currentRackPosition != null)
                             {
-                                sw.rackPositionUID = newUid;
-                                swUpdated++;
+                                int oldUid = sw.rackPositionUID;
+                                int newUid = sw.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    sw.rackPositionUID = newUid;
+                                    swUpdated++;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
+                    foreach (var sw in switches)
+                    {
+                        try
+                        {
+                            if (sw.currentRackPosition != null)
+                            {
+                                int oldUid = sw.rackPositionUID;
+                                int newUid = sw.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    sw.rackPositionUID = newUid;
+                                    swUpdated++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 if (swUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {swUpdated} switch rackPositionUID references");
@@ -127,24 +177,49 @@ public static class GameHooks
 
             try
             {
-                var panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                // [Bolt Performance] O(1) dictionary lookup via NetworkMap prevents expensive O(N) FindObjectsOfType scene traversal
+                var nm = Il2Cpp.NetworkMap.instance;
                 int ppUpdated = 0;
-                foreach (var pp in panels)
+                if (nm != null && nm.patchPanels != null)
                 {
-                    try
+                    foreach (var pp in nm.patchPanels.Values)
                     {
-                        if (pp.currentRackPosition != null)
+                        try
                         {
-                            int oldUid = pp.rackPositionUID;
-                            int newUid = pp.currentRackPosition.rackPosGlobalUID;
-                            if (oldUid != newUid)
+                            if (pp.currentRackPosition != null)
                             {
-                                pp.rackPositionUID = newUid;
-                                ppUpdated++;
+                                int oldUid = pp.rackPositionUID;
+                                int newUid = pp.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    pp.rackPositionUID = newUid;
+                                    ppUpdated++;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+                else
+                {
+                    var panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+                    foreach (var pp in panels)
+                    {
+                        try
+                        {
+                            if (pp.currentRackPosition != null)
+                            {
+                                int oldUid = pp.rackPositionUID;
+                                int newUid = pp.currentRackPosition.rackPosGlobalUID;
+                                if (oldUid != newUid)
+                                {
+                                    pp.rackPositionUID = newUid;
+                                    ppUpdated++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 if (ppUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {ppUpdated} patchpanel rackPositionUID references");

@@ -103,6 +103,12 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal via pattern argument
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains(Path.DirectorySeparatorChar.ToString()) || pattern.Contains(Path.AltDirectorySeparatorChar.ToString())))
+                {
+                    throw new UnauthorizedAccessException("Access denied: pattern contains invalid characters");
+                }
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

@@ -2,10 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe [`VERSION`](VERSION).
 
-## [Unreleased]
+## [1.2.3] — 2026-09-22
 
 ### Added
 
+- Mod-Abhängigkeiten (`GregModDeps`): Declare/EnsureLoaded/CheckAll mit Mindestversionen (MelonLoader-Registry) plus Manifest-Diff (GetLocalManifest/DiffManifests/FormatDiff) als ModSync-Voraussetzung für Coop.
 - Save-Batch A (`gregCore.Core.Networking`): `GregNetworkDeviceSaves` (Router/Firewall/SFP/LACP/Kabel/Label/VLAN-Filter, Upsert wo Schlüssel), `GregCustomerSaves` + `GregEconomySaves` (CustomerBase/Record/Monthly/Balance, Dict-Brücken), `GregJobSaves` (Technician/RepairJob/InteractObject, Upsert per uid); Bool-Arrays in `GregModPack`.
 - Networking-Batch (`gregCore.Core.Networking`): `GregPatchPanels` (Save-DTO + Runtime-Brücke für PatchPanel/PatchPanelSaveData), `GregSetIP` (Keypad-Fund, Subnetzmathe mit Fallback, Show/Cancel), `GregServiceRequests` (Save-Snapshot, AddRequest/LoadFromSave/RebuildUI, Row-Helfer), `GregServers` (ServerSaveData-DTO + Runtime-Aktionen: SetIP, Power, Customer/App, Repair).
 - Custom Items (`GregCustomItems` + `GregObjImport`): Shop-/StaticItems aus DTO + Pack-Ordner per Vanilla-ModLoader laden (Mesh-Vorabcheck, Traversal-Schutz, GetPrefab).
@@ -16,6 +17,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
 - Einheitliches Open-Source-Layout (README, Docs, Badges) nach gregCore-Vorbild.
 - Codacy-Analyse-Konfiguration (`.codacy/`, CLI v2 wie gregModmanager): `lizard`, `opengrep`, `pylint`, `trivy` für C#/Python/Shell; lokal ohne CI-Doppel-Lauf, `GH_TOKEN`/`CODACY_API_TOKEN` nur als Forgejo-Secrets.
 
-## [#] — 2026-09-22
+### Changed
 
-- Initialer standardisierter Stand.
+- Quellbaum in `gregCore.*`-Assemblies umstrukturiert; `lib/MoonSharp` und `ci-stubs/` entfernt (MoonSharp via NuGet).
+- Finalisierte öffentliche Doku (README, QUICKSTART, ARCHITECTURE, SOURCE_LAYOUT, INDEX) für den Open-Source-Release 1.2.3.

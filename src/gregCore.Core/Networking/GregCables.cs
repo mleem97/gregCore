@@ -1,0 +1,260 @@
+/// <file-summary>
+/// Schicht:      Core (Networking)
+/// Zweck:        Kabel-Brücke (live CableLink): finden (alle/per switchId/
+///               per Typ), Zustand lesen (Speed, Typ, Parents, SFP),
+///               Aktionen (Speed setzen, SFP rein/raus, Second-/Label-Action,
+///               Rope-Anker). Alles best-effort.
+/// Hinweis:      CableIDComponent hat keine öffentlichen Member (nur private
+///               CableId/SwitchId) — bewusst ausgelassen.
+/// </file-summary>
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using MelonLoader;
+using UnityEngine;
+
+namespace gregCore.Core.Networking;
+
+[ExcludeFromCodeCoverage(Justification = "Live Il2Cpp interop against game assemblies; needs running game.")]
+public static class GregCables
+{
+    // ── DTO ──────────────────────────────────────────────────────────────────
+
+    public sealed class LinkInfo
+    {
+        public string SwitchID = "";
+        public string Type = "";
+        public float ConnectionSpeed;
+        public int CustomerID = -1;
+        public bool IsStartOrEnd;
+        public bool IsEndPoint;
+        public bool IsSFPPort;
+        public int SfpTypeInserted = -1;
+        public int SfpTypeSupported = -1;
+        public bool IsFibrePort;
+        public int CableIDsOnLink;
+        public string ParentServerID = "";
+        public string ParentSwitchID = "";
+        public string ParentPatchPanelID = "";
+    }
+
+    // ── Finden ───────────────────────────────────────────────────────────────
+
+    public static List<global::Il2Cpp.CableLink> FindAll()
+    {
+        var result = new List<global::Il2Cpp.CableLink>();
+        Try(() =>
+        {
+            var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.CableLink>();
+            if (all == null) return;
+            foreach (var l in all)
+            {
+                if (l == null) continue;
+                try
+                {
+                    var go = l.gameObject;
+                    if (go != null && go.scene.IsValid() && go.scene.isLoaded)
+                        result.Add(l);
+                }
+                catch { }
+            }
+        });
+        return result;
+    }
+
+    public static List<global::Il2Cpp.CableLink> FindBySwitchId(string switchID)
+    {
+        var result = new List<global::Il2Cpp.CableLink>();
+        if (string.IsNullOrEmpty(switchID)) return result;
+        Try(() =>
+        {
+            foreach (var l in FindAll())
+            {
+                string id = null;
+                try { id = l.switchID; } catch { continue; }
+                if (string.Equals(id, switchID, StringComparison.OrdinalIgnoreCase))
+                {
+                    try { result.Add(l); } catch { }
+                }
+            }
+        });
+        return result;
+    }
+
+    public static List<global::Il2Cpp.CableLink> FindByType(string typeOfLink)
+    {
+        var result = new List<global::Il2Cpp.CableLink>();
+        if (string.IsNullOrWhiteSpace(typeOfLink)) return result;
+        Try(() =>
+        {
+            foreach (var l in FindAll())
+            {
+                string t = null;
+                try { t = l.typeOfLink.ToString(); } catch { continue; }
+                if (string.Equals(t, typeOfLink, StringComparison.OrdinalIgnoreCase))
+                {
+                    try { result.Add(l); } catch { }
+                }
+            }
+        });
+        return result;
+    }
+
+    // ── Lesen ────────────────────────────────────────────────────────────────
+
+    public static LinkInfo Read(global::Il2Cpp.CableLink link)
+    {
+        var dto = new LinkInfo();
+        if (link == null) return dto;
+        Try(() => dto.SwitchID = link.switchID ?? "");
+        Try(() => dto.Type = link.typeOfLink.ToString());
+        Try(() => dto.ConnectionSpeed = link.connectionSpeed);
+        Try(() => dto.CustomerID = link.CustomerID);
+        Try(() => dto.IsStartOrEnd = link.isStartOrEnd);
+        Try(() => dto.IsEndPoint = link.isEndPoint);
+        Try(() => dto.IsSFPPort = link.isSFPPort);
+        Try(() => dto.SfpTypeInserted = link.sfpTypeInserted);
+        Try(() => dto.SfpTypeSupported = link.sfpTypeSupported);
+        Try(() => dto.IsFibrePort = link.isFibrePort);
+        Try(() => dto.CableIDsOnLink = link.cableIDsOnLink);
+        Try(() => dto.ParentServerID = link.parentServer != null ? link.parentServer.ServerID ?? "" : "");
+        Try(() => dto.ParentSwitchID = link.parentSwitch != null ? link.parentSwitch.switchId ?? "" : "");
+        Try(() => dto.ParentPatchPanelID = link.parentPatchPanel != null ? link.parentPatchPanel.patchPanelId ?? "" : "");
+        return dto;
+    }
+
+    public static List<LinkInfo> ReadAll()
+    {
+        var result = new List<LinkInfo>();
+        Try(() =>
+        {
+            foreach (var l in FindAll())
+            {
+                try { result.Add(Read(l)); } catch { }
+            }
+        });
+        return result;
+    }
+
+    // ── Aktionen ─────────────────────────────────────────────────────────────
+
+    public static bool SetConnectionSpeed(global::Il2Cpp.CableLink link, float speed)
+    {
+        if (link == null) return false;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            link.SetConnectionSpeed(speed);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"SetConnectionSpeed fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool InsertSFP(global::Il2Cpp.CableLink link, float speed, int type, global::Il2Cpp.SFPModule module)
+    {
+        if (link == null || module == null) return false;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            link.InsertSFP(speed, type, module);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"InsertSFP fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool RemoveSFP(global::Il2Cpp.CableLink link)
+    {
+        if (link == null) return false;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            link.RemoveSFP();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"RemoveSFP fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool SecondAction(global::Il2Cpp.CableLink link)
+    {
+        if (link == null) return false;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            if (!link.IsAllowedToDoSecondAction()) return false;
+            link.SecondActionOnClick();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"SecondAction fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool LabelAction(global::Il2Cpp.CableLink link)
+    {
+        if (link == null) return false;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            link.LabelActionOnClick();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"LabelAction fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static Transform GetRopeAttachPoint(global::Il2Cpp.CableLink link, bool createIfMissing)
+    {
+        if (link == null) return null;
+        try
+        {
+            var _ = link.gameObject; // liveness
+            if (createIfMissing)
+            {
+                try { link.CreateRopeAttachPoint(); } catch { }
+            }
+            return link.GetRopeAttachPoint();
+        }
+        catch (Exception ex)
+        {
+            Warn($"RopeAttachPoint fehlgeschlagen: {Base(ex)}");
+            return null;
+        }
+    }
+
+    private static string Base(Exception ex)
+    {
+        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { return "?"; }
+    }
+
+    private static void Warn(string message)
+    {
+        try { MelonLogger.Warning($"[gregCore][Net] Cables: {message}"); } catch { }
+    }
+
+    private static void Try(Action action)
+    {
+        try { action?.Invoke(); }
+        catch (Exception ex)
+        {
+            try { MelonLogger.Warning($"[gregCore][Net] Cables-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+        }
+    }
+}

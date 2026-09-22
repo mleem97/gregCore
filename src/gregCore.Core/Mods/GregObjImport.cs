@@ -1,0 +1,135 @@
+/// <file-summary>
+/// Schicht:      Core (Mods)
+/// Zweck:        Sicherer Wrapper um den Vanilla-ObjImporter (Mod-Meshes aus
+///               .obj-Dateien): Pfadvalidierung (Existenz, Endung, kein
+///               Directory-Traversal, Groessenlimit), Ergebnispruefung
+///               (non-null, vertexCount > 0). Nie Exceptions an Aufrufer.
+/// </file-summary>
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using MelonLoader;
+using UnityEngine;
+
+namespace gregCore.Core.Mods;
+
+[ExcludeFromCodeCoverage(Justification = "Live Il2Cpp interop against game assemblies; needs running game.")]
+public static class GregObjImport
+{
+    private const long MaxObjBytes = 64L * 1024L * 1024L;
+
+    // Direktimport mit Validierung. Null bei jedem Fehler (mit Warnung).
+    public static Mesh ImportMesh(string filePath)
+    {
+        if (!TryValidatePath(filePath, out string full))
+            return null;
+        Mesh mesh = null;
+        try { mesh = global::Il2Cpp.ObjImporter.ImportOBJ(full); }
+        catch (Exception ex)
+        {
+            Warn($"Import fehlgeschlagen ('{Short(full)}'): {Base(ex)}");
+            return null;
+        }
+        if (mesh == null)
+        {
+            Warn($"Import lieferte null ('{Short(full)}').");
+            return null;
+        }
+        int verts = -1;
+        try { verts = mesh.vertexCount; } catch { verts = -1; }
+        if (verts <= 0)
+        {
+            Warn($"Import ohne Vertices ('{Short(full)}').");
+            return null;
+        }
+        return mesh;
+    }
+
+    public static bool TryImportMesh(string filePath, out Mesh mesh)
+    {
+        mesh = ImportMesh(filePath);
+        return mesh != null;
+    }
+
+    // Komfort für ModPacks: Modelldatei relativ zum Pack-Ordner, ohne
+    // dass ".." aus dem Ordner ausbrechen kann.
+    public static Mesh ImportMeshForPack(string folderPath, string modelFile)
+    {
+        if (string.IsNullOrWhiteSpace(folderPath) || string.IsNullOrWhiteSpace(modelFile))
+            return null;
+        string combined = null;
+        try
+        {
+            string root = Path.GetFullPath(folderPath);
+            combined = Path.GetFullPath(Path.Combine(root, modelFile));
+            if (!combined.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(combined, root, StringComparison.OrdinalIgnoreCase))
+            {
+                Warn($"Pfad bricht aus dem Pack-Ordner aus ('{modelFile}').");
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Warn($"Pfadkombination fehlgeschlagen: {Base(ex)}");
+            return null;
+        }
+        return ImportMesh(combined);
+    }
+
+    private static bool TryValidatePath(string filePath, out string full)
+    {
+        full = null;
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            Warn("Leerer Dateipfad.");
+            return false;
+        }
+        string candidate = filePath;
+        try { candidate = Path.GetFullPath(filePath); } catch { }
+        if (!string.Equals(Path.GetExtension(candidate), ".obj", StringComparison.OrdinalIgnoreCase))
+        {
+            Warn($"Kein .obj-Pfad ('{Short(filePath)}').");
+            return false;
+        }
+        FileInfo info = null;
+        try { info = new FileInfo(candidate); } catch { info = null; }
+        if (info == null || !info.Exists)
+        {
+            Warn($"Datei nicht gefunden ('{Short(filePath)}').");
+            return false;
+        }
+        try
+        {
+            if (info.Length > MaxObjBytes)
+            {
+                Warn($"Datei zu gross ({info.Length} Bytes, Limit {MaxObjBytes}): '{Short(filePath)}'.");
+                return false;
+            }
+        }
+        catch { }
+        full = candidate;
+        return true;
+    }
+
+    private static string Short(string path)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(path)) return "?";
+            return path.Length > 80 ? "..." + path.Substring(path.Length - 77) : path;
+        }
+        catch { return "?"; }
+    }
+
+    private static string Base(Exception ex)
+    {
+        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { return "?"; }
+    }
+
+    private static void Warn(string message)
+    {
+        try { MelonLogger.Warning($"[gregCore][Mods] ObjImport: {message}"); } catch { }
+    }
+}

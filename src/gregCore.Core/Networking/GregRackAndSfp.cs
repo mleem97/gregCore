@@ -393,7 +393,8 @@ public static class GregRackAndSfp
     }
 
     // Il2Cpp-Coroutine über verwaltete Pumpe starten (MoveNext pro Frame).
-    private static bool StartIl2CppRoutine(Il2CppSystem.Collections.IEnumerator routine)
+    // Internal: auch von GregRacks nutzbar (gleiche Assembly).
+    internal static bool StartIl2CppRoutine(Il2CppSystem.Collections.IEnumerator routine)
     {
         if (routine == null) return false;
         try

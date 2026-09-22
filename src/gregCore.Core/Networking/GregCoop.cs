@@ -1,0 +1,408 @@
+/// <file-summary>
+/// Schicht:      Core (Networking)
+/// Zweck:        Coop-Brücke: Session (Ensure/Shutdown), Peers/Avatare
+///               (finden, lesen, entfernen), Held-Items, Loose-Items
+///               (registrieren, announcen), Trolley-Ghosts, Chat senden.
+///               Alles best-effort.
+/// </file-summary>
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using MelonLoader;
+using UnityEngine;
+
+namespace gregCore.Core.Networking;
+
+[ExcludeFromCodeCoverage(Justification = "Live Il2Cpp interop against game assemblies; needs running game.")]
+public static class GregCoop
+{
+    // ── DTO ──────────────────────────────────────────────────────────────────
+
+    public sealed class PeerInfo
+    {
+        public ulong PeerId;
+        public Vector3 Position;
+        public float Yaw;
+        public string Hand = "";
+        public int SubType;
+        public bool HasHeldColor;
+        public float LastSeenTime;
+    }
+
+    // ── Session ──────────────────────────────────────────────────────────────
+
+    public static bool EnsureSession()
+    {
+        try
+        {
+            global::Il2Cpp.CoopBootstrap.EnsureSession();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"EnsureSession fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool ShutdownSession()
+    {
+        try
+        {
+            global::Il2Cpp.CoopBootstrap.ShutdownSession();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"ShutdownSession fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    // ── PlayerSync / Peers ───────────────────────────────────────────────────
+
+    public static global::Il2Cpp.CoopPlayerSync FindPlayerSync()
+    {
+        global::Il2Cpp.CoopPlayerSync found = null;
+        Try(() =>
+        {
+            var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.CoopPlayerSync>();
+            if (all == null) return;
+            foreach (var s in all)
+            {
+                if (s == null) continue;
+                try
+                {
+                    var go = s.gameObject;
+                    if (go != null && go.scene.IsValid() && go.scene.isLoaded)
+                    {
+                        found = s;
+                        break;
+                    }
+                }
+                catch { }
+            }
+        });
+        return found;
+    }
+
+    public static List<PeerInfo> GetPeers()
+    {
+        var result = new List<PeerInfo>();
+        var sync = FindPlayerSync();
+        if (sync == null) return result;
+        Try(() =>
+        {
+            var _ = sync.gameObject; // liveness
+            var dict = sync.avatars;
+            if (dict == null) return;
+            foreach (var kv in dict)
+            {
+                try
+                {
+                    var avatar = kv.Value;
+                    if (avatar == null) continue;
+                    var info = new PeerInfo { PeerId = kv.Key };
+                    try { info.Position = avatar.targetPos; } catch { }
+                    try { info.Yaw = avatar.targetYaw; } catch { }
+                    try { info.Hand = avatar.currentHand.ToString(); } catch { }
+                    try { info.SubType = avatar.currentSubType; } catch { }
+                    try { info.HasHeldColor = avatar.currentHasHeldColor; } catch { }
+                    try { info.LastSeenTime = avatar.LastSeenTime; } catch { }
+                    result.Add(info);
+                }
+                catch { }
+            }
+        });
+        return result;
+    }
+
+    public static bool RemoveAvatar(ulong peerId)
+    {
+        var sync = FindPlayerSync();
+        if (sync == null) return false;
+        try
+        {
+            var _ = sync.gameObject; // liveness
+            sync.RemoveAvatar(peerId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"RemoveAvatar fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool ForceResend()
+    {
+        var sync = FindPlayerSync();
+        if (sync == null) return false;
+        try
+        {
+            var _ = sync.gameObject; // liveness
+            sync.ForceResend();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"ForceResend fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static float GetPeerTimeout()
+    {
+        try { return global::Il2Cpp.CoopPlayerSync.PeerTimeout; }
+        catch { return -1f; }
+    }
+
+    // ── Held-Items (lokaler Spieler) ─────────────────────────────────────────
+
+    private static global::Il2Cpp.PlayerManager LocalPlayer()
+    {
+        try { return global::Il2Cpp.PlayerManager.instance; }
+        catch { return null; }
+    }
+
+    public static string GetHeldHandType()
+    {
+        var pm = LocalPlayer();
+        if (pm == null) return "";
+        try { return global::Il2Cpp.CoopPlayerSync.GetHeldHandType(pm).ToString(); }
+        catch { return ""; }
+    }
+
+    public static int GetHeldSubType()
+    {
+        var pm = LocalPlayer();
+        if (pm == null) return -1;
+        try { return global::Il2Cpp.CoopPlayerSync.GetHeldSubType(pm); }
+        catch { return -1; }
+    }
+
+    public static Color GetHeldColor(Color fallback)
+    {
+        var pm = LocalPlayer();
+        if (pm == null) return fallback;
+        try
+        {
+            Color color = fallback;
+            if (global::Il2Cpp.CoopPlayerSync.TryGetHeldColor(pm, out color))
+                return color;
+            return fallback;
+        }
+        catch { return fallback; }
+    }
+
+    // ── Loose-Items ──────────────────────────────────────────────────────────
+
+    public static bool RegisterLoose(global::Il2Cpp.UsableObject uo)
+    {
+        if (uo == null) return false;
+        try
+        {
+            global::Il2Cpp.CoopLooseItems.Register(uo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"Loose-Register fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool UnregisterLoose(global::Il2Cpp.UsableObject uo)
+    {
+        if (uo == null) return false;
+        try
+        {
+            global::Il2Cpp.CoopLooseItems.Unregister(uo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"Loose-Unregister fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static global::Il2Cpp.UsableObject GetLooseById(string coopLooseId)
+    {
+        if (string.IsNullOrEmpty(coopLooseId)) return null;
+        try { return global::Il2Cpp.CoopLooseItems.GetById(coopLooseId); }
+        catch { return null; }
+    }
+
+    public static bool AnnounceDropped(global::Il2Cpp.UsableObject uo)
+    {
+        if (uo == null) return false;
+        try
+        {
+            global::Il2Cpp.CoopLooseItems.AnnounceDropped(uo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"AnnounceDropped fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool AnnouncePickedUp(global::Il2Cpp.UsableObject uo)
+    {
+        if (uo == null) return false;
+        try
+        {
+            global::Il2Cpp.CoopLooseItems.AnnouncePickedUp(uo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"AnnouncePickedUp fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    public static bool AnnounceTrolleyItem(global::Il2Cpp.UsableObject uo)
+    {
+        if (uo == null) return false;
+        try
+        {
+            global::Il2Cpp.CoopLooseItems.AnnounceTrolleyItem(uo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"AnnounceTrolleyItem fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    // ── Trolley-Ghosts ───────────────────────────────────────────────────────
+
+    public static global::Il2Cpp.CoopTrolleySync FindTrolleySync()
+    {
+        global::Il2Cpp.CoopTrolleySync found = null;
+        Try(() =>
+        {
+            var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.CoopTrolleySync>();
+            if (all == null) return;
+            foreach (var s in all)
+            {
+                if (s == null) continue;
+                try
+                {
+                    var go = s.gameObject;
+                    if (go != null && go.scene.IsValid() && go.scene.isLoaded)
+                    {
+                        found = s;
+                        break;
+                    }
+                }
+                catch { }
+            }
+        });
+        return found;
+    }
+
+    public static List<ulong> GetTrolleyGhostIds()
+    {
+        var result = new List<ulong>();
+        var sync = FindTrolleySync();
+        if (sync == null) return result;
+        Try(() =>
+        {
+            var _ = sync.gameObject; // liveness
+            var dict = sync.ghosts;
+            if (dict == null) return;
+            foreach (var kv in dict)
+            {
+                try { result.Add(kv.Key); } catch { }
+            }
+        });
+        return result;
+    }
+
+    public static bool RemoveTrolleyGhost(ulong peerId)
+    {
+        var sync = FindTrolleySync();
+        if (sync == null) return false;
+        try
+        {
+            var _ = sync.gameObject; // liveness
+            sync.RemoveGhost(peerId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"RemoveGhost fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    // ── Chat ─────────────────────────────────────────────────────────────────
+
+    public static global::Il2Cpp.ChatController FindChat()
+    {
+        global::Il2Cpp.ChatController found = null;
+        Try(() =>
+        {
+            var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.ChatController>();
+            if (all == null) return;
+            foreach (var c in all)
+            {
+                if (c == null) continue;
+                try
+                {
+                    var go = c.gameObject;
+                    if (go != null && go.scene.IsValid() && go.scene.isLoaded)
+                    {
+                        found = c;
+                        break;
+                    }
+                }
+                catch { }
+            }
+        });
+        return found;
+    }
+
+    public static bool SendToChat(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return false;
+        var chat = FindChat();
+        if (chat == null) return false;
+        try
+        {
+            var _ = chat.gameObject; // liveness
+            chat.AddToChatOutput(text);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Warn($"SendToChat fehlgeschlagen: {Base(ex)}");
+            return false;
+        }
+    }
+
+    private static string Base(Exception ex)
+    {
+        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { return "?"; }
+    }
+
+    private static void Warn(string message)
+    {
+        try { MelonLogger.Warning($"[gregCore][Net] Coop: {message}"); } catch { }
+    }
+
+    private static void Try(Action action)
+    {
+        try { action?.Invoke(); }
+        catch (Exception ex)
+        {
+            try { MelonLogger.Warning($"[gregCore][Net] Coop-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+        }
+    }
+}

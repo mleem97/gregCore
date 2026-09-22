@@ -239,6 +239,14 @@ public static class GregModPack
         return arr;
     }
 
+    public static Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<bool> ToBoolArray(bool[] src)
+    {
+        if (src == null || src.Length == 0) return null;
+        var arr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<bool>(src.Length);
+        for (int i = 0; i < src.Length; i++) arr[i] = src[i];
+        return arr;
+    }
+
     public static float[] FromFloatArray(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<float> src)
     {
         if (src == null) return Array.Empty<float>();
@@ -261,6 +269,19 @@ public static class GregModPack
         for (int i = 0; i < dst.Length; i++)
         {
             try { dst[i] = src[i]; } catch { dst[i] = 0; }
+        }
+        return dst;
+    }
+
+    public static bool[] FromBoolArray(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<bool> src)
+    {
+        if (src == null) return Array.Empty<bool>();
+        int n = 0;
+        try { n = src.Length; } catch { return Array.Empty<bool>(); }
+        var dst = new bool[Math.Max(0, n)];
+        for (int i = 0; i < dst.Length; i++)
+        {
+            try { dst[i] = src[i]; } catch { dst[i] = false; }
         }
         return dst;
     }

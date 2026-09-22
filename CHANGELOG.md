@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
 
 ### Added
 
+- Networking-Batch (`gregCore.Core.Networking`): `GregPatchPanels` (Save-DTO + Runtime-Brücke für PatchPanel/PatchPanelSaveData), `GregSetIP` (Keypad-Fund, Subnetzmathe mit Fallback, Show/Cancel), `GregServiceRequests` (Save-Snapshot, AddRequest/LoadFromSave/RebuildUI, Row-Helfer), `GregServers` (ServerSaveData-DTO + Runtime-Aktionen: SetIP, Power, Customer/App, Repair).
 - Custom Items (`GregCustomItems` + `GregObjImport`): Shop-/StaticItems aus DTO + Pack-Ordner per Vanilla-ModLoader laden (Mesh-Vorabcheck, Traversal-Schutz, GetPrefab).
 - ModPackConfig-Erweiterung (`GregModPack`): Builder (Create/EnsureLists/AddShopItem/AddStaticItem/AddDll) und Reader (Snapshot/ReadShopItem/ReadStaticItem) fuer alle Pack-Typen, inkl. managed Array-Brücken.
 - Savepersistenz (`GregModSave`): ModItemSaveData-DTO plus Create/Fill/Read/ReadAll/Upsert/Remove gegen die spieleigene Liste (SaveData.modItemData), geschluesselt per modFolderName.

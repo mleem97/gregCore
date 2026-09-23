@@ -1,6 +1,6 @@
 # gregCore QuickStart Guide
 
-> **Version:** 1.1.0  
+> **Version:** 1.2.3  
 > **Target:** Unity 6.4+ IL2CPP | MelonLoader 0.7+  
 > **Status:** Production Ready
 
@@ -17,9 +17,46 @@
 
 ---
 
-## 2. Dein Erster Mod (Lua – Empfohlen)
+## 2. Build aus dem Quellcode (Entwickler)
 
-### 2.1 Ordnerstruktur
+Voraussetzungen: **.NET 6 SDK**, lokale Data-Center-/MelonLoader-Installation,
+Referenzassemblies unter `references/` (einmaliges Spielen mit MelonLoader,
+dann `MelonLoader/Il2CppAssemblies/` und `MelonLoader/net6/` kopieren).
+
+```bash
+git clone https://github.com/mleem97/gregCore.git
+cd gregCore
+
+# Release-Build (empfohlen)
+dotnet build -c Release
+# oder dual:
+./build.sh --both
+
+# Artefakt: bin/Release/net6.0/gregCore.dll (bzw. Releases/ nach build.sh)
+```
+
+### Tests
+
+```bash
+DOTNET_ROLL_FORWARD=Major dotnet test
+```
+
+> `DOTNET_ROLL_FORWARD=Major` ist nur nötig, wenn auf dem Host kein .NET-6-Runtime
+> installiert ist (z. B. nur .NET 8/10). Projektzielt auf `net6.0`.
+
+### Version prüfen
+
+```bash
+python3 scripts/validate_version.py 1.2.3   # → exit 0
+```
+
+Quelle der Wahrheit: [`VERSION`](VERSION) · Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
+## 3. Dein Erster Mod (Lua – Empfohlen)
+
+### 3.1 Ordnerstruktur
 
 ```
 UserData/gregCore/Mods/Lua/
@@ -28,7 +65,7 @@ UserData/gregCore/Mods/Lua/
     └── main.lua
 ```
 
-### 2.2 mod.json (Manifest)
+### 3.2 mod.json (Manifest)
 
 ```json
 {
@@ -38,11 +75,11 @@ UserData/gregCore/Mods/Lua/
   "author": "Your Name",
   "description": "A starter template for gregCore Lua modding.",
   "entry": "main.lua",
-  "min_framework_version": "1.1.0"
+  "min_framework_version": "1.2.3"
 }
 ```
 
-### 2.3 main.lua
+### 3.3 main.lua
 
 ```lua
 -- Lifecycle: Called when the mod is first loaded
@@ -76,7 +113,7 @@ function on_shutdown()
 end
 ```
 
-### 2.4 In-Game REPL (F12)
+### 3.4 In-Game REPL (F12)
 
 Drücke `F12` im Spiel für die Lua-Konsole:
 
@@ -89,7 +126,7 @@ greg.ui.notify("Hello from REPL!")
 
 ---
 
-## 3. Verfügbare Lua-API (Auswahl)
+## 4. Verfügbare Lua-API (Auswahl)
 
 ### Player (`greg.player`)
 
@@ -159,7 +196,7 @@ greg.ui.notify("Hello from REPL!")
 
 ---
 
-## 4. Hook-System (1771+ Hooks)
+## 5. Hook-System (1850+ Hooks)
 
 gregCore patched automatisch alle Methoden aus `game_hooks.json`. Du kannst auf sie hören:
 
@@ -175,7 +212,7 @@ greg.hooks.audio.list()      -- Hooks in Gruppe "Audio"
 
 ---
 
-## 5. Andere Sprachen
+## 6. Andere Sprachen
 
 | Sprache | Dateiendung | Status | Hinweis |
 |---------|------------|--------|---------|
@@ -187,7 +224,7 @@ greg.hooks.audio.list()      -- Hooks in Gruppe "Audio"
 
 ---
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 ### "No hooks found" / Events funktionieren nicht
 - Prüfe dass `game_hooks.json` im gleichen Verzeichnis wie `gregCore.dll` liegt.
@@ -202,14 +239,17 @@ greg.hooks.audio.list()      -- Hooks in Gruppe "Audio"
 - Stelle sicher dass die entsprechenden NuGet-Pakete (Jint, pythonnet) in gregCore eingebunden sind.
 - Bei selbst-kompilierten Builds: Prüfe `gregCore.csproj` PackageReferences.
 
+### `dotnet test` schlägt fehl mit fehlendem .NET-6-Runtime
+- `DOTNET_ROLL_FORWARD=Major dotnet test` setzen (siehe Abschnitt 2).
+
 ---
 
-## 7. Weiterführende Links
+## 8. Weiterführende Links
 
-- `examples/Lua/starter_template/` – Minimaler Start
-- `examples/Lua/example_mod/` – Event-Beispiel
-- `examples/Lua/advanced_automation/` – Coroutinen + Timer
+- `examples/Lua/` – Minimalbeispiele
+- `templates/csharp/` / `templates/lua/` – Starter-Templates
 - `docs/FrameworkAPI.md` – Vollständige Hook-Referenz (autogeneriert)
+- `docs/INDEX.md` – Dokumentationsindex
 
 ---
 

@@ -67,6 +67,7 @@ changelog and release notes. The release snapshot remains immutable.
 
 GregCore follows Semantic Versioning 2.0.0 and Keep a Changelog. `dev` and
 `pre-release` identifiers are prerelease metadata, not separate numeric release
-versions. The current development line after `v1.2.1` is `1.2.2-dev.0`; it is
-more meaningful than inventing a lower `0.x` line after a published `1.x`
-release. A stable `1.2.2` is created only when the candidate is ready.
+versions. The current published line is `v1.2.3`. After a stable `X.Y.Z`
+release, the next development line is `X.Y.(Z+1)-dev.0`; inventing a lower
+`0.x` line after a published `1.x` release is not allowed. The next stable
+version is created only when the candidate is ready.

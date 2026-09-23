@@ -1,35 +1,17 @@
-# Contributing to gregCore
+# Contributing — gregCore
 
-Thank you for your interest in contributing to gregCore!
+Repo: [https://github.com/mleem97/gregCore](https://github.com/mleem97/gregCore) · Lizenz: Apache-2.0 · Verhaltenskodex: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-## Getting Started
+## Workflow
 
-1. Fork the repository
-2. Clone your fork locally
-3. Populate `lib/references/MelonLoader/` from your local game install (see README)
-4. Build with `dotnet build -c Release`
-5. Create a feature branch, make your changes, submit a PR
+1. Issue oder Idee kurz beschreiben (was/warum).
+2. Branch vom aktuellen `main`: `feat/<kurzname>`, `fix/<kurzname>`, `docs/<kurzname>`.
+3. Kleine, reviewbare Commits (Conventional Commits).
+4. Vor dem PR: bauen + testen (siehe [QUICKSTART.md](QUICKSTART.md)), Doku (`README.md`, `docs/`) und `CHANGELOG.md` (Unreleased) aktualisieren.
+5. PR mit Beschreibung, Screenshots/Logs bei UI-/Verhaltensänderungen.
 
-## Code Style
+## Regeln
 
-- C# latest language version
-- Use `Nullable` annotations where applicable
-- Follow existing naming conventions (PascalCase for public, _camelCase for private fields)
-- Keep PRs small and focused
-
-## Reporting Issues
-
-- Use GitHub Issues with the provided templates
-- Include game version, MelonLoader/BepInEx version, and OS
-- Provide reproducible steps when possible
-
-## Pull Requests
-
-- Target the `main` branch
-- Include a clear description of changes
-- Ensure the project builds without errors
-- Keep PRs focused on a single feature or fix
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the Apache License 2.0.
+- Keine Secrets, keine Binärdateien ohne Not (dann via Releases, nicht ins Repo).
+- Keine generierten Artefakte committen (`bin/`, `obj/`, `dist/`, `node_modules/`, `.next/` …).
+- Sicherheitsthemen NICHT als Issue, sondern per [SECURITY.md](SECURITY.md) melden.

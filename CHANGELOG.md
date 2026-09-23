@@ -21,3 +21,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
 
 - Quellbaum in `gregCore.*`-Assemblies umstrukturiert; `lib/MoonSharp` und `ci-stubs/` entfernt (MoonSharp via NuGet).
 - Finalisierte öffentliche Doku (README, QUICKSTART, ARCHITECTURE, SOURCE_LAYOUT, INDEX) für den Open-Source-Release 1.2.3.
+- `IGregAPI.Version`, Hook-Counts in Doku/Kommentaren und Workshop-Beschreibungen auf 1.2.3 / 1850+ angeglichen.

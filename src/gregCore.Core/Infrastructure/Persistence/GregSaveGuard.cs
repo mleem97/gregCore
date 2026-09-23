@@ -123,12 +123,22 @@ public static class GregSaveGuard
             }
 
             // Vanilla-Fallback (Laden): direkt nach der Deserialisierung.
-            // Mehrere Einstiege -> ein gemeinsamer Postfix (idempotent).
-            foreach (string name in new[] { "LoadFromBytes", "LoadGame", "LoadGameData" })
+            // LoadGame liefert das Save als Rückgabe (Singleton bleibt im
+            // Hauptmenü unangetastet — dort ist SaveData.instance noch nicht
+            // konstruierbar und wirft NRE). Die void-Einstiege nur in
+            // Spiel-Szenen (Menü lädt nur Vorschaudaten, kein Mod-Content).
+            var loadGame = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "LoadGame",
+                new Type[] { typeof(string) });
+            if (loadGame != null)
+            {
+                harmony.Patch(loadGame, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGamePostfix)));
+                installed++;
+            }
+            foreach (string name in new[] { "LoadFromBytes", "LoadGameData" })
             {
                 var target = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), name);
                 if (target == null) continue;
-                harmony.Patch(target, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGameDataPostfix)));
+                harmony.Patch(target, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGuardedPostfix)));
                 installed++;
             }
 
@@ -184,16 +194,41 @@ public static class GregSaveGuard
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (SaveGameData): " + ex.Message); }
     }
 
-    // Postfix nach jedem Lade-Einstieg: Fremd-/Out-of-Range-Ids fallen
-    // rueckstoßfrei auf ein normales Vanilla-Modul zurueck.
-    public static void LoadGameDataPostfix()
+    // Postfix nach LoadGame: sanitiert das zurückgegebene Save — der
+    // Singleton wird nie berührt (im Hauptmenü noch nicht konstruierbar).
+    public static void LoadGamePostfix(global::Il2Cpp.SaveData __result)
     {
         try
         {
+            if (__result == null) return;
+            SanitizeSaveData(__result, "Laden");
+        }
+        catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (Laden): " + ex.Message); }
+    }
+
+    // Postfix für void-Lade-Einstiege: nur in Spiel-Szenen. Im Hauptmenü
+    // lädt das Spiel nur Vorschaudaten (kein Mod-Content) — und der
+    // Singleton-Zugriff wirft dort NRE (still übersprungen, kein Warning).
+    public static void LoadGuardedPostfix()
+    {
+        try
+        {
+            if (!IsGameplayScene()) return;
             SanitizeSaveData(global::Il2Cpp.SaveData.instance, "Laden");
             gregCore.Infrastructure.Logging.DevLog.Msg("Load-Postfix ausgeführt (SaveData.instance verfügbar).");
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (Laden): " + ex.Message); }
+    }
+
+    private static bool IsGameplayScene()
+    {
+        try
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (!scene.IsValid() || !scene.isLoaded) return false;
+            return !string.Equals(scene.name, "MainMenu", StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
     }
 
     /// <summary>

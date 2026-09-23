@@ -1,0 +1,48 @@
+/// <file-summary>
+/// Schicht:      Core (Mods)
+/// Zweck:        Mod-Vertrag: Mods melden sich mit ID/Name/Version und ihren
+///               Menue-IDs an. Grundlage fuer Dashboard, Diagnose ("welcher
+///               Mod haelt welchen Lock?") und settings-weite Features.
+/// </file-summary>
+
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using MelonLoader;
+
+namespace gregCore.Core.Mods;
+
+[ExcludeFromCodeCoverage(Justification = "Simple registry over static state; logic covered by inspection.")]
+public static class GregModRegistry
+{
+    public sealed class Entry
+    {
+        public string Id;
+        public string Name;
+        public string Version;
+        public string[] Menus = System.Array.Empty<string>();
+    }
+
+    private static readonly Dictionary<string, Entry> _mods =
+        new Dictionary<string, Entry>(System.StringComparer.OrdinalIgnoreCase);
+
+    public static void Register(string id, string name, string version, string[] menus)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return;
+        lock (_mods)
+        {
+            _mods[id] = new Entry
+            {
+                Id = id,
+                Name = string.IsNullOrEmpty(name) ? id : name,
+                Version = version ?? "",
+                Menus = menus ?? System.Array.Empty<string>(),
+            };
+        }
+        MelonLogger.Msg($"[gregCore][Mods] Registriert: {name} v{version} ({id}).");
+    }
+
+    public static IReadOnlyList<Entry> All()
+    {
+        lock (_mods) { return new List<Entry>(_mods.Values); }
+    }
+}

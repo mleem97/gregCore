@@ -1,0 +1,331 @@
+/// <file-summary>
+/// Schicht:      Bridge
+/// Zweck:        Zentraler Orchestrator für die Lua-Modding-Umgebung.
+/// Maintainer:   Initialisiert Loader, Scheduler, Hot-Reload und Dev-Tools.
+///               Verbindet C#-Hooks mit der Lua-VM.
+/// </file-summary>
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using MoonSharp.Interpreter;
+using MelonLoader;
+using gregCore.API;
+using gregCore.Infrastructure.Scripting.Lua;
+using gregCore.Infrastructure.Scripting.Lua.Modules;
+using gregCore.Infrastructure.Scripting.Lua.Dev;
+
+namespace gregCore.Bridge.LuaFFI;
+
+public sealed class LuaFFIBridge
+{
+    private static readonly List<LuaPlugin> _plugins = new();
+    private static LuaHotReload? _hotReload;
+    private static LuaHookBindingGenerator? _hookGenerator;
+    private static LuaRepl? _repl;
+    private static LuaProfiler? _profiler;
+    private static LuaErrorOverlay? _errorOverlay;
+    private static bool _initialized;
+
+    public static void Initialize()
+    {
+        if (_initialized) return;
+
+        MelonLogger.Msg("[LuaFFI] Initializing modernized Lua environment...");
+
+        UserData.RegisterType<gregCore.UI.GregUIBuilder>();
+
+        string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
+        string luaDir = Path.Combine(gameRoot, "UserData", "gregCore", "Mods", "Lua");
+        string sharedDir = Path.Combine(luaDir, "@shared");
+        string hooksFile = Path.Combine(gameRoot, "UserData", "gregCore", "game_hooks.json");
+
+        if (!Directory.Exists(luaDir)) Directory.CreateDirectory(luaDir);
+        if (!Directory.Exists(sharedDir)) Directory.CreateDirectory(sharedDir);
+
+        // Infrastructure
+        _profiler = new LuaProfiler(2.0f); // 2ms per frame budget
+        _errorOverlay = new LuaErrorOverlay();
+        _repl = new LuaRepl();
+        _repl.Initialize();
+
+        // Hook Generator
+        _hookGenerator = new LuaHookBindingGenerator(API.GregAPI.EventBus!, hooksFile);
+        _hookGenerator.LoadHooks();
+
+        // Hot Reload
+        _hotReload = new LuaHotReload(luaDir, OnPluginNeedsReload);
+        _hotReload.Start();
+
+        LoadPlugins(luaDir);
+        _initialized = true;
+    }
+
+    private static void LoadPlugins(string luaDir)
+    {
+        foreach (string source in Directory.GetDirectories(luaDir).Concat(global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(luaDir, ".lua")))
+        {
+            var isLegacyFile = File.Exists(source);
+            string dir = isLegacyFile ? Path.GetDirectoryName(source)! : source;
+            if (!isLegacyFile && Path.GetFileName(dir).StartsWith("@")) continue; // Skip @shared and others
+
+            string mainFile = isLegacyFile ? source : Path.Combine(dir, "main.lua");
+            string manifestFile = Path.Combine(dir, "mod.json");
+
+            if (!isLegacyFile && !File.Exists(mainFile)) continue;
+
+            try
+            {
+                var manifest = isLegacyFile
+                    ? new gregCore.Core.Models.ModManifest { Id = Path.GetFileNameWithoutExtension(source), Name = Path.GetFileNameWithoutExtension(source), Entrypoint = Path.GetFileName(source), Loader = "Lua" }
+                    : ReadManifest(manifestFile, Path.GetFileName(dir));
+                string id = manifest.Id;
+                mainFile = Path.Combine(dir, string.IsNullOrWhiteSpace(manifest.Entrypoint) ? "main.lua" : manifest.Entrypoint);
+                var script = new Script(CoreModules.Preset_SoftSandbox);
+
+                // 1. Module Loader (require support)
+                var loader = new LuaModuleLoader(script, dir, Path.Combine(luaDir, "@shared"));
+                loader.Register();
+
+                // 2. Global greg table
+                var gregTable = new Table(script);
+                script.Globals["greg"] = gregTable;
+
+                // 3. Register Core Modules
+                GregEventLuaModule.Register(gregTable, script, API.GregAPI.EventBus!, id);
+                GregIoLuaModule.Register(gregTable, script, id, Path.Combine(dir, "data"));
+
+                // 4. Register Domain Modules
+                LuaPlayerModule.Register(gregTable, script, id);
+                LuaWorldModule.Register(gregTable, script, id);
+                LuaRackModule.Register(gregTable, script, id);
+                LuaServerModule.Register(gregTable, script, id);
+                LuaCableModule.Register(gregTable, script, id);
+                LuaUiModule.Register(gregTable, script, id);
+
+                // 5. Register Auto-Hooks
+                _hookGenerator?.RegisterInScript(script, gregTable, id);
+
+                // 6. Scheduler
+                var scheduler = new LuaCoroutineScheduler(script);
+                scheduler.Register(gregTable);
+
+                // 7. Load file
+                if (!File.Exists(mainFile)) throw new FileNotFoundException($"Lua entrypoint not found: {mainFile}");
+                script.DoFile(mainFile);
+
+                var plugin = new LuaPlugin
+                {
+                    Id = id,
+                    Manifest = manifest,
+                    Script = script,
+                    MainFile = mainFile,
+                    Scheduler = scheduler,
+                    OnInit = script.Globals.Get("on_init").Type == DataType.Function ? script.Globals.Get("on_init").Function : null,
+                    OnUpdate = script.Globals.Get("on_update").Type == DataType.Function ? script.Globals.Get("on_update").Function : null,
+                    OnSceneLoaded = script.Globals.Get("on_scene_loaded").Type == DataType.Function ? script.Globals.Get("on_scene_loaded").Function : null,
+                    OnShutdown = script.Globals.Get("on_shutdown").Type == DataType.Function ? script.Globals.Get("on_shutdown").Function : null,
+                    OnReload = script.Globals.Get("on_reload").Type == DataType.Function ? script.Globals.Get("on_reload").Function : null
+                };
+
+                SafeCall(plugin, plugin.OnInit);
+                _plugins.Add(plugin);
+
+                // Hot-reload registration
+                _hotReload?.RegisterPlugin(id, script, mainFile);
+
+                MelonLogger.Msg($"[LuaFFI] Mod loaded: {id} ({_hookGenerator?.TotalHookCount} hooks available)");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[LuaFFI] Error loading mod {dir}: {ex.Message}");
+                _errorOverlay?.ReportError(Path.GetFileName(dir), ex.Message);
+            }
+        }
+    }
+
+    public static void OnUpdate(float dt)
+    {
+        if (!_initialized) return;
+
+        _repl?.Update();
+
+        foreach (var plugin in _plugins)
+        {
+            using (_profiler?.BeginScope(plugin.Id))
+            {
+                try
+                {
+                    plugin.Scheduler.OnUpdate(dt);
+                    if (plugin.OnUpdate != null)
+                    {
+                        plugin.OnUpdate.Call(dt);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _errorOverlay?.ReportError(plugin.Id, ex.Message);
+                }
+            }
+        }
+
+        _profiler?.EndFrame();
+    }
+
+    public static void OnSceneLoaded(string name)
+    {
+        if (!_initialized) return;
+        foreach (var plugin in _plugins)
+        {
+            try { plugin.OnSceneLoaded?.Call(name); } catch { }
+        }
+    }
+
+    public static void Shutdown()
+    {
+        if (!_initialized) return;
+        foreach (var plugin in _plugins)
+        {
+            GregEventLuaModule.UnregisterAll(plugin.Id, API.GregAPI.EventBus!);
+            try { plugin.OnShutdown?.Call(); } catch { }
+        }
+        _plugins.Clear();
+        _hotReload?.Stop();
+        _initialized = false;
+    }
+
+    private static void OnPluginNeedsReload(LuaPluginReloadInfo info)
+    {
+        MelonLogger.Msg($"[LuaFFI] Hot-reloading mod: {info.ModId}");
+
+        // Find existing plugin
+        var existing = _plugins.Find(p => p.Id == info.ModId);
+        if (existing != null)
+        {
+            GregEventLuaModule.UnregisterAll(existing.Id, API.GregAPI.EventBus!);
+            try { existing.OnShutdown?.Call(); } catch { }
+            _plugins.Remove(existing);
+        }
+
+        // Re-load using the provided new Script instance from LuaHotReload.
+        try
+        {
+            LoadSpecificPlugin(info);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaFFI] Hot-reload failed for {info.ModId}: {ex.Message}");
+        }
+    }
+
+    private static void LoadSpecificPlugin(LuaPluginReloadInfo info)
+    {
+        // Use the NewScript provided by the hot-reload infrastructure and wire up
+        // the same modules / scheduler / hooks as in initial LoadPlugins.
+        var newScript = info.NewScript;
+        string id = info.ModId;
+        string mainFile = info.MainFilePath;
+
+        try
+        {
+            // Ensure shared folder exists
+            string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
+            string luaDir = Path.Combine(gameRoot, "UserData", "gregCore", "Mods", "Lua");
+            string sharedDir = Path.Combine(luaDir, "@shared");
+
+            // 1. Module Loader (require support)
+            var loader = new LuaModuleLoader(newScript, Path.GetDirectoryName(mainFile)!, sharedDir);
+            loader.Register();
+
+            // 2. Global greg table
+            var gregTable = new Table(newScript);
+            newScript.Globals["greg"] = gregTable;
+
+            // 3. Register Core Modules
+            GregEventLuaModule.Register(gregTable, newScript, API.GregAPI.EventBus!, id);
+            GregIoLuaModule.Register(gregTable, newScript, id, Path.Combine(Path.GetDirectoryName(mainFile)!, "data"));
+
+            // 4. Register Domain Modules
+            LuaPlayerModule.Register(gregTable, newScript, id);
+            LuaWorldModule.Register(gregTable, newScript, id);
+            LuaRackModule.Register(gregTable, newScript, id);
+            LuaServerModule.Register(gregTable, newScript, id);
+            LuaCableModule.Register(gregTable, newScript, id);
+            LuaUiModule.Register(gregTable, newScript, id);
+
+            // 5. Register Auto-Hooks
+            _hookGenerator?.RegisterInScript(newScript, gregTable, id);
+
+            // 6. Scheduler
+            var scheduler = new LuaCoroutineScheduler(newScript);
+            scheduler.Register(gregTable);
+
+            // 7. Load file
+            newScript.DoFile(mainFile);
+
+            var plugin = new LuaPlugin
+            {
+                Id = id,
+                Manifest = ReadManifest(Path.Combine(Path.GetDirectoryName(mainFile)!, "mod.json"), id),
+                Script = newScript,
+                MainFile = mainFile,
+                Scheduler = scheduler,
+                OnInit = newScript.Globals.Get("on_init").Type == DataType.Function ? newScript.Globals.Get("on_init").Function : null,
+                OnUpdate = newScript.Globals.Get("on_update").Type == DataType.Function ? newScript.Globals.Get("on_update").Function : null,
+                OnSceneLoaded = newScript.Globals.Get("on_scene_loaded").Type == DataType.Function ? newScript.Globals.Get("on_scene_loaded").Function : null,
+                OnShutdown = newScript.Globals.Get("on_shutdown").Type == DataType.Function ? newScript.Globals.Get("on_shutdown").Function : null,
+                OnReload = newScript.Globals.Get("on_reload").Type == DataType.Function ? newScript.Globals.Get("on_reload").Function : null
+            };
+
+            SafeCall(plugin, plugin.OnInit);
+            _plugins.Add(plugin);
+
+            // Hot-reload registration (update the watcher map)
+            _hotReload?.RegisterPlugin(id, newScript, mainFile);
+
+            MelonLogger.Msg($"[LuaFFI] Mod reloaded: {id} ({_hookGenerator?.TotalHookCount} hooks available)");
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaFFI] Error reloading mod {info.ModId}: {ex.Message}");
+            _errorOverlay?.ReportError(info.ModId, ex.Message);
+        }
+    }
+
+    private static void SafeCall(LuaPlugin plugin, Closure? closure, params object[] args)
+    {
+        if (closure == null) return;
+        try { closure.Call(args); }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaMod:{plugin.Id}] Runtime error: {ex.Message}");
+            _errorOverlay?.ReportError(plugin.Id, ex.Message);
+        }
+    }
+
+    private static gregCore.Core.Models.ModManifest ReadManifest(string path, string fallbackId)
+    {
+        if (!File.Exists(path))
+            return new gregCore.Core.Models.ModManifest { Id = fallbackId, Name = fallbackId, Entrypoint = "main.lua", Loader = "Lua" };
+        var manifest = JsonSerializer.Deserialize<gregCore.Core.Models.ModManifest>(File.ReadAllText(path));
+        if (manifest == null || string.IsNullOrWhiteSpace(manifest.Id))
+            throw new InvalidDataException($"Lua manifest '{path}' has no id.");
+        if (!string.IsNullOrWhiteSpace(manifest.Entrypoint) && !File.Exists(Path.Combine(Path.GetDirectoryName(path)!, manifest.Entrypoint)))
+            throw new FileNotFoundException($"Lua entrypoint not found: {manifest.Entrypoint}");
+        return manifest;
+    }
+}
+
+public class LuaPlugin
+{
+    public string Id = "";
+    public Script Script = null!;
+    public string MainFile = "";
+    public gregCore.Core.Models.ModManifest Manifest = new();
+    public LuaCoroutineScheduler Scheduler = null!;
+    public Closure? OnInit;
+    public Closure? OnUpdate;
+    public Closure? OnSceneLoaded;
+    public Closure? OnShutdown;
+    public Closure? OnReload;
+}

@@ -148,6 +148,10 @@ public static class GregModHub
             foreach (var m in menus)
             {
                 if (m.MenuId == MenuId) continue;
+                // Framework-interne Menues (z.B. greg.console) sind per Taste
+                // bedienbar und gehoeren nicht in die Hub-Liste.
+                if (m.MenuId != null && m.MenuId.StartsWith("greg.",
+                    System.StringComparison.OrdinalIgnoreCase)) continue;
                 string owner = null;
                 foreach (var mod in mods)
                 {
@@ -208,15 +212,24 @@ public static class GregModHub
 
     private static VisualElement MenuRow(Font font, GregMenuRegistry.MenuInfo m)
     {
-        string state = m.Open ? "Offen" : "Zu";
-        string btn = m.HasOpener ? (m.Open ? "Schliessen" : "Oeffnen") : null;
         string captured = m.MenuId;
-        return Row(font, $"  {m.MenuId}  [{state}]", btn,
-            btn != null ? (System.Action)(() =>
-            {
-                GregMenuRegistry.TryOpen(captured);
-                Rebuild();
-            }) : null);
+        // Ehrliche Buttons: "Schliessen" nur mit registriertem Closer (und nur
+        // dann ist auch der Offen-Status verlaesslich). Sonst "Oeffnen" ohne
+        // Status-Anzeige statt gelogenem "Zu".
+        if (m.HasCloser)
+        {
+            if (m.Open)
+                return Row(font, $"  {m.MenuId}  [Offen]", "Schliessen",
+                    () => { GregMenuRegistry.TryClose(captured); Rebuild(); });
+            if (m.HasOpener)
+                return Row(font, $"  {m.MenuId}  [Zu]", "Oeffnen",
+                    () => { GregMenuRegistry.TryOpen(captured); Rebuild(); });
+            return Row(font, $"  {m.MenuId}  [Zu]", null, null);
+        }
+        if (m.HasOpener)
+            return Row(font, $"  {m.MenuId}", "Oeffnen",
+                () => { GregMenuRegistry.TryOpen(captured); Rebuild(); });
+        return Row(font, $"  {m.MenuId}", null, null);
     }
 
     private static VisualElement Row(Font font, string text, string buttonLabel, System.Action onClick)

@@ -23,6 +23,7 @@ public static class GregMenuRegistry
         public GregMenuOptions Options = new GregMenuOptions();
         public bool Open;
         public Action Opener;
+        public Action Closer;
     }
 
     private static readonly Dictionary<string, Entry> _menus = new Dictionary<string, Entry>();
@@ -79,6 +80,39 @@ public static class GregMenuRegistry
         }
     }
 
+    // Schliesser fuer das F1-Hub: wird aufgerufen wenn der Benutzer im Hub
+    // auf "Schliessen" klickt. Nur wenn ein Closer registriert ist, zeigt der
+    // Hub "Schliessen" an — sonst bleibt es bei ehrlichem "Oeffnen".
+    public static void RegisterCloser(string menuId, Action closer)
+    {
+        if (string.IsNullOrEmpty(menuId)) return;
+        lock (_menus)
+        {
+            if (!_menus.TryGetValue(menuId, out var e))
+            {
+                e = new Entry();
+                _menus[menuId] = e;
+            }
+            e.Closer = closer;
+        }
+    }
+
+    public static bool TryClose(string menuId)
+    {
+        Action closer = null;
+        lock (_menus)
+        {
+            if (_menus.TryGetValue(menuId, out var e)) closer = e.Closer;
+        }
+        if (closer == null) return false;
+        try { closer(); return true; }
+        catch (Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore][UI] Menue-Schliesser fehlgeschlagen ({menuId}): {ex.Message}");
+            return false;
+        }
+    }
+
     public static IReadOnlyList<MenuInfo> Snapshot()
     {
         var list = new List<MenuInfo>();
@@ -92,6 +126,7 @@ public static class GregMenuRegistry
                     MenuId = kv.Key,
                     Open = kv.Value.Open,
                     HasOpener = kv.Value.Opener != null,
+                    HasCloser = kv.Value.Closer != null,
                 });
             }
         }
@@ -104,6 +139,7 @@ public static class GregMenuRegistry
         public string MenuId;
         public bool Open;
         public bool HasOpener;
+        public bool HasCloser;
     }
 
     public static void SetOpen(string menuId, bool open)

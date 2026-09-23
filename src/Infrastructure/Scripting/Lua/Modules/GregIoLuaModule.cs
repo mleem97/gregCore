@@ -1,4 +1,4 @@
-/// <file-summary>
+﻿/// <file-summary>
 /// Schicht:      Infrastructure
 /// Zweck:        Sandboxed IO Funktionen für Lua.
 /// Maintainer:   Darf nur auf {modDir}/data/ zugreifen.
@@ -103,6 +103,12 @@ public static class GregIoLuaModule
         {
             try
             {
+                // [Security] Prevent path traversal via pattern in list_files
+                if (pattern != null && (pattern.Contains("..") || pattern.Contains(Path.DirectorySeparatorChar.ToString()) || pattern.Contains(Path.AltDirectorySeparatorChar.ToString())))
+                {
+                    throw new UnauthorizedAccessException("Access denied: pattern contains invalid path characters");
+                }
+
                 var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();

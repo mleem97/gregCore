@@ -2,6 +2,19 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe [`VERSION`](VERSION).
 
+## [Unreleased]
+
+### Added
+
+- Save-Inventar (`GregSaveInventory`): beim Laden wird alles inventarisiert,
+  was im Save existiert (Server, Switches, Router, Firewalls, PatchPanels,
+  Kabel, SFP-Module, LACP-Gruppen). Jeder Eintrag bekommt eine stabile, für
+  den Spieler unsichtbare UID — Mods steuern Dinge direkt an (`TryFindLive`,
+  `TryGetUid`, `GetAll`, `Rebuilt`-Event). Server/Switch/PatchPanel nutzen
+  ihre `gregID`, Kabel/LACP deterministische UIDs aus Vanilla-IDs,
+  Router/Firewall/SFP per Sidecar persistiert (`greg_inventory.<save>.tsv`,
+  Index-Shift-Reparatur via Hint). Doku: `docs/modding/api/inventory.md`.
+
 ## [1.2.3] — 2026-09-22
 
 ### Added

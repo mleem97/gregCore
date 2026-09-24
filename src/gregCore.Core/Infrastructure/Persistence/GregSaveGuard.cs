@@ -142,13 +142,25 @@ public static class GregSaveGuard
                 installed++;
             }
 
+            // Save-Inventar: nach dem Healing (Prefix) sind alle Device-IDs
+            // final - hier wird alles im Save inventarisiert + mit stabilen
+            // UIDs versehen (unsichtbar, Sidecar + Speicher).
+            var loadNetworkState = AccessTools.Method(typeof(global::Il2Cpp.WaypointInitializationSystem),
+                "LoadNetworkState");
+            if (loadNetworkState != null)
+            {
+                harmony.Patch(loadNetworkState,
+                    postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+                installed++;
+            }
+
             if (installed == 0)
             {
                 MelonLogger.Warning("[gregCore][Save] Keine SaveSystem-Methode gefunden (API-Drift?).");
                 return;
             }
             _hooksInstalled = true;
-            MelonLogger.Msg($"[gregCore][Save] Save-Hooks installiert ({installed}): Backup, Sidecars, Vanilla-Fallback.");
+            MelonLogger.Msg($"[gregCore][Save] Save-Hooks installiert ({installed}): Backup, Sidecars, Vanilla-Fallback, Inventar.");
         }
         catch (Exception ex)
         {
@@ -229,6 +241,17 @@ public static class GregSaveGuard
             return !string.Equals(scene.name, "MainMenu", StringComparison.OrdinalIgnoreCase);
         }
         catch { return false; }
+    }
+
+    // Postfix nach WaypointInitializationSystem.LoadNetworkState: Healing-
+    // Prefix lief bereits, alle Device-IDs sind final. Hier Inventar bauen.
+    public static void LoadNetworkStatePostfix(global::Il2Cpp.NetworkSaveData networkData)
+    {
+        try
+        {
+            GregSaveInventory.RebuildFromNetworkData(networkData);
+        }
+        catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Inventar (LoadNetworkState): " + ex.Message); }
     }
 
     /// <summary>

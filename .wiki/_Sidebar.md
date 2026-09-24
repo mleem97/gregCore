@@ -1,17 +1,6 @@
 # Wiki sidebar
 
 - [[Home]]
-- Hooks
-  - [[Hooks Reference]]
-  - [[Core Events]]
-  - [[Developer Events Hooks Guide]]
-  - [[Guidebook Lua 02 Events]]
-- [[Glossary]]
-- FAQ + Help
-  - [[FAQ Troubleshooting]]
-  - [[Guidebook Debugging]]
-  - [[Guidebook Modelling Troubleshooting]]
-  - [[Guidebook Porting Matrix]]
 - [[Guidebook]]
   - [[Guidebook Prerequisites]]
   - Lua track
@@ -53,6 +42,17 @@
 - Core
   - [[Core Overview]]
   - [[Core Save Engine]]
+- Hooks
+  - [[Hooks Reference]]
+  - [[Core Events]]
+  - [[Developer Events Hooks Guide]]
+  - [[Guidebook Lua 02 Events]]
+- [[Glossary]]
+- FAQ + Help
+  - [[FAQ Troubleshooting]]
+  - [[Guidebook Debugging]]
+  - [[Guidebook Modelling Troubleshooting]]
+  - [[Guidebook Porting Matrix]]
 - Developers
   - [[Developer Getting Started]]
   - [[Developer Environment]]

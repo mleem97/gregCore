@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Sandboxed IO Funktionen für Lua.
-/// Maintainer:   Darf nur auf {modDir}/data/ zugreifen.
+/// Layer:       Infrastructure
+/// Purpose:      Sandboxed IO functions for Lua.
+/// Maintainer:   May only access {modDir}/data/.
 ///               greg.io.read_file(), write_file(), file_exists(), list_files(), delete_file()
 /// </file-summary>
 
@@ -16,7 +16,7 @@ namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 public static class GregIoLuaModule
 {
     /// <summary>
-    /// Registriert sandboxed I/O-Funktionen im greg.io Table.
+    /// Registers sandboxed I/O functions in the greg.io table.
     /// </summary>
     public static void Register(Table greg, Script script, string modId, string modDir)
     {
@@ -25,9 +25,28 @@ public static class GregIoLuaModule
         Directory.CreateDirectory(dataDir);
 
         var ioTable = new Table(script);
+        RegisterReadFile(ioTable, dataDir, modId);
+        RegisterWriteFile(ioTable, dataDir, modId);
+        RegisterAppendDelete(ioTable, dataDir, modId);
+        RegisterFileExists(ioTable, dataDir, modId);
+        RegisterListFiles(ioTable, dataDir, script, modId);
+        RegisterReadJson(ioTable, dataDir, script, modId);
+        RegisterWriteJson(ioTable, dataDir, modId);
+
+        // Aliases matching the public docs (same implementation, no drift).
+        ioTable["read_text"] = ioTable.Get("read_file");
+        ioTable["write_text"] = ioTable.Get("write_file");
+
+        ioTable["data_dir"] = dataDir.Replace('\\', '/');
+
+        greg["io"] = ioTable;
+    }
+
+    private static void RegisterReadFile(Table t, string dataDir, string modId)
+    {
 
         // greg.io.read_file(path) → string
-        ioTable["read_file"] = (Func<string, string>)(path =>
+        t["read_file"] = (Func<string, string>)(path =>
         {
             try
             {
@@ -40,9 +59,13 @@ public static class GregIoLuaModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterWriteFile(Table t, string dataDir, string modId)
+    {
 
         // greg.io.write_file(path, content)
-        ioTable["write_file"] = (Action<string, string>)((path, content) =>
+        t["write_file"] = (Action<string, string>)((path, content) =>
         {
             try
             {
@@ -56,9 +79,12 @@ public static class GregIoLuaModule
                 LuaLog.Error($"[LuaMod:{modId}] io.write_file('{path}') failed: {ex.Message}");
             }
         });
+    }
 
+    private static void RegisterAppendDelete(Table t, string dataDir, string modId)
+    {
         // greg.io.append_file(path, content)
-        ioTable["append_file"] = (Action<string, string>)((path, content) =>
+        t["append_file"] = (Action<string, string>)((path, content) =>
         {
             try
             {
@@ -71,8 +97,26 @@ public static class GregIoLuaModule
             }
         });
 
+        // greg.io.delete_file(path)
+        t["delete_file"] = (Action<string>)(path =>
+        {
+            try
+            {
+                string fullPath = ResolveSafe(dataDir, path);
+                if (File.Exists(fullPath)) File.Delete(fullPath);
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] io.delete_file('{path}') failed: {ex.Message}");
+            }
+        });
+    }
+
+    private static void RegisterFileExists(Table t, string dataDir, string modId)
+    {
+
         // greg.io.file_exists(path) → bool
-        ioTable["file_exists"] = (Func<string, bool>)(path =>
+        t["file_exists"] = (Func<string, bool>)(path =>
         {
             try
             {
@@ -86,7 +130,7 @@ public static class GregIoLuaModule
         });
 
         // greg.io.delete_file(path)
-        ioTable["delete_file"] = (Action<string>)(path =>
+        t["delete_file"] = (Action<string>)(path =>
         {
             try
             {
@@ -98,13 +142,17 @@ public static class GregIoLuaModule
                 LuaLog.Error($"[LuaMod:{modId}] io.delete_file('{path}') failed: {ex.Message}");
             }
         });
+    }
+
+    private static void RegisterListFiles(Table t, string dataDir, Script script, string modId)
+    {
 
         // greg.io.list_files(pattern?) → table of strings
-        ioTable["list_files"] = (Func<string?, Table>)(pattern =>
+        t["list_files"] = (Func<string?, Table>)(pattern =>
         {
             try
             {
-                // Sandbox: Pattern darf nicht aus dataDir ausbrechen.
+                // Sandbox: pattern must not escape dataDir.
                 string safe = SanitizeSearchPattern(pattern);
                 var files = Directory.GetFiles(dataDir, safe, SearchOption.AllDirectories)
                     .Where(f => IsInsideSandbox(dataDir, f))
@@ -124,16 +172,13 @@ public static class GregIoLuaModule
                 return new Table(script);
             }
         });
+    }
 
-        // greg.io.data_dir → string (read-only)
-        ioTable["data_dir"] = dataDir.Replace('\\', '/');
-
-        // Aliases matching the public docs (same implementation, no drift).
-        ioTable["read_text"] = ioTable.Get("read_file");
-        ioTable["write_text"] = ioTable.Get("write_file");
+    private static void RegisterReadJson(Table t, string dataDir, Script script, string modId)
+    {
 
         // greg.io.read_json(path) → table or nil
-        ioTable["read_json"] = (Func<string, DynValue>)((path) =>
+        t["read_json"] = (Func<string, DynValue>)((path) =>
         {
             try
             {
@@ -152,9 +197,13 @@ public static class GregIoLuaModule
                 return DynValue.Nil;
             }
         });
+    }
+
+    private static void RegisterWriteJson(Table t, string dataDir, string modId)
+    {
 
         // greg.io.write_json(path, table) → bool
-        ioTable["write_json"] = (Func<string, DynValue, bool>)((path, value) =>
+        t["write_json"] = (Func<string, DynValue, bool>)((path, value) =>
         {
             try
             {
@@ -172,14 +221,12 @@ public static class GregIoLuaModule
                 return false;
             }
         });
-
-        greg["io"] = ioTable;
     }
 
     /// <summary>
-    /// Einmalige Migration: fruehere Builds legten Dateien unter
-    /// {modDir}/data/data ab (doppelter Pfad). Bestehende Dateien werden
-    /// eine Ebene hoch kopiert (nie ueberschrieben, Originale bleiben).
+    /// One-time migration: earlier builds placed files under
+    /// {modDir}/data/data (duplicate path). Existing files are
+    /// copied up one level (never overwritten, originals kept).
     /// </summary>
     private static void MigrateLegacyDataDir(string modDir, string modId)
     {
@@ -204,10 +251,10 @@ public static class GregIoLuaModule
     }
 
     /// <summary>
-    /// Löst einen relativen Pfad auf und validiert, dass er innerhalb des Data-Dirs liegt.
+    /// Resolves a relative path and validates that it lies inside the data dir.
     /// </summary>
-    // Suchpattern darf kein Directory-Traversal enthalten (kein "..",
-    // keine Pfadtrenner ausserhalb des Dateinamens). Wirft bei Missbrauch.
+    // Search pattern must not contain directory traversal (no "..",
+    // no path separators outside the file name). Throws on misuse.
     private static string SanitizeSearchPattern(string pattern)
     {
         string safe = string.IsNullOrWhiteSpace(pattern) ? "*.*" : pattern;

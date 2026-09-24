@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Tablets/Widgets (GregUIBuilder hinter Handles).
-///               Callbacks laufen als Lua-Closures (Fehler -> Log, kein Crash).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for tablets/widgets (GregUIBuilder behind handles).
+///               Callbacks run as Lua closures (errors -> log, no crash).
 /// Maintainer:   greg.tablet_* / greg.widget_* (open, add_*, toggle, visible, close)
 /// </file-summary>
 
@@ -19,6 +19,16 @@ public static class LuaTabletModule
 
     public static void Register(Table greg, Script script, string modId)
     {
+        RegisterTabletOpen(greg, modId);
+        RegisterWidgetOpen(greg, modId);
+        RegisterPanelAddButton(greg, modId);
+        RegisterPanelAddSlider(greg, modId);
+        RegisterPanelAddSection(greg);
+        RegisterPanelVisible(greg);
+    }
+
+    private static void RegisterTabletOpen(Table greg, string modId)
+    {
         // greg.tablet_open(title) → handle id ("" on failure)
         greg["tablet_open"] = (Func<string, string>)((title) =>
         {
@@ -34,6 +44,10 @@ public static class LuaTabletModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterWidgetOpen(Table greg, string modId)
+    {
 
         // greg.widget_open(title, x?, y?) → handle id ("" on failure)
         greg["widget_open"] = (Func<string, double, double, string>)((title, x, y) =>
@@ -64,6 +78,10 @@ public static class LuaTabletModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterPanelAddButton(Table greg, string modId)
+    {
 
         // greg.panel_add_button(id, label, fn) → bool
         greg["panel_add_button"] = (Func<string, string, Closure, bool>)((id, label, fn) =>
@@ -90,6 +108,10 @@ public static class LuaTabletModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterPanelAddSlider(Table greg, string modId)
+    {
 
         // greg.panel_add_slider(id, label, min, max, value, fn) → bool (fn receives number)
         greg["panel_add_slider"] = (Func<string, string, double, double, double, Closure, bool>)(
@@ -118,6 +140,10 @@ public static class LuaTabletModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterPanelAddSection(Table greg)
+    {
 
         // greg.panel_add_section(id, title) → bool
         greg["panel_add_section"] = (Func<string, string, bool>)((id, title) =>
@@ -144,6 +170,10 @@ public static class LuaTabletModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterPanelVisible(Table greg)
+    {
 
         // greg.panel_visible(id) → bool
         greg["panel_visible"] = (Func<string, bool>)((id) =>

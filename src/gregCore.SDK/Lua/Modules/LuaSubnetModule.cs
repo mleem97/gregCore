@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Subnetz-Mathematik (reine Funktionen, kein Spiel).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for subnet math (pure functions, no game).
 /// Maintainer:   greg.subnet.mask_from_cidr(), usable_ips(), first_usable()
 /// </file-summary>
 
@@ -14,9 +14,23 @@ public static class LuaSubnetModule
     public static void Register(Table greg, Script script, string modId)
     {
         var subnetTable = new Table(script);
+        RegisterMaskFromCidr(subnetTable, modId);
+        RegisterUsableIps(subnetTable, script, modId);
+        RegisterFirstUsable(subnetTable, modId);
+        greg["subnet"] = subnetTable;
+
+        var setipTable = new Table(script);
+        RegisterShowFor(setipTable, modId);
+        RegisterCancel(setipTable);
+
+        greg["setip"] = setipTable;
+    }
+
+    private static void RegisterMaskFromCidr(Table t, string modId)
+    {
 
         // greg.subnet.mask_from_cidr(cidr) → string ("" on failure)
-        subnetTable["mask_from_cidr"] = (Func<int, string>)((cidr) =>
+        t["mask_from_cidr"] = (Func<int, string>)((cidr) =>
         {
             try { return gregCore.Core.Networking.GregSetIP.MaskFromCidrManaged(cidr) ?? ""; }
             catch (Exception ex)
@@ -25,9 +39,13 @@ public static class LuaSubnetModule
                 return "";
             }
         });
+    }
 
-        // greg.subnet.usable_ips(subnet) → array (Vorsicht bei grossen Netzen!)
-        subnetTable["usable_ips"] = (Func<string, Table>)((subnet) =>
+    private static void RegisterUsableIps(Table t, Script script, string modId)
+    {
+
+        // greg.subnet.usable_ips(subnet) → array (caution with large networks!)
+        t["usable_ips"] = (Func<string, Table>)((subnet) =>
         {
             try
             {
@@ -37,7 +55,7 @@ public static class LuaSubnetModule
                 foreach (var ip in gregCore.Core.Networking.GregSetIP.GetUsableIPs(subnet))
                 {
                     result[i++] = ip ?? "";
-                    if (i > 65536) break; // harter Deckel gegen Riesennetze
+                    if (i > 65536) break; // hard cap against giant networks
                 }
                 return result;
             }
@@ -47,9 +65,13 @@ public static class LuaSubnetModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterFirstUsable(Table t, string modId)
+    {
 
         // greg.subnet.first_usable(subnet) → string ("" when none)
-        subnetTable["first_usable"] = (Func<string, string>)((subnet) =>
+        t["first_usable"] = (Func<string, string>)((subnet) =>
         {
             try
             {
@@ -62,7 +84,35 @@ public static class LuaSubnetModule
                 return "";
             }
         });
+    }
 
-        greg["subnet"] = subnetTable;
+    private static void RegisterShowFor(Table t, string modId)
+    {
+
+        // greg.setip.show_for(serverId) → bool (opens the vanilla keypad)
+        t["show_for"] = (Func<string, bool>)((serverId) =>
+        {
+            try
+            {
+                var s = gregCore.Core.Networking.GregServers.FindById(serverId);
+                return s != null && gregCore.Core.Networking.GregSetIP.ShowFor(s);
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] setip.show_for() failed: {ex.Message}");
+                return false;
+            }
+        });
+    }
+
+    private static void RegisterCancel(Table t)
+    {
+
+        // greg.setip.cancel() → bool
+        t["cancel"] = (Func<bool>)(() =>
+        {
+            try { return gregCore.Core.Networking.GregSetIP.Cancel(); }
+            catch { return false; }
+        });
     }
 }

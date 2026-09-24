@@ -350,4 +350,121 @@ public class LuaSdkTests
         greg.Get("world").Table.Get("open_all_walls").Type
             .Should().BeOneOf(DataType.Function, DataType.ClrFunction);
     }
+
+    [Fact]
+    public void Server_Round3_Ops_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaServerModule.Register(greg, script, "test");
+        var server = greg.Get("server").Table;
+        Call(server, "set_app", "nope", 1).Boolean.Should().BeFalse();
+        Call(server, "clear_warning", "nope").Boolean.Should().BeFalse();
+        Call(server, "has_cable", "nope").Boolean.Should().BeFalse();
+        Call(server, "valid_position", "nope").Boolean.Should().BeFalse();
+        Call(server, "capture", "nope").IsNil().Should().BeTrue();
+        Call(server, "insert_into_rack", "nope",
+            script.DoString("return {rack_uid=1}")).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Patch_Round3_Ops_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaPatchModule.Register(greg, script, "test");
+        var patch = greg.Get("patch").Table;
+        Call(patch, "valid_position", "nope").Boolean.Should().BeFalse();
+        Call(patch, "capture", "nope").IsNil().Should().BeTrue();
+        Call(patch, "insert_into_rack", "nope",
+            script.DoString("return {rack_uid=1}")).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Rack_Round3_Ops_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaRackModule.Register(greg, script, "test");
+        var rack = greg.Get("rack").Table;
+        Call(rack, "position_count", 12345).Number.Should().Be(-1);
+        Call(rack, "position_usage", 12345).Table.Length.Should().Be(0);
+        Call(rack, "unmount", 12345).Boolean.Should().BeFalse();
+        Call(rack, "position_set_used", 99, true).Boolean.Should().BeFalse();
+        Call(rack, "position_allowed", 99).Boolean.Should().BeFalse();
+        Call(rack, "position_begin_insert", 99).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Cable_Links_And_Ops_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaCableModule.Register(greg, script, "test");
+        var cable = greg.Get("cable").Table;
+        Call(cable, "links").Table.Length.Should().Be(0);
+        Call(cable, "set_speed", 1, 5.0).Boolean.Should().BeFalse();
+        Call(cable, "remove_sfp", 1).Boolean.Should().BeFalse();
+        Call(cable, "second_action", 1).Boolean.Should().BeFalse();
+        Call(cable, "label_action", 1).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Shop_Round3_Ops_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaShopModule.Register(greg, script, "test");
+        var shop = greg.Get("shop").Table;
+        Call(shop, "mod_items").Table.Length.Should().Be(0);
+        Call(shop, "buy_mod_item", 1).Boolean.Should().BeFalse();
+        Call(shop, "picker_is_open").Boolean.Should().BeFalse();
+        Call(shop, "picker_open").Boolean.Should().BeFalse();
+        Call(shop, "picker_cancel").Boolean.Should().BeFalse();
+        Call(shop, "picker_color").IsNil().Should().BeTrue();
+        Call(shop, "picker_set_color", 1.0, 0.0, 0.0, 1.0).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Tech_Request_Next_Job_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaTechModule.Register(greg, script, "test");
+        Call(greg.Get("tech").Table, "request_next_job", 1).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ModSave_List_Upsert_Remove_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaModSaveModule.Register(greg, script, "test");
+        var modsave = greg.Get("modsave").Table;
+        Call(modsave, "list", "test").Table.Length.Should().Be(0);
+        Call(modsave, "upsert", "test",
+            script.DoString("return {position={x=1,y=2,z=3}}")).Boolean.Should().BeFalse();
+        Call(modsave, "remove", "test").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void SetIp_Show_Cancel_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaSubnetModule.Register(greg, script, "test");
+        var setip = greg.Get("setip").Table;
+        Call(setip, "show_for", "nope").Boolean.Should().BeFalse();
+        Call(setip, "cancel").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Customer_Register_Subnet_New_Form()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaCustomerModule.Register(greg, script, "test");
+        Call(greg.Get("customer").Table, "register_subnet",
+            1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();
+    }
 }

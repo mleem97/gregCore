@@ -80,21 +80,13 @@ namespace gregCore.UI
             _tooltipRoot.style.top = screenPosition.y + 15;
             _tooltipRoot.style.display = DisplayStyle.Flex;
 
-            // Clamp to screen
-            var root = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Tooltip);
-            if (root != null)
+            // Clamp to screen next frame: resolvedStyle is stale until
+            // the new text has been laid out (otherwise width is 0 and
+            // the tooltip can end up off-screen).
+            _tooltipRoot.schedule.Execute(new System.Action<UnityEngine.UIElements.TimerState>(_ =>
             {
-                float maxW = root.resolvedStyle.width;
-                float maxH = root.resolvedStyle.height;
-                if (_tooltipRoot.style.left.value.value + _tooltipRoot.resolvedStyle.width > maxW)
-                {
-                    _tooltipRoot.style.left = screenPosition.x - _tooltipRoot.resolvedStyle.width - 10;
-                }
-                if (_tooltipRoot.style.top.value.value + _tooltipRoot.resolvedStyle.height > maxH)
-                {
-                    _tooltipRoot.style.top = screenPosition.y - _tooltipRoot.resolvedStyle.height - 10;
-                }
-            }
+                ClampToScreen(screenPosition);
+            })).StartingIn(10);
         }
 
         public static void Hide()
@@ -104,6 +96,28 @@ namespace gregCore.UI
                 _tooltipRoot.style.display = DisplayStyle.None;
                 _currentText = null;
             }
+        }
+
+        private static void ClampToScreen(Vector2 screenPosition)
+        {
+            try
+            {
+                if (_tooltipRoot == null) return;
+                var root = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Tooltip);
+                if (root == null) return;
+                float maxW = root.resolvedStyle.width;
+                float maxH = root.resolvedStyle.height;
+                if (maxW <= 0 || maxH <= 0) return;
+                if (_tooltipRoot.style.left.value.value + _tooltipRoot.resolvedStyle.width > maxW)
+                {
+                    _tooltipRoot.style.left = screenPosition.x - _tooltipRoot.resolvedStyle.width - 10;
+                }
+                if (_tooltipRoot.style.top.value.value + _tooltipRoot.resolvedStyle.height > maxH)
+                {
+                    _tooltipRoot.style.top = screenPosition.y - _tooltipRoot.resolvedStyle.height - 10;
+                }
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         /// <summary>

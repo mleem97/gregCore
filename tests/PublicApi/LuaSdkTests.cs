@@ -313,6 +313,9 @@ public class LuaSdkTests
         var req = greg.Get("requests").Table;
         Call(req, "list").Table.Length.Should().Be(0);
         Call(req, "current_number").Number.Should().Be(0);
+        // requests.add() deliberately untested headless: constructing a live
+        // Il2Cpp.ServiceRequest outside the game crashes its finalizer on GC
+        // (game-only path, verified by review + build).
     }
 
     [Fact]
@@ -467,6 +470,60 @@ public class LuaSdkTests
         LuaCustomerModule.Register(greg, script, "test");
         Call(greg.Get("customer").Table, "register_subnet",
             1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();
+        Call(greg.Get("customer").Table, "apply_save",
+            1, script.DoString("return {difficulty=2}")).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void All_Modules_Register_Together_Like_Bridge()
+    {
+        string dir = NewTempDir();
+        try
+        {
+            var script = NewScript();
+            var greg = NewGreg(script);
+            LuaPlayerModule.Register(greg, script, "test");
+            LuaWorldModule.Register(greg, script, "test");
+            LuaRackModule.Register(greg, script, "test");
+            LuaServerModule.Register(greg, script, "test");
+            LuaSwitchModule.Register(greg, script, "test");
+            LuaPatchModule.Register(greg, script, "test");
+            LuaTechModule.Register(greg, script, "test");
+            LuaCableModule.Register(greg, script, "test");
+            LuaNetModule.Register(greg, script, "test");
+            LuaCustomerModule.Register(greg, script, "test");
+            LuaEconomyModule.Register(greg, script, "test");
+            LuaShopModule.Register(greg, script, "test");
+            LuaRequestsModule.Register(greg, script, "test");
+            LuaSubnetModule.Register(greg, script, "test");
+            LuaUiModule.Register(greg, script, "test");
+            LuaTabletModule.Register(greg, script, "test");
+            LuaModsModule.Register(greg, script, "test");
+            LuaModSaveModule.Register(greg, script, "test");
+            LuaItemsModule.Register(greg, script, "test", dir);
+            LuaJsonModule.Register(greg, script, "test");
+            LuaConfigModule.Register(greg, script, "test", dir);
+            LuaSaveModule.Register(greg, script, "test", dir);
+            LuaInternetModule.Register(greg, script, "test");
+            LuaSettingsModule.Register(greg, script, "test");
+            LuaObjectivesModule.Register(greg, script, "test");
+            LuaTooltipModule.Register(greg, script, "test");
+            LuaCoopModule.Register(greg, script, "test");
+            LuaMiscModule.Register(greg, script, "test");
+            foreach (var name in new[] { "player", "world", "rack", "server", "switch",
+                         "patch", "tech", "cable", "net", "customer", "economy", "shop",
+                         "requests", "subnet", "setip", "ui", "mods",
+                         "modsave", "items", "json", "config", "save", "internet",
+                         "settings", "objectives", "tooltip", "coop", "steam", "locale",
+                         "numpad", "pause" })
+            {
+                var v = greg.Get(name);
+                (v.Type == DataType.Table).Should().BeTrue(name + " table missing");
+            }
+            // Spot-check cross-module calls through one shared table.
+            script.DoString("return greg.switch.count() + greg.server.count()").Number.Should().Be(0);
+        }
+        finally { DeleteTempDir(dir); }
     }
 
     [Fact]

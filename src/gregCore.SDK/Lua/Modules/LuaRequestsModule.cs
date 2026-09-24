@@ -16,6 +16,7 @@ public static class LuaRequestsModule
         var requestsTable = new Table(script);
         RegisterList(requestsTable, script, modId);
         RegisterCurrentNumber(requestsTable);
+        RegisterAdd(requestsTable, modId);
 
         greg["requests"] = requestsTable;
     }
@@ -65,6 +66,42 @@ public static class LuaRequestsModule
         {
             try { return gregCore.Core.Networking.GregServiceRequests.GetCurrentSRNumber(); }
             catch { return 0; }
+        });
+    }
+
+    private static void RegisterAdd(Table t, string modId)
+    {
+
+        // greg.requests.add(spec) → bool (spec: number?, state?, short, long?)
+        t["add"] = (Func<DynValue, bool>)((spec) =>
+        {
+            try
+            {
+                if (spec == null || spec.Type != DataType.Table) return false;
+                var sr = new global::Il2Cpp.ServiceRequest();
+                try
+                {
+                    var st = spec.Table;
+                    string number = LuaServerModule.Str(st, "number");
+                    int n;
+                    if (!string.IsNullOrEmpty(number) && int.TryParse(number, out n)) sr.srNumber = n;
+                    string state = LuaServerModule.Str(st, "state");
+                    sr.state = string.Equals(state, "done", StringComparison.OrdinalIgnoreCase)
+                        ? global::Il2Cpp.ServiceRequest.SRState.Resolved
+                        : global::Il2Cpp.ServiceRequest.SRState.InProgress;
+                    string sh = LuaServerModule.Str(st, "short");
+                    if (sh != null) sr.shortDescription = sh;
+                    string lo = LuaServerModule.Str(st, "long");
+                    if (lo != null) sr.longDescription = lo;
+                }
+                catch { /* ignored: partial spec still usable */ }
+                return gregCore.Core.Networking.GregServiceRequests.AddRequest(sr);
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] requests.add() failed: {ex.Message}");
+                return false;
+            }
         });
     }
 }

@@ -80,11 +80,12 @@ namespace gregCore.UI
             if (element == null) return;
             element.style.opacity = 0;
             element.style.transitionDuration = new StyleList<TimeValue>(MakeTimeValueList(durationMs));
-            element.schedule.Execute(new Action<TimerState>(_ =>
+            TrackHide(element, element.schedule.Execute(new Action<TimerState>(_ =>
             {
+                try { _pendingHides.Remove(element); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 element.style.display = DisplayStyle.None;
                 onComplete?.Invoke();
-            })).StartingIn((long)durationMs + 50);
+            })).StartingIn((long)durationMs + 50));
         }
 
         /// <summary>
@@ -93,6 +94,7 @@ namespace gregCore.UI
         public static void SlideIn(VisualElement element, SlideDirection direction, float durationMs = 400)
         {
             if (element == null) return;
+            CancelHide(element);
 
             var startTranslate = direction switch
             {
@@ -174,13 +176,18 @@ namespace gregCore.UI
 
             element.style.translate = endTranslate;
             element.style.transitionDuration = new StyleList<TimeValue>(MakeTimeValueList(durationMs));
-            element.schedule.Execute(new Action<TimerState>(_ => element.style.display = DisplayStyle.None))
-                .StartingIn((long)durationMs + 50);
+            TrackHide(element, element.schedule.Execute(new Action<TimerState>(_ =>
+            {
+                try { _pendingHides.Remove(element); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                element.style.display = DisplayStyle.None;
+            }))
+                .StartingIn((long)durationMs + 50));
         }
 
         private static void ZoomIn(VisualElement element, float durationMs)
         {
             if (element == null) return;
+            CancelHide(element);
             element.style.scale = new Scale(new Vector2(0.8f, 0.8f));
             element.style.opacity = 0;
             element.style.display = DisplayStyle.Flex;
@@ -199,11 +206,12 @@ namespace gregCore.UI
             element.style.scale = new Scale(new Vector2(0.8f, 0.8f));
             element.style.opacity = 0;
             element.style.transitionDuration = new StyleList<TimeValue>(MakeTimeValueList(durationMs));
-            element.schedule.Execute(new Action<TimerState>(_ =>
+            TrackHide(element, element.schedule.Execute(new Action<TimerState>(_ =>
             {
+                try { _pendingHides.Remove(element); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 element.style.display = DisplayStyle.None;
                 onComplete?.Invoke();
-            })).StartingIn((long)durationMs + 50);
+            })).StartingIn((long)durationMs + 50));
         }
     }
 

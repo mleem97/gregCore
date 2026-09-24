@@ -1,6 +1,6 @@
 /// <file-summary>
 /// Layer:       Infrastructure
-/// Purpose:     Event binding functions for Lua.
+/// Purpose:      Event-binding functions for Lua.
 /// Maintainer:   Connects Lua callbacks to the IGregEventBus.
 ///               greg.on(), greg.off(), greg.once(), greg.fire()
 /// </file-summary>
@@ -29,6 +29,14 @@ public static class GregEventLuaModule
     /// Registers event functions in the greg table.
     /// </summary>
     public static void Register(Table greg, Script script, GregEventBus eventBus, string modId)
+    {
+        RegisterOn(greg, eventBus, script, modId);
+        RegisterOff(greg, eventBus, modId);
+        RegisterOnce(greg, eventBus, script, modId);
+        RegisterFire(greg, eventBus, modId);
+    }
+
+    private static void RegisterOn(Table greg, GregEventBus eventBus, Script script, string modId)
     {
         // greg.on(hookName, callback) – Subscribe to an event
         greg["on"] = (Func<string, Closure, string>)((hookName, callback) =>
@@ -66,6 +74,10 @@ public static class GregEventLuaModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterOff(Table greg, GregEventBus eventBus, string modId)
+    {
 
         greg["off"] = (Action<string>)(token =>
         {
@@ -75,15 +87,10 @@ public static class GregEventLuaModule
             eventBus.Unsubscribe(subscription.HookName, subscription.Handler);
             list.Remove(subscription);
         });
+    }
 
-        greg["off"] = (Action<string>)(token =>
-        {
-            if (!_handlers.TryGetValue(modId, out var list)) return;
-            var subscription = list.FirstOrDefault(x => x.Token == token);
-            if (subscription == null) return;
-            eventBus.Unsubscribe(subscription.HookName, subscription.Handler);
-            list.Remove(subscription);
-        });
+    private static void RegisterOnce(Table greg, GregEventBus eventBus, Script script, string modId)
+    {
 
         // greg.once(hookName, callback) – Subscribe once, auto-unsubscribes after first call
         greg["once"] = (Func<string, Closure, string>)((hookName, callback) =>
@@ -121,6 +128,10 @@ public static class GregEventLuaModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterFire(Table greg, GregEventBus eventBus, string modId)
+    {
 
         // greg.fire(hookName, dataTable) – Fire a custom event
         greg["fire"] = (Action<string, Table?>)((hookName, dataTable) =>

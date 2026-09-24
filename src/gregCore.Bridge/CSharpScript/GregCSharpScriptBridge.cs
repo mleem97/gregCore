@@ -41,6 +41,7 @@ public sealed class GregCSharpScriptBridge
         }
 
         LoadMods(csharpDir);
+        StartWatching();
         _initialized = true;
     }
 

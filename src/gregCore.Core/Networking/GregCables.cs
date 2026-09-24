@@ -81,8 +81,7 @@ public static class GregCables
         return result;
     }
 
-    public static List<global::Il2Cpp.CableLink> FindByType(string typeOfLink)
-    {
+    public static List<global::Il2Cpp.CableLink> FindByType(string typeOfLink)    {
         var result = new List<global::Il2Cpp.CableLink>();
         if (string.IsNullOrWhiteSpace(typeOfLink)) return result;
         Try(() =>
@@ -122,6 +121,7 @@ public static class GregCables
         });
         return result;
     }
+
     // ── Read ─────────────────────────────────────────────────────────────────
     public static LinkInfo Read(global::Il2Cpp.CableLink link)
     {

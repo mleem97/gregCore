@@ -17,6 +17,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
   Ein kaputter Eintrag bricht nie das gesamte Healing ab.
 - Log-Dedup per ID-String statt `GetHashCode`; Logs im
   `[gregCore][HwId]`-Format; `NewPatchPanelIdpatch`-Typo korrigiert.
+- Kompatibilitaetswache (`IncompatibleModGuard`): Erkennt den alten separaten
+  404-PersistentID-Mod (Name/Assembly) und entpatcht ihn (`UnpatchSelf`) — bei
+  Mod-Init und erneut beim Szenen-Laden — damit gregID das einzige ID-System
+  bleibt. Warnung in Log + Toast, einmal pro Sitzung.
 
 ### Added
 

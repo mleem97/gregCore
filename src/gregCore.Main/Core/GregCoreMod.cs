@@ -49,6 +49,10 @@ namespace gregCore.Core
             MelonLogger.Msg("--- " + BuildInfo.ShortLabel + " ---");
             gregCore.Infrastructure.Logging.DevLog.Msg("Framework-Lebenszyklus gestartet (Flavor " + BuildInfo.Flavor + ").");
 
+            // Kompatibilitaetswache: alten 404-ID-Mod entpatchen, falls vorhanden
+            // (erneut beim Szenen-Laden fuer spaet geladene Mods).
+            try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
+
             // Verzeichnis-Policy: Layout sicherstellen + Verstoesse melden.
             try
             {
@@ -311,6 +315,9 @@ namespace gregCore.Core
         {
             try
             {
+                // Kompatibilitaetswache (zweiter Lauf: faengt spaet geladene
+                // inkompatible ID-Mods; bereits behandelte werden uebersprungen).
+                try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
                 // Netz-Session: Szene ist stabil, Coop-Lookups ab jetzt sicher.
                 try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneLoaded(); } catch { }
                 // Save-Sidecars der Mods fuer diesen Spielstand laden.

@@ -1,0 +1,14 @@
+runtimes:
+    - python@3.11.11
+tools:
+    - lizard@1.23.0
+    - opengrep@1.23.0
+    - pylint@4.0.5
+    - trivy@0.70.0
+# Vendored third-party code is not ours to fix (upstream: MoonSharp Lua).
+# Findings there (math.random via System.Random = Lua semantics, URL strings,
+# upstream TablePair design) are context-blind true-negatives.
+exclude_paths:
+    - "lib/**"
+    - "bin/**"
+    - "obj/**"

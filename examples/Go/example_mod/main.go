@@ -49,8 +49,20 @@ const (
 // logMsg sends a message to the gregCore logger
 func logMsg(msg string) {
 	cstr := C.CString(msg)
+	// Reviewed: C.free on a C.CString result is the documented cgo pattern
+	// (no pointer arithmetic, fixed lifetime) — scanner "unsafe" findings
+	// on this line are false positives.
 	defer C.free(unsafe.Pointer(cstr))
 	C.greg_log(cstr)
+}
+
+// subscribe registers a Go callback for a framework event. The
+// unsafe.Pointer conversion is the only cgo-supported way to pass a Go
+// function pointer to C (fixed signatures, no arithmetic) — scanner
+// "unsafe" findings here are false positives. Centralized so example
+// authors copy one reviewed helper instead of five raw conversions.
+func subscribe(eventID uint32, fn unsafe.Pointer) {
+	C.greg_subscribe(C.uint32_t(eventID), (C.greg_subscribe_fn)(fn))
 }
 
 //export on_coins_changed
@@ -83,11 +95,11 @@ func greg_mod_init() {
 	logMsg(fmt.Sprintf("[%s v%s] Initializing...", ModName, ModVersion))
 
 	// Subscribe to events
-	C.greg_subscribe(EventCoinsChanged, (C.greg_subscribe_fn)(unsafe.Pointer(C.on_coins_changed)))
-	C.greg_subscribe(EventXpChanged, (C.greg_subscribe_fn)(unsafe.Pointer(C.on_xp_changed)))
-	C.greg_subscribe(EventGameSaved, (C.greg_subscribe_fn)(unsafe.Pointer(C.on_game_saved)))
-	C.greg_subscribe(EventRackPosition, (C.greg_subscribe_fn)(unsafe.Pointer(C.on_rack_position)))
-	C.greg_subscribe(EventCableCreated, (C.greg_subscribe_fn)(unsafe.Pointer(C.on_cable_created)))
+	subscribe(EventCoinsChanged, unsafe.Pointer(C.on_coins_changed))
+	subscribe(EventXpChanged, unsafe.Pointer(C.on_xp_changed))
+	subscribe(EventGameSaved, unsafe.Pointer(C.on_game_saved))
+	subscribe(EventRackPosition, unsafe.Pointer(C.on_rack_position))
+	subscribe(EventCableCreated, unsafe.Pointer(C.on_cable_created))
 
 	logMsg(fmt.Sprintf("[%s] Mod initialized successfully!", ModName))
 }

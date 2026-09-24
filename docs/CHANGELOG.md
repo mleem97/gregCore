@@ -2,6 +2,40 @@
 
 All notable changes to gregCore are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Keybind auto-resolve (`GregKeybindRegistry`): colliding or game-reserved
+  (`Escape`, `F1`) toggle requests move to the first free `FallbackPool` key
+  (`F12…F2`, then navigation keys), loudly logged + `AutoResolved` flag +
+  persisted. Pool exhausted → `HasConflict` flag as before. New query
+  `FindFreeKey()`. Docs: `docs/modding/keybinds.md`. Tests:
+  `GregKeybindAutoResolveTests` (8 cases).
+
+### Fixed
+
+- Hardware-ID system: deterministic gregIDs (SHA-256 of the legacy device ID
+  instead of per-load random GUIDs), so live objects and save endpoints
+  correlate by construction and route evaluation survives game builds that
+  bind save entries to live objects differently. Previously healed saves
+  keep working (prefix skip on both sides).
+- Hardware-ID rewrites are now gated on the GregDoctor fingerprint verdict
+  (`GregGameCompat.HwIdRewritesAllowed`): on unknown/unsupported game builds
+  device IDs pass through untouched (route-safe vanilla passthrough) with one
+  loud `[gregCore][HwId] DISABLED ...` warning, instead of renumbering devices
+  that cannot be verified. Fixes silent customer disconnects after loading
+  vanilla saves on newer game builds (e.g. 1.1.10 with gregCore 1.2.3).
+
+### Added
+
+- `GregGameCompat` boot latch (supported-build verdict for fail-safe patches)
+  with unit tests (`GregGameCompatTests`: latch semantics, ID determinism,
+  schema, 500-ID uniqueness, empty-input fallback).
+- Troubleshooting entry for UNSUPPORTED_GAME_BUILD + broken routes
+  (`docs/troubleshooting/doctor.md`); hardware-ids doc covers the
+  deterministic scheme and the safe-mode gate.
+
 ## [1.1.0] - 2025-06-28
 
 ### Changed
@@ -25,5 +59,5 @@ All notable changes to gregCore are documented here.
 - Save engine with versioning (LiteDB)
 - Multi-mod architecture with dependency resolution
 - Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer
+- Native Data Center co-op compatibility boundary
 - CI/CD pipeline with auto-versioning

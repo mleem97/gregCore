@@ -5,12 +5,13 @@
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/greg)
 [![gregFramework](https://img.shields.io/badge/gregFramework-Website-blue?style=for-the-badge)](https://gregframework.eu)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](./LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=for-the-badge)]()
+[![Version](https://img.shields.io/badge/Version-1.2.3-orange?style=for-the-badge)](./CHANGELOG.md)
 [![GameVersion](https://img.shields.io/badge/Game%20Version-1.0.50.15-yellow?style=for-the-badge)]()
 [![Unity](https://img.shields.io/badge/Unity-6000.5-black?style=for-the-badge&logo=unity&logoColor=white)]()
 
 ## Links
 
+- **Steam Workshop:** [My Workshop (Data Center)](https://steamcommunity.com/id/frikadelle3000/myworkshopfiles/?appid=4170200)
 - **Repository:** [github.com/mleem97/gregCore](https://github.com/mleem97/gregCore)
 - **Discord / Support:** [discord.gg/greg](https://discord.gg/greg)
 - **Website:** [gregframework.eu](https://gregframework.eu)
@@ -32,13 +33,18 @@
 
 - Harmony-based runtime patching system (Prefix / Postfix)
 - UI overlay and widget management (UI Toolkit / UGUI)
+- ComputerUI extensions: custom shortcuts + apps/pages on the in-game computer (C# + Lua)
 - Save engine with versioning and migration (LiteDB)
 - Multi-mod architecture with dependency resolution
 - Wall rack and grid placement systems
 - Custom shop and employee management APIs
 - Logging and diagnostic infrastructure
 - Lua, JS and Python scripting bridges
-- FishNet multiplayer sync layer (optional)
+- Native Data Center co-op compatibility without a replacement networking stack
+- Tasten-HUD (`GregHud`) und zentrales Mod-Hub (F1)
+- Own hardware ID system (`gregID:` schema): stable device identity
+  for switches, patch panels and servers across save/load
+  (see `docs/modding/hardware-ids.md`)
 
 ## Installation
 
@@ -67,7 +73,7 @@
 ### Build only
 
 - .NET 6 SDK
-- Game reference assemblies in `lib/references/MelonLoader/`
+- Game reference assemblies in `references/` (Il2CppInterop-Dummies aus dem Spiel-Install)
 
 ## Build from Source
 
@@ -76,7 +82,7 @@ Requirements:
 - .NET 6 SDK
 - local Data Center / MelonLoader installation
 
-> **Note:** This framework was built on Linux using Proton-GE 10-34. Populate `lib/references/MelonLoader/` from your local game install (run the game once with MelonLoader, then copy `MelonLoader/Il2CppAssemblies/` and `MelonLoader/net6/`).
+> **Note:** This framework was built on Linux using Proton-GE 10-34. Populate `references/` from your local game install (run the game once with MelonLoader, then copy `MelonLoader/Il2CppAssemblies/` and `MelonLoader/net6/`).
 
 Build:
 
@@ -92,29 +98,44 @@ Release output:
 bin/Release/net6.0/gregCore.dll
 ```
 
+Tests (needs a .NET 6 runtime, or roll-forward on newer hosts):
+
+```bash
+DOTNET_ROLL_FORWARD=Major dotnet test
+```
+
+Details: [QUICKSTART.md](QUICKSTART.md), [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Repository Layout
 
 ```
-gregCore.Framework/
-├── src/                    # Framework + mod source code
-│   ├── Core/               # GregCoreMod.cs — entry point
-│   ├── Infrastructure/     # Config, logging, persistence
-│   ├── GameLayer/          # Harmony patches for game classes
-│   ├── UI/                 # UI Toolkit overlay
-│   ├── API/                # Public API surface
-│   └── ...                 # 27 modules total
+├── src/                    # Framework source (gregCore.* assemblies)
+│   ├── gregCore.Main/      # MelonLoader entry point (GregCoreMod)
+│   ├── gregCore.Core/      # Config, logging, persistence, networking, services
+│   ├── gregCore.UI/        # UI overlays, HUD, Mod-Hub, click routing
+│   ├── gregCore.Abstractions/ # Public API surface for mod developers
+│   ├── gregCore.Bridge/    # Scripting bridges (Lua/JS/Python/Rust/Go/C#)
+│   ├── gregCore.Hooks/     # Dynamic Harmony patching + hook integration
+│   ├── gregCore.Patches/   # Game-specific Harmony patches
+│   ├── gregCore.Mod/       # Mod registry / multi-mod runtime
+│   ├── gregCore.SDK/       # SDK packs for external tooling
+│   ├── gregCore.Compatibility/ # Built-in QoL/compat modules
+│   ├── gregCore.GameApi/   # Generated game API surface
+│   └── gregCore.Shared/    # Shared utilities (DevLog, …)
 ├── framework/              # greg_hooks.json — canonical hook registry
 ├── game_hooks.json         # Patchable methods from IL2CPP dump
-├── lib/                    # Reference assemblies (game stubs, MelonLoader)
-├── docs/                   # Auto-generated API docs
-├── scripts/                # Build and code-generation helpers
-├── tests/                  # Unit tests
-├── sdk/                    # SDK packs
+├── references/             # Game + MelonLoader reference assemblies
+├── docs/                   # Documentation ([Index](docs/INDEX.md))
+├── scripts/                # Build, release, mirror, validation helpers
+├── tests/                  # Unit tests (gregCore.Tests)
 ├── examples/               # Example mods (C#, Go, JS, Lua, Python, Rust)
-├── .github/workflows/      # CI pipeline
+├── templates/              # C#/Lua mod templates
+├── tools/                  # GameApiGenerator, coverage scanner
+├── .forgejo/ / .gitea/     # CI + mirror workflows (identical)
 ├── VERSION                 # Single source of truth for version
 ├── gregCore.csproj         # Project file
-├── LICENSE                 # Apache 2.0
+├── gregCore.sln            # Solution file
+├── LICENSE                 # Apache-2.0
 └── README.md
 ```
 
@@ -131,6 +152,14 @@ See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the auto-generated hook r
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+Development follows `dev -> pre-release -> main`. See
+[the branch and release policy](docs/maintainers/branch-protection.md) before
+opening a pull request. Downloads are published on the GitHub Releases page;
+development builds are intentionally not presented as stable releases.
+Native Data Center co-op remains game-owned; mod authors should follow the
+[native co-op boundary](docs/modding/native-coop.md) and avoid adding a second
+transport or lobby implementation.
 
 ## License
 

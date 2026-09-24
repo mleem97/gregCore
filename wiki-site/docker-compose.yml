@@ -1,0 +1,22 @@
+# gregCore Wiki stack (Portainer: App Templates / Custom stack, or repository stack).
+# Repository stacks: build context is the REPO ROOT (required for .wiki/),
+# compose file path: wiki-site/docker-compose.yml
+name: gregwiki
+
+services:
+  wiki:
+    build:
+      context: ..
+      dockerfile: wiki-site/Dockerfile
+    image: gregwiki:latest
+    container_name: gregwiki
+    restart: unless-stopped
+    ports:
+      - "${WIKI_PORT:-8088}:80"
+    # Uncomment for Traefik (Coolify/Portainer + reverse proxy):
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.gregwiki.rule=Host(`${WIKI_HOST:-wiki.example.com}`)"
+    #   - "traefik.http.routers.gregwiki.entrypoints=websecure"
+    #   - "traefik.http.routers.gregwiki.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.gregwiki.loadbalancer.server.port=80"

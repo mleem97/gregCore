@@ -1,0 +1,53 @@
+name: Mirror GitHub Sync
+
+# ----------------------------------------------------------------------------
+# GitHub = NUR noch passiver Mirror (kein CI, kein eigener Push-Zyklus).
+# Forgejo bleibt einzige Push-Quelle; dieser Workflow spiegelt GitHub auf den
+# Forgejo-Stand: Code/Branches, fehlende Tags (kein Force-Push auf vorhandene
+# GitHub-Tags), Release-Assets (gregCore.dll/gregCore.dev.dll im gamepath-
+# Deploy-Layout Mods/UserLibs/Plugins gemäß Release-Art) sowie Release-Doku
+# (CHANGELOG.md, VERSION, README.md, Releases/README.md).
+#
+# Referenz-Implementierung für die Fleet (gregCore.main). Der eigentliche
+# Sync läuft vollständig im idempotenten Skript:
+#   scripts/gregMirror.Sync.sh            # laufender Sync (nur aktueller Tag)
+#   scripts/gregMirror.Sync.sh --backfill # einmaliger Erst-Sync aller Releases
+#   scripts/gregMirror.Sync.sh --dry-run  # nur anzeigen, nichts ändern
+#
+# Secrets: GH_TOKEN (GitHub, repo-Scope) + gh CLI im Runner.
+# ----------------------------------------------------------------------------
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: 'Einmaliger Backfill aller fehlenden GitHub-Releases (Erst-Sync der Fleet)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync-Skript ausführbar machen
+        run: chmod +x scripts/gregMirror.Sync.sh
+
+      - name: GitHub-Mirror auf Forgejo-Stand bringen
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ARGS=()
+          [[ "${{ inputs.backfill }}" == "true" ]] && ARGS+=(--backfill)
+          bash scripts/gregMirror.Sync.sh "${ARGS[@]}"

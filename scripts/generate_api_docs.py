@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generate_api_docs.py
-Generates docs/FrameworkAPI.md from game_hooks.json and framework/greg_hooks.json.
+Generates docs/FrameworkAPI.md from the reviewed framework manifest.
 
 Usage:
   python3 scripts/generate_api_docs.py \
@@ -79,17 +79,17 @@ def render_greg_hooks(data: dict) -> str:
         lines.append("|-----------|-------------|----------|-------------|")
         for h in sorted(groups[group_name], key=lambda x: x.get("name", "")):
             hook_name = h.get("name", "")
-            target = h.get("patchTarget", "")
-            strategy = h.get("strategy", "")
-            desc = h.get("description", "")
-            lines.append(f"| `{hook_name}` | `{target}` | `{strategy}` | {desc} |")
+            target = h.get("signature") or h.get("patchTarget", "")
+            status = h.get("status", "review")
+            desc = h.get("approvalReason", h.get("description", ""))
+            lines.append(f"| `{hook_name}` | `{target}` | `{status}` | {desc} |")
         lines.append("")
     return "\n".join(lines)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate FrameworkAPI.md from hook JSON files.")
-    parser.add_argument("--game-hooks", required=True, help="Path to game_hooks.json")
+    parser = argparse.ArgumentParser(description="Generate FrameworkAPI.md from the reviewed hook manifest.")
+    parser.add_argument("--game-hooks", required=False, help="Ignored legacy inventory path (compatibility option)")
     parser.add_argument("--greg-hooks", required=True, help="Path to framework/greg_hooks.json")
     parser.add_argument("--output", required=True, help="Output markdown file path")
     parser.add_argument("--version", default="?", help="Current framework version")
@@ -101,7 +101,7 @@ def main() -> None:
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
 
     today = date.today().isoformat()
-    game_section = render_game_hooks(game_hooks if isinstance(game_hooks, list) else [])
+    game_section = "_The raw game inventory is scanner output and is not a supported API._\n"
     greg_section = render_greg_hooks(greg_hooks if isinstance(greg_hooks, dict) else {})
 
     doc = f"""# gregCore FrameworkAPI Reference

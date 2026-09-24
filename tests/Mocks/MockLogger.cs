@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Tests
-/// Zweck:        Mock-Logger für Unit-Tests.
-/// Maintainer:   Nur in Tests verwenden.
+/// Layer:       Tests
+/// Purpose:     Mock logger for unit tests.
+/// Maintainer:   For use in tests only.
 /// </file-summary>
 
 using System;

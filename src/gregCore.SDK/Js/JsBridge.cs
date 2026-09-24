@@ -32,14 +32,14 @@ public sealed class JsBridge : IGregLanguageBridge
         _engine.SetValue("greg", greg);
 
         string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
-        // Policy: Laufzeit-Kompatibilitaet (kein Mod) -> AUSSCHLIESSLICH ./UserLibs.
+        // Policy: runtime compatibility (no mod) -> EXCLUSIVELY ./UserLibs.
         string jsDir = Path.Combine(gameRoot, "UserLibs", "Js");
         if (!Directory.Exists(jsDir)) Directory.CreateDirectory(jsDir);
         string legacyDir = Path.Combine(gameRoot, "Plugins", "Js");
         try
         {
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.js").Length > 0)
-                MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Veraltet: JS-Dateien unter ./Plugins/Js werden ignoriert - bitte nach ./UserLibs/Js verschieben.");
+                MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Deprecated: JS files under ./Plugins/Js are ignored - move them to ./UserLibs/Js.");
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
@@ -73,11 +73,11 @@ public sealed class JsBridge : IGregLanguageBridge
         try
         {
             _engine.Execute(scriptContent);
-            _logger.Debug("JS-Skript ausgeführt.");
+            _logger.Debug("JS script executed.");
         }
         catch (Exception ex)
         {
-            _logger.Error($"[JsBridge] JS-Fehler: {ex.Message}", ex);
+            _logger.Error($"[JsBridge] JS error: {ex.Message}", ex);
         }
     }
 }

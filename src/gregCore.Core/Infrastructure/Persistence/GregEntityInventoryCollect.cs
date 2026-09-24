@@ -25,7 +25,7 @@ public static partial class GregEntityInventory
             byUid[e.Uid] = e;
             byKindKey[KindKey(kind, e.NativeKey)] = e;
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectServers(global::Il2Cpp.NetworkSaveData networkData,
@@ -57,7 +57,7 @@ public static partial class GregEntityInventory
                 AddEntry(byUid, byKindKey, usedUids, InventoryKind.Server, id, uid, "");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectSwitches(global::Il2Cpp.NetworkSaveData networkData,
@@ -86,7 +86,7 @@ public static partial class GregEntityInventory
                 AddEntry(byUid, byKindKey, usedUids, InventoryKind.Switch, id, uid, "");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectPatchPanels(global::Il2Cpp.NetworkSaveData networkData,
@@ -115,7 +115,7 @@ public static partial class GregEntityInventory
                 AddEntry(byUid, byKindKey, usedUids, InventoryKind.PatchPanel, id, uid, "");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectCables(global::Il2Cpp.NetworkSaveData networkData,
@@ -141,7 +141,7 @@ public static partial class GregEntityInventory
                 AddEntry(byUid, byKindKey, usedUids, InventoryKind.Cable, nativeKey, uid, "");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectLacpGroups(global::Il2Cpp.NetworkSaveData networkData,
@@ -167,7 +167,7 @@ public static partial class GregEntityInventory
                 AddEntry(byUid, byKindKey, usedUids, InventoryKind.LacpGroup, nativeKey, uid, "");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectRouters(global::Il2Cpp.NetworkSaveData networkData,
@@ -186,7 +186,7 @@ public static partial class GregEntityInventory
                     var r = list[i];
                     if (r == null || r.Pointer == IntPtr.Zero) continue;
                     int routes = 0;
-                    try { routes = r.routes != null ? r.routes.Count : 0; } catch { }
+                    try { routes = r.routes != null ? r.routes.Count : 0; } catch { /* ignored: best-effort save scan, faulty entry skipped */ }
                     hint = "asn:" + r.asn.ToString(CultureInfo.InvariantCulture)
                         + "/routes:" + routes.ToString(CultureInfo.InvariantCulture);
                 }
@@ -197,7 +197,7 @@ public static partial class GregEntityInventory
                 RememberPersisted(InventoryKind.Router, nativeKey, uid, hint);
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectFirewalls(global::Il2Cpp.NetworkSaveData networkData,
@@ -216,7 +216,7 @@ public static partial class GregEntityInventory
                     var f = list[i];
                     if (f == null || f.Pointer == IntPtr.Zero) continue;
                     int rules = 0;
-                    try { rules = f.filterRules != null ? f.filterRules.Count : 0; } catch { }
+                    try { rules = f.filterRules != null ? f.filterRules.Count : 0; } catch { /* ignored: best-effort save scan, faulty entry skipped */ }
                     hint = "cluster:" + (f.clusterIP ?? "") + "/rules:" + rules.ToString(CultureInfo.InvariantCulture);
                 }
                 catch { continue; }
@@ -226,7 +226,7 @@ public static partial class GregEntityInventory
                 RememberPersisted(InventoryKind.Firewall, nativeKey, uid, hint);
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     private static void CollectSfpModules(global::Il2Cpp.NetworkSaveData networkData,
@@ -257,7 +257,7 @@ public static partial class GregEntityInventory
                 RememberPersisted(InventoryKind.SfpModule, nativeKey, uid, hint);
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 
     /// <summary>
@@ -312,6 +312,6 @@ public static partial class GregEntityInventory
                 _persistedHint[KindKey(kind, nativeKey)] = hint ?? "";
             }
         }
-        catch { }
+        catch { /* ignored: best-effort save scan, faulty entry skipped */ }
     }
 }

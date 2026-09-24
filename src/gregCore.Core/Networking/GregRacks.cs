@@ -57,7 +57,7 @@ public static class GregRacks
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(o);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -351,7 +351,7 @@ public static class GregRacks
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Racks: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Racks: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -359,7 +359,7 @@ public static class GregRacks
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Racks-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Racks-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

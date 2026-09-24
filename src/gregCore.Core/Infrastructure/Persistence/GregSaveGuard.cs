@@ -326,7 +326,7 @@ public static class GregSaveGuard
             foreach (var m in _vanillaMaps)
             {
                 int? r = null;
-                try { r = m.ToVanilla(customId); } catch { }
+                try { r = m.ToVanilla(customId); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 if (r.HasValue) return r.Value;
             }
         }
@@ -351,13 +351,13 @@ public static class GregSaveGuard
                 {
                     string path = SidecarPath(dir, name, kv.Key);
                     string content = null;
-                    try { if (File.Exists(path)) content = File.ReadAllText(path); } catch { }
+                    try { if (File.Exists(path)) content = File.ReadAllText(path); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     if (content == null) continue;
-                    try { kv.Value.Load(content); } catch { }
+                    try { kv.Value.Load(content); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void WriteSidecars(string dir, string name)
@@ -382,11 +382,11 @@ public static class GregSaveGuard
                             File.Delete(path);
                         File.Move(tmp, path);
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void BackupVanillaSave(string dir, string name)
@@ -442,11 +442,11 @@ public static class GregSaveGuard
             dirs.Sort(StringComparer.Ordinal);
             while (dirs.Count > Math.Max(1, MaxBackupsPerSave))
             {
-                try { Directory.Delete(dirs[0], true); } catch { }
+                try { Directory.Delete(dirs[0], true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dirs.RemoveAt(0);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     internal static string SidecarPath(string dir, string save, string modId)

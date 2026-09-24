@@ -56,7 +56,7 @@ public static class GregCustomers
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(cb);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -114,7 +114,7 @@ public static class GregCustomers
         {
             foreach (var cb in FindAllBases())
             {
-                try { result.Add(ReadBase(cb)); } catch { }
+                try { result.Add(ReadBase(cb)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -181,7 +181,7 @@ public static class GregCustomers
             arr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStringArray(src.Count);
             for (int i = 0; i < src.Count; i++)
             {
-                try { arr[i] = src[i] ?? ""; } catch { }
+                try { arr[i] = src[i] ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch { arr = null; }
@@ -259,7 +259,7 @@ public static class GregCustomers
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Customers: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Customers: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -267,7 +267,7 @@ public static class GregCustomers
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Customers-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Customers-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

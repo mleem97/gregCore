@@ -51,7 +51,7 @@ namespace gregCore.Core
 
             // Compatibility guard: unpatch old 404 ID mod if present
             // (again on scene load for late-loading mods).
-            try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
+            try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             MelonLogger.Msg("[gregCore][HwId] HWID ACTIVE (gregID: Switch/PatchPanel/Server).");
 
             // Verzeichnis-Policy: Layout sicherstellen + Verstoesse melden.
@@ -318,11 +318,11 @@ namespace gregCore.Core
             {
                 // Compatibility guard (second run: catches late-loading
                 // incompatible ID mods; handled ones are skipped).
-                try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
+                try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 // Netz-Session: Szene ist stabil, Coop-Lookups ab jetzt sicher.
-                try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneLoaded(); } catch { }
+                try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneLoaded(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 // Save-Sidecars der Mods fuer diesen Spielstand laden.
-                try { gregCore.Infrastructure.Persistence.GregSaveGuard.LoadSidecarsForCurrentSave(); } catch { }
+                try { gregCore.Infrastructure.Persistence.GregSaveGuard.LoadSidecarsForCurrentSave(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 // Lazy font search — fonts are only available after scene load
                 GregFontLoader.SearchFonts();
 
@@ -363,7 +363,7 @@ namespace gregCore.Core
 
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
         {
-            try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneUnloading(); } catch { }
+            try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneUnloading(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         public override void OnApplicationQuit()        {

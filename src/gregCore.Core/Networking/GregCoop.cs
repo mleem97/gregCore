@@ -81,7 +81,7 @@ public static class GregCoop
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -104,15 +104,15 @@ public static class GregCoop
                     var avatar = kv.Value;
                     if (avatar == null) continue;
                     var info = new PeerInfo { PeerId = kv.Key };
-                    try { info.Position = avatar.targetPos; } catch { }
-                    try { info.Yaw = avatar.targetYaw; } catch { }
-                    try { info.Hand = avatar.currentHand.ToString(); } catch { }
-                    try { info.SubType = avatar.currentSubType; } catch { }
-                    try { info.HasHeldColor = avatar.currentHasHeldColor; } catch { }
-                    try { info.LastSeenTime = avatar.LastSeenTime; } catch { }
+                    try { info.Position = avatar.targetPos; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { info.Yaw = avatar.targetYaw; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { info.Hand = avatar.currentHand.ToString(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { info.SubType = avatar.currentSubType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { info.HasHeldColor = avatar.currentHasHeldColor; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { info.LastSeenTime = avatar.LastSeenTime; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     result.Add(info);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -301,7 +301,7 @@ public static class GregCoop
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -319,7 +319,7 @@ public static class GregCoop
             if (dict == null) return;
             foreach (var kv in dict)
             {
-                try { result.Add(kv.Key); } catch { }
+                try { result.Add(kv.Key); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -363,7 +363,7 @@ public static class GregCoop
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -394,7 +394,7 @@ public static class GregCoop
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Coop: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Coop: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -402,7 +402,7 @@ public static class GregCoop
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Coop-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Coop-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

@@ -190,12 +190,12 @@ public static class GregNetSession
             if (joined) PeerJoined?.Invoke();
             else PeerLeft?.Invoke();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void OnPeersChanged()
     {
         try { PollPeerChanges(); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

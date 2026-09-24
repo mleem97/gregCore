@@ -82,7 +82,7 @@ public static class GregJobSaves
         {
             foreach (var entry in list)
             {
-                try { result.Add(ReadTechnician(entry)); } catch { }
+                try { result.Add(ReadTechnician(entry)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -122,7 +122,7 @@ public static class GregJobSaves
         {
             foreach (var entry in list)
             {
-                try { result.Add(ReadRepairJob(entry)); } catch { }
+                try { result.Add(ReadRepairJob(entry)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -178,7 +178,7 @@ public static class GregJobSaves
         {
             foreach (var entry in list)
             {
-                try { result.Add(ReadInteractObject(entry)); } catch { }
+                try { result.Add(ReadInteractObject(entry)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -213,7 +213,7 @@ public static class GregJobSaves
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] JobSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] JobSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

@@ -46,7 +46,7 @@ public static class GregInternet
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(ep);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -72,7 +72,7 @@ public static class GregInternet
         {
             foreach (var ep in FindAllEndpoints())
             {
-                try { result.Add(ReadEndpoint(ep)); } catch { }
+                try { result.Add(ReadEndpoint(ep)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -249,7 +249,7 @@ public static class GregInternet
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Internet: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Internet: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -257,7 +257,7 @@ public static class GregInternet
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Internet-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Internet-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

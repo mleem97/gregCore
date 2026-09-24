@@ -158,7 +158,7 @@ namespace gregCore.UI
             while (_active.Count >= MaxActive)
             {
                 var oldest = _active[0].element;
-                try { oldest?.RemoveFromHierarchy(); } catch { }
+                try { oldest?.RemoveFromHierarchy(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 _active.RemoveAt(0);
             }
 
@@ -199,7 +199,7 @@ namespace gregCore.UI
                 var f = GregFontLoader.DefaultUGUIFont;
                 if (f != null) label.style.unityFont = f;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             toast.Add(label);
 
             _container.Add(toast);
@@ -220,7 +220,7 @@ namespace gregCore.UI
             while (_active.Count >= MaxActive)
             {
                 var oldest = _active[0].element;
-                try { oldest?.RemoveFromHierarchy(); } catch { }
+                try { oldest?.RemoveFromHierarchy(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 _active.RemoveAt(0);
             }
 
@@ -248,7 +248,7 @@ namespace gregCore.UI
                 {
                     art = new VisualElement();
                     art.style.backgroundImage = new StyleBackground(Background.FromTexture2D(cover));
-                    try { art.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover); } catch { }
+                    try { art.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     art.style.width = 56f;
                     art.style.height = 56f;
                 }
@@ -269,7 +269,7 @@ namespace gregCore.UI
             col.style.flexDirection = FlexDirection.Column;
             col.style.flexGrow = 1f;
             Font f2 = null;
-            try { f2 = GregFontLoader.DefaultUGUIFont; } catch { }
+            try { f2 = GregFontLoader.DefaultUGUIFont; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             AddRichLine(col, lineTop, 11f, new Color(0.65f, 0.65f, 0.7f), false, f2);
             AddRichLine(col, lineTitle, 17f, new Color(1f, 1f, 1f), true, f2);
             AddRichLine(col, lineSub, 13f, new Color(0.88f, 0.88f, 0.88f), false, f2);
@@ -296,15 +296,15 @@ namespace gregCore.UI
                 label.style.whiteSpace = WhiteSpace.Normal;
                 if (bold)
                 {
-                    try { label.style.unityFontStyleAndWeight = FontStyle.Bold; } catch { }
+                    try { label.style.unityFontStyleAndWeight = FontStyle.Bold; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 if (font != null)
                 {
-                    try { label.style.unityFont = font; } catch { }
+                    try { label.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 parent.Add(label);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         public static void Update()
@@ -332,7 +332,7 @@ namespace gregCore.UI
                             element?.RemoveFromHierarchy();
                         })).StartingIn(350);
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     _active.RemoveAt(i);
                 }
             }

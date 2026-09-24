@@ -78,10 +78,10 @@ public static class GregIconToolkit
                         added++;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return added;
     }
 
@@ -95,10 +95,10 @@ public static class GregIconToolkit
             try { ok = ImageConversion.LoadImage(tex, bytes); } catch { ok = false; }
             if (!ok)
             {
-                try { UnityEngine.Object.Destroy(tex); } catch { }
+                try { UnityEngine.Object.Destroy(tex); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return null;
             }
-            try { tex.filterMode = FilterMode.Bilinear; } catch { }
+            try { tex.filterMode = FilterMode.Bilinear; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return tex;
         }
         catch { return null; }
@@ -126,15 +126,15 @@ public static class GregIconToolkit
                     Texture2D old;
                     if (_cache.TryGetValue(key, out old) && old != null)
                     {
-                        try { UnityEngine.Object.Destroy(old); } catch { }
+                        try { UnityEngine.Object.Destroy(old); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                     _cache[key] = tex;
                     added++;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return added;
     }
 
@@ -142,7 +142,7 @@ public static class GregIconToolkit
     // ueberschreiben eingebettete (Custom-Schicht).
     public static void RegisterFolder(string folder)
     {
-        try { RegisterFolderCounted(folder); } catch { }
+        try { RegisterFolderCounted(folder); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static bool Has(string name)
@@ -173,7 +173,7 @@ public static class GregIconToolkit
             var tex = Get(name);
             if (tex == null) return false;
             el.style.backgroundImage = new StyleBackground(Background.FromTexture2D(tex));
-            try { el.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain); } catch { }
+            try { el.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (size > 0f)
             {
                 el.style.width = size;
@@ -193,7 +193,7 @@ public static class GregIconToolkit
             if (tex == null) return null;
             var el = new VisualElement();
             el.style.backgroundImage = new StyleBackground(Background.FromTexture2D(tex));
-            try { el.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain); } catch { }
+            try { el.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             el.style.width = size;
             el.style.height = size;
             el.pickingMode = PickingMode.Ignore;

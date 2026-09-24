@@ -147,7 +147,7 @@ public static class GregNetworkDeviceSaves
                     e.targetIp = r.TargetIp ?? "";
                     list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.routingTable = list;
         });
@@ -163,7 +163,7 @@ public static class GregNetworkDeviceSaves
                     e.subnetCidr = s.SubnetCidr ?? "";
                     list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.ownedSubnets = list;
         });
@@ -182,7 +182,7 @@ public static class GregNetworkDeviceSaves
                     e.targetIp = r.TargetIp ?? "";
                     list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.routes = list;
         });
@@ -202,10 +202,10 @@ public static class GregNetworkDeviceSaves
             {
                 if (e == null) continue;
                 var r = new SubnetRoute();
-                try { r.SourceVlanId = e.sourceVlanId; } catch { }
-                try { r.SubnetCidr = e.subnetCidr ?? ""; } catch { }
-                try { r.TargetVlanId = e.targetVlanId; } catch { }
-                try { r.TargetIp = e.targetIp ?? ""; } catch { }
+                try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.RoutingTable.Add(r);
             }
         });
@@ -217,8 +217,8 @@ public static class GregNetworkDeviceSaves
             {
                 if (e == null) continue;
                 var s = new OwnedSubnet();
-                try { s.VlanId = e.vlanId; } catch { }
-                try { s.SubnetCidr = e.subnetCidr ?? ""; } catch { }
+                try { s.VlanId = e.vlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { s.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.OwnedSubnets.Add(s);
             }
         });
@@ -230,11 +230,11 @@ public static class GregNetworkDeviceSaves
             {
                 if (e == null) continue;
                 var r = new RouteEntry();
-                try { r.RouteId = e.routeId; } catch { }
-                try { r.SourceVlanId = e.sourceVlanId; } catch { }
-                try { r.SourceIp = e.sourceIp ?? ""; } catch { }
-                try { r.TargetVlanId = e.targetVlanId; } catch { }
-                try { r.TargetIp = e.targetIp ?? ""; } catch { }
+                try { r.RouteId = e.routeId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.SourceIp = e.sourceIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.Routes.Add(r);
             }
         });
@@ -273,7 +273,7 @@ public static class GregNetworkDeviceSaves
                     e.allow = r.Allow;
                     list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.filterRules = list;
         });
@@ -292,13 +292,13 @@ public static class GregNetworkDeviceSaves
             {
                 if (e == null) continue;
                 var r = new FilterRule();
-                try { r.PortIndex = e.portIndex; } catch { }
-                try { r.SourceIpCidr = e.sourceIpCidr ?? ""; } catch { }
-                try { r.DestIpCidr = e.destIpCidr ?? ""; } catch { }
-                try { r.NetworkPort = e.networkPort; } catch { }
-                try { r.Protocol = e.protocol.ToString(); } catch { }
-                try { r.Bidirectional = e.bidirectional; } catch { }
-                try { r.Allow = e.allow; } catch { }
+                try { r.PortIndex = e.portIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.SourceIpCidr = e.sourceIpCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.DestIpCidr = e.destIpCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.NetworkPort = e.networkPort; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.Protocol = e.protocol.ToString(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.Bidirectional = e.bidirectional; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { r.Allow = e.allow; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.FilterRules.Add(r);
             }
         });
@@ -358,7 +358,7 @@ public static class GregNetworkDeviceSaves
             var list = new Il2CppSystem.Collections.Generic.List<int>();
             foreach (var id in dto.CableIds ?? new List<int>())
             {
-                try { list.Add(id); } catch { }
+                try { list.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.cableIds = list;
         });
@@ -377,7 +377,7 @@ public static class GregNetworkDeviceSaves
             if (list == null) return;
             foreach (var id in list)
             {
-                try { dto.CableIds.Add(id); } catch { }
+                try { dto.CableIds.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return dto;
@@ -462,7 +462,7 @@ public static class GregNetworkDeviceSaves
             var list = new Il2CppSystem.Collections.Generic.List<Vector3>();
             foreach (var v in dto.Waypoints ?? new List<Vector3>())
             {
-                try { list.Add(v); } catch { }
+                try { list.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.waypoints = list;
         });
@@ -471,7 +471,7 @@ public static class GregNetworkDeviceSaves
             var list = new Il2CppSystem.Collections.Generic.List<Vector3>();
             foreach (var v in dto.MidPointPositions ?? new List<Vector3>())
             {
-                try { list.Add(v); } catch { }
+                try { list.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.midPointPositions = list;
         });
@@ -492,7 +492,7 @@ public static class GregNetworkDeviceSaves
             if (list == null) return;
             foreach (var v in list)
             {
-                try { dto.Waypoints.Add(v); } catch { }
+                try { dto.Waypoints.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() =>
@@ -501,7 +501,7 @@ public static class GregNetworkDeviceSaves
             if (list == null) return;
             foreach (var v in list)
             {
-                try { dto.MidPointPositions.Add(v); } catch { }
+                try { dto.MidPointPositions.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() => dto.MaxSpeed = entry.maxSpeed);
@@ -568,7 +568,7 @@ public static class GregNetworkDeviceSaves
                 var list = new Il2CppSystem.Collections.Generic.List<int>();
                 foreach (var id in dto.DisallowedVlanIds ?? new List<int>())
                 {
-                    try { list.Add(id); } catch { }
+                    try { list.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 entry.disallowedVlanIds = list;
             });
@@ -587,7 +587,7 @@ public static class GregNetworkDeviceSaves
             if (list == null) return;
             foreach (var id in list)
             {
-                try { dto.DisallowedVlanIds.Add(id); } catch { }
+                try { dto.DisallowedVlanIds.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return dto;
@@ -598,7 +598,7 @@ public static class GregNetworkDeviceSaves
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] DeviceSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] DeviceSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

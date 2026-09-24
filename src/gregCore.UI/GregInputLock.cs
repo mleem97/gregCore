@@ -71,7 +71,7 @@ public static class GregInputLock
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void ForceCursor()
@@ -81,7 +81,7 @@ public static class GregInputLock
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SetPlayerManager(bool mouse, bool movement, bool rayInteract)
@@ -90,11 +90,11 @@ public static class GregInputLock
         {
             var pm = global::Il2Cpp.PlayerManager.instance;
             if (pm == null) return;
-            try { pm.enabledMouseMovement = mouse; } catch { }
-            try { pm.enabledPlayerMovement = movement; } catch { }
-            try { pm.enabledRayLookInteract = rayInteract; } catch { }
+            try { pm.enabledMouseMovement = mouse; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { pm.enabledPlayerMovement = movement; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { pm.enabledRayLookInteract = rayInteract; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SuspendAll()
@@ -112,7 +112,7 @@ public static class GregInputLock
         if (now < _nextRescanRealtime) return;
         _nextRescanRealtime = now + 2f;
         PlayerInput[] all = null;
-        try { all = Resources.FindObjectsOfTypeAll<PlayerInput>(); } catch { }
+        try { all = Resources.FindObjectsOfTypeAll<PlayerInput>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         if (all == null) return;
         foreach (var pi in all)
         {
@@ -130,11 +130,11 @@ public static class GregInputLock
                     var asset = pi.actions;
                     if (asset != null && asset.enabled) asset.Disable();
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 pi.DeactivateInput();
                 Suspended.Add(pi);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -143,14 +143,14 @@ public static class GregInputLock
         foreach (var pi in Suspended)
         {
             if (pi == null) continue;
-            try { pi.ActivateInput(); } catch { }
+            try { pi.ActivateInput(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             try
             {
                 InputActionAsset asset = null;
-                try { asset = pi.actions; } catch { }
+                try { asset = pi.actions; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 if (asset != null && !asset.enabled) asset.Enable();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         Suspended.Clear();
     }

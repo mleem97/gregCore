@@ -92,7 +92,7 @@ public static class GregShop
             foreach (var si in items)
             {
                 if (si == null) continue;
-                try { result.Add(si); } catch { }
+                try { result.Add(si); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -194,7 +194,7 @@ public static class GregShop
             foreach (var mi in items)
             {
                 if (mi == null) continue;
-                try { result.Add(mi); } catch { }
+                try { result.Add(mi); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -249,7 +249,7 @@ public static class GregShop
                 var picker = shop.flexibleColorPicker;
                 if (picker != null) return picker;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         global::Il2Cpp.FlexibleColorPicker found = null;
         Try(() =>
@@ -268,7 +268,7 @@ public static class GregShop
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -344,7 +344,7 @@ public static class GregShop
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Shop: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Shop: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -352,7 +352,7 @@ public static class GregShop
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Shop-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Shop-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

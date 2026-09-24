@@ -73,7 +73,7 @@ public static class GregServiceRequests
             if (list == null) return;
             foreach (var sr in list)
             {
-                try { result.Add(Read(sr)); } catch { }
+                try { result.Add(Read(sr)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -102,7 +102,7 @@ public static class GregServiceRequests
             if (list == null) return;
             foreach (var sr in list)
             {
-                try { snap.Requests.Add(Read(sr)); } catch { }
+                try { snap.Requests.Add(Read(sr)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return snap;
@@ -193,7 +193,7 @@ public static class GregServiceRequests
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(r);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -268,7 +268,7 @@ public static class GregServiceRequests
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] ServiceRequests: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] ServiceRequests: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -276,7 +276,7 @@ public static class GregServiceRequests
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] ServiceRequests-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] ServiceRequests-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

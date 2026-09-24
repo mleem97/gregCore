@@ -171,6 +171,6 @@ public static class GregCustomItems
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Mods] CustomItems: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Mods] CustomItems: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

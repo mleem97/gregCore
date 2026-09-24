@@ -189,7 +189,7 @@ public static partial class GregEntityInventory
                             return true;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: best-effort inventory, game continues */ }
                     return false;
                 case InventoryKind.Switch:
                     return TryFindSwitch(e.NativeKey, out go);
@@ -220,7 +220,7 @@ public static partial class GregEntityInventory
                     {
                         if (s.gameObject != null) { go = s.gameObject; return true; }
                     }
-                    catch { }
+                    catch { /* ignored: best-effort inventory, game continues */ }
                     return false;
                 }
             }
@@ -247,7 +247,7 @@ public static partial class GregEntityInventory
                     {
                         if (p.gameObject != null) { go = p.gameObject; return true; }
                     }
-                    catch { }
+                    catch { /* ignored: best-effort inventory, game continues */ }
                     return false;
                 }
             }
@@ -352,7 +352,7 @@ public static partial class GregEntityInventory
         catch (Exception ex)
         {
             string report = "Verify failed: " + ex.GetBaseException().Message;
-            try { MelonLogger.Warning("[gregCore][Save] " + report); } catch { }
+            try { MelonLogger.Warning("[gregCore][Save] " + report); } catch { /* ignored: best-effort inventory, game continues */ }
             return report;
         }
     }
@@ -382,7 +382,7 @@ public static partial class GregEntityInventory
             EnsureMapLoaded(key, dir, name);
             var fresh = CollectAll(networkData);
             PublishFresh(fresh, key);
-            try { Rebuilt?.Invoke(); } catch { }
+            try { Rebuilt?.Invoke(); } catch { /* ignored: best-effort inventory, game continues */ }
             MelonLogger.Msg("[gregCore][Save] Inventar: " + Summary());
             if (EntityInventoryConfig.VerboseLogging)
             {
@@ -390,7 +390,7 @@ public static partial class GregEntityInventory
             }
             if (EntityInventoryConfig.DumpOnRebuild)
             {
-                try { MelonLogger.Msg(Dump()); } catch { }
+                try { MelonLogger.Msg(Dump()); } catch { /* ignored: best-effort inventory, game continues */ }
             }
         }
         catch (Exception ex)
@@ -424,7 +424,7 @@ public static partial class GregEntityInventory
             }
             MelonLogger.Msg("[gregCore][Save] EntityInventory deaktiviert (Pref) - kein Inventar.");
         }
-        catch { }
+        catch { /* ignored: best-effort inventory, game continues */ }
     }
 
     private static void ResolveSaveKey(out string dir, out string name, out string key)
@@ -447,7 +447,7 @@ public static partial class GregEntityInventory
                 _mapLoadedForKey = key;
             }
         }
-        catch { }
+        catch { /* ignored: best-effort inventory, game continues */ }
     }
 
     private static FreshData CollectAll(global::Il2Cpp.NetworkSaveData networkData)
@@ -482,6 +482,6 @@ public static partial class GregEntityInventory
                 _ready = true;
             }
         }
-        catch { }
+        catch { /* ignored: best-effort inventory, game continues */ }
     }
 }

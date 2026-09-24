@@ -36,14 +36,14 @@ public static class GregHudRegistry
                 Label = string.IsNullOrWhiteSpace(label) ? modId : label.Trim(),
             };
         }
-        try { GregHud.Refresh(); } catch { }
+        try { GregHud.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Unregister(string modId)
     {
         if (string.IsNullOrWhiteSpace(modId)) return;
         lock (_entries) { _entries.Remove(modId); }
-        try { GregHud.Refresh(); } catch { }
+        try { GregHud.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static IReadOnlyList<Entry> All()

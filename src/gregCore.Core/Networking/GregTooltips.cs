@@ -34,7 +34,7 @@ public static class GregTooltips
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -110,7 +110,7 @@ public static class GregTooltips
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -157,7 +157,7 @@ public static class GregTooltips
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Tooltips: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Tooltips: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -165,7 +165,7 @@ public static class GregTooltips
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Tooltips-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Tooltips-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

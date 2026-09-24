@@ -68,7 +68,7 @@ public static class GregModPack
     {
         global::Il2Cpp.ModPackConfig cfg = null;
         try { cfg = new global::Il2Cpp.ModPackConfig(); } catch { return null; }
-        try { cfg.modName = modName ?? ""; } catch { }
+        try { cfg.modName = modName ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         EnsureLists(cfg);
         return cfg;
     }
@@ -77,9 +77,9 @@ public static class GregModPack
     public static void EnsureLists(global::Il2Cpp.ModPackConfig cfg)
     {
         if (cfg == null) return;
-        try { if (cfg.shopItems == null) cfg.shopItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ShopItemConfig>(); } catch { }
-        try { if (cfg.staticItems == null) cfg.staticItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.StaticItemConfig>(); } catch { }
-        try { if (cfg.dlls == null) cfg.dlls = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.DllEntry>(); } catch { }
+        try { if (cfg.shopItems == null) cfg.shopItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ShopItemConfig>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { if (cfg.staticItems == null) cfg.staticItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.StaticItemConfig>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { if (cfg.dlls == null) cfg.dlls = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.DllEntry>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // ── Builder: DTO -> Spieltyp (jeweils best-effort pro Feld) ──────────────
@@ -154,7 +154,7 @@ public static class GregModPack
             if (list == null) return;
             foreach (var item in list)
             {
-                try { snap.ShopItems.Add(ReadShopItem(item)); } catch { }
+                try { snap.ShopItems.Add(ReadShopItem(item)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() =>
@@ -163,7 +163,7 @@ public static class GregModPack
             if (list == null) return;
             foreach (var item in list)
             {
-                try { snap.StaticItems.Add(ReadStaticItem(item)); } catch { }
+                try { snap.StaticItems.Add(ReadStaticItem(item)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() =>
@@ -180,7 +180,7 @@ public static class GregModPack
                         EntryClass = entry != null ? entry.entryClass ?? "" : "",
                     });
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return snap;
@@ -291,7 +291,7 @@ public static class GregModPack
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Mods] ModPack-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Mods] ModPack-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

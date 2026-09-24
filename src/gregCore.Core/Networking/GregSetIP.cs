@@ -37,9 +37,9 @@ public static class GregSetIP
                     {
                         if (s.isActive) { found = s; break; }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -71,7 +71,7 @@ public static class GregSetIP
                 string mask = inst.GetMaskFromCidr(cidr);
                 if (!string.IsNullOrEmpty(mask)) return mask;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         return MaskFromCidrManaged(cidr);
     }
@@ -96,7 +96,7 @@ public static class GregSetIP
                     string ip = arr[i];
                     if (!string.IsNullOrEmpty(ip)) result.Add(ip);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -170,7 +170,7 @@ public static class GregSetIP
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] SetIP: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] SetIP: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -178,7 +178,7 @@ public static class GregSetIP
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] SetIP-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] SetIP-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

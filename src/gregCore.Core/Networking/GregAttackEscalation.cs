@@ -88,7 +88,7 @@ public static class GregAttackEscalation
         {
             yield return wait;
             if (!_running) yield break;
-            try { Tick(1f); } catch { }
+            try { Tick(1f); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -135,23 +135,23 @@ public static class GregAttackEscalation
         {
             if (stats.AttackInterval > 0f) mgr.attackInterval = stats.AttackInterval;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             if (stats.SpawnRate > 0f) mgr.spawnRate = stats.SpawnRate;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             if (stats.MoveSpeed > 0f) mgr.moveSpeed = stats.MoveSpeed;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             MelonLogger.Msg($"[gregCore][Net] Angriffs-Eskalation: Stufe {tier} " +
                 $"(Intervall {stats.AttackInterval:F0}s, Rate x{(stats.SpawnRate / Math.Max(0.001f, _baseRate)):F2}).");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // ── Reine Stufenmathe (ohne Spiel testbar) ───────────────────────────────

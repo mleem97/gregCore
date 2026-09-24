@@ -73,7 +73,7 @@ public static class GregModSave
         {
             foreach (var entry in list)
             {
-                try { result.Add(Read(entry)); } catch { }
+                try { result.Add(Read(entry)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -130,7 +130,7 @@ public static class GregModSave
                 try { name = entry.modFolderName; } catch { continue; }
                 if (string.Equals(name, modFolderName, StringComparison.OrdinalIgnoreCase))
                 {
-                    try { list.RemoveAt(i); removed = true; } catch { }
+                    try { list.RemoveAt(i); removed = true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         });
@@ -147,7 +147,7 @@ public static class GregModSave
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Mods] ModSave-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Mods] ModSave-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

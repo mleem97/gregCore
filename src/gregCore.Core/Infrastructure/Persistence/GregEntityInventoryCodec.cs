@@ -27,9 +27,9 @@ public static partial class GregEntityInventory
         private static bool _loaded;
         private static readonly object _loadGate = new object();
 
-        public static bool Enabled = true;
-        public static bool VerboseLogging = false;
-        public static bool DumpOnRebuild = false;
+        public static bool Enabled { get; internal set; } = true;
+        public static bool VerboseLogging { get; internal set; } = false;
+        public static bool DumpOnRebuild { get; internal set; } = false;
 
         public static void Load()
         {
@@ -50,10 +50,10 @@ public static partial class GregEntityInventory
                     VerboseLogging = verbose.Value;
                     DumpOnRebuild = dump.Value;
                 }
-                catch { }
-                try { category.SaveToFile(false); } catch { }
+                catch { /* ignored: optional persistence, game continues without sidecar */ }
+                try { category.SaveToFile(false); } catch { /* ignored: optional persistence, game continues without sidecar */ }
             }
-            catch { }
+            catch { /* ignored: optional persistence, game continues without sidecar */ }
         }
 
         // Nur Tests/Tools: Laufzeit-Umschalter ohne Datei.
@@ -66,7 +66,7 @@ public static partial class GregEntityInventory
                 if (verbose.HasValue) VerboseLogging = verbose.Value;
                 if (dump.HasValue) DumpOnRebuild = dump.Value;
             }
-            catch { }
+            catch { /* ignored: optional persistence, game continues without sidecar */ }
         }
     }
 
@@ -89,7 +89,7 @@ public static partial class GregEntityInventory
             }
             GregSaveGuard.RegisterSidecar(SidecarModId, SerializeMap, ParseMap);
         }
-        catch { }
+        catch { /* ignored: optional persistence, game continues without sidecar */ }
     }
 
     public static string SerializeMap()
@@ -132,7 +132,7 @@ public static partial class GregEntityInventory
                 foreach (var kv in hints) _persistedHint[kv.Key] = kv.Value;
             }
         }
-        catch { }
+        catch { /* ignored: optional persistence, game continues without sidecar */ }
     }
 
     /// <summary>Reine TSV-Logik (kindKey -&gt; uid/hint), unit-testbar ohne Spiel.</summary>
@@ -161,7 +161,7 @@ public static partial class GregEntityInventory
                 hints[kk] = hint;
             }
         }
-        catch { }
+        catch { /* ignored: optional persistence, game continues without sidecar */ }
         return uids;
     }
 
@@ -184,7 +184,7 @@ public static partial class GregEntityInventory
             }
             MelonLogger.Msg("[gregCore][Save] Inventar-Sidecar geladen: " + uids.Count + " UID(s).");
         }
-        catch { }
+        catch { /* ignored: optional persistence, game continues without sidecar */ }
     }
 
     // ------------------------------------------------------------ helpers (pure, testbar)

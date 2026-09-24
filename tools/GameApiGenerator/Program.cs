@@ -51,7 +51,7 @@ bool IsComponent(TypeDefinition t)
             try { b = b.Resolve()?.BaseType; } catch { return false; }
         }
     }
-    catch { }
+    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     return false;
 }
 
@@ -113,7 +113,7 @@ foreach (var t in types)
             }
         }
     }
-    catch { }
+    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
     var methods = new List<(string Name, bool Static)>();
     var seenMethods = new HashSet<string>(StringComparer.Ordinal);
@@ -128,7 +128,7 @@ foreach (var t in types)
                 if (seenMethods.Add(m.Name)) methods.Add((m.Name, m.IsStatic));
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         methods.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -141,7 +141,7 @@ foreach (var t in types)
             if (p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true) props.Add(p.Name);
         }
     }
-    catch { }
+    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
     var fields = new List<string>();
     try
@@ -153,7 +153,7 @@ foreach (var t in types)
             fields.Add(f.Name);
         }
     }
-    catch { }
+    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
     var nested = new List<string>();
     try
@@ -168,7 +168,7 @@ foreach (var t in types)
             foreach (var child in def.NestedTypes) stack.Push((child, full));
         }
     }
-    catch { }
+    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     nested.Sort(StringComparer.OrdinalIgnoreCase);
 
     var enumValues = new List<(string Name, string Value)>();
@@ -182,7 +182,7 @@ foreach (var t in types)
                 enumValues.Add((f.Name, f.Constant?.ToString() ?? "?"));
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     var moduleName = Sanitize(shortName, keywords) + arity + "Module";

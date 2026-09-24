@@ -74,3 +74,37 @@ und `spawnedItems` wird nie geleert (stale Keys!). Bewährt (Backplanes):
 PrefabIDs landen in Saves. Umbenennen/Recyceln bricht alte Spielstände → IDs und
 `ShopGuid`s **nie** wiederverwenden. Nachfolger-Mods halten Aliase lesbar
 (RealisticModules liest MoreModules-`1000–1006`).
+
+## 6. Shortcut: GregShopItems API (EN)
+
+> API: `gregCore.Core.Networking.GregShopItems`. Implements steps 2–3 above
+> as reusable primitives — no more per-mod registry dicts, template scans,
+> or button builders.
+
+```csharp
+// Once (e.g. in SetupRegistry):
+gregCore.Core.Networking.GregShopItems.RegisterPrefab(itemId, baseItemId,
+    () => BuildMyPrefab(itemId));
+
+// In the GetPrefabForItem prefix (replaces Registry dict + fallback scan):
+if (gregCore.Core.Networking.GregShopItems.TryResolvePrefab(itemID, out var prefab))
+{
+    __result = prefab;   // inactive holder child (prefab semantics)
+    return false;
+}
+if (gregCore.Core.Networking.GregShopItems.TryGetBaseId(itemID, out var baseId))
+{
+    itemID = baseId;     // remap-only path (Backplanes style)
+}
+return true;
+
+// Shop buttons (replaces AddShopButton + dedup flag):
+var template = gregCore.Core.Networking.GregShopItems.FindTemplate(shop, itemType);
+var parent = gregCore.Core.Networking.GregShopItems.FindSection(shop, "HL Mods");
+gregCore.Core.Networking.GregShopItems.AddButton(template, parent,
+    itemId, label, price, xp, guid, isCustomColor, sprite); // skips existing guid
+```
+
+Rules: prefab results must be inactive holder children (never live scene
+objects — orphans pollute saves, see MoreSpools v1.2.1). Item IDs and shop
+guids are never reused (section 5).

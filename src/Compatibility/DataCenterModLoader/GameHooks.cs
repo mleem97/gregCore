@@ -76,7 +76,7 @@ public static class GameHooks
                 {
                     foreach (var kvp in netMap.servers)
                     {
-                        var srv = kvp.Value;
+                        var srv = kvp.Value?.TryCast<Il2Cpp.Server>();
                         try
                         {
                             if (srv != null && srv.currentRackPosition != null)
@@ -132,7 +132,7 @@ public static class GameHooks
                 {
                     foreach (var kvp in netMap.switches)
                     {
-                        var sw = kvp.Value;
+                        var sw = kvp.Value?.TryCast<Il2Cpp.NetworkSwitch>();
                         try
                         {
                             if (sw != null && sw.currentRackPosition != null)
@@ -188,7 +188,7 @@ public static class GameHooks
                 {
                     foreach (var kvp in netMap.patchPanels)
                     {
-                        var pp = kvp.Value;
+                        var pp = kvp.Value?.TryCast<Il2Cpp.PatchPanel>();
                         try
                         {
                             if (pp != null && pp.currentRackPosition != null)

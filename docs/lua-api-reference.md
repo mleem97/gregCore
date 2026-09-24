@@ -87,6 +87,7 @@ Define these functions globally in `main.lua` (all optional):
 - `find_base(baseId) -> table or nil`
 - `is_ip_present(baseId, ip) -> bool` / `app_id_for_ip(baseId, ip) -> number` (-1 unknown)
 - `register_subnet(baseId, vlanId, routeKey, ips) -> bool` / `unregister_subnet(baseId, routeKey) -> bool`
+- `apply_save(baseId, spec) -> bool` (writes customer/difficulty/internet flags into the live base)
 
 ### `greg.economy` (read-only)
 - `sheet() -> table or nil`: `{total_salary, months}`.
@@ -116,9 +117,10 @@ Define these functions globally in `main.lua` (all optional):
 - `ensure({mod=, min_version=?, required=?}) -> ok, detail`
 - `check() -> table`: array of `{owner, mod, detail}` problems (empty = ok).
 
-### `greg.requests` (read-only)
+### `greg.requests`
 - `list() -> table`: array of `{number, state, short, long, rewarded, done, progress}`.
 - `current_number() -> number`
+- `add(spec) -> bool` (spec: `short`, `long`?, `state`? as "open"/"done", `number`?)
 
 ### `greg.subnet`
 - `mask_from_cidr(cidr) -> string` (pure math, no game needed)

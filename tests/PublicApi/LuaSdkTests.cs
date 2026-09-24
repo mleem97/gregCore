@@ -313,6 +313,9 @@ public class LuaSdkTests
         var req = greg.Get("requests").Table;
         Call(req, "list").Table.Length.Should().Be(0);
         Call(req, "current_number").Number.Should().Be(0);
+        // requests.add() deliberately untested headless: constructing a live
+        // Il2Cpp.ServiceRequest outside the game crashes its finalizer on GC
+        // (game-only path, verified by review + build).
     }
 
     [Fact]
@@ -467,6 +470,8 @@ public class LuaSdkTests
         LuaCustomerModule.Register(greg, script, "test");
         Call(greg.Get("customer").Table, "register_subnet",
             1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();
+        Call(greg.Get("customer").Table, "apply_save",
+            1, script.DoString("return {difficulty=2}")).Boolean.Should().BeFalse();
     }
 
     [Fact]

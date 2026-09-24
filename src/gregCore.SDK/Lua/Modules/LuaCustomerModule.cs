@@ -19,6 +19,7 @@ public static class LuaCustomerModule
         RegisterIsIpPresent(customerTable);
         RegisterRegisterSubnet(customerTable, modId);
         RegisterUnregisterSubnet(customerTable, modId);
+        RegisterApplySave(customerTable, modId);
 
         greg["customer"] = customerTable;
     }
@@ -142,6 +143,36 @@ public static class LuaCustomerModule
             catch (Exception ex)
             {
                 LuaLog.Error($"[LuaMod:{modId}] customer.unregister_subnet() failed: {ex.Message}");
+                return false;
+            }
+        });
+    }
+
+    private static void RegisterApplySave(Table t, string modId)
+    {
+
+        // greg.customer.apply_save(baseId, spec) → bool (writes a save DTO
+        // into the live base; spec keys mirror GregCustomerSaves.CustomerBase)
+        t["apply_save"] = (Func<int, DynValue, bool>)((baseId, spec) =>
+        {
+            try
+            {
+                var cb = FindBaseById(baseId);
+                if (cb == null || spec == null || spec.Type != DataType.Table) return false;
+                var dto = new gregCore.Core.Networking.GregCustomerSaves.CustomerBase();
+                var st = spec.Table;
+                dto.CustomerBaseID = baseId;
+                int? i = LuaServerModule.Int(st, "customer_id");
+                if (i.HasValue) dto.CustomerID = i.Value;
+                i = LuaServerModule.Int(st, "difficulty");
+                if (i.HasValue) dto.Difficulty = i.Value;
+                bool? b = LuaServerModule.Bool(st, "wants_internet");
+                if (b.HasValue) dto.WantsInternet = b.Value;
+                return gregCore.Core.Networking.GregCustomers.LoadData(cb, dto);
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] customer.apply_save() failed: {ex.Message}");
                 return false;
             }
         });

@@ -93,7 +93,7 @@ public static class GameHooks
                                 }
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 else
@@ -148,7 +148,7 @@ public static class GameHooks
                                 }
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 else

@@ -76,7 +76,17 @@ namespace DataCenterModLoader
 
         private static void BuildSidebar()
         {
-            var sidebar = new VisualElement
+            var sidebar = MakeSidebarRoot();
+            if (_modOrder.Count == 0)
+                AddNoModsLabel(sidebar);
+            else
+                AddModButtons(sidebar);
+            _panelRoot?.Add(sidebar);
+        }
+
+        private static VisualElement MakeSidebarRoot()
+        {
+            return new VisualElement
             {
                 style =
                 {
@@ -88,48 +98,50 @@ namespace DataCenterModLoader
                     flexDirection = FlexDirection.Column
                 }
             };
-            
-            if (_modOrder.Count == 0)
+        }
+
+        private static void AddNoModsLabel(VisualElement sidebar)
+        {
+            var noMods = new Label("No mods")
             {
-                var noMods = new Label("No mods")
+                style =
                 {
-                    style =
-                    {
-                        fontSize = 14,
-                        color = new Color(0.7f, 0.7f, 0.7f),
-                        marginTop = 4,
-                        marginLeft = 4
-                    }
-                };
-                sidebar.Add(noMods);
-            }
-            else
-            {
-                foreach (var modId in _modOrder)
-                {
-                    var btn = new UnityEngine.UIElements.Button();
-                    btn.text = modId.Length > 16 ? modId.Substring(0, 14) + ".." : modId;
-                    btn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>
-                    {
-                        _selectedModId = modId;
-                        BuildContentArea();
-                    }));
-                    btn.style.backgroundColor = modId == _selectedModId ?
-                        new Color(0.2f, 0.2f, 0.2f) : Color.clear;
-                    btn.style.color = Color.white;
-                    btn.style.unityFontStyleAndWeight = FontStyle.Bold;
-                    btn.style.height = 32;
-                    btn.style.marginTop = 3;
-                    btn.style.borderTopWidth = 0;
-                    btn.style.borderBottomWidth = 0;
-                    btn.style.borderLeftWidth = 0;
-                    btn.style.borderRightWidth = 0;
-                    btn.style.unityTextAlign = TextAnchor.MiddleLeft;
-                    sidebar.Add(btn);
+                    fontSize = 14,
+                    color = new Color(0.7f, 0.7f, 0.7f),
+                    marginTop = 4,
+                    marginLeft = 4
                 }
-            }
-            
-            _panelRoot?.Add(sidebar);
+            };
+            sidebar.Add(noMods);
+        }
+
+        private static void AddModButtons(VisualElement sidebar)
+        {
+            foreach (var modId in _modOrder)
+                sidebar.Add(MakeModButton(modId));
+        }
+
+        private static UnityEngine.UIElements.Button MakeModButton(string modId)
+        {
+            var btn = new UnityEngine.UIElements.Button();
+            btn.text = modId.Length > 16 ? modId.Substring(0, 14) + ".." : modId;
+            btn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>
+            {
+                _selectedModId = modId;
+                BuildContentArea();
+            }));
+            btn.style.backgroundColor = modId == _selectedModId ?
+                new Color(0.2f, 0.2f, 0.2f) : Color.clear;
+            btn.style.color = Color.white;
+            btn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            btn.style.height = 32;
+            btn.style.marginTop = 3;
+            btn.style.borderTopWidth = 0;
+            btn.style.borderBottomWidth = 0;
+            btn.style.borderLeftWidth = 0;
+            btn.style.borderRightWidth = 0;
+            btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+            return btn;
         }
 
         private static void BuildContentArea()
@@ -183,7 +195,15 @@ namespace DataCenterModLoader
 
         private static void BuildConfigEntry(VisualElement parent, ConfigEntry entry)
         {
-            var entryRow = new VisualElement
+            var entryRow = MakeEntryRow();
+            entryRow.Add(MakeEntryLabel(entry.DisplayName));
+            AddEntryControl(entryRow, entry);
+            parent.Add(entryRow);
+        }
+
+        private static VisualElement MakeEntryRow()
+        {
+            return new VisualElement
             {
                 style =
                 {
@@ -193,8 +213,11 @@ namespace DataCenterModLoader
                     marginBottom = 4
                 }
             };
-            
-            var label = new Label(entry.DisplayName)
+        }
+
+        private static Label MakeEntryLabel(string text)
+        {
+            return new Label(text)
             {
                 style =
                 {
@@ -203,52 +226,61 @@ namespace DataCenterModLoader
                     width = 200
                 }
             };
-            entryRow.Add(label);
-            
+        }
+
+        private static void AddEntryControl(VisualElement entryRow, ConfigEntry entry)
+        {
             if (entry.Type == ConfigEntryType.Bool)
-            {
-                var toggle = new Toggle
-                {
-                    value = entry.BoolValue,
-                    style = { width = 50 }
-                };
-                toggle.RegisterCallback<ChangeEvent<bool>>(new Action<ChangeEvent<bool>>(evt => 
-                {
-                    entry.BoolValue = evt.newValue;
-                    SaveConfig(entry);
-                }));
-                entryRow.Add(toggle);
-            }
+                AddBoolToggle(entryRow, entry);
             else if (entry.Type == ConfigEntryType.Int)
-            {
-                var slider = new Slider(entry.IntMin, entry.IntMax)
-                {
-                    value = entry.IntValue,
-                    style = { flexGrow = 1 }
-                };
-                slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt => 
-                {
-                    entry.IntValue = (int)evt.newValue;
-                    SaveConfig(entry);
-                }));
-                entryRow.Add(slider);
-            }
+                AddIntSlider(entryRow, entry);
             else if (entry.Type == ConfigEntryType.Float)
+                AddFloatSlider(entryRow, entry);
+        }
+
+        private static void AddBoolToggle(VisualElement entryRow, ConfigEntry entry)
+        {
+            var toggle = new Toggle
             {
-                var slider = new Slider(entry.FloatMin, entry.FloatMax)
-                {
-                    value = entry.FloatValue,
-                    style = { flexGrow = 1 }
-                };
-                slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt => 
-                {
-                    entry.FloatValue = evt.newValue;
-                    SaveConfig(entry);
-                }));
-                entryRow.Add(slider);
-            }
-            
-            parent.Add(entryRow);
+                value = entry.BoolValue,
+                style = { width = 50 }
+            };
+            toggle.RegisterCallback<ChangeEvent<bool>>(new Action<ChangeEvent<bool>>(evt =>
+            {
+                entry.BoolValue = evt.newValue;
+                SaveConfig(entry);
+            }));
+            entryRow.Add(toggle);
+        }
+
+        private static void AddIntSlider(VisualElement entryRow, ConfigEntry entry)
+        {
+            var slider = new Slider(entry.IntMin, entry.IntMax)
+            {
+                value = entry.IntValue,
+                style = { flexGrow = 1 }
+            };
+            slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt =>
+            {
+                entry.IntValue = (int)evt.newValue;
+                SaveConfig(entry);
+            }));
+            entryRow.Add(slider);
+        }
+
+        private static void AddFloatSlider(VisualElement entryRow, ConfigEntry entry)
+        {
+            var slider = new Slider(entry.FloatMin, entry.FloatMax)
+            {
+                value = entry.FloatValue,
+                style = { flexGrow = 1 }
+            };
+            slider.RegisterCallback<ChangeEvent<float>>(new Action<ChangeEvent<float>>(evt =>
+            {
+                entry.FloatValue = evt.newValue;
+                SaveConfig(entry);
+            }));
+            entryRow.Add(slider);
         }
 
         private static void SaveConfig(ConfigEntry entry)

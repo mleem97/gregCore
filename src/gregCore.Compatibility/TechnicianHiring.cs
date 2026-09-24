@@ -8,7 +8,7 @@ namespace DataCenterModLoader;
 
 public static class TechnicianHiring
 {
-    private readonly struct TechDef
+    private readonly struct TechDef : System.IEquatable<TechDef>
     {
         public readonly string Id;
         public readonly string Name;
@@ -23,6 +23,19 @@ public static class TechnicianHiring
             Description = description;
             Salary = salary;
             RequiredRep = requiredRep;
+        }
+
+        public bool Equals(TechDef other)
+        {
+            return Id == other.Id && Name == other.Name && Description == other.Description
+                && Salary.Equals(other.Salary) && RequiredRep.Equals(other.RequiredRep);
+        }
+
+        public override bool Equals(object obj) => obj is TechDef other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            return System.HashCode.Combine(Id, Name, Description, Salary, RequiredRep);
         }
     }
 
@@ -95,84 +108,101 @@ public static class TechnicianHiring
 
             CrashLog.Log($"TechnicianHiring.OnEmployeeHired: handling '{employeeId}'");
 
-            var tm = TechnicianManager.instance;
-            if (tm == null)
-            {
-                CrashLog.Log("TechnicianHiring.OnEmployeeHired: TechnicianManager.instance is null aborting");
-                Core.Instance?.LoggerInstance.Error("[TechnicianHiring] TechnicianManager not available");
-                return;
-            }
-
-            var existing = tm.technicians;
-            if (existing == null || existing.Count == 0)
-            {
-                CrashLog.Log("TechnicianHiring.OnEmployeeHired: No existing technicians to clone");
-                Core.Instance?.LoggerInstance.Error("[TechnicianHiring] No existing technicians to clone");
-                return;
-            }
-
-            int existingCount = existing.Count;
-
-            int sourceIndex = _spawnedTechIds.Count % existingCount;
-            var source = existing[sourceIndex];
-            if (source == null)
-            {
-                CrashLog.Log($"TechnicianHiring.OnEmployeeHired: source technician at index {sourceIndex} is null");
-                return;
-            }
-
-            CrashLog.Log($"TechnicianHiring.OnEmployeeHired: cloning technician at index {sourceIndex} ('{source.technicianName}')");
-
-            var clone = UnityEngine.Object.Instantiate(source.gameObject);
-            if (clone == null)
-            {
-                CrashLog.Log("TechnicianHiring.OnEmployeeHired: Object.Instantiate returned null");
-                return;
-            }
-
-            var tech = clone.GetComponent<Technician>();
-            if (tech == null)
-            {
-                CrashLog.Log("TechnicianHiring.OnEmployeeHired: cloned object has no Technician component");
-                UnityEngine.Object.Destroy(clone);
-                return;
-            }
-
-            int newId = _nextTechId++;
-            tech.technicianID = newId;
-            tech.technicianName = "Mod Tech " + newId;
-
-            // Salary handled by CustomEmployeeManager, zero it out here
-            tech.salary = 0;
-
-            if (tm.transformContainer != null && tm.transformContainer.Length > 0)
-                tech.transformContainer = tm.transformContainer[0];
-            if (tm.transformDumpster != null && tm.transformDumpster.Length > 0)
-                tech.transformDumpster = tm.transformDumpster[0];
-            if (tm.transformDeviceSpawnPosition != null && tm.transformDeviceSpawnPosition.Length > 0)
-                tech.transformDeviceSpawnPosition = tm.transformDeviceSpawnPosition[0];
-
-            if (tm.transformIdle != null && tm.transformIdle.Length > 0)
-            {
-                int idleIndex = _spawnedTechIds.Count % tm.transformIdle.Length;
-                tech.transformIdle = tm.transformIdle[idleIndex];
-                CrashLog.Log($"TechnicianHiring.OnEmployeeHired: assigned idle transform index {idleIndex}");
-            }
-            else
-            {
-                CrashLog.Log("TechnicianHiring.OnEmployeeHired: no idle transforms available on TechnicianManager");
-            }
-
-            tm.AddTechnician(tech);
-            _spawnedTechIds.Add(newId);
-
-            CrashLog.Log($"TechnicianHiring.OnEmployeeHired: spawned technician id={newId} for employee '{employeeId}' (total spawned: {_spawnedTechIds.Count})");
-            Core.Instance?.LoggerInstance.Msg($"[TechnicianHiring] Spawned technician #{newId} for '{employeeId}'");
+            var ctx = ResolveHireContext(employeeId);
+            if (ctx == null) return;
+            var tech = CloneSourceTechnician(ctx.Value.source, employeeId);
+            if (tech == null) return;
+            ConfigureHiredTechnician(ctx.Value.manager, tech, employeeId);
         }
         catch (Exception ex)
         {
             CrashLog.LogException($"TechnicianHiring.OnEmployeeHired({employeeId})", ex);
         }
+    }
+
+    private static (TechnicianManager manager, Technician source)? ResolveHireContext(string employeeId)
+    {
+        var tm = TechnicianManager.instance;
+        if (tm == null)
+        {
+            CrashLog.Log("TechnicianHiring.OnEmployeeHired: TechnicianManager.instance is null aborting");
+            Core.Instance?.LoggerInstance.Error("[TechnicianHiring] TechnicianManager not available");
+            return null;
+        }
+
+        var existing = tm.technicians;
+        if (existing == null || existing.Count == 0)
+        {
+            CrashLog.Log("TechnicianHiring.OnEmployeeHired: No existing technicians to clone");
+            Core.Instance?.LoggerInstance.Error("[TechnicianHiring] No existing technicians to clone");
+            return null;
+        }
+
+        int existingCount = existing.Count;
+
+        int sourceIndex = _spawnedTechIds.Count % existingCount;
+        var source = existing[sourceIndex];
+        if (source == null)
+        {
+            CrashLog.Log($"TechnicianHiring.OnEmployeeHired: source technician at index {sourceIndex} is null");
+            return null;
+        }
+
+        CrashLog.Log($"TechnicianHiring.OnEmployeeHired: cloning technician at index {sourceIndex} ('{source.technicianName}')");
+        return (tm, source);
+    }
+
+    private static Technician CloneSourceTechnician(Technician source, string employeeId)
+    {
+        var clone = UnityEngine.Object.Instantiate(source.gameObject);
+        if (clone == null)
+        {
+            CrashLog.Log("TechnicianHiring.OnEmployeeHired: Object.Instantiate returned null");
+            return null;
+        }
+
+        var tech = clone.GetComponent<Technician>();
+        if (tech == null)
+        {
+            CrashLog.Log("TechnicianHiring.OnEmployeeHired: cloned object has no Technician component");
+            UnityEngine.Object.Destroy(clone);
+            return null;
+        }
+        return tech;
+    }
+
+    private static void ConfigureHiredTechnician(TechnicianManager tm, Technician tech, string employeeId)
+    {
+        int newId = _nextTechId++;
+        tech.technicianID = newId;
+        tech.technicianName = "Mod Tech " + newId;
+
+        // Salary handled by CustomEmployeeManager, zero it out here
+        tech.salary = 0;
+
+        if (tm.transformContainer != null && tm.transformContainer.Length > 0)
+            tech.transformContainer = tm.transformContainer[0];
+        if (tm.transformDumpster != null && tm.transformDumpster.Length > 0)
+            tech.transformDumpster = tm.transformDumpster[0];
+        if (tm.transformDeviceSpawnPosition != null && tm.transformDeviceSpawnPosition.Length > 0)
+            tech.transformDeviceSpawnPosition = tm.transformDeviceSpawnPosition[0];
+
+        if (tm.transformIdle != null && tm.transformIdle.Length > 0)
+        {
+            int idleIndex = _spawnedTechIds.Count % tm.transformIdle.Length;
+            tech.transformIdle = tm.transformIdle[idleIndex];
+            CrashLog.Log($"TechnicianHiring.OnEmployeeHired: assigned idle transform index {idleIndex}");
+        }
+        else
+        {
+            CrashLog.Log("TechnicianHiring.OnEmployeeHired: no idle transforms available on TechnicianManager");
+        }
+
+        tm.AddTechnician(tech);
+        _spawnedTechIds.Add(newId);
+
+        CrashLog.Log($"TechnicianHiring.OnEmployeeHired: spawned technician id={newId} for employee '{employeeId}' (total spawned: {_spawnedTechIds.Count})");
+        Core.Instance?.LoggerInstance.Msg($"[TechnicianHiring] Spawned technician #{newId} for '{employeeId}'");
     }
 
     public static void OnEmployeeFired(string employeeId)

@@ -487,12 +487,18 @@ namespace gregCore.API
 
     public class GregSettingsProxy
     {
+        public sealed class SliderOptions
+        {
+            public string Cat { get; set; } = "General";
+            public string Desc { get; set; } = "";
+        }
+
         public void RegisterToggle(string modId, string k, string n, bool def, Action<bool> cb)
             => RegisterToggle(modId, k, n, def, cb, "General", "");
         public void RegisterToggle(string modId, string k, string n, bool def, Action<bool> cb, string cat, string desc) { /* shim, wired later */ }
         public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb)
-            => RegisterSlider(modId, k, n, min, max, def, cb, "General", "");
-        public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb, string cat, string desc) { /* shim, wired later */ }
+            => RegisterSlider(modId, k, n, min, max, def, cb, new SliderOptions());
+        public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb, SliderOptions opts) { /* shim, wired later */ }
         public void RegisterToggle(string k, string n, string d, bool def) { /* shim, wired later */ }
         public void RegisterSlider(string k, string n, string d, float min, float max, float def) { /* shim, wired later */ }
     }

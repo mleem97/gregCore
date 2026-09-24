@@ -4,8 +4,8 @@ using gregCore.Sdk.Models;
 namespace gregCore.Sdk;
 
 /// <summary>
-/// Das öffentliche Interface für alle Mod-Entwickler (SDK Layer).
-/// Stellt eine stabile, versionierte API bereit.
+/// The public interface for all mod developers (SDK layer).
+/// Provides a stable, versioned API.
 /// </summary>
 public interface IGregAPI
 {
@@ -25,4 +25,25 @@ public interface IGregAPI
 
     // --- Notifications ---
     void ShowNotification(string title, string message, float duration = 5f);
+
+    // --- Logging (short) ---
+    void Log(string message);
+    void Warn(string message);
+    void Error(string message);
+
+    // --- Toasts & F1 menus (UI) ---
+    void Toast(string message, float duration = 3f);
+    void ToastRich(string top, string title, string sub, float duration = 5f);
+    void BindMenuToggle(string menuId, Action toggle, Func<bool> isOpen);
+    void ReportMenu(string menuId, bool open);
+
+    // --- Custom shop items (prefab remap + buttons) ---
+    void RegisterShopPrefab(int itemId, int baseItemId, Func<UnityEngine.GameObject> resolver);
+    bool TryResolveShopPrefab(int itemId, out UnityEngine.GameObject prefab);
+
+    // --- Mod save sidecars (persisted next to the save) ---
+    void RegisterSaveSidecar(string modId, Func<string> save, Action<string> load);
+
+    // --- C# script HotLoad (main menu only; true = applied now) ---
+    bool TryReloadScriptsNow();
 }

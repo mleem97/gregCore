@@ -130,4 +130,60 @@ public class GregAPI : IGregAPI
     {
         _notifications.Show(title, message, duration);
     }
+
+    public void Log(string message)
+    {
+        try { _logger.Info(message); } catch { }
+    }
+
+    public void Warn(string message)
+    {
+        try { _logger.Warning(message); } catch { }
+    }
+
+    public void Error(string message)
+    {
+        try { _logger.Error(message); } catch { }
+    }
+
+    public void Toast(string message, float duration = 3f)
+    {
+        try { gregCore.UI.GregNotificationManager.Show(message, duration); } catch { }
+    }
+
+    public void ToastRich(string top, string title, string sub, float duration = 5f)
+    {
+        try { gregCore.UI.GregNotificationManager.ShowRich(top, title, sub, null, null, duration); } catch { }
+    }
+
+    public void BindMenuToggle(string menuId, Action toggle, Func<bool> isOpen)
+    {
+        try { gregCore.UI.GregMenuBinding.BindToggle(menuId, toggle, isOpen); } catch { }
+    }
+
+    public void ReportMenu(string menuId, bool open)
+    {
+        try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { }
+    }
+
+    public void RegisterShopPrefab(int itemId, int baseItemId, Func<UnityEngine.GameObject> resolver)
+    {
+        try { gregCore.Core.Networking.GregShopItems.RegisterPrefab(itemId, baseItemId, resolver); } catch { }
+    }
+
+    public bool TryResolveShopPrefab(int itemId, out UnityEngine.GameObject prefab)
+    {
+        prefab = null;
+        try { return gregCore.Core.Networking.GregShopItems.TryResolvePrefab(itemId, out prefab); } catch { return false; }
+    }
+
+    public void RegisterSaveSidecar(string modId, Func<string> save, Action<string> load)
+    {
+        try { gregCore.Infrastructure.Persistence.GregSaveGuard.RegisterSidecar(modId, save, load); } catch { }
+    }
+
+    public bool TryReloadScriptsNow()
+    {
+        try { return gregCore.Bridge.CSharpScript.GregCSharpScriptBridge.TryReloadNow(); } catch { return false; }
+    }
 }

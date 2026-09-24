@@ -470,6 +470,58 @@ public class LuaSdkTests
     }
 
     [Fact]
+    public void All_Modules_Register_Together_Like_Bridge()
+    {
+        string dir = NewTempDir();
+        try
+        {
+            var script = NewScript();
+            var greg = NewGreg(script);
+            LuaPlayerModule.Register(greg, script, "test");
+            LuaWorldModule.Register(greg, script, "test");
+            LuaRackModule.Register(greg, script, "test");
+            LuaServerModule.Register(greg, script, "test");
+            LuaSwitchModule.Register(greg, script, "test");
+            LuaPatchModule.Register(greg, script, "test");
+            LuaTechModule.Register(greg, script, "test");
+            LuaCableModule.Register(greg, script, "test");
+            LuaNetModule.Register(greg, script, "test");
+            LuaCustomerModule.Register(greg, script, "test");
+            LuaEconomyModule.Register(greg, script, "test");
+            LuaShopModule.Register(greg, script, "test");
+            LuaRequestsModule.Register(greg, script, "test");
+            LuaSubnetModule.Register(greg, script, "test");
+            LuaUiModule.Register(greg, script, "test");
+            LuaTabletModule.Register(greg, script, "test");
+            LuaModsModule.Register(greg, script, "test");
+            LuaModSaveModule.Register(greg, script, "test");
+            LuaItemsModule.Register(greg, script, "test", dir);
+            LuaJsonModule.Register(greg, script, "test");
+            LuaConfigModule.Register(greg, script, "test", dir);
+            LuaSaveModule.Register(greg, script, "test", dir);
+            LuaInternetModule.Register(greg, script, "test");
+            LuaSettingsModule.Register(greg, script, "test");
+            LuaObjectivesModule.Register(greg, script, "test");
+            LuaTooltipModule.Register(greg, script, "test");
+            LuaCoopModule.Register(greg, script, "test");
+            LuaMiscModule.Register(greg, script, "test");
+            foreach (var name in new[] { "player", "world", "rack", "server", "switch",
+                         "patch", "tech", "cable", "net", "customer", "economy", "shop",
+                         "requests", "subnet", "setip", "ui", "mods",
+                         "modsave", "items", "json", "config", "save", "internet",
+                         "settings", "objectives", "tooltip", "coop", "steam", "locale",
+                         "numpad", "pause" })
+            {
+                var v = greg.Get(name);
+                (v.Type == DataType.Table).Should().BeTrue(name + " table missing");
+            }
+            // Spot-check cross-module calls through one shared table.
+            script.DoString("return greg.switch.count() + greg.server.count()").Number.Should().Be(0);
+        }
+        finally { DeleteTempDir(dir); }
+    }
+
+    [Fact]
     public void Internet_Endpoints_Default_Headless()
     {
         var script = NewScript();

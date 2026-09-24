@@ -144,15 +144,12 @@ public static class GregSaveGuard
 
             // Save-Inventar: nach dem Healing (Prefix) sind alle Device-IDs
             // final - hier wird alles im Save inventarisiert + mit stabilen
-            // UIDs versehen (unsichtbar, Sidecar + Speicher).
+            // UIDs versehen (unsichtbar, Sidecar + Speicher). Extrahiert
+            // (Codeline-Limit): nur Hook-Registrierung bleibt hier.
             var loadNetworkState = AccessTools.Method(typeof(global::Il2Cpp.WaypointInitializationSystem),
                 "LoadNetworkState");
-            if (loadNetworkState != null)
-            {
-                harmony.Patch(loadNetworkState,
-                    postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+            if (loadNetworkState != null && PatchLoadNetworkState(harmony, loadNetworkState))
                 installed++;
-            }
 
             if (installed == 0)
             {
@@ -252,6 +249,18 @@ public static class GregSaveGuard
             GregEntityInventory.RebuildFromNetworkData(networkData);
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Inventar (LoadNetworkState): " + ex.Message); }
+    }
+
+    private static bool PatchLoadNetworkState(HarmonyLib.Harmony harmony, System.Reflection.MethodInfo loadNetworkState)
+    {
+        try
+        {
+            if (harmony == null || loadNetworkState == null) return false;
+            harmony.Patch(loadNetworkState,
+                postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+            return true;
+        }
+        catch { return false; }
     }
 
     /// <summary>

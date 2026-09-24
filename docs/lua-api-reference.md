@@ -136,6 +136,38 @@ Define these functions globally in `main.lua` (all optional):
 - `register_shop_item(subfolder, spec) -> bool` — spec keys: `name, price, xp, size_u, mass, scale, model, texture, icon, type` (snake_case or PascalCase).
 - `register_static_item(subfolder, spec) -> bool`
 
+### `greg.internet`
+- `endpoints() -> table`: array of `{server, ip, type, app, max, current}`.
+- `command_center_level() -> number`
+- `auto_repair_mode() -> number` / `set_auto_repair_mode(mode) -> bool`
+
+### `greg.settings` (game audio)
+- `set_master_volume(v) -> bool` / `set_music_volume(v) -> bool`
+- `set_effect_volume(v) -> bool` / `set_racks_volume(v) -> bool` (0..1)
+- `reload() -> bool`
+
+### `greg.objectives`
+- `show(index) -> bool` / `stop() -> bool` / `skip() -> bool`
+- `active() -> table` (objective UIDs) / `tutorial_in_progress() -> bool`
+- `create({loc=, uid=, x=, y=, z=, xp=?, rep=?, sub=?}) -> bool`
+- `start(uid, x, y, z) -> bool` / `clear() -> bool`
+
+### `greg.tooltip`
+- `overlay(text, x, y, z, xOffset?) -> bool` / `hide() -> bool`
+- `interact(text) -> bool` / `hide_interact() -> bool`
+
+### `greg.coop`
+- `ensure() -> bool` / `shutdown() -> bool`
+- `peers() -> table`: array of `{id, x, y, z, yaw}`.
+- `remove_avatar(peerId) -> bool` / `resend() -> bool` / `peer_timeout() -> number`
+
+### Misc (`greg.steam`, `greg.locale`, `greg.numpad`, `greg.pause`)
+- `steam.parse_lobby(connect) -> number` (0 when unparsable)
+- `locale.text(uid, fallback) -> string` / `locale.change(uid) -> bool` / `locale.current() -> number`
+- `numpad.is_active() -> bool` / `numpad.written()`, `numpad.copied() -> string`
+- `numpad.press(digit) -> bool` / `numpad.press_ok() -> bool` / `numpad.press_delete() -> bool`
+- `pause.is_paused() -> bool` / `pause.on_open(fn) -> bool` / `pause.on_close(fn) -> bool`
+
 ### Tablets & widgets (handles, `greg.tablet_*` / `greg.widget_*` / `greg.panel_*`)
 - `tablet_open(title) -> id` / `widget_open(title, x?, y?) -> id` ("" = failed)
 - `panel_add_label(id, text)` / `panel_add_section(id, title)` / `panel_add_spacer(id, height?)` → bool
@@ -154,6 +186,12 @@ Define these functions globally in `main.lua` (all optional):
 - `notify(message, duration?)`
 - `log(message, type?)` / `log_info(message)` / `log_warning(message)` / `log_error(message)` (DevConsole + log file)
 - `register_mod_config_tab(tab_id, label, builder_fn)`
+
+### `greg.computer` (in-game computer shortcuts & apps)
+- `register_shortcut(id, label, target) -> bool` / `unregister_shortcut(id) -> bool`
+- `register_app(appId, title, onOpen, onClose) -> bool` / `unregister_app(appId) -> bool`
+- `open_app(appId) -> bool` / `close_app() -> bool` / `current_app() -> string`
+- `list_shortcuts() -> table` / `list_apps() -> table`
 
 ## 5. Config & Save Data
 Per-mod JSON files under `<modId>/data/` (created on demand, write-through).

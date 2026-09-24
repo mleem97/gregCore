@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Techniker (Bestand, Dispatch).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for technicians (inventory, dispatch).
 /// Maintainer:   greg.tech.free_count(), total_count(), dispatch_server(),
 ///               dispatch_switch()
 /// </file-summary>
@@ -16,9 +16,22 @@ public static class LuaTechModule
     public static void Register(Table greg, Script script, string modId)
     {
         var techTable = new Table(script);
+        RegisterFreeCount(techTable, modId);
+        RegisterDispatchServer(techTable, modId);
+        RegisterList(techTable, script, modId);
+        RegisterSendToServer(techTable);
+        RegisterSendToSwitch(techTable);
+        RegisterHire(techTable, modId);
+        RegisterRequestNextJob(techTable);
+
+        greg["tech"] = techTable;
+    }
+
+    private static void RegisterFreeCount(Table t, string modId)
+    {
 
         // greg.tech.free_count() → number of idle technicians
-        techTable["free_count"] = (Func<int>)(() =>
+        t["free_count"] = (Func<int>)(() =>
         {
             try { return (int)API.GregAPI.GetFreeTechnicianCount(); }
             catch (Exception ex)
@@ -29,7 +42,7 @@ public static class LuaTechModule
         });
 
         // greg.tech.total_count() → number of technicians
-        techTable["total_count"] = (Func<int>)(() =>
+        t["total_count"] = (Func<int>)(() =>
         {
             try { return (int)API.GregAPI.GetTotalTechnicianCount(); }
             catch (Exception ex)
@@ -38,9 +51,13 @@ public static class LuaTechModule
                 return 0;
             }
         });
+    }
+
+    private static void RegisterDispatchServer(Table t, string modId)
+    {
 
         // greg.tech.dispatch_server() → 1 if a repair was dispatched, else 0
-        techTable["dispatch_server"] = (Func<int>)(() =>
+        t["dispatch_server"] = (Func<int>)(() =>
         {
             try { return API.GregAPI.DispatchRepairServer(); }
             catch (Exception ex)
@@ -51,7 +68,7 @@ public static class LuaTechModule
         });
 
         // greg.tech.dispatch_switch() → 1 if a repair was dispatched, else 0
-        techTable["dispatch_switch"] = (Func<int>)(() =>
+        t["dispatch_switch"] = (Func<int>)(() =>
         {
             try { return API.GregAPI.DispatchRepairSwitch(); }
             catch (Exception ex)
@@ -60,9 +77,13 @@ public static class LuaTechModule
                 return 0;
             }
         });
+    }
+
+    private static void RegisterList(Table t, Script script, string modId)
+    {
 
         // greg.tech.list() → array of {id, name, salary, state, busy}
-        techTable["list"] = (Func<Table>)(() =>
+        t["list"] = (Func<Table>)(() =>
         {
             try
             {
@@ -91,9 +112,13 @@ public static class LuaTechModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterSendToServer(Table t)
+    {
 
         // greg.tech.send_to_server(technicianId, serverId) → bool
-        techTable["send_to_server"] = (Func<int, string, bool>)((techId, serverId) =>
+        t["send_to_server"] = (Func<int, string, bool>)((techId, serverId) =>
         {
             try
             {
@@ -104,9 +129,13 @@ public static class LuaTechModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterSendToSwitch(Table t)
+    {
 
         // greg.tech.send_to_switch(technicianId, switchId) → bool
-        techTable["send_to_switch"] = (Func<int, string, bool>)((techId, switchId) =>
+        t["send_to_switch"] = (Func<int, string, bool>)((techId, switchId) =>
         {
             try
             {
@@ -128,9 +157,13 @@ public static class LuaTechModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterHire(Table t, string modId)
+    {
 
         // greg.tech.hire(index) → bool
-        techTable["hire"] = (Func<int, bool>)((index) =>
+        t["hire"] = (Func<int, bool>)((index) =>
         {
             try { return gregCore.Core.Networking.GregTechnicians.HireEmployee(index); }
             catch (Exception ex)
@@ -141,7 +174,7 @@ public static class LuaTechModule
         });
 
         // greg.tech.fire(technicianId) → bool
-        techTable["fire"] = (Func<int, bool>)((techId) =>
+        t["fire"] = (Func<int, bool>)((techId) =>
         {
             try { return gregCore.Core.Networking.GregTechnicians.FireTechnician(techId); }
             catch (Exception ex)
@@ -150,7 +183,21 @@ public static class LuaTechModule
                 return false;
             }
         });
+    }
 
-        greg["tech"] = techTable;
+    private static void RegisterRequestNextJob(Table t)
+    {
+
+        // greg.tech.request_next_job(techId) → bool
+        t["request_next_job"] = (Func<int, bool>)((techId) =>
+        {
+            try
+            {
+                var tech = gregCore.Core.Networking.GregTechnicians.FindByID(techId);
+                return tech != null &&
+                    gregCore.Core.Networking.GregTechnicians.RequestNextJob(tech);
+            }
+            catch { return false; }
+        });
     }
 }

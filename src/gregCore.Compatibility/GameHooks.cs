@@ -117,27 +117,6 @@ public static class GameHooks
                         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
-                else
-                {
-                    var servers = UnityEngine.Object.FindObjectsOfType<Il2Cpp.Server>();
-                    foreach (var srv in servers)
-                    {
-                        try
-                        {
-                            if (srv != null && srv.currentRackPosition != null)
-                            {
-                                int oldUid = srv.rackPositionUID;
-                                int newUid = srv.currentRackPosition.rackPosGlobalUID;
-                                if (oldUid != newUid)
-                                {
-                                    srv.rackPositionUID = newUid;
-                                    updated++;
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-                }
 
                 if (updated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {updated} server rackPositionUID references");
@@ -194,27 +173,6 @@ public static class GameHooks
                         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
-                else
-                {
-                    var switches = UnityEngine.Object.FindObjectsOfType<Il2Cpp.NetworkSwitch>();
-                    foreach (var sw in switches)
-                    {
-                        try
-                        {
-                            if (sw != null && sw.currentRackPosition != null)
-                            {
-                                int oldUid = sw.rackPositionUID;
-                                int newUid = sw.currentRackPosition.rackPosGlobalUID;
-                                if (oldUid != newUid)
-                                {
-                                    sw.rackPositionUID = newUid;
-                                    swUpdated++;
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-                }
 
                 if (swUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {swUpdated} switch rackPositionUID references");
@@ -226,32 +184,10 @@ public static class GameHooks
 
             try
             {
-                var netMap = global::Il2Cpp.NetworkMap.instance;
+                // No NetworkMap fast path for patch panels (no such registry
+                // on the game type) — scene scan only.
                 int ppUpdated = 0;
 
-                if (netMap != null && netMap.patchPanels != null)
-                {
-                    foreach (var kvp in netMap.patchPanels)
-                    {
-                        var pp = kvp.Value;
-                        try
-                        {
-                            if (pp != null && pp.currentRackPosition != null)
-                            {
-                                int oldUid = pp.rackPositionUID;
-                                int newUid = pp.currentRackPosition.rackPosGlobalUID;
-                                if (oldUid != newUid)
-                                {
-                                    pp.rackPositionUID = newUid;
-                                    ppUpdated++;
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-                else
                 {
                     var panels = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
                     foreach (var pp in panels)
@@ -269,7 +205,7 @@ public static class GameHooks
                                 }
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
 

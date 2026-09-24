@@ -130,15 +130,21 @@ public static class GregLang
 
         try
         {
-            string gameRoot = "";
-            try { gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory ?? ""; } catch { }
-            if (string.IsNullOrWhiteSpace(gameRoot))
+            string modsDir = "";
+            try { modsDir = global::MelonLoader.Utils.MelonEnvironment.ModsDirectory ?? ""; } catch { }
+            if (string.IsNullOrWhiteSpace(modsDir))
             {
-                try { gameRoot = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ""; } catch { }
+                string gameRoot = "";
+                try { gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory ?? ""; } catch { }
+                if (string.IsNullOrWhiteSpace(gameRoot))
+                {
+                    try { gameRoot = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ""; } catch { }
+                }
+                try { modsDir = Path.Combine(gameRoot, "Mods"); } catch { }
             }
 
             string root = "";
-            try { root = Path.Combine(gameRoot, "Mods", "Data"); } catch { }
+            try { root = Path.Combine(modsDir, "Data"); } catch { }
             string preference = LoadPreference();
 
             string resolved = preference == LangCodes.Auto ? DetectSystemLanguage() : LangCodes.Normalize(preference);

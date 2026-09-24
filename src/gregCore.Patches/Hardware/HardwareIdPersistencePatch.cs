@@ -49,7 +49,7 @@ public static class HardwareIdPersistencePatch
         string cleanId = deviceId.Substring(0, cut);
         if (_loggedIds.Add(prefix + "|" + cleanId))
         {
-            MelonLogger.Msg($"[gregCore][HwId] Suffix stripped: {deviceId} -> {cleanId}");
+            MelonLogger.Msg($"[gregCore][HwId] Unsuffixed: {deviceId} -> {cleanId}");
         }
         return cleanId;
     }
@@ -294,7 +294,7 @@ public static class GregNetworkIdHealing
             if (networkData == null || networkData.Pointer == IntPtr.Zero) return;
             var data = networkData;
 
-            MelonLogger.Msg("[gregCore][HwId] Scanning map data for legacy IDs...");
+            MelonLogger.Msg("[gregCore][HwId] Healing map IDs...");
 
             // Heals every ID without gregID prefix (empty excluded — the
             // Start patch assigns those). Endpoints follow. Per-entry
@@ -322,7 +322,7 @@ public static class GregNetworkIdHealing
                                 if (cable.endPoint != null && cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | Switch: {oldId} -> {newGuid} | Cables: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Remap Switch {oldId} -> {newGuid} ({healedCables} cables)");
                     }
                     catch { }
                 }
@@ -359,7 +359,7 @@ public static class GregNetworkIdHealing
                                 }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | PatchPanel: {oldId} -> {newGuid} | Cables: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Remap PatchPanel {oldId} -> {newGuid} ({healedCables} cables)");
                     }
                     catch { }
                 }
@@ -388,7 +388,7 @@ public static class GregNetworkIdHealing
                                 if (cable.endPoint != null && cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | Server: {oldId} -> {newGuid} | Cables: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Remap Server {oldId} -> {newGuid} ({healedCables} cables)");
                     }
                     catch { }
                 }

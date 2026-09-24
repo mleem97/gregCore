@@ -52,7 +52,7 @@ namespace gregCore.Core
             // Compatibility guard: unpatch old 404 ID mod if present
             // (again on scene load for late-loading mods).
             try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
-            MelonLogger.Msg("[gregCore][HwId] HWID SYSTEM ACTIVE (gregID schema: Switch/PatchPanel/Server).");
+            MelonLogger.Msg("[gregCore][HwId] HWID ACTIVE (gregID: Switch/PatchPanel/Server).");
 
             // Verzeichnis-Policy: Layout sicherstellen + Verstoesse melden.
             try

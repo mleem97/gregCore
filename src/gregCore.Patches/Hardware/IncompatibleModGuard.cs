@@ -71,25 +71,24 @@ public static class IncompatibleModGuard
                         {
                             harmony.UnpatchSelf();
                             anyDisabled = true;
-                            MelonLogger.Warning($"[gregCore][HwId] Incompatible ID mod found " +
-                                $"('{modName}' v{version}): patches removed — gregID stays the only ID system.");
+                            MelonLogger.Warning($"[gregCore][HwId] Disabled incompatible ID mod " +
+                                $"'{modName}' v{version} (gregID only).");
                             try
                             {
                                 gregCore.UI.GregNotificationManager.Show(
-                                    $"Incompatible ID mod '{modName}' disabled — gregID active.",
+                                    $"'{modName}' disabled — gregID active.",
                                     gregCore.UI.GregNotificationManager.GregToastType.Warning, 6f);
                             }
                             catch { }
                         }
                         else
                         {
-                            MelonLogger.Msg($"[gregCore][HwId] '{modName}' found, but no Harmony instance " +
-                                "(inert, nothing to unpatch).");
+                            MelonLogger.Msg($"[gregCore][HwId] '{modName}': no Harmony instance, skipped.");
                         }
                     }
                     catch (Exception ex)
                     {
-                        MelonLogger.Warning($"[gregCore][HwId] Failed to unpatch '{modName}': " +
+                        MelonLogger.Warning($"[gregCore][HwId] Unpatch failed '{modName}': " +
                             $"{ex.GetBaseException().Message}");
                     }
                 }

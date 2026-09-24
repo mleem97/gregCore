@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für persistenten Mod-State (JSON-Datei pro Mod,
-///               unabhaengig vom Spiel-Save; wird beim Start geladen).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for persistent mod state (JSON file per mod,
+///               independent of the game save; loaded at startup).
 /// Maintainer:   greg.save.get(), set(), delete(), has(), keys(), save_now()
 /// </file-summary>
 
@@ -18,9 +18,18 @@ public static class LuaSaveModule
     {
         var store = new LuaKvStore(modId, "save", Path.Combine(modDir ?? ".", "data"), "save.json");
         var saveTable = new Table(script);
+        RegisterGet(saveTable, store, script, modId);
+        RegisterSet(saveTable, store, modId);
+        RegisterKeys(saveTable, store, script);
+
+        greg["save"] = saveTable;
+    }
+
+    private static void RegisterGet(Table t, LuaKvStore store, Script script, string modId)
+    {
 
         // greg.save.get(key) → string or nil
-        saveTable["get"] = (Func<string, DynValue>)((key) =>
+        t["get"] = (Func<string, DynValue>)((key) =>
         {
             try
             {
@@ -35,7 +44,7 @@ public static class LuaSaveModule
         });
 
         // greg.save.get_or(key, default) → string
-        saveTable["get_or"] = (Func<string, string, string>)((key, fallback) =>
+        t["get_or"] = (Func<string, string, string>)((key, fallback) =>
         {
             try
             {
@@ -44,9 +53,13 @@ public static class LuaSaveModule
             }
             catch { return fallback ?? ""; }
         });
+    }
+
+    private static void RegisterSet(Table t, LuaKvStore store, string modId)
+    {
 
         // greg.save.set(key, value) — writes through immediately
-        saveTable["set"] = (Action<string, string>)((key, value) =>
+        t["set"] = (Action<string, string>)((key, value) =>
         {
             try { store.Set(key, value); }
             catch (Exception ex)
@@ -56,21 +69,25 @@ public static class LuaSaveModule
         });
 
         // greg.save.delete(key) → bool
-        saveTable["delete"] = (Func<string, bool>)((key) =>
+        t["delete"] = (Func<string, bool>)((key) =>
         {
             try { return store.Delete(key); }
             catch { return false; }
         });
 
         // greg.save.has(key) → bool
-        saveTable["has"] = (Func<string, bool>)((key) =>
+        t["has"] = (Func<string, bool>)((key) =>
         {
             try { return store.Has(key); }
             catch { return false; }
         });
+    }
+
+    private static void RegisterKeys(Table t, LuaKvStore store, Script script)
+    {
 
         // greg.save.keys() → array of keys
-        saveTable["keys"] = (Func<Table>)(() =>
+        t["keys"] = (Func<Table>)(() =>
         {
             try
             {
@@ -83,12 +100,10 @@ public static class LuaSaveModule
         });
 
         // greg.save.save_now() → bool (force flush to disk)
-        saveTable["save_now"] = (Func<bool>)(() =>
+        t["save_now"] = (Func<bool>)(() =>
         {
             try { return store.SaveNow(); }
             catch { return false; }
         });
-
-        greg["save"] = saveTable;
     }
 }

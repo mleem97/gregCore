@@ -1,9 +1,9 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Datei-gestützter String-Key-Value-Speicher für Lua-Module
-///               (config/save). Eine JSON-Datei pro Store, sofortiges
-///               Schreiben bei jeder Änderung, robust gegen korrupte Dateien.
-/// Maintainer:   NurDiese Datei kennt das Dateiformat (flaches Objekt).
+/// Layer:       Infrastructure
+/// Purpose:      File-backed string key-value store for Lua modules
+///               (config/save). One JSON file per store, immediate
+///               writes on every change, robust against corrupt files.
+/// Maintainer:   Only this file knows the file format (flat object).
 /// </file-summary>
 
 using System;

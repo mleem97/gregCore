@@ -467,4 +467,89 @@ public class LuaSdkTests
         Call(greg.Get("customer").Table, "register_subnet",
             1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();
     }
+
+    [Fact]
+    public void Internet_Endpoints_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaInternetModule.Register(greg, script, "test");
+        var net = greg.Get("internet").Table;
+        Call(net, "endpoints").Table.Length.Should().Be(0);
+        Call(net, "command_center_level").Number.Should().Be(0);
+        Call(net, "auto_repair_mode").Number.Should().Be(-1);
+        Call(net, "set_auto_repair_mode", 1).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Settings_Volumes_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaSettingsModule.Register(greg, script, "test");
+        var settings = greg.Get("settings").Table;
+        Call(settings, "set_master_volume", 0.5).Boolean.Should().BeFalse();
+        Call(settings, "set_music_volume", 0.5).Boolean.Should().BeFalse();
+        Call(settings, "set_effect_volume", 0.5).Boolean.Should().BeFalse();
+        Call(settings, "set_racks_volume", 0.5).Boolean.Should().BeFalse();
+        Call(settings, "reload").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Objectives_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaObjectivesModule.Register(greg, script, "test");
+        var obj = greg.Get("objectives").Table;
+        Call(obj, "show", 1).Boolean.Should().BeFalse();
+        Call(obj, "stop").Boolean.Should().BeFalse();
+        Call(obj, "skip").Boolean.Should().BeFalse();
+        Call(obj, "active").Table.Length.Should().Be(0);
+        Call(obj, "tutorial_in_progress").Boolean.Should().BeFalse();
+        Call(obj, "create", script.DoString("return {loc=1, uid=2}")).Boolean.Should().BeFalse();
+        Call(obj, "start", 1, 0.0, 0.0, 0.0).Boolean.Should().BeFalse();
+        Call(obj, "clear").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Tooltip_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaTooltipModule.Register(greg, script, "test");
+        var tip = greg.Get("tooltip").Table;
+        Call(tip, "overlay", "hi", 0.0, 0.0, 0.0, 5).Boolean.Should().BeFalse();
+        Call(tip, "hide").Boolean.Should().BeFalse();
+        Call(tip, "interact", "hi").Boolean.Should().BeFalse();
+        Call(tip, "hide_interact").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Coop_Default_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaCoopModule.Register(greg, script, "test");
+        var coop = greg.Get("coop").Table;
+        Call(coop, "peers").Table.Length.Should().Be(0);
+        Call(coop, "peer_timeout").Number.Should().Be(-1);
+        Call(coop, "remove_avatar", 123.0).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Misc_Steam_Locale_Numpad_Pause()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaMiscModule.Register(greg, script, "test");
+        Call(greg.Get("steam").Table, "parse_lobby", "x").Number.Should().Be(0);
+        var locale = greg.Get("locale").Table;
+        Call(locale, "text", 1, "fb").String.Should().Be("fb");
+        Call(locale, "change", 1).Boolean.Should().BeFalse();
+        var numpad = greg.Get("numpad").Table;
+        Call(numpad, "is_active").Boolean.Should().BeFalse();
+        Call(numpad, "press", "1").Boolean.Should().BeFalse();
+        Call(greg.Get("pause").Table, "is_paused").Boolean.Should().BeFalse();
+    }
 }

@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Absturzsicheres Loggen fuer Lua-Module: MelonLogger wirft
-///               ausserhalb der Spiel-Laufzeit (z.B. Unit-Tests) beim
-///               Loggen selbst - das darf niemals einen Mod-Aufruf sprengen.
+/// Layer:       Infrastructure
+/// Purpose:      Crash-safe logging for Lua modules: MelonLogger throws
+///               outside the game runtime (e.g. unit tests) while
+///               logging itself - that must never break a mod call.
 /// </file-summary>
 
 using MelonLoader;

@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API zum Registrieren eigener Shop-/Static-Items.
-///               Specs kommen als Lua-Tabellen (Felder wie im Doc), Meshes als
-///               Dateien im Mod-Ordner. Fehler -> false + Log, kein Crash.
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for registering custom shop/static items.
+///               Specs arrive as Lua tables (fields as in the docs), meshes as
+///               files in the mod folder. Errors -> false + log, no crash.
 /// Maintainer:   greg.items.register_shop_item(), register_static_item()
 /// </file-summary>
 
@@ -18,10 +18,18 @@ public static class LuaItemsModule
     public static void Register(Table greg, Script script, string modId, string modDir)
     {
         var itemsTable = new Table(script);
+        RegisterRegisterShopItem(itemsTable, script, modId, modDir);
+        RegisterRegisterStaticItem(itemsTable, script, modId, modDir);
+
+        greg["items"] = itemsTable;
+    }
+
+    private static void RegisterRegisterShopItem(Table t, Script script, string modId, string modDir)
+    {
 
         // greg.items.register_shop_item(subfolder, spec) → bool
         // spec: {name, price, xp, size_u, mass, scale, model, texture, icon, type, ...}
-        itemsTable["register_shop_item"] = (Func<string, DynValue, bool>)((subfolder, spec) =>
+        t["register_shop_item"] = (Func<string, DynValue, bool>)((subfolder, spec) =>
         {
             try
             {
@@ -37,9 +45,13 @@ public static class LuaItemsModule
                 return false;
             }
         });
+    }
+
+    private static void RegisterRegisterStaticItem(Table t, Script script, string modId, string modDir)
+    {
 
         // greg.items.register_static_item(subfolder, spec) → bool
-        itemsTable["register_static_item"] = (Func<string, DynValue, bool>)((subfolder, spec) =>
+        t["register_static_item"] = (Func<string, DynValue, bool>)((subfolder, spec) =>
         {
             try
             {
@@ -55,8 +67,6 @@ public static class LuaItemsModule
                 return false;
             }
         });
-
-        greg["items"] = itemsTable;
     }
 
     internal static string ResolveFolder(string modDir, string subfolder)
@@ -113,7 +123,7 @@ public static class LuaItemsModule
                 plain = mapped;
             }
             string json = JsonSerializer.Serialize(plain);
-            // Case-insensitiv: Lua nutzt snake_case/klein, DTOs PascalCase.
+            // Case-insensitive: Lua uses snake_case/lowercase, DTOs use PascalCase.
             return JsonSerializer.Deserialize<T>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }

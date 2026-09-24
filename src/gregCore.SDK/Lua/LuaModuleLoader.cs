@@ -7,8 +7,8 @@ using MelonLoader;
 namespace gregCore.Infrastructure.Scripting.Lua;
 
 /// <summary>
-/// Implements require()-System für Lua-Mods mit Sandbox-Checks.
-/// Sucht im Mod-eigenen Verzeichnis und unterstützt @shared/ Präfix.
+/// Implements a require() system for Lua mods with sandbox checks.
+/// Searches the mod's own directory and supports the @shared/ prefix.
 /// </summary>
 public class LuaModuleLoader
 {
@@ -27,7 +27,7 @@ public class LuaModuleLoader
     }
 
     /// <summary>
-    /// Registriert require() global in der Lua-Instanz.
+    /// Registers require() globally in the Lua instance.
     /// </summary>
     public void Register()
     {

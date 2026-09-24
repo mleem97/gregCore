@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Switch-Management (Spiegel von LuaServerModule).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for switch management (mirror of LuaServerModule).
 /// Maintainer:   greg.switch.get_all(), count(), broken_count(), repair(),
 ///               repair_all(), find_by_id()
 /// </file-summary>
@@ -16,9 +16,20 @@ public static class LuaSwitchModule
     public static void Register(Table greg, Script script, string modId)
     {
         var switchTable = new Table(script);
+        RegisterGetAll(switchTable, script, modId);
+        RegisterGetList(switchTable, script);
+        RegisterCount(switchTable);
+        RegisterFindById(switchTable, script);
+        RegisterRepair(switchTable);
+
+        greg["switch"] = switchTable;
+    }
+
+    private static void RegisterGetAll(Table t, Script script, string modId)
+    {
 
         // greg.switch.get_all() → table of switch info
-        switchTable["get_all"] = (Func<Table>)(() =>
+        t["get_all"] = (Func<Table>)(() =>
         {
             try
             {
@@ -41,9 +52,13 @@ public static class LuaSwitchModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterGetList(Table t, Script script)
+    {
 
         // greg.switch.get_list() → array of switch IDs (alias-friendly)
-        switchTable["get_list"] = (Func<Table>)(() =>
+        t["get_list"] = (Func<Table>)(() =>
         {
             try
             {
@@ -63,9 +78,13 @@ public static class LuaSwitchModule
             }
             catch { return new Table(script); }
         });
+    }
+
+    private static void RegisterCount(Table t)
+    {
 
         // greg.switch.count() → number
-        switchTable["count"] = (Func<int>)(() =>
+        t["count"] = (Func<int>)(() =>
         {
             try
             {
@@ -77,14 +96,18 @@ public static class LuaSwitchModule
         });
 
         // greg.switch.broken_count() → number
-        switchTable["broken_count"] = (Func<int>)(() =>
+        t["broken_count"] = (Func<int>)(() =>
         {
             try { return (int)API.GregAPI.GetBrokenSwitchCount(); }
             catch { return 0; }
         });
+    }
+
+    private static void RegisterFindById(Table t, Script script)
+    {
 
         // greg.switch.find_by_id(id) → info table or nil
-        switchTable["find_by_id"] = (Func<string, DynValue>)((id) =>
+        t["find_by_id"] = (Func<string, DynValue>)((id) =>
         {
             try
             {
@@ -103,9 +126,13 @@ public static class LuaSwitchModule
             }
             catch { return DynValue.Nil; }
         });
+    }
+
+    private static void RegisterRepair(Table t)
+    {
 
         // greg.switch.repair(id) → bool
-        switchTable["repair"] = (Func<string, bool>)((id) =>
+        t["repair"] = (Func<string, bool>)((id) =>
         {
             try
             {
@@ -128,13 +155,11 @@ public static class LuaSwitchModule
         });
 
         // greg.switch.repair_all() → number of repaired
-        switchTable["repair_all"] = (Func<int>)(() =>
+        t["repair_all"] = (Func<int>)(() =>
         {
             try { return API.GregAPI.DispatchRepairSwitch(); }
             catch { return 0; }
         });
-
-        greg["switch"] = switchTable;
     }
 
     internal static System.Collections.Generic.List<Il2Cpp.NetworkSwitch> FindAllSwitches()

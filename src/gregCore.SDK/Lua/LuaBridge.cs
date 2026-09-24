@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua Skripting Bridge.
-/// Maintainer:   Ermöglicht Modding via Lua-Skripte.
+/// Layer:       Infrastructure
+/// Purpose:      Lua scripting bridge.
+/// Maintainer:   Enables modding via Lua scripts.
 /// </file-summary>
 
 namespace gregCore.Infrastructure.Scripting.Lua;

@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Service-Requests (read-only).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for service requests (read-only).
 /// Maintainer:   greg.requests.list(), current_number()
 /// </file-summary>
 
@@ -14,9 +14,17 @@ public static class LuaRequestsModule
     public static void Register(Table greg, Script script, string modId)
     {
         var requestsTable = new Table(script);
+        RegisterList(requestsTable, script, modId);
+        RegisterCurrentNumber(requestsTable);
+
+        greg["requests"] = requestsTable;
+    }
+
+    private static void RegisterList(Table t, Script script, string modId)
+    {
 
         // greg.requests.list() → array of {number, state, short, long, rewarded, done, progress}
-        requestsTable["list"] = (Func<Table>)(() =>
+        t["list"] = (Func<Table>)(() =>
         {
             try
             {
@@ -47,14 +55,16 @@ public static class LuaRequestsModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterCurrentNumber(Table t)
+    {
 
         // greg.requests.current_number() → number
-        requestsTable["current_number"] = (Func<int>)(() =>
+        t["current_number"] = (Func<int>)(() =>
         {
             try { return gregCore.Core.Networking.GregServiceRequests.GetCurrentSRNumber(); }
             catch { return 0; }
         });
-
-        greg["requests"] = requestsTable;
     }
 }

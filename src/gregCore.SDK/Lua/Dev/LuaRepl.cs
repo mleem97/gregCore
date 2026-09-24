@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        In-Game Lua REPL für Live-Debugging.
-/// Maintainer:   Öffnet/Schließt via Keybind (F12). UI Toolkit-basiert.
-///               Evaluiert Lua-Expressions gegen einen persistenten Script-Context.
+/// Layer:       Infrastructure
+/// Purpose:      In-game Lua REPL for live debugging.
+/// Maintainer:   Opens/closes via keybind (F12). UI Toolkit-based.
+///               Evaluates Lua expressions against a persistent script context.
 /// </file-summary>
 
 using System;
@@ -31,7 +31,7 @@ public sealed class LuaRepl
     private Script? _replScript;
 
     /// <summary>
-    /// Erstellt den REPL mit einem frischen MoonSharp-Script-Context.
+    /// Creates the REPL with a fresh MoonSharp script context.
     /// </summary>
     public void Initialize()
     {
@@ -103,7 +103,7 @@ public sealed class LuaRepl
     }
 
     /// <summary>
-    /// Toggle Sichtbarkeit (aufgerufen aus OnUpdate bei F12).
+    /// Toggles visibility (called from OnUpdate on F12).
     /// </summary>
     public void Toggle()
     {

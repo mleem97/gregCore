@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für persistente Mod-Einstellungen (JSON-Datei pro Mod).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for persistent mod settings (JSON file per mod).
 /// Maintainer:   greg.config.get(), set(), delete(), has(), keys()
 /// </file-summary>
 
@@ -17,9 +17,18 @@ public static class LuaConfigModule
     {
         var store = new LuaKvStore(modId, "config", Path.Combine(modDir ?? ".", "data"), "config.json");
         var configTable = new Table(script);
+        RegisterGet(configTable, store, script, modId);
+        RegisterSet(configTable, store, modId);
+        RegisterKeys(configTable, store, script);
+
+        greg["config"] = configTable;
+    }
+
+    private static void RegisterGet(Table t, LuaKvStore store, Script script, string modId)
+    {
 
         // greg.config.get(key) → string or nil
-        configTable["get"] = (Func<string, DynValue>)((key) =>
+        t["get"] = (Func<string, DynValue>)((key) =>
         {
             try
             {
@@ -34,7 +43,7 @@ public static class LuaConfigModule
         });
 
         // greg.config.get_or(key, default) → string
-        configTable["get_or"] = (Func<string, string, string>)((key, fallback) =>
+        t["get_or"] = (Func<string, string, string>)((key, fallback) =>
         {
             try
             {
@@ -43,9 +52,13 @@ public static class LuaConfigModule
             }
             catch { return fallback ?? ""; }
         });
+    }
+
+    private static void RegisterSet(Table t, LuaKvStore store, string modId)
+    {
 
         // greg.config.set(key, value)
-        configTable["set"] = (Action<string, string>)((key, value) =>
+        t["set"] = (Action<string, string>)((key, value) =>
         {
             try { store.Set(key, value); }
             catch (Exception ex)
@@ -55,21 +68,25 @@ public static class LuaConfigModule
         });
 
         // greg.config.delete(key) → bool
-        configTable["delete"] = (Func<string, bool>)((key) =>
+        t["delete"] = (Func<string, bool>)((key) =>
         {
             try { return store.Delete(key); }
             catch { return false; }
         });
 
         // greg.config.has(key) → bool
-        configTable["has"] = (Func<string, bool>)((key) =>
+        t["has"] = (Func<string, bool>)((key) =>
         {
             try { return store.Has(key); }
             catch { return false; }
         });
+    }
+
+    private static void RegisterKeys(Table t, LuaKvStore store, Script script)
+    {
 
         // greg.config.keys() → array of keys
-        configTable["keys"] = (Func<Table>)(() =>
+        t["keys"] = (Func<Table>)(() =>
         {
             try
             {
@@ -80,7 +97,5 @@ public static class LuaConfigModule
             }
             catch { return new Table(script); }
         });
-
-        greg["config"] = configTable;
     }
 }

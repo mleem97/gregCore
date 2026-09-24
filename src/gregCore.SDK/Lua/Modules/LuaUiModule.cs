@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für UI-Interaktion (Notifications).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for UI interaction (notifications).
 /// Maintainer:   greg.ui.notify(), greg.ui.log()
-///               Spätere Erweiterung: greg.ui.show_panel() für IMGUI-Panels.
+///               Later extension: greg.ui.show_panel() for IMGUI panels.
 /// </file-summary>
 
 using System;
@@ -14,17 +14,25 @@ namespace gregCore.Infrastructure.Scripting.Lua.Modules;
 
 public static class LuaUiModule
 {
-    // Von der Main-Composition gesetzt: haengt Lua-Config-Tabs ins
-    // Spiel-Settings-Hub. Ohne Verdrahtung wird register_mod_config_tab
-    // stillschweigend ignoriert (kein harter Bezug aufs Hauptprojekt).
+    // Set by the main composition: hooks Lua config tabs into
+    // the game settings hub. Without wiring, register_mod_config_tab
+    // is silently ignored (no hard reference to the main project).
     public static Action<string, string, Action<GregUIBuilder>>? RegisterTabHandler { get; set; }
 
     public static void Register(Table greg, Script script, string modId)
     {
         var uiTable = new Table(script);
+        RegisterNotify(uiTable, modId);
+        RegisterRegisterModConfigTab(uiTable, script, modId);
+
+        greg["ui"] = uiTable;
+    }
+
+    private static void RegisterNotify(Table t, string modId)
+    {
 
         // greg.ui.notify(message, duration?)
-        uiTable["notify"] = (Action<string, double?>)((message, duration) =>
+        t["notify"] = (Action<string, double?>)((message, duration) =>
         {
             try
             {
@@ -36,23 +44,27 @@ public static class LuaUiModule
         });
 
         // greg.ui.log(message, type?) – Adds to DevConsole
-        uiTable["log"] = (Action<string, string?>)((message, type) =>
+        t["log"] = (Action<string, string?>)((message, type) =>
         {
             try { API.GregAPI.Log(message, type ?? "INFO"); }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         });
 
         // greg.ui.log_info(message)
-        uiTable["log_info"] = (Action<string>)((msg) => API.GregAPI.LogInfo($"[{modId}] {msg}"));
+        t["log_info"] = (Action<string>)((msg) => API.GregAPI.LogInfo($"[{modId}] {msg}"));
 
         // greg.ui.log_warning(message)
-        uiTable["log_warning"] = (Action<string>)((msg) => API.GregAPI.LogWarning($"[{modId}] {msg}"));
+        t["log_warning"] = (Action<string>)((msg) => API.GregAPI.LogWarning($"[{modId}] {msg}"));
 
         // greg.ui.log_error(message)
-        uiTable["log_error"] = (Action<string>)((msg) => API.GregAPI.LogError($"[{modId}] {msg}"));
+        t["log_error"] = (Action<string>)((msg) => API.GregAPI.LogError($"[{modId}] {msg}"));
+    }
+
+    private static void RegisterRegisterModConfigTab(Table t, Script script, string modId)
+    {
 
         // greg.ui.register_mod_config_tab(tab_id, label, builder_fn)
-        uiTable["register_mod_config_tab"] = (Action<string, string, Closure>)((tabId, label, builderFn) =>
+        t["register_mod_config_tab"] = (Action<string, string, Closure>)((tabId, label, builderFn) =>
         {
             try
             {
@@ -80,7 +92,5 @@ public static class LuaUiModule
                 MelonLogger.Error($"[LuaMod:{modId}] ui.register_mod_config_tab failed: {ex.Message}");
             }
         });
-
-        greg["ui"] = uiTable;
     }
 }

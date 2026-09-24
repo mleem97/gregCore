@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Auto-generiert Lua-Bindings aus game_hooks.json.
-/// Maintainer:   Liest die Hook-Definitionen und erstellt greg.hooks.{group}
-///               Tables mit on_{method_name} Subscription-Funktionen.
+/// Layer:       Infrastructure
+/// Purpose:      Auto-generates Lua bindings from game_hooks.json.
+/// Maintainer:   Reads the hook definitions and creates greg.hooks.{group}
+///               tables with on_{method_name} subscription functions.
 /// </file-summary>
 
 using System;
@@ -22,7 +22,7 @@ public sealed class LuaHookBindingGenerator
     private readonly string _hooksFilePath;
 
     /// <summary>
-    /// Geladene Hook-Definitionen, gruppiert nach Group.
+    /// Loaded hook definitions, grouped by Group.
     /// </summary>
     private readonly Dictionary<string, List<HookDefinition>> _hooksByGroup = new();
 
@@ -33,7 +33,7 @@ public sealed class LuaHookBindingGenerator
     }
 
     /// <summary>
-    /// Lädt game_hooks.json und baut die interne Registry.
+    /// Loads game_hooks.json and builds the internal registry.
     /// </summary>
     public void LoadHooks()
     {
@@ -70,7 +70,7 @@ public sealed class LuaHookBindingGenerator
     }
 
     /// <summary>
-    /// Registriert greg.hooks.{group} Tables im Script.
+    /// Registers greg.hooks.{group} tables in the script.
     /// </summary>
     public void RegisterInScript(Script script, Table greg, string modId)
     {
@@ -142,12 +142,12 @@ public sealed class LuaHookBindingGenerator
     }
 
     /// <summary>
-    /// Gibt die Anzahl der geladenen Gruppen zurück.
+    /// Returns the number of loaded groups.
     /// </summary>
     public int GroupCount => _hooksByGroup.Count;
 
     /// <summary>
-    /// Gibt die Gesamtzahl aller Hooks zurück.
+    /// Returns the total number of all hooks.
     /// </summary>
     public int TotalHookCount => _hooksByGroup.Values.Sum(g => g.Count);
 

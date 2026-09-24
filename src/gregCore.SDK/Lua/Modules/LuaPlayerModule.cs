@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Player-Interaktion.
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for player interaction.
 /// Maintainer:   greg.player.position(), money(), xp(), teleport(), add_money()
-///               Nutzt PlayerManager.instance und MainGameManager.instance.
+///               Uses PlayerManager.instance and MainGameManager.instance.
 /// </file-summary>
 
 using System;
@@ -16,9 +16,20 @@ public static class LuaPlayerModule
     public static void Register(Table greg, Script script, string modId)
     {
         var playerTable = new Table(script);
+        RegisterPosition(playerTable, script);
+        RegisterSetMoney(playerTable, modId);
+        RegisterSetXp(playerTable, modId);
+        RegisterTeleport(playerTable, modId);
+        RegisterIsSitting(playerTable);
+
+        greg["player"] = playerTable;
+    }
+
+    private static void RegisterPosition(Table t, Script script)
+    {
 
         // greg.player.position() → {x, y, z}
-        playerTable["position"] = (Func<Table>)(() =>
+        t["position"] = (Func<Table>)(() =>
         {
             try
             {
@@ -38,21 +49,25 @@ public static class LuaPlayerModule
         });
 
         // greg.player.money() → number
-        playerTable["money"] = (Func<double>)(() =>
+        t["money"] = (Func<double>)(() =>
         {
             try { return API.GregAPI.GetPlayerMoney(); }
             catch { return 0.0; }
         });
+    }
+
+    private static void RegisterSetMoney(Table t, string modId)
+    {
 
         // greg.player.set_money(amount)
-        playerTable["set_money"] = (Action<double>)((val) =>
+        t["set_money"] = (Action<double>)((val) =>
         {
             try { API.GregAPI.SetPlayerMoney(val); }
             catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] player.set_money failed: {ex.Message}"); }
         });
 
         // greg.player.add_money(amount)
-        playerTable["add_money"] = (Action<double>)((amount) =>
+        t["add_money"] = (Action<double>)((amount) =>
         {
             try
             {
@@ -63,35 +78,43 @@ public static class LuaPlayerModule
         });
 
         // greg.player.xp() → number
-        playerTable["xp"] = (Func<double>)(() =>
+        t["xp"] = (Func<double>)(() =>
         {
             try { return API.GregAPI.GetPlayerXp(); }
             catch { return 0.0; }
         });
+    }
+
+    private static void RegisterSetXp(Table t, string modId)
+    {
 
         // greg.player.set_xp(amount)
-        playerTable["set_xp"] = (Action<double>)((val) =>
+        t["set_xp"] = (Action<double>)((val) =>
         {
             try { API.GregAPI.SetPlayerXp(val); }
             catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] player.set_xp failed: {ex.Message}"); }
         });
 
         // greg.player.reputation() → number
-        playerTable["reputation"] = (Func<double>)(() =>
+        t["reputation"] = (Func<double>)(() =>
         {
             try { return API.GregAPI.GetPlayerReputation(); }
             catch { return 0.0; }
         });
 
         // greg.player.set_reputation(amount)
-        playerTable["set_reputation"] = (Action<double>)((val) =>
+        t["set_reputation"] = (Action<double>)((val) =>
         {
             try { API.GregAPI.SetPlayerReputation(val); }
             catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] player.set_reputation failed: {ex.Message}"); }
         });
+    }
+
+    private static void RegisterTeleport(Table t, string modId)
+    {
 
         // greg.player.teleport(x, y, z)
-        playerTable["teleport"] = (Action<double, double, double>)((x, y, z) =>
+        t["teleport"] = (Action<double, double, double>)((x, y, z) =>
         {
             try
             {
@@ -105,7 +128,7 @@ public static class LuaPlayerModule
         });
 
         // greg.player.is_crouching() → bool
-        playerTable["is_crouching"] = (Func<bool>)(() =>
+        t["is_crouching"] = (Func<bool>)(() =>
         {
             try
             {
@@ -114,9 +137,13 @@ public static class LuaPlayerModule
             }
             catch { return false; }
         });
+    }
+
+    private static void RegisterIsSitting(Table t)
+    {
 
         // greg.player.is_sitting() → bool
-        playerTable["is_sitting"] = (Func<bool>)(() =>
+        t["is_sitting"] = (Func<bool>)(() =>
         {
             try
             {
@@ -125,7 +152,5 @@ public static class LuaPlayerModule
             }
             catch { return false; }
         });
-
-        greg["player"] = playerTable;
     }
 }

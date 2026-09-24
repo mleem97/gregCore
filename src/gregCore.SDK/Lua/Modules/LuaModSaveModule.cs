@@ -16,9 +16,18 @@ public static class LuaModSaveModule
     public static void Register(Table greg, Script script, string modId)
     {
         var saveTable = new Table(script);
+        RegisterList(saveTable, script, modId);
+        RegisterUpsert(saveTable, modId);
+        RegisterRemove(saveTable);
+
+        greg["modsave"] = saveTable;
+    }
+
+    private static void RegisterList(Table t, Script script, string modId)
+    {
 
         // greg.modsave.list(folder) → array of entries
-        saveTable["list"] = (Func<string, Table>)((folder) =>
+        t["list"] = (Func<string, Table>)((folder) =>
         {
             try
             {
@@ -46,10 +55,14 @@ public static class LuaModSaveModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterUpsert(Table t, string modId)
+    {
 
         // greg.modsave.upsert(folder, spec) → bool (spec: position{x,y,z},
         // rotation{x,y,z}, values[], ints[], ints2[])
-        saveTable["upsert"] = (Func<string, DynValue, bool>)((folder, spec) =>
+        t["upsert"] = (Func<string, DynValue, bool>)((folder, spec) =>
         {
             try
             {
@@ -74,9 +87,13 @@ public static class LuaModSaveModule
                 return false;
             }
         });
+    }
+
+    private static void RegisterRemove(Table t)
+    {
 
         // greg.modsave.remove(folder) → bool (all entries of the folder)
-        saveTable["remove"] = (Func<string, bool>)((folder) =>
+        t["remove"] = (Func<string, bool>)((folder) =>
         {
             try
             {
@@ -86,8 +103,6 @@ public static class LuaModSaveModule
             }
             catch { return false; }
         });
-
-        greg["modsave"] = saveTable;
     }
 
     internal static Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ModItemSaveData> ModItemList()

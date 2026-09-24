@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Kunden (Bases lesen, IP-Lookup, Subnetz-Routen).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for customers (reading bases, IP lookup, subnet routes).
 /// Maintainer:   greg.customer.bases(), is_ip_present(), app_id_for_ip(),
 ///               register_subnet(), unregister_subnet()
 /// </file-summary>
@@ -15,9 +15,19 @@ public static class LuaCustomerModule
     public static void Register(Table greg, Script script, string modId)
     {
         var customerTable = new Table(script);
+        RegisterBases(customerTable, script, modId);
+        RegisterIsIpPresent(customerTable);
+        RegisterRegisterSubnet(customerTable, modId);
+        RegisterUnregisterSubnet(customerTable, modId);
+
+        greg["customer"] = customerTable;
+    }
+
+    private static void RegisterBases(Table t, Script script, string modId)
+    {
 
         // greg.customer.bases() → array of customer base info
-        customerTable["bases"] = (Func<Table>)(() =>
+        t["bases"] = (Func<Table>)(() =>
         {
             try
             {
@@ -47,9 +57,13 @@ public static class LuaCustomerModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterIsIpPresent(Table t)
+    {
 
         // greg.customer.is_ip_present(baseId, ip) → bool
-        customerTable["is_ip_present"] = (Func<int, string, bool>)((baseId, ip) =>
+        t["is_ip_present"] = (Func<int, string, bool>)((baseId, ip) =>
         {
             try
             {
@@ -60,7 +74,7 @@ public static class LuaCustomerModule
         });
 
         // greg.customer.app_id_for_ip(baseId, ip) → number (-1 when unknown)
-        customerTable["app_id_for_ip"] = (Func<int, string, int>)((baseId, ip) =>
+        t["app_id_for_ip"] = (Func<int, string, int>)((baseId, ip) =>
         {
             try
             {
@@ -70,9 +84,13 @@ public static class LuaCustomerModule
             }
             catch { return -1; }
         });
+    }
+
+    private static void RegisterRegisterSubnet(Table t, string modId)
+    {
 
         // greg.customer.register_subnet(baseId, vlanId, routeKey, ips) → bool
-        customerTable["register_subnet"] = (Func<int, int, string, DynValue, bool>)((baseId, vlanId, routeKey, ips) =>
+        t["register_subnet"] = (Func<int, int, string, DynValue, bool>)((baseId, vlanId, routeKey, ips) =>
         {
             try
             {
@@ -101,9 +119,13 @@ public static class LuaCustomerModule
                 return false;
             }
         });
+    }
+
+    private static void RegisterUnregisterSubnet(Table t, string modId)
+    {
 
         // greg.customer.unregister_subnet(baseId, routeKey) → bool
-        customerTable["unregister_subnet"] = (Func<int, string, bool>)((baseId, routeKey) =>
+        t["unregister_subnet"] = (Func<int, string, bool>)((baseId, routeKey) =>
         {
             try
             {
@@ -116,8 +138,6 @@ public static class LuaCustomerModule
                 return false;
             }
         });
-
-        greg["customer"] = customerTable;
     }
 
     internal static Il2Cpp.CustomerBase FindBaseById(int baseId)

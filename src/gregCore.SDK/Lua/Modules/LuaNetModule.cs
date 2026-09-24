@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Netzwerkgeräte aus dem Save (read-only).
-///               Schreiben braucht C# (keine stabilen Live-Handles aus Lua).
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for network devices from the save (read-only).
+///               Writing requires C# (no stable live handles from Lua).
 /// Maintainer:   greg.net.routers(), firewalls(), sfps(), lacps(), cables()
 /// </file-summary>
 
@@ -15,9 +15,20 @@ public static class LuaNetModule
     public static void Register(Table greg, Script script, string modId)
     {
         var netTable = new Table(script);
+        RegisterRouters(netTable, script, modId);
+        RegisterFirewalls(netTable, script, modId);
+        RegisterSfps(netTable, script, modId);
+        RegisterLacps(netTable, script);
+        RegisterCables(netTable, script, modId);
+
+        greg["net"] = netTable;
+    }
+
+    private static void RegisterRouters(Table t, Script script, string modId)
+    {
 
         // greg.net.routers() → array of {asn, next_route_id, routes, owned}
-        netTable["routers"] = (Func<Table>)(() =>
+        t["routers"] = (Func<Table>)(() =>
         {
             try
             {
@@ -53,9 +64,13 @@ public static class LuaNetModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterFirewalls(Table t, Script script, string modId)
+    {
 
         // greg.net.firewalls() → array of {cluster_ip, rules}
-        netTable["firewalls"] = (Func<Table>)(() =>
+        t["firewalls"] = (Func<Table>)(() =>
         {
             try
             {
@@ -87,9 +102,13 @@ public static class LuaNetModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterSfps(Table t, Script script, string modId)
+    {
 
         // greg.net.sfps() → array of {prefab, x, y, z, inserted}
-        netTable["sfps"] = (Func<Table>)(() =>
+        t["sfps"] = (Func<Table>)(() =>
         {
             try
             {
@@ -129,9 +148,13 @@ public static class LuaNetModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterLacps(Table t, Script script)
+    {
 
         // greg.net.lacps() → array of group ids
-        netTable["lacps"] = (Func<Table>)(() =>
+        t["lacps"] = (Func<Table>)(() =>
         {
             try
             {
@@ -154,9 +177,13 @@ public static class LuaNetModule
             }
             catch { return new Table(script); }
         });
+    }
+
+    private static void RegisterCables(Table t, Script script, string modId)
+    {
 
         // greg.net.cables() → array of {id, maxspeed}
-        netTable["cables"] = (Func<Table>)(() =>
+        t["cables"] = (Func<Table>)(() =>
         {
             try
             {
@@ -188,8 +215,6 @@ public static class LuaNetModule
                 return new Table(script);
             }
         });
-
-        greg["net"] = netTable;
     }
 
     internal static global::Il2Cpp.NetworkSaveData NetworkData()

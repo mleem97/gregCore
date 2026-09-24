@@ -1,6 +1,6 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Mod-Registry und Abhängigkeiten.
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for the mod registry and dependencies.
 /// Maintainer:   greg.mods.list(), is_loaded(), version(), declare(),
 ///               ensure(), check()
 /// </file-summary>
@@ -15,9 +15,20 @@ public static class LuaModsModule
     public static void Register(Table greg, Script script, string modId)
     {
         var modsTable = new Table(script);
+        RegisterList(modsTable, script, modId);
+        RegisterIsLoaded(modsTable);
+        RegisterDeclare(modsTable, modId);
+        RegisterEnsure(modsTable);
+        RegisterCheck(modsTable, script, modId);
+
+        greg["mods"] = modsTable;
+    }
+
+    private static void RegisterList(Table t, Script script, string modId)
+    {
 
         // greg.mods.list() → array of {id, name, version}
-        modsTable["list"] = (Func<Table>)(() =>
+        t["list"] = (Func<Table>)(() =>
         {
             try
             {
@@ -44,23 +55,31 @@ public static class LuaModsModule
                 return new Table(script);
             }
         });
+    }
+
+    private static void RegisterIsLoaded(Table t)
+    {
 
         // greg.mods.is_loaded(modIdOrName) → bool
-        modsTable["is_loaded"] = (Func<string, bool>)((name) =>
+        t["is_loaded"] = (Func<string, bool>)((name) =>
         {
             try { return gregCore.Core.Mods.GregModDeps.IsMelonLoaded(name); }
             catch { return false; }
         });
 
         // greg.mods.version(modIdOrName) → string ("" when unknown)
-        modsTable["version"] = (Func<string, string>)((name) =>
+        t["version"] = (Func<string, string>)((name) =>
         {
             try { return gregCore.Core.Mods.GregModDeps.GetMelonVersion(name) ?? ""; }
             catch { return ""; }
         });
+    }
+
+    private static void RegisterDeclare(Table t, string modId)
+    {
 
         // greg.mods.declare({{mod=, min_version=, required=}, ...}) → bool
-        modsTable["declare"] = (Func<Table, bool>)((deps) =>
+        t["declare"] = (Func<Table, bool>)((deps) =>
         {
             try
             {
@@ -99,9 +118,13 @@ public static class LuaModsModule
                 return false;
             }
         });
+    }
+
+    private static void RegisterEnsure(Table t)
+    {
 
         // greg.mods.ensure({mod=, min_version=?, required=?}) → ok, detail
-        modsTable["ensure"] = (Func<DynValue, DynValue>)((spec) =>
+        t["ensure"] = (Func<DynValue, DynValue>)((spec) =>
         {
             try
             {
@@ -136,9 +159,13 @@ public static class LuaModsModule
                     DynValue.NewString(ex.Message));
             }
         });
+    }
+
+    private static void RegisterCheck(Table t, Script script, string modId)
+    {
 
         // greg.mods.check() → array of {owner, mod, detail} problems (empty = ok)
-        modsTable["check"] = (Func<Table>)(() =>
+        t["check"] = (Func<Table>)(() =>
         {
             try
             {
@@ -161,7 +188,5 @@ public static class LuaModsModule
             }
             catch { return new Table(script); }
         });
-
-        greg["mods"] = modsTable;
     }
 }

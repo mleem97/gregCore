@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        UI-Overlay für Lua-Fehler.
-/// Maintainer:   Zeigt Fehler mit Stacktrace, Auto-Hide nach 10 Sekunden.
-///               UI Toolkit-basiert, semi-transparent.
+/// Layer:       Infrastructure
+/// Purpose:      UI overlay for Lua errors.
+/// Maintainer:   Displays errors with stack trace, auto-hide after 10 seconds.
+///               UI Toolkit-based, semi-transparent.
 /// </file-summary>
 
 using System;
@@ -22,7 +22,7 @@ public sealed class LuaErrorOverlay
     private VisualElement? _root;
 
     /// <summary>
-    /// Fügt einen neuen Fehler hinzu.
+    /// Adds a new error.
     /// </summary>
     public void ReportError(string modId, string message, string? stackTrace = null)
     {
@@ -182,7 +182,7 @@ public sealed class LuaErrorOverlay
     }
 
     /// <summary>
-    /// Entfernt alle sichtbaren Fehler.
+    /// Removes all visible errors.
     /// </summary>
     public void DismissAll()
     {

@@ -201,6 +201,34 @@ public static class LuaTabletModule
         });
     }
 
+    /// <summary>
+    /// Opens a tracked tablet for a computer app page. Returns the handle
+    /// id ("" on failure). The handle works with all panel_add_* calls.
+    /// </summary>
+    internal static string OpenTabletForApp(string title)
+    {
+        try
+        {
+            var builder = gregCore.UI.GregUIBuilder.CreateTablet(title ?? "App");
+            builder.Build();
+            return Track(builder);
+        }
+        catch { return ""; }
+    }
+
+    /// <summary>Hides and forgets a tablet handle (best-effort).</summary>
+    internal static void CloseTablet(string handle)
+    {
+        try
+        {
+            var b = Lookup(handle);
+            if (b == null) return;
+            try { b.IsVisible = false; } catch { }
+            lock (_gate) { _panels.Remove(handle ?? ""); }
+        }
+        catch { }
+    }
+
     private static string Track(gregCore.UI.GregUIBuilder builder)
     {
         try

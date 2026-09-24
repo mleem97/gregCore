@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Event-Binding Funktionen für Lua.
-/// Maintainer:   Verbindet Lua-Callbacks mit dem IGregEventBus.
+/// Layer:       Infrastructure
+/// Purpose:      Event-binding functions for Lua.
+/// Maintainer:   Connects Lua callbacks to the IGregEventBus.
 ///               greg.on(), greg.off(), greg.once(), greg.fire()
 /// </file-summary>
 
@@ -26,9 +26,17 @@ public static class GregEventLuaModule
     private static readonly Dictionary<string, List<Subscription>> _handlers = new();
 
     /// <summary>
-    /// Registriert Event-Funktionen im greg-Table.
+    /// Registers event functions in the greg table.
     /// </summary>
     public static void Register(Table greg, Script script, GregEventBus eventBus, string modId)
+    {
+        RegisterOn(greg, eventBus, script, modId);
+        RegisterOff(greg, eventBus, modId);
+        RegisterOnce(greg, eventBus, script, modId);
+        RegisterFire(greg, eventBus, modId);
+    }
+
+    private static void RegisterOn(Table greg, GregEventBus eventBus, Script script, string modId)
     {
         // greg.on(hookName, callback) – Subscribe to an event
         greg["on"] = (Func<string, Closure, string>)((hookName, callback) =>
@@ -66,6 +74,10 @@ public static class GregEventLuaModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterOff(Table greg, GregEventBus eventBus, string modId)
+    {
 
         greg["off"] = (Action<string>)(token =>
         {
@@ -75,6 +87,10 @@ public static class GregEventLuaModule
             eventBus.Unsubscribe(subscription.HookName, subscription.Handler);
             list.Remove(subscription);
         });
+    }
+
+    private static void RegisterOnce(Table greg, GregEventBus eventBus, Script script, string modId)
+    {
 
         // greg.once(hookName, callback) – Subscribe once, auto-unsubscribes after first call
         greg["once"] = (Func<string, Closure, string>)((hookName, callback) =>
@@ -112,6 +128,10 @@ public static class GregEventLuaModule
                 return "";
             }
         });
+    }
+
+    private static void RegisterFire(Table greg, GregEventBus eventBus, string modId)
+    {
 
         // greg.fire(hookName, dataTable) – Fire a custom event
         greg["fire"] = (Action<string, Table?>)((hookName, dataTable) =>
@@ -146,7 +166,7 @@ public static class GregEventLuaModule
     }
 
     /// <summary>
-    /// Konvertiert ein EventPayload in ein Lua-Table.
+    /// Converts an EventPayload into a Lua table.
     /// </summary>
     public static Table PayloadToTable(Script script, EventPayload payload)
     {
@@ -177,7 +197,7 @@ public static class GregEventLuaModule
     }
 
     /// <summary>
-    /// Entfernt alle Handler eines Mods (für Shutdown/Hot-Reload).
+    /// Removes all handlers of a mod (for shutdown/hot-reload).
     /// </summary>
     public static void UnregisterAll(string modId, GregEventBus eventBus)
     {

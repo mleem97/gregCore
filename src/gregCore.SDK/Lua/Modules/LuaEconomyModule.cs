@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für Wirtschaftsdaten (Bilanz lesen, read-only).
-/// Maintainer:   greg.economy.sheet(), history(). Save-Graph wird per
-///               Probing aufgeloest (API-Drift-tolerant), alles best-effort.
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for economy data (reading balance sheet, read-only).
+/// Maintainer:   greg.economy.sheet(), history(). The save graph is resolved via
+///               probing (API-drift tolerant), all best-effort.
 /// </file-summary>
 
 using System;
@@ -15,9 +15,17 @@ public static class LuaEconomyModule
     public static void Register(Table greg, Script script, string modId)
     {
         var economyTable = new Table(script);
+        RegisterSheet(economyTable, script, modId);
+        RegisterHistory(economyTable, script, modId);
+
+        greg["economy"] = economyTable;
+    }
+
+    private static void RegisterSheet(Table t, Script script, string modId)
+    {
 
         // greg.economy.sheet() → { total_salary, months } or nil
-        economyTable["sheet"] = (Func<DynValue>)(() =>
+        t["sheet"] = (Func<DynValue>)(() =>
         {
             try
             {
@@ -36,9 +44,13 @@ public static class LuaEconomyModule
                 return DynValue.Nil;
             }
         });
+    }
+
+    private static void RegisterHistory(Table t, Script script, string modId)
+    {
 
         // greg.economy.history() → array of { month, day, salary, repair, shop }
-        economyTable["history"] = (Func<Table>)(() =>
+        t["history"] = (Func<Table>)(() =>
         {
             try
             {
@@ -69,8 +81,6 @@ public static class LuaEconomyModule
                 return new Table(script);
             }
         });
-
-        greg["economy"] = economyTable;
     }
 
     internal static gregCore.Core.Networking.GregEconomySaves.BalanceSheet ReadBalanceSheet()
@@ -79,7 +89,7 @@ public static class LuaEconomyModule
         {
             var save = greg.Sdk.GregPublicAPI.GetSaveDataSafe();
             if (save == null) return null;
-            // Save-Graph per Probing auflösen (Feldnamen je nach Build-Typ).
+            // Resolve the save graph via probing (field names vary by build type).
             object sheetData = ProbeMember(save, "balanceSheetData")
                 ?? ProbeMember(save, "balanceSheet");
             if (sheetData is global::Il2Cpp.BalanceSheetSaveData typed)

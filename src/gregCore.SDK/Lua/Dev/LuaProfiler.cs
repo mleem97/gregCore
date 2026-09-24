@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Frame-Budget-Tracking für Lua-Mods.
-/// Maintainer:   Misst CPU-Zeit pro Lua-Mod pro Frame.
-///               Warnt bei Überschreitung des Frame-Budgets.
+/// Layer:       Infrastructure
+/// Purpose:      Frame-budget tracking for Lua mods.
+/// Maintainer:   Measures CPU time per Lua mod per frame.
+///               Warns when the frame budget is exceeded.
 /// </file-summary>
 
 using System;
@@ -22,16 +22,16 @@ public sealed class LuaProfiler
     private float _warningCooldown;
 
     /// <summary>
-    /// Erstellt einen Profiler mit dem angegebenen Frame-Budget.
+    /// Creates a profiler with the given frame budget.
     /// </summary>
-    /// <param name="frameBudgetMs">Max. Millisekunden pro Frame für alle Lua-Mods zusammen (Default: 2.0ms)</param>
+    /// <param name="frameBudgetMs">Max. milliseconds per frame for all Lua mods combined (Default: 2.0ms)</param>
     public LuaProfiler(float frameBudgetMs = 2.0f)
     {
         _frameBudgetMs = frameBudgetMs;
     }
 
     /// <summary>
-    /// Startet eine Messung für einen Mod.
+    /// Starts a measurement for a mod.
     /// </summary>
     public ProfileScope BeginScope(string modId)
     {
@@ -45,7 +45,7 @@ public sealed class LuaProfiler
     }
 
     /// <summary>
-    /// Wird am Ende jedes Frames aufgerufen.
+    /// Called at the end of each frame.
     /// </summary>
     public void EndFrame()
     {
@@ -86,7 +86,7 @@ public sealed class LuaProfiler
     }
 
     /// <summary>
-    /// Gibt einen Profiling-Report als String zurück (für REPL/Console).
+    /// Returns a profiling report as a string (for REPL/console).
     /// </summary>
     public string GetReport()
     {

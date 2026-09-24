@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Infrastructure
-/// Zweck:        Lua-API für JSON (parse/stringify ohne Spiel-Abhaengigkeit).
-/// Maintainer:   greg.json.parse(), stringify(); reine Konvertierung,
-///               unit-testbar ohne Spiel.
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for JSON (parse/stringify without game dependency).
+/// Maintainer:   greg.json.parse(), stringify(); pure conversion,
+///               unit-testable without the game.
 /// </file-summary>
 
 using System;
@@ -18,9 +18,17 @@ public static class LuaJsonModule
     public static void Register(Table greg, Script script, string modId)
     {
         var jsonTable = new Table(script);
+        RegisterParse(jsonTable, script, modId);
+        RegisterStringify(jsonTable, modId);
+
+        greg["json"] = jsonTable;
+    }
+
+    private static void RegisterParse(Table t, Script script, string modId)
+    {
 
         // greg.json.parse(text) → table/string/number/boolean or nil
-        jsonTable["parse"] = (Func<string, DynValue>)((text) =>
+        t["parse"] = (Func<string, DynValue>)((text) =>
         {
             try
             {
@@ -36,9 +44,13 @@ public static class LuaJsonModule
                 return DynValue.Nil;
             }
         });
+    }
+
+    private static void RegisterStringify(Table t, string modId)
+    {
 
         // greg.json.stringify(value) → string ("" on failure)
-        jsonTable["stringify"] = (Func<DynValue, string>)((value) =>
+        t["stringify"] = (Func<DynValue, string>)((value) =>
         {
             try
             {
@@ -51,8 +63,6 @@ public static class LuaJsonModule
                 return "";
             }
         });
-
-        greg["json"] = jsonTable;
     }
 
     internal static DynValue FromJsonElement(Script script, JsonElement el)

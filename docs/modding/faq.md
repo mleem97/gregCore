@@ -62,3 +62,17 @@ tote Hooks löschen (siehe [Harmony + IL2CPP](harmony-il2cpp.md)).
 
 Masse zu klein. Fix: `Rigidbody.mass`-Multiplikator + `angularDrag`-Multiplikator
 (LargerCart-`CartStabilizer`-Muster, konfigurierbar, einmal pro Szene).
+
+## RGB-/Material-Animation frisst Frames
+
+Pro Frame alle Renderer durchlaufen + `materials`-Zugriffe (klonen!) skaliert nicht.
+Fix (Backplanes-`RgbAnimator`-Muster): nur registrierte Slots anfassen
+(Pointer-Key + Material/Property), tote Server per Liveness-Check aus dem Tracking
+werfen, Hue-Rotation zeitbasiert (`Time` statt Frame-Zähler).
+
+## Bulk-Käufe (30+ Einheiten) falsch zugeordnet
+
+Preis-Peek als Primärschlüssel versagt bei gleichen Preispunkten. Fix: Checkout-
+Snapshot mit einer Spec **pro Einheit** in Cart-Reihenfolge (Quantity expandiert),
+Prefab-Familie als Drift-Korrektur, Pending-Cap großzügig + Expiry, danach
+verifizieren (siehe [Shop-Items](shop-items.md), Abschnitt 4).

@@ -20,6 +20,14 @@
 - Scans/Sweeps per Timestamp-Gate (1/s-Repair-Fenster, 2-s-Panel-Refresh,
   0,1-s-HUD-Throttle, 30-s-Rescans) statt pro Frame.
 - `FindObjectsOfType` nur in Fenstern/auf Knopfdruck (Verify/Repair), nie in `OnUpdate`.
+- Zustand über Events statt Polling halten (Vorbild `PortSpeedMemory`, Backplanes):
+  Ports einmalig mit Ziel-Speed registrieren (Instanz-ID + Speed), in
+  `InsertSFP`/`SetConnectionSpeed`-Postfixen Drift per direktem Feld-Write
+  nachziehen. Stale Einträge (zerstörte Kabel, recycelte IDs) per Referenz-Check
+  selbstreinigend, Map-Größe mit Sweep-Threshold begrenzen.
+- Material-Animation (Vorbild `RgbAnimator`, Backplanes): nur getrackte Slots
+  anfassen (Pointer-Key + Material/Property), Tote per Liveness-Check aussortieren,
+  Hue-Rotation zeitbasiert — nie alle Renderer pro Frame durchlaufen.
 
 ## 3. IL2CPP-Typen korrekt benutzen
 

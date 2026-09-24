@@ -43,10 +43,17 @@ Holder parken (siehe [Harmony + IL2CPP](harmony-il2cpp.md)).
 ## 4. Cart → Auslieferung
 
 - Custom-IDs brauchen oft eigene Cart-Logik (`ButtonBuyShopItem`-Prefix): Zeile per
-  `ShopCartItem.Initialize(shop, name, id, price, type, noCustomColor)` anlegen,
+  `ShopCartItem.Initialize(shop, name, id, price, itemType, noCustomColor)` anlegen,
   Menge via `BuyAnotherItem`, Summe via `UpdateCartTotal`.
 - Auslieferung am Checkout über `GetPrefabForItem` (eine Instanz pro Kauf, keine
   Extra-Spawns — sonst Geister-Boxen).
+- **Bulk-Käufe pro Einheit zuordnen** (Vorbild Backplanes-Checkout-Snapshot):
+  Beim `SpawnAll`-Beginn eine Spec **pro Einheit** in Cart-Reihenfolge ablegen
+  (Quantity expandieren), Prefab-Familie gegen Cart-Drift prüfen (Preis-Peek nur
+  als Korrektur, nie als Primärschlüssel). So kriegt bei 30+ Einheiten aus
+  mehreren Familien zum selben Preis jede Spawn-Instanz ihre exakte Spec.
+  Pending-Queues dabei groß genug dimensionieren (Backplanes: Cap 12 → 200,
+  10-Minuten-Expiry) und nach Checkout verifizieren (Mismatch → Log + Notification).
 - Exklusivität: Wer dieselben ID-Ranges besitzt (MoreModules vs. MoreServers vs.
   RealisticModules), weicht per `RegisteredMelons`-Check zurück (`s_disabledBySibling`,
   Fehler ins Log) — doppelte Buttons/Käufe sind schlimmer als ein inaktiver Mod.

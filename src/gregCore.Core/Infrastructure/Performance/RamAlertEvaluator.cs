@@ -19,7 +19,7 @@ public static class RamAlertEvaluator
 {
     // Hysterese-Band: Re-Arm erst deutlich unter der Schwelle, damit der
     // Alert bei schwankendem Verbrauch nicht flattert.
-    public const int RearmHysteresisMb = 256;
+    public static int RearmHysteresisMb { get; } = 256;
 
     // Unter Proton/Wine enthaelt WorkingSet das komplette Wine-Mapping und
     // liegt permanent ueber jeder sinnvollen Schwelle. Private Bytes messen

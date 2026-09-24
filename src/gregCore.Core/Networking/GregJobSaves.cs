@@ -23,8 +23,8 @@ public static class GregJobSaves
 
     public sealed class TechnicianSave
     {
-        public float[] Position = Array.Empty<float>();
-        public int TechnicianID;
+        public float[] Position { get; set; } = Array.Empty<float>();
+        public int TechnicianID { get; set; }
     }
 
     public sealed class RepairJob
@@ -35,15 +35,15 @@ public static class GregJobSaves
 
     public sealed class InteractObject
     {
-        public int Uid;
-        public float[] Value = Array.Empty<float>();
-        public int[] SaveIntArray = Array.Empty<int>();
-        public int[] SaveIntArray2 = Array.Empty<int>();
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public string LabelText = "";
-        public string CoopLooseId = "";
-        public string RackTemplateId = "";
+        public int Uid { get; set; }
+        public float[] Value { get; set; } = Array.Empty<float>();
+        public int[] SaveIntArray { get; set; } = Array.Empty<int>();
+        public int[] SaveIntArray2 { get; set; } = Array.Empty<int>();
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public string LabelText { get; set; } = "";
+        public string CoopLooseId { get; set; } = "";
+        public string RackTemplateId { get; set; } = "";
     }
 
     // ── Technician ───────────────────────────────────────────────────────────

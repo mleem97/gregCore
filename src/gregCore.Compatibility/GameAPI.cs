@@ -962,7 +962,7 @@ public partial class GameAPIManager : IDisposable
     private int SteamSendP2PImpl(ulong target, IntPtr data, uint len, uint reliable) => 0;
     private uint SteamIsP2PAvailableImpl(IntPtr outSize) => 0;
     private uint SteamReadP2PImpl(IntPtr buf, uint bufLen, IntPtr outSender) => 0;
-    private void SteamAcceptP2PImpl(ulong remote) { }
+    private void SteamAcceptP2PImpl(ulong remote) { /* intentionally inert: native Data Center owns lobby callbacks */ }
     private uint SteamPollEventImpl(IntPtr outType, IntPtr outData)
     {
         // Intentionally inert: native Data Center owns lobby callbacks.
@@ -1252,7 +1252,7 @@ public partial class GameAPIManager : IDisposable
                     if (srv.gameObject.scene.name == null) continue;
                     if ((srv.ServerID ?? "") == targetId) return (ulong)srv.Pointer.ToInt64();
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             foreach (var sw in UnityEngine.Resources.FindObjectsOfTypeAll<NetworkSwitch>())
             {
@@ -1261,7 +1261,7 @@ public partial class GameAPIManager : IDisposable
                     if (sw.gameObject.scene.name == null) continue;
                     if ((sw.switchId ?? "") == targetId) return (ulong)sw.Pointer.ToInt64();
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             foreach (var pp in UnityEngine.Resources.FindObjectsOfTypeAll<PatchPanel>())
             {
@@ -1270,7 +1270,7 @@ public partial class GameAPIManager : IDisposable
                     if (pp.gameObject.scene.name == null) continue;
                     if ((pp.patchPanelId ?? "") == targetId) return (ulong)pp.Pointer.ToInt64();
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch (Exception ex)
@@ -1426,7 +1426,7 @@ public partial class GameAPIManager : IDisposable
                         rb.WakeUp();
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             else if (objectType == 7)
             {
@@ -1474,7 +1474,7 @@ public partial class GameAPIManager : IDisposable
                         rb.WakeUp();
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             else
             {
@@ -1507,7 +1507,7 @@ public partial class GameAPIManager : IDisposable
                                 rb.WakeUp();
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 catch (Exception ex)
@@ -1528,7 +1528,7 @@ public partial class GameAPIManager : IDisposable
             }
 
             try { SpawnedObjectTracker.RegisterRemoteSpawn(go.GetInstanceID(), resultId); }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             CrashLog.Log($"[WorldSync] SpawnObject: created '{resultId}' (type={objectType}, prefab={prefabId}) OK");
             return 1;
@@ -1556,7 +1556,7 @@ public partial class GameAPIManager : IDisposable
             var positions = UnityEngine.Object.FindObjectsOfType<Il2Cpp.RackPosition>();
             foreach (var rp in positions)
             {
-                try { if (rp.rackPosGlobalUID == rackUid) return rp; } catch { }
+                try { if (rp.rackPosGlobalUID == rackUid) return rp; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             if (attempt == 0)
@@ -1798,14 +1798,14 @@ public partial class GameAPIManager : IDisposable
             var ptr = new IntPtr((long)handle);
 
             byte guessedType = 0;
-            try { var s = new Il2Cpp.Server(ptr); if (!string.IsNullOrEmpty(s.ServerID)) guessedType = (byte)s.serverType; } catch { }
+            try { var s = new Il2Cpp.Server(ptr); if (!string.IsNullOrEmpty(s.ServerID)) guessedType = (byte)s.serverType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (guessedType == 0)
             {
-                try { var sw = new Il2Cpp.NetworkSwitch(ptr); if (!string.IsNullOrEmpty(sw.switchId)) guessedType = 4; } catch { }
+                try { var sw = new Il2Cpp.NetworkSwitch(ptr); if (!string.IsNullOrEmpty(sw.switchId)) guessedType = 4; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (guessedType == 0)
             {
-                try { var pp = new Il2Cpp.PatchPanel(ptr); if (!string.IsNullOrEmpty(pp.patchPanelId)) guessedType = 7; } catch { }
+                try { var pp = new Il2Cpp.PatchPanel(ptr); if (!string.IsNullOrEmpty(pp.patchPanelId)) guessedType = 7; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             // Preserve the object ID through InsertedInRack callbacks
@@ -1816,13 +1816,13 @@ public partial class GameAPIManager : IDisposable
                 case 1:
                 case 2:
                 case 3:
-                    try { var srv = new Il2Cpp.Server(ptr); preserveId = srv.ServerID ?? ""; } catch { }
+                    try { var srv = new Il2Cpp.Server(ptr); preserveId = srv.ServerID ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 4:
-                    try { var sw = new Il2Cpp.NetworkSwitch(ptr); preserveId = sw.switchId ?? ""; } catch { }
+                    try { var sw = new Il2Cpp.NetworkSwitch(ptr); preserveId = sw.switchId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 7:
-                    try { var pp = new Il2Cpp.PatchPanel(ptr); preserveId = pp.patchPanelId ?? ""; } catch { }
+                    try { var pp = new Il2Cpp.PatchPanel(ptr); preserveId = pp.patchPanelId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
             }
             if (!string.IsNullOrEmpty(preserveId))
@@ -1846,7 +1846,7 @@ public partial class GameAPIManager : IDisposable
                     rb.angularVelocity = UnityEngine.Vector3.zero;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             Patch_Rack_MarkPositionAsUsed.SuppressEvents = true;
             try { rack.MarkPositionAsUsed(rackPos.positionIndex, sizeInU); }
@@ -1886,14 +1886,14 @@ public partial class GameAPIManager : IDisposable
 
             var ptr = new IntPtr((long)handle);
             byte guessedType = 0;
-            try { var s = new Il2Cpp.Server(ptr); if (!string.IsNullOrEmpty(s.ServerID)) guessedType = (byte)s.serverType; } catch { }
+            try { var s = new Il2Cpp.Server(ptr); if (!string.IsNullOrEmpty(s.ServerID)) guessedType = (byte)s.serverType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (guessedType == 0)
             {
-                try { var sw = new Il2Cpp.NetworkSwitch(ptr); if (!string.IsNullOrEmpty(sw.switchId)) guessedType = 4; } catch { }
+                try { var sw = new Il2Cpp.NetworkSwitch(ptr); if (!string.IsNullOrEmpty(sw.switchId)) guessedType = 4; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (guessedType == 0)
             {
-                try { var pp = new Il2Cpp.PatchPanel(ptr); if (!string.IsNullOrEmpty(pp.patchPanelId)) guessedType = 7; } catch { }
+                try { var pp = new Il2Cpp.PatchPanel(ptr); if (!string.IsNullOrEmpty(pp.patchPanelId)) guessedType = 7; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             // Clear installed objects tracking before uninstall bookkeeping
             try
@@ -1905,18 +1905,18 @@ public partial class GameAPIManager : IDisposable
                     case 1:
                     case 2:
                     case 3:
-                        try { var s2 = new Il2Cpp.Server(ptr); removeUid = s2.currentRackPosition != null ? s2.currentRackPosition.rackPosGlobalUID : s2.rackPositionUID; } catch { }
+                        try { var s2 = new Il2Cpp.Server(ptr); removeUid = s2.currentRackPosition != null ? s2.currentRackPosition.rackPosGlobalUID : s2.rackPositionUID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     case 4:
-                        try { var sw2 = new Il2Cpp.NetworkSwitch(ptr); removeUid = sw2.currentRackPosition != null ? sw2.currentRackPosition.rackPosGlobalUID : sw2.rackPositionUID; } catch { }
+                        try { var sw2 = new Il2Cpp.NetworkSwitch(ptr); removeUid = sw2.currentRackPosition != null ? sw2.currentRackPosition.rackPosGlobalUID : sw2.rackPositionUID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     case 7:
-                        try { var pp2 = new Il2Cpp.PatchPanel(ptr); removeUid = pp2.currentRackPosition != null ? pp2.currentRackPosition.rackPosGlobalUID : pp2.rackPositionUID; } catch { }
+                        try { var pp2 = new Il2Cpp.PatchPanel(ptr); removeUid = pp2.currentRackPosition != null ? pp2.currentRackPosition.rackPosGlobalUID : pp2.rackPositionUID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                 }
                 if (removeUid > 0) Patch_Rack_MarkPositionAsUsed.RemoveInstalledObject(removeUid);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             RackUninstallBookkeeping(ptr, guessedType, "RemoveFromRack");
 
@@ -1927,7 +1927,7 @@ public partial class GameAPIManager : IDisposable
                 if (mgr != null && mgr.parentUsableObjects != null)
                     comp.transform.SetParent(mgr.parentUsableObjects, true);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             // ── 4. Re-enable physics ────────────────────────────────────────
             try
@@ -1943,7 +1943,7 @@ public partial class GameAPIManager : IDisposable
                     rb.WakeUp();
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             CrashLog.Log($"[WorldSync] RemoveFromRack: '{objId}' removed OK");
             return 1;
@@ -2122,7 +2122,7 @@ public partial class GameAPIManager : IDisposable
                 return;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Try NetworkSwitch
         try
@@ -2135,7 +2135,7 @@ public partial class GameAPIManager : IDisposable
                 return;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Try PatchPanel
         try
@@ -2147,7 +2147,7 @@ public partial class GameAPIManager : IDisposable
                 CrashLog.Log($"[WorldSync] TryResetObjectInHands: cleared PatchPanel '{pp.patchPanelId}'");
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     int WorldEnsureRackUIDsImpl()
@@ -2196,7 +2196,7 @@ public partial class GameAPIManager : IDisposable
                                 Marshal.WriteInt64(outHandles, (int)(count * 8), srv.Pointer.ToInt64());
                                 count++;
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         break;
                     }
@@ -2212,7 +2212,7 @@ public partial class GameAPIManager : IDisposable
                                 Marshal.WriteInt64(outHandles, (int)(count * 8), sw.Pointer.ToInt64());
                                 count++;
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         break;
                     }
@@ -2236,33 +2236,33 @@ public partial class GameAPIManager : IDisposable
             switch (fieldId)
             {
                 case 0: // ServerId
-                    try { var srv = new Server(ptr); value = srv?.ServerID ?? ""; } catch { }
+                    try { var srv = new Server(ptr); value = srv?.ServerID ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 1: // SwitchId
-                    try { var sw = new NetworkSwitch(ptr); value = sw?.switchId ?? ""; } catch { }
+                    try { var sw = new NetworkSwitch(ptr); value = sw?.switchId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 2: // RACK_POSITION_UID
                     {
                         // Try each type, but filter negative values which indicate
                         // we're reading the wrong Il2Cpp field offset (type confusion).
                         int bestUid = 0;
-                        try { var srv = new Server(ptr); int uid = srv.rackPositionUID; if (uid > 0) bestUid = uid; } catch { }
+                        try { var srv = new Server(ptr); int uid = srv.rackPositionUID; if (uid > 0) bestUid = uid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         if (bestUid == 0)
                         {
-                            try { var sw = new NetworkSwitch(ptr); int uid = sw.rackPositionUID; if (uid > 0) bestUid = uid; } catch { }
+                            try { var sw = new NetworkSwitch(ptr); int uid = sw.rackPositionUID; if (uid > 0) bestUid = uid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         if (bestUid == 0)
                         {
-                            try { var pp = new PatchPanel(ptr); int uid = pp.rackPositionUID; if (uid > 0) bestUid = uid; } catch { }
+                            try { var pp = new PatchPanel(ptr); int uid = pp.rackPositionUID; if (uid > 0) bestUid = uid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         value = bestUid.ToString();
                     }
                     break;
                 case 3: // GameObjectName
-                    try { var comp = new UnityEngine.Component(ptr); value = comp?.gameObject?.name ?? ""; } catch { }
+                    try { var comp = new UnityEngine.Component(ptr); value = comp?.gameObject?.name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 4: // PatchPanelId
-                    try { var pp = new PatchPanel(ptr); value = pp?.patchPanelId ?? ""; } catch { }
+                    try { var pp = new PatchPanel(ptr); value = pp?.patchPanelId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
             }
             if (string.IsNullOrEmpty(value)) return 0;
@@ -2295,13 +2295,13 @@ public partial class GameAPIManager : IDisposable
             switch (fieldId)
             {
                 case 0: // ServerID
-                    try { var srv = new Server(ptr); srv.ServerID = newValue; return 1; } catch { }
+                    try { var srv = new Server(ptr); srv.ServerID = newValue; return 1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 1: // SwitchId
-                    try { var sw = new NetworkSwitch(ptr); sw.switchId = newValue; return 1; } catch { }
+                    try { var sw = new NetworkSwitch(ptr); sw.switchId = newValue; return 1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
                 case 4: // PatchPanelId
-                    try { var pp = new PatchPanel(ptr); pp.patchPanelId = newValue; return 1; } catch { }
+                    try { var pp = new PatchPanel(ptr); pp.patchPanelId = newValue; return 1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     break;
             }
             return 0;
@@ -2465,7 +2465,7 @@ public partial class GameAPIManager : IDisposable
                                 };
                                 if (val == targetId) return (ulong)srv.Pointer.ToInt64();
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         // Lookup failed — dump all known servers so we can see if ID mismatch
                         try
@@ -2486,7 +2486,7 @@ public partial class GameAPIManager : IDisposable
                             }
                             CrashLog.Log(sb.ToString());
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     }
                 case 4: // NetworkSwitch
@@ -2504,7 +2504,7 @@ public partial class GameAPIManager : IDisposable
                                 };
                                 if (val == targetId) return (ulong)sw.Pointer.ToInt64();
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         try
                         {
@@ -2524,7 +2524,7 @@ public partial class GameAPIManager : IDisposable
                             }
                             CrashLog.Log(sb.ToString());
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     }
                 case 7: // PatchPanel
@@ -2542,7 +2542,7 @@ public partial class GameAPIManager : IDisposable
                                 };
                                 if (val == targetId) return (ulong)pp.Pointer.ToInt64();
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         // Lookup failed dump
                         try
@@ -2563,7 +2563,7 @@ public partial class GameAPIManager : IDisposable
                             }
                             CrashLog.Log(sb.ToString());
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     }
             }
@@ -2695,13 +2695,13 @@ public partial class GameAPIManager : IDisposable
                     case 1:
                     case 2:
                     case 3:
-                        try { var srv = new Il2Cpp.Server(ptr); objectId = srv.ServerID ?? ""; } catch { }
+                        try { var srv = new Il2Cpp.Server(ptr); objectId = srv.ServerID ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     case 4:
-                        try { var sw = new Il2Cpp.NetworkSwitch(ptr); objectId = sw.switchId ?? ""; } catch { }
+                        try { var sw = new Il2Cpp.NetworkSwitch(ptr); objectId = sw.switchId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                     case 7:
-                        try { var pp = new Il2Cpp.PatchPanel(ptr); objectId = pp.patchPanelId ?? ""; } catch { }
+                        try { var pp = new Il2Cpp.PatchPanel(ptr); objectId = pp.patchPanelId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         break;
                 }
                 if (!string.IsNullOrEmpty(objectId))
@@ -2786,7 +2786,7 @@ public partial class GameAPIManager : IDisposable
                     if (posUid > 0)
                         Patch_Rack_MarkPositionAsUsed.RemoveInstalledObject(posUid);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             if (savedRackPos != null)

@@ -160,7 +160,7 @@ public static class RustFFIBridge
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.dll").Length > 0)
                 MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Veraltet: Rust-Dateien unter ./Plugins/Rust werden ignoriert - bitte nach ./UserLibs/Rust verschieben.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         foreach (string file in global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(rustDir, ".dll"))
         {

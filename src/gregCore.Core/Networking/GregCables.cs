@@ -23,20 +23,20 @@ public static class GregCables
 
     public sealed class LinkInfo
     {
-        public string SwitchID = "";
-        public string Type = "";
-        public float ConnectionSpeed;
-        public int CustomerID = -1;
-        public bool IsStartOrEnd;
-        public bool IsEndPoint;
-        public bool IsSFPPort;
-        public int SfpTypeInserted = -1;
-        public int SfpTypeSupported = -1;
-        public bool IsFibrePort;
-        public int CableIDsOnLink;
-        public string ParentServerID = "";
-        public string ParentSwitchID = "";
-        public string ParentPatchPanelID = "";
+        public string SwitchID { get; set; } = "";
+        public string Type { get; set; } = "";
+        public float ConnectionSpeed { get; set; }
+        public int CustomerID { get; set; } = -1;
+        public bool IsStartOrEnd { get; set; }
+        public bool IsEndPoint { get; set; }
+        public bool IsSFPPort { get; set; }
+        public int SfpTypeInserted { get; set; } = -1;
+        public int SfpTypeSupported { get; set; } = -1;
+        public bool IsFibrePort { get; set; }
+        public int CableIDsOnLink { get; set; }
+        public string ParentServerID { get; set; } = "";
+        public string ParentSwitchID { get; set; } = "";
+        public string ParentPatchPanelID { get; set; } = "";
     }
 
     // ── Finden ───────────────────────────────────────────────────────────────

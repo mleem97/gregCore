@@ -21,12 +21,12 @@ public static class GregCustomers
 
     public sealed class BaseInfo
     {
-        public int CustomerBaseID = -1;
-        public int CustomerID = -1;
-        public float EffectiveMoneySpeed;
-        public bool AllRequirementsMet;
-        public bool WantsInternet;
-        public bool WasFullySatisfied;
+        public int CustomerBaseID { get; set; } = -1;
+        public int CustomerID { get; set; } = -1;
+        public float EffectiveMoneySpeed { get; set; }
+        public bool AllRequirementsMet { get; set; }
+        public bool WantsInternet { get; set; }
+        public bool WasFullySatisfied { get; set; }
     }
 
     public sealed class ItemInfo

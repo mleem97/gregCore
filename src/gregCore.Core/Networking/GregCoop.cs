@@ -21,13 +21,13 @@ public static class GregCoop
 
     public sealed class PeerInfo
     {
-        public ulong PeerId;
-        public Vector3 Position;
-        public float Yaw;
-        public string Hand = "";
-        public int SubType;
-        public bool HasHeldColor;
-        public float LastSeenTime;
+        public ulong PeerId { get; set; }
+        public Vector3 Position { get; set; }
+        public float Yaw { get; set; }
+        public string Hand { get; set; } = "";
+        public int SubType { get; set; }
+        public bool HasHeldColor { get; set; }
+        public float LastSeenTime { get; set; }
     }
 
     // ── Session ──────────────────────────────────────────────────────────────

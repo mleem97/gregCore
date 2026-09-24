@@ -83,7 +83,7 @@ public static class GregInternet
         if (ep == null) return false;
         try
         {
-            var _ = ep.gameObject; // liveness
+            _ = ep.gameObject; // liveness
             ep.UpdateAppID(appID);
             return true;
         }
@@ -122,7 +122,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.SetAutoRepairMode(mode);
             return true;
         }
@@ -139,7 +139,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ToggleClearWarningAuto(isOn);
             return true;
         }
@@ -156,7 +156,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ButtonUpgradeCommandCenter();
             return true;
         }
@@ -173,7 +173,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ButtonDowngradeCommandCenter();
             return true;
         }
@@ -219,7 +219,7 @@ public static class GregInternet
         if (mgr == null || firewall == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             return mgr.MaliciousAllowed(firewall);
         }
         catch { return false; }
@@ -231,7 +231,7 @@ public static class GregInternet
         if (mgr == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.LaunchAttack();
             return true;
         }

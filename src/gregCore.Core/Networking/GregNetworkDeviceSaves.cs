@@ -22,10 +22,10 @@ public static class GregNetworkDeviceSaves
 
     public sealed class SubnetRoute
     {
-        public int SourceVlanId;
-        public string SubnetCidr = "";
-        public int TargetVlanId;
-        public string TargetIp = "";
+        public int SourceVlanId { get; set; }
+        public string SubnetCidr { get; set; } = "";
+        public int TargetVlanId { get; set; }
+        public string TargetIp { get; set; } = "";
     }
 
     public sealed class OwnedSubnet
@@ -54,13 +54,13 @@ public static class GregNetworkDeviceSaves
 
     public sealed class FilterRule
     {
-        public int PortIndex;
-        public string SourceIpCidr = "";
-        public string DestIpCidr = "";
-        public int NetworkPort;
-        public string Protocol = "";
-        public bool Bidirectional;
-        public bool Allow;
+        public int PortIndex { get; set; }
+        public string SourceIpCidr { get; set; } = "";
+        public string DestIpCidr { get; set; } = "";
+        public int NetworkPort { get; set; }
+        public string Protocol { get; set; } = "";
+        public bool Bidirectional { get; set; }
+        public bool Allow { get; set; }
     }
 
     public sealed class FirewallSave

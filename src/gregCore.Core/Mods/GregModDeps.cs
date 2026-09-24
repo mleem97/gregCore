@@ -20,9 +20,9 @@ public static class GregModDeps
 
     public sealed class Dependency
     {
-        public string ModId = "";
-        public string MinVersion = "";
-        public bool Required = true;
+        public string ModId { get; set; } = "";
+        public string MinVersion { get; set; } = "";
+        public bool Required { get; set; } = true;
     }
 
     public sealed class Problem

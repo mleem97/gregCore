@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace DataCenterModLoader
 {
-    public partial class ModConfigSystem
+    public static partial class ModConfigSystem
     {
         // UI Toolkit implementation - replaces IMGUI DrawSettingsChoice(), ShowPanel(), DrawPanel(), InitStyles()
         
@@ -23,7 +23,7 @@ namespace DataCenterModLoader
                     es.enabled = false;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             BuildConfigUI();
         }

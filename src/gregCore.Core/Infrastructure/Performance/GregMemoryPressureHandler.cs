@@ -38,7 +38,7 @@ internal sealed class GregMemoryPressureHandler
         {
             if (p.Data != null && p.Data.ContainsKey("ramMb")) ramMb = Convert.ToInt32(p.Data["ramMb"]);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         _logger.Warning($"[Memory] RAM Warning ({ramMb} MB) - Gen1 GC");
         // Throttle: Warn-GC hoechstens 1x pro Minute, sonst wird aus der
         // Druckentlastung selbst ein FPS-Problem.

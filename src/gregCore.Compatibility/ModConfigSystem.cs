@@ -61,7 +61,7 @@ public static partial class ModConfigSystem
     private static readonly List<string> _modOrder = new();
     private static bool _initialized;
 
-    private static bool _showPanel;
+    private static bool _showPanel = false;
     private static UnityEngine.UIElements.VisualElement? _panelRoot;
     private static string? _selectedModId;
     private static float _scrollOffset;
@@ -144,7 +144,7 @@ public static partial class ModConfigSystem
                         _disabledEventSystem = null;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
 
@@ -163,7 +163,7 @@ public static partial class ModConfigSystem
                     _disabledEventSystem = null;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             try
             {
@@ -293,7 +293,7 @@ public static partial class ModConfigSystem
                         }
                         if (settingsBtn != null) break;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -457,8 +457,8 @@ public static partial class ModConfigSystem
                 foreach (var t in cloneTexts)
                 {
                     t.text = "Mod Settings";
-                    try { t.SetText("Mod Settings"); } catch { }
-                    try { t.ForceMeshUpdate(); } catch { }
+                    try { t.SetText("Mod Settings"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { t.ForceMeshUpdate(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -695,23 +695,38 @@ public static partial class ModConfigSystem
         }
     }
 
-    public static bool RegisterBoolOption(string modId, string key, string displayName, bool defaultValue, string description = "")
+    public static bool RegisterBoolOption(string modId, string key, string displayName, bool defaultValue)
+        => RegisterBoolOption(modId, key, displayName, defaultValue, "");
+
+    public static bool RegisterBoolOption(string modId, string key, string displayName, bool defaultValue, string description)
         => RegisterBool(modId, key, displayName, defaultValue, description) == 1;
 
-    public static bool RegisterIntOption(string modId, string key, string displayName, int defaultValue, int min, int max, string description = "")
+    public static bool RegisterIntOption(string modId, string key, string displayName, int defaultValue, int min, int max)
+        => RegisterIntOption(modId, key, displayName, defaultValue, min, max, "");
+
+    public static bool RegisterIntOption(string modId, string key, string displayName, int defaultValue, int min, int max, string description)
         => RegisterInt(modId, key, displayName, defaultValue, min, max, description) == 1;
 
-    public static bool RegisterFloatOption(string modId, string key, string displayName, float defaultValue, float min, float max, string description = "")
+    public static bool RegisterFloatOption(string modId, string key, string displayName, float defaultValue, float min, float max)
+        => RegisterFloatOption(modId, key, displayName, defaultValue, min, max, "");
+
+    public static bool RegisterFloatOption(string modId, string key, string displayName, float defaultValue, float min, float max, string description)
         => RegisterFloat(modId, key, displayName, defaultValue, min, max, description) == 1;
 
-    public static bool GetBoolValue(string modId, string key, bool defaultValue = false)
+    public static bool GetBoolValue(string modId, string key)
+        => GetBoolValue(modId, key, false);
+
+    public static bool GetBoolValue(string modId, string key, bool defaultValue)
     {
         uint raw = GetBool(modId, key);
         if (raw == 0xFFFFFFFF) return defaultValue;
         return raw == 1;
     }
 
-    public static int GetIntValue(string modId, string key, int defaultValue = 0)
+    public static int GetIntValue(string modId, string key)
+        => GetIntValue(modId, key, 0);
+
+    public static int GetIntValue(string modId, string key, int defaultValue)
     {
         try
         {
@@ -725,7 +740,10 @@ public static partial class ModConfigSystem
         catch { return defaultValue; }
     }
 
-    public static float GetFloatValue(string modId, string key, float defaultValue = 0f)
+    public static float GetFloatValue(string modId, string key)
+        => GetFloatValue(modId, key, 0f);
+
+    public static float GetFloatValue(string modId, string key, float defaultValue)
     {
         try
         {

@@ -19,12 +19,12 @@ public static class GregEconomySaves
 
     public sealed class MonthlySnapshot
     {
-        public int Month;
-        public int Day;
-        public List<GregCustomerSaves.CustomerRecord> Records = new List<GregCustomerSaves.CustomerRecord>();
-        public float SalaryExpense;
-        public float RepairExpense;
-        public float ShopExpense;
+        public int Month { get; set; }
+        public int Day { get; set; }
+        public List<GregCustomerSaves.CustomerRecord> Records { get; set; } = new List<GregCustomerSaves.CustomerRecord>();
+        public float SalaryExpense { get; set; }
+        public float RepairExpense { get; set; }
+        public float ShopExpense { get; set; }
     }
 
     public sealed class BalanceSheet

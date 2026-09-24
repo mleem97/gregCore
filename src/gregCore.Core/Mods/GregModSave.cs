@@ -21,12 +21,12 @@ public static class GregModSave
 
     public sealed class ItemSave
     {
-        public string ModFolderName = "";
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public float[] SaveValue = Array.Empty<float>();
-        public int[] SaveIntArray = Array.Empty<int>();
-        public int[] SaveIntArray2 = Array.Empty<int>();
+        public string ModFolderName { get; set; } = "";
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public float[] SaveValue { get; set; } = Array.Empty<float>();
+        public int[] SaveIntArray { get; set; } = Array.Empty<int>();
+        public int[] SaveIntArray2 { get; set; } = Array.Empty<int>();
     }
 
     // ── Erzeugen / Fuellen ───────────────────────────────────────────────────

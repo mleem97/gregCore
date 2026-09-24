@@ -25,9 +25,7 @@ public static class CrashLog
                 $"========================================={Environment.NewLine}";
             File.WriteAllText(_logPath, header);
         }
-        catch
-        {
-        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Log(string msg)
@@ -45,9 +43,7 @@ public static class CrashLog
                     $"[{DateTime.Now:HH:mm:ss.fff}] {msg}{Environment.NewLine}");
             }
         }
-        catch
-        {
-        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void LogException(string context, Exception ex)
@@ -73,9 +69,7 @@ public static class CrashLog
                     Environment.NewLine);
             }
         }
-        catch
-        {
-        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }
 
@@ -179,9 +173,7 @@ public class Core
                         GameHooks.ForceProcessPendingQueue(technicianManager);
                     }
                 }
-                catch
-                {
-                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch (Exception ex)

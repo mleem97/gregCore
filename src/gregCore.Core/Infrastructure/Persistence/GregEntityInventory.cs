@@ -21,13 +21,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using MelonLoader;
 using UnityEngine;
 
 namespace gregCore.Infrastructure.Persistence;
 
 [ExcludeFromCodeCoverage(Justification = "Live Il2Cpp interop against game assemblies; needs running game.")]
-public static class GregSaveInventory
+public static class GregEntityInventory
 {
     public enum InventoryKind
     {
@@ -275,16 +276,114 @@ public static class GregSaveInventory
         catch { return ""; }
     }
 
+    /// <summary>
+    /// Vollstaendiges Inventar als Text (Kontrolle/Debugging). Pro Kind alle
+    /// Eintraege mit UID, NativeKey, Hint und Live-Status (ID-Kinds).
+    /// </summary>
+    public static string Dump()
+    {
+        try
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("gregCore EntityInventory Dump (saveKey=" + SaveKey + ", ready=" + IsReady + ")");
+            foreach (InventoryKind k in Enum.GetValues(typeof(InventoryKind)))
+            {
+                var all = GetAll(k);
+                sb.AppendLine("[" + k.ToString() + "] count=" + all.Count);
+                foreach (var e in all)
+                {
+                    if (e == null) continue;
+                    string live = "-";
+                    if (k == InventoryKind.Server || k == InventoryKind.Switch || k == InventoryKind.PatchPanel)
+                    {
+                        GameObject go;
+                        live = TryFindLive(e.Uid, out go) && go != null ? "live" : "MISSING";
+                    }
+                    sb.AppendLine("  " + e.Uid + " <= " + e.NativeKey
+                        + (string.IsNullOrEmpty(e.Hint) ? "" : " (" + e.Hint + ")")
+                        + " [" + live + "]");
+                }
+            }
+            return sb.ToString();
+        }
+        catch (Exception ex) { return "Dump failed: " + ex.GetBaseException().Message; }
+    }
+
+    /// <summary>
+    /// Prueft das Inventar: Duplikat-UIDs, leere Keys, Live-Aufloesbarkeit
+    /// (ID-Kinds). Gibt einen Report zurueck und loggt Warnungen.
+    /// </summary>
+    public static string Verify()
+    {
+        try
+        {
+            int dupes = 0, emptyKeys = 0, liveOk = 0, liveMissing = 0;
+            var missingExamples = new List<string>();
+            lock (_gate)
+            {
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var e in _byUid.Values)
+                {
+                    if (e == null) continue;
+                    if (!seen.Add(e.Uid)) dupes++;
+                    if (string.IsNullOrWhiteSpace(e.NativeKey)) emptyKeys++;
+                }
+            }
+            foreach (InventoryKind k in new[] { InventoryKind.Server, InventoryKind.Switch, InventoryKind.PatchPanel })
+            {
+                foreach (var e in GetAll(k))
+                {
+                    if (e == null) continue;
+                    GameObject go;
+                    if (TryFindLive(e.Uid, out go) && go != null) liveOk++;
+                    else
+                    {
+                        liveMissing++;
+                        if (missingExamples.Count < 5) missingExamples.Add(e.Uid);
+                    }
+                }
+            }
+            string report = "EntityInventory Verify: dupes=" + dupes + " emptyKeys=" + emptyKeys
+                + " liveOk=" + liveOk + " liveMissing=" + liveMissing
+                + (missingExamples.Count > 0 ? " z.B. " + string.Join(",", missingExamples.ToArray()) : "");
+            if (dupes > 0 || emptyKeys > 0 || liveMissing > 0)
+                MelonLogger.Warning("[gregCore][Save] " + report);
+            else
+                MelonLogger.Msg("[gregCore][Save] " + report);
+            return report;
+        }
+        catch (Exception ex)
+        {
+            string report = "Verify failed: " + ex.GetBaseException().Message;
+            try { MelonLogger.Warning("[gregCore][Save] " + report); } catch { }
+            return report;
+        }
+    }
+
     // ------------------------------------------------------------ rebuild
 
     /// <summary>
     /// Baut das Inventar aus den deserialisierten/geheilten Save-Daten.
     /// Aufruf im LoadNetworkState-Postfix (Healing-Prefix lief bereits).
+    /// Respektiert EntityInventoryConfig (Enabled/Verbose/Dump).
     /// </summary>
     public static void RebuildFromNetworkData(global::Il2Cpp.NetworkSaveData networkData)
     {
         try
         {
+            EntityInventoryConfig.Load();
+            if (!EntityInventoryConfig.Enabled)
+            {
+                lock (_gate)
+                {
+                    _byUid.Clear();
+                    _byKindKey.Clear();
+                    _saveKey = "";
+                    _ready = false;
+                }
+                MelonLogger.Msg("[gregCore][Save] EntityInventory deaktiviert (Pref) - kein Inventar.");
+                return;
+            }
             if (networkData == null || networkData.Pointer == IntPtr.Zero) return;
             string dir = null, name = null;
             try { dir = global::Il2Cpp.SaveSystem.saveDirPath; } catch { dir = null; }
@@ -327,6 +426,14 @@ public static class GregSaveInventory
             }
             try { Rebuilt?.Invoke(); } catch { }
             MelonLogger.Msg("[gregCore][Save] Inventar: " + Summary());
+            if (EntityInventoryConfig.VerboseLogging)
+            {
+                MelonLogger.Msg("[gregCore][Save] Inventar-Sidecar-Map: " + PersistedCount() + " Eintraege (saveKey=" + key + ").");
+            }
+            if (EntityInventoryConfig.DumpOnRebuild)
+            {
+                try { MelonLogger.Msg(Dump()); } catch { }
+            }
         }
         catch (Exception ex)
         {
@@ -635,6 +742,66 @@ public static class GregSaveInventory
         catch { }
     }
 
+    // ------------------------------------------------------------ config
+
+    /// <summary>
+    /// Control-Surface des Inventars (MelonPreferences, Kategorie
+    /// gregCore.EntityInventory). Enabled=false schaltet Rebuilds ab.
+    /// </summary>
+    public static class EntityInventoryConfig
+    {
+        private static bool _loaded;
+        private static readonly object _loadGate = new object();
+
+        public static bool Enabled = true;
+        public static bool VerboseLogging = false;
+        public static bool DumpOnRebuild = false;
+
+        public static void Load()
+        {
+            try
+            {
+                lock (_loadGate)
+                {
+                    if (_loaded) return;
+                    _loaded = true;
+                }
+                var category = MelonPreferences.CreateCategory("gregCore.EntityInventory", "EntityInventory (Save-Inventar)");
+                var enabled = category.CreateEntry("Enabled", true, "Inventar beim Laden aufbauen.");
+                var verbose = category.CreateEntry("VerboseLogging", false, "Ausfuehrliche Inventar-Logs.");
+                var dump = category.CreateEntry("DumpOnRebuild", false, "Vollstaendiges Inventar nach jedem Rebuild loggen.");
+                try
+                {
+                    Enabled = enabled.Value;
+                    VerboseLogging = verbose.Value;
+                    DumpOnRebuild = dump.Value;
+                }
+                catch { }
+                try { category.SaveToFile(false); } catch { }
+            }
+            catch { }
+        }
+
+        // Nur Tests/Tools: Laufzeit-Umschalter ohne Datei.
+        public static void OverrideForTesting(bool? enabled, bool? verbose, bool? dump)
+        {
+            try
+            {
+                lock (_loadGate) { _loaded = true; }
+                if (enabled.HasValue) Enabled = enabled.Value;
+                if (verbose.HasValue) VerboseLogging = verbose.Value;
+                if (dump.HasValue) DumpOnRebuild = dump.Value;
+            }
+            catch { }
+        }
+    }
+
+    private static int PersistedCount()
+    {
+        try { lock (_gate) { return _persistedUid.Count; } }
+        catch { return -1; }
+    }
+
     // ------------------------------------------------------------ sidecar
 
     private static void EnsureSidecarRegistered()
@@ -747,6 +914,48 @@ public static class GregSaveInventory
     }
 
     // ------------------------------------------------------------ helpers (pure, testbar)
+
+    private static readonly Regex GregIdTokenRegex =
+        new Regex(@"gregID:[A-Za-z]+:[0-9A-Za-z_\-]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex UnityDuplicateSuffixRegex =
+        new Regex(@"^(.*)\s\(\d+\)$", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Entfernt gregID-Token aus Anzeigetexten (Screens), ersetzt sie durch
+    /// die Vanilla-Bezeichnung. No-Op wenn kein Token enthalten (billig).
+    /// </summary>
+    public static string ScrubGregIds(string text, string replacement)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (text.IndexOf("gregID:", StringComparison.OrdinalIgnoreCase) < 0) return text;
+            return GregIdTokenRegex.Replace(text, replacement ?? "");
+        }
+        catch { return text; }
+    }
+
+    /// <summary>
+    /// Vanilla-Bezeichnung aus Objektnamen: "(Clone)" und Unity-Duplikat-
+    /// Suffixe (" (1)") entfernen. gregID-Namen liefern "" (keine Vanilla-
+    /// Form vorhanden - Aufrufer faellt zurueck).
+    /// </summary>
+    public static string CleanDisplayName(string name)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "";
+            string n = name.Trim();
+            if (n.StartsWith("gregID:", StringComparison.OrdinalIgnoreCase)) return "";
+            int clone = n.IndexOf("(Clone)", StringComparison.OrdinalIgnoreCase);
+            if (clone >= 0) n = n.Substring(0, clone).Trim();
+            var m = UnityDuplicateSuffixRegex.Match(n);
+            if (m.Success && m.Groups.Count > 1) n = m.Groups[1].Value.Trim();
+            return n;
+        }
+        catch { return name ?? ""; }
+    }
 
     public static string KindKey(InventoryKind kind, string nativeKey)
     {

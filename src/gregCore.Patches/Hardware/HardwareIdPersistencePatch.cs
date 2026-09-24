@@ -4,6 +4,7 @@ using Il2CppSystem.Collections.Generic;
 using System;
 using MelonLoader;
 using gregCore.GameLayer.Hooks;
+using gregCore.Infrastructure.Persistence;
 
 namespace gregCore.GameLayer.Patches.Hardware;
 
@@ -52,7 +53,8 @@ public static class HardwareIdPersistencePatch
                 {
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
                     __instance.switchId = uniqueId!;
-                    __instance.gameObject.name = uniqueId;
+                    // Display-Trennung: gameObject.name bleibt Vanilla (Persistenz
+                    // steckt in switchId + Inventar-UID, unsichtbar dahinter).
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -104,7 +106,7 @@ public static class HardwareIdPersistencePatch
                 {
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
                     __instance.patchPanelId = uniqueId!;
-                    __instance.gameObject.name = uniqueId;
+                    // Display-Trennung: gameObject.name bleibt Vanilla (siehe Switch).
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -155,7 +157,7 @@ public static class HardwareIdPersistencePatch
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
                     __instance.ServerID = uniqueId!;
 
-                    __instance.gameObject.name = uniqueId;
+                    // Display-Trennung: gameObject.name bleibt Vanilla (siehe Switch).
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -186,6 +188,73 @@ public static class HardwareIdPersistencePatch
                 if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueServerIdPatch), ex); }
+        }
+    }
+
+    #endregion
+
+    #region DISPLAY SCRUB (Vanilla-Bezeichnung auf Screens)
+
+    // Screens duerfen nie gregIDs zeigen: Falls ein Screen-Text ein gregID-
+    // Token enthaelt (ServerID-Durchgriff), wird nur das Token durch die
+    // Vanilla-Bezeichnung ersetzt. Vanilla-Texte ohne Token: No-Op.
+    // HINWEIS: Aeltere Saves/Sessions mit umbenannten Objekten (Name =
+    // gregID) fallen auf "Server"/"Switch" zurueck - einmalig, danach ist
+    // der Name wieder Vanilla (Namen werden nicht gespeichert).
+
+    private static string VanillaDesignation(global::UnityEngine.GameObject go, string fallback)
+    {
+        try
+        {
+            string n = null;
+            try { n = go != null ? go.name : null; } catch { }
+            string clean = GregEntityInventory.CleanDisplayName(n);
+            return string.IsNullOrEmpty(clean) ? fallback : clean;
+        }
+        catch { return fallback; }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.UpdateServerScreenUI))]
+    internal static class ServerScreenScrubPatch
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.Server __instance)
+        {
+            try
+            {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                var txt = __instance.txtServerScreen;
+                if (txt == null || txt.Pointer == IntPtr.Zero) return;
+                string cur = null;
+                try { cur = txt.text; } catch { return; }
+                if (string.IsNullOrEmpty(cur)
+                    || cur.IndexOf("gregID:", StringComparison.OrdinalIgnoreCase) < 0) return;
+                string designation = VanillaDesignation(__instance.gameObject, "Server");
+                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
+            }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(ServerScreenScrubPatch), ex); }
+        }
+    }
+
+    [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.UpdateScreenUI))]
+    internal static class SwitchScreenScrubPatch
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance)
+        {
+            try
+            {
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                var txt = __instance.txtScreen;
+                if (txt == null || txt.Pointer == IntPtr.Zero) return;
+                string cur = null;
+                try { cur = txt.text; } catch { return; }
+                if (string.IsNullOrEmpty(cur)
+                    || cur.IndexOf("gregID:", StringComparison.OrdinalIgnoreCase) < 0) return;
+                string designation = VanillaDesignation(__instance.gameObject, "Switch");
+                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
+            }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(SwitchScreenScrubPatch), ex); }
         }
     }
 

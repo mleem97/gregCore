@@ -12,7 +12,7 @@ using gregCore.Infrastructure.Persistence;
 
 namespace gregCore.Tests.Infrastructure;
 
-public class GregSaveInventoryTests
+public class GregEntityInventoryTests
 {
     [Theory]
     [InlineData("gregUID:Cable:42", true)]
@@ -25,7 +25,7 @@ public class GregSaveInventoryTests
     [InlineData("gregID:Router:001122334455", false)]
     public void IsGregUid_ClassifiesPrefixes(string uid, bool expected)
     {
-        GregSaveInventory.IsGregUid(uid).Should().Be(expected);
+        GregEntityInventory.IsGregUid(uid).Should().Be(expected);
     }
 
     [Theory]
@@ -35,40 +35,61 @@ public class GregSaveInventoryTests
     [InlineData("", "gregID:Server:", false)]
     public void IsGregDeviceUid_MatchesPrefixCaseInsensitive(string uid, string prefix, bool expected)
     {
-        GregSaveInventory.IsGregDeviceUid(uid, prefix).Should().Be(expected);
+        GregEntityInventory.IsGregDeviceUid(uid, prefix).Should().Be(expected);
     }
 
     [Fact]
     public void NewUid_HasKindAndTwelveHexDigits()
     {
-        string uid = GregSaveInventory.NewUid(GregSaveInventory.InventoryKind.Router);
+        string uid = GregEntityInventory.NewUid(GregEntityInventory.InventoryKind.Router);
         uid.Should().StartWith("gregUID:Router:");
         uid.Substring("gregUID:Router:".Length).Should().MatchRegex("^[0-9A-F]{12}$");
-        GregSaveInventory.NewUid(GregSaveInventory.InventoryKind.Router).Should().NotBe(uid);
+        GregEntityInventory.NewUid(GregEntityInventory.InventoryKind.Router).Should().NotBe(uid);
     }
 
     [Fact]
     public void NewHex_IsDeterministicTwelveHex()
     {
-        string a = GregSaveInventory.NewHex("Server.Yellow1");
-        string b = GregSaveInventory.NewHex("Server.Yellow1");
+        string a = GregEntityInventory.NewHex("Server.Yellow1");
+        string b = GregEntityInventory.NewHex("Server.Yellow1");
         a.Should().Be(b);
         a.Should().MatchRegex("^[0-9A-F]{12}$");
-        GregSaveInventory.NewHex("Server.Blue1").Should().NotBe(a);
+        GregEntityInventory.NewHex("Server.Blue1").Should().NotBe(a);
     }
 
     [Fact]
     public void KindKey_CombinesKindAndTrimmedKey()
     {
-        GregSaveInventory.KindKey(GregSaveInventory.InventoryKind.Cable, "  cable#7 ")
+        GregEntityInventory.KindKey(GregEntityInventory.InventoryKind.Cable, "  cable#7 ")
             .Should().Be("Cable\ncable#7");
     }
 
     [Fact]
     public void SanitizeField_RemovesTsvBreakers()
     {
-        GregSaveInventory.SanitizeField("a\tb\rc\nd").Should().Be("a b c d");
-        GregSaveInventory.SanitizeField(null!).Should().Be("");
+        GregEntityInventory.SanitizeField("a\tb\rc\nd").Should().Be("a b c d");
+        GregEntityInventory.SanitizeField(null!).Should().Be("");
+    }
+
+    [Theory]
+    [InlineData("ID gregID:Server:D4AB126B7F70 online", "Server.Yellow1", "ID Server.Yellow1 online")]
+    [InlineData("plain vanilla text", "Server.Yellow1", "plain vanilla text")]
+    [InlineData("", "Server.Yellow1", "")]
+    [InlineData("gregID:Switch:ABC_def-1", "Switch", "Switch")]
+    public void ScrubGregIds_ReplacesOnlyTokens(string text, string replacement, string expected)
+    {
+        GregEntityInventory.ScrubGregIds(text, replacement).Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("Server.Yellow1(Clone)", "Server.Yellow1")]
+    [InlineData("Server.Yellow1 (1)", "Server.Yellow1")]
+    [InlineData("Server.Yellow1", "Server.Yellow1")]
+    [InlineData("gregID:Server:D4AB126B7F70", "")]
+    [InlineData("", "")]
+    public void CleanDisplayName_StripsCloneAndDuplicateSuffix(string name, string expected)
+    {
+        GregEntityInventory.CleanDisplayName(name).Should().Be(expected);
     }
 
     [Fact]
@@ -80,7 +101,7 @@ public class GregSaveInventoryTests
             + "Firewall\tfirewall#0\tnot-a-uid\tcluster:x\n"
             + "broken-line\n"
             + "SfpModule\tsfp#3\tgregUID:SfpModule:001122334455\t\n";
-        var uids = GregSaveInventory.ParseUidMap(tsv, out var hints);
+        var uids = GregEntityInventory.ParseUidMap(tsv, out var hints);
         uids.Should().HaveCount(2);
         uids["Router\nrouter#0"].Should().Be("gregUID:Router:AABBCCDDEEFF");
         hints["Router\nrouter#0"].Should().Be("asn:1/routes:2");
@@ -92,12 +113,12 @@ public class GregSaveInventoryTests
     public void ParseMap_SerializeMap_PersistEntries()
     {
         string tsv = "Cable\tcable#9911\tgregUID:Cable:9911\t\n";
-        GregSaveInventory.ParseMap(tsv);
+        GregEntityInventory.ParseMap(tsv);
         string uid;
-        GregSaveInventory.TryGetUid(GregSaveInventory.InventoryKind.Cable, "cable#9911", out uid)
+        GregEntityInventory.TryGetUid(GregEntityInventory.InventoryKind.Cable, "cable#9911", out uid)
             .Should().BeFalse("nur Sidecar-Map, kein Rebuild");
-        string serialized = GregSaveInventory.SerializeMap();
+        string serialized = GregEntityInventory.SerializeMap();
         serialized.Should().Contain("cable#9911").And.Contain("gregUID:Cable:9911");
-        GregSaveInventory.IsGregUid("gregUID:Cable:9911").Should().BeTrue();
+        GregEntityInventory.IsGregUid("gregUID:Cable:9911").Should().BeTrue();
     }
 }

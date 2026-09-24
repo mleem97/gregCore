@@ -249,7 +249,7 @@ public static class GregSaveGuard
     {
         try
         {
-            GregSaveInventory.RebuildFromNetworkData(networkData);
+            GregEntityInventory.RebuildFromNetworkData(networkData);
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Inventar (LoadNetworkState): " + ex.Message); }
     }

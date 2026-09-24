@@ -61,6 +61,96 @@ public static class LuaTechModule
             }
         });
 
+        // greg.tech.list() → array of {id, name, salary, state, busy}
+        techTable["list"] = (Func<Table>)(() =>
+        {
+            try
+            {
+                var result = new Table(script);
+                int i = 1;
+                foreach (var info in gregCore.Core.Networking.GregTechnicians.ReadAll())
+                {
+                    try
+                    {
+                        if (info == null) continue;
+                        var t = new Table(script);
+                        t["id"] = info.TechnicianID;
+                        t["name"] = info.Name ?? "";
+                        t["salary"] = (double)info.Salary;
+                        t["state"] = info.State ?? "";
+                        t["busy"] = info.IsBusy;
+                        result[i++] = t;
+                    }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] tech.list() failed: {ex.Message}");
+                return new Table(script);
+            }
+        });
+
+        // greg.tech.send_to_server(technicianId, serverId) → bool
+        techTable["send_to_server"] = (Func<int, string, bool>)((techId, serverId) =>
+        {
+            try
+            {
+                var tech = gregCore.Core.Networking.GregTechnicians.FindByID(techId);
+                var server = gregCore.Core.Networking.GregServers.FindById(serverId);
+                return tech != null && server != null &&
+                    gregCore.Core.Networking.GregTechnicians.SendTechnician(null, server);
+            }
+            catch { return false; }
+        });
+
+        // greg.tech.send_to_switch(technicianId, switchId) → bool
+        techTable["send_to_switch"] = (Func<int, string, bool>)((techId, switchId) =>
+        {
+            try
+            {
+                var tech = gregCore.Core.Networking.GregTechnicians.FindByID(techId);
+                if (tech == null) return false;
+                global::Il2Cpp.NetworkSwitch target = null;
+                foreach (var sw in LuaSwitchModule.FindAllSwitches())
+                {
+                    string sid = null;
+                    try { sid = sw.switchId; } catch { continue; }
+                    if (string.Equals(sid, switchId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        target = sw;
+                        break;
+                    }
+                }
+                return target != null &&
+                    gregCore.Core.Networking.GregTechnicians.SendTechnician(target, null);
+            }
+            catch { return false; }
+        });
+
+        // greg.tech.hire(index) → bool
+        techTable["hire"] = (Func<int, bool>)((index) =>
+        {
+            try { return gregCore.Core.Networking.GregTechnicians.HireEmployee(index); }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] tech.hire() failed: {ex.Message}");
+                return false;
+            }
+        });
+
+        // greg.tech.fire(technicianId) → bool
+        techTable["fire"] = (Func<int, bool>)((techId) =>
+        {
+            try { return gregCore.Core.Networking.GregTechnicians.FireTechnician(techId); }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] tech.fire() failed: {ex.Message}");
+                return false;
+            }
+        });
+
         greg["tech"] = techTable;
     }
 }

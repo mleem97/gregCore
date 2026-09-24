@@ -89,6 +89,10 @@ public class LuaSdkTests
         Call(tech, "total_count").Number.Should().Be(0);
         Call(tech, "dispatch_server").Number.Should().Be(0);
         Call(tech, "dispatch_switch").Number.Should().Be(0);
+        Call(tech, "list").Table.Length.Should().Be(0);
+        Call(tech, "send_to_server", 1, "nope").Boolean.Should().BeFalse();
+        Call(tech, "hire", 0).Boolean.Should().BeFalse();
+        Call(tech, "fire", 1).Boolean.Should().BeFalse();
     }
 
     [Fact]

@@ -56,6 +56,9 @@ Define these functions globally in `main.lua` (all optional):
 ### `greg.tech` (technicians)
 - `free_count() -> number` / `total_count() -> number`
 - `dispatch_server() -> 1/0` / `dispatch_switch() -> 1/0`: sends a technician to one broken device.
+- `list() -> table`: array of `{id, name, salary, state, busy}`.
+- `send_to_server(technicianId, serverId) -> bool` / `send_to_switch(technicianId, switchId) -> bool`
+- `hire(index) -> bool` / `fire(technicianId) -> bool`
 
 ### `greg.rack`
 - `get_all() -> table` / `count() -> number`

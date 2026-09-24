@@ -150,7 +150,7 @@ namespace greg.QoL
                         if (name == "UsableObject") isUsable = true;
                         if (name == "Server" || name == "NetworkSwitch" || name == "PatchPanel" || name == "Rack") isHardware = true;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
             

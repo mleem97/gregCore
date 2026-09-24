@@ -117,20 +117,20 @@ public static class EntityManager
                     typeName.Contains("Avatar") || typeName.Contains("Generator") ||
                     typeName == "Animator" || typeName.Contains("Renderer"))
                     continue;
-                try { mb.enabled = false; } catch { }
+                try { mb.enabled = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
 
             if (navCheck != null)
-                try { UnityEngine.Object.DestroyImmediate(navCheck); } catch { }
+                try { UnityEngine.Object.DestroyImmediate(navCheck); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             foreach (var cc in go.GetComponentsInChildren<CharacterController>(true))
-                try { UnityEngine.Object.DestroyImmediate(cc); } catch { }
+                try { UnityEngine.Object.DestroyImmediate(cc); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             foreach (var c in go.GetComponentsInChildren<Collider>(true))
-                try { UnityEngine.Object.DestroyImmediate(c); } catch { }
+                try { UnityEngine.Object.DestroyImmediate(c); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             foreach (var rb in go.GetComponentsInChildren<Rigidbody>(true))
-                try { UnityEngine.Object.DestroyImmediate(rb); } catch { }
+                try { UnityEngine.Object.DestroyImmediate(rb); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             foreach (var nav in go.GetComponentsInChildren<NavMeshAgent>(true))
-                try { UnityEngine.Object.DestroyImmediate(nav); } catch { }
+                try { UnityEngine.Object.DestroyImmediate(nav); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             go.SetActive(true);
 
@@ -206,7 +206,7 @@ public static class EntityManager
             if (entity.HasWalkingParam)
                 entity.Animator.SetBool(entity.WalkingParamHash, isWalking);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     /// <summary>Set just the carry animator bool (cheap, can be called every frame)</summary>
@@ -215,7 +215,7 @@ public static class EntityManager
         if (!_entities.TryGetValue(entityId, out var entity)) return;
         if (entity.Animator == null || !entity.HasCarryingParam) return;
         try { entity.Animator.SetBool(entity.CarryingParamHash, isCarrying); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     /// <summary>Create a visual proxy from real game prefab, parented to entity root</summary>
@@ -483,27 +483,27 @@ public static class EntityManager
     {
         // Remove all colliders
         foreach (var col in go.GetComponentsInChildren<Collider>(true))
-            try { UnityEngine.Object.DestroyImmediate(col); } catch { }
+            try { UnityEngine.Object.DestroyImmediate(col); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Remove all rigidbodies
         foreach (var rb in go.GetComponentsInChildren<Rigidbody>(true))
-            try { UnityEngine.Object.DestroyImmediate(rb); } catch { }
+            try { UnityEngine.Object.DestroyImmediate(rb); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Remove NavMeshAgents
         foreach (var nav in go.GetComponentsInChildren<NavMeshAgent>(true))
-            try { UnityEngine.Object.DestroyImmediate(nav); } catch { }
+            try { UnityEngine.Object.DestroyImmediate(nav); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Remove CharacterControllers
         foreach (var cc in go.GetComponentsInChildren<CharacterController>(true))
-            try { UnityEngine.Object.DestroyImmediate(cc); } catch { }
+            try { UnityEngine.Object.DestroyImmediate(cc); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Remove all game scripts (MonoBehaviours) — keeps Transform, MeshFilter, MeshRenderer, etc.
         foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true))
-            try { UnityEngine.Object.DestroyImmediate(mb); } catch { }
+            try { UnityEngine.Object.DestroyImmediate(mb); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         // Disable animators (don't want independent animation)
         foreach (var anim in go.GetComponentsInChildren<Animator>(true))
-            try { anim.enabled = false; } catch { }
+            try { anim.enabled = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     /// <summary>Create a primitive fallback when real prefab isn't available</summary>
@@ -576,7 +576,7 @@ public static class EntityManager
                     mat.color = color;
                     renderer.material = mat;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             return proxy;
@@ -597,7 +597,7 @@ public static class EntityManager
             if (entity.HasCrouchParam)
                 entity.Animator.SetBool(entity.CrouchParamHash, isCrouching);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void SetSitting(uint entityId, bool isSitting)
@@ -609,7 +609,7 @@ public static class EntityManager
             if (entity.HasSittingParam)
                 entity.Animator.SetBool(entity.SittingParamHash, isSitting);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static uint GetPrefabCount()
@@ -620,7 +620,7 @@ public static class EntityManager
             if (mgr != null && mgr.techniciansPrefabs != null)
                 return (uint)mgr.techniciansPrefabs.Length;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return 0;
     }
 
@@ -633,7 +633,7 @@ public static class EntityManager
             var tmp = entity.NameTagGO.GetComponentInChildren<TextMeshProUGUI>();
             if (tmp != null) tmp.text = name;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Update()
@@ -679,7 +679,7 @@ public static class EntityManager
                     if (mb == null) continue;
                     string typeName = mb.GetIl2CppType().Name;
                     if (typeName == "Animator" || typeName.Contains("Renderer")) continue;
-                    try { mb.enabled = false; } catch { }
+                    try { mb.enabled = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 entity.WaitingForUMA = false;
 

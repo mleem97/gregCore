@@ -83,7 +83,7 @@ namespace gregCore.UI
             txt.enableWordWrapping = true;
             
             txt.enabled = true;
-            try { txt.ForceMeshUpdate(); } catch { }
+            try { txt.ForceMeshUpdate(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             return txt;
         }

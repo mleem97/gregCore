@@ -118,14 +118,14 @@ internal static class Patch_Server_ServerInsertedInRack
         {
             string instanceId = "";
             byte objectType = 0;
-            try { instanceId = __instance?.ServerID ?? ""; } catch { }
-            try { objectType = (byte)(__instance?.serverType ?? 0); } catch { }
+            try { instanceId = __instance?.ServerID ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { objectType = (byte)(__instance?.serverType ?? 0); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             // Determine rack position UID from multiple sources
             int rackPosUid = -1;
-            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { }
+            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             CrashLog.Log($"ServerInsertedInRack [diag]: instanceId={instanceId}, type={objectType}, rackUid={rackPosUid}");
 
@@ -135,8 +135,8 @@ internal static class Patch_Server_ServerInsertedInRack
             {
                 if (!string.IsNullOrEmpty(pending.Value.objectId) && instanceId != pending.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.ServerID = pending.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.ServerID = pending.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] ServerInsertedInRack: restored clone ID '{instanceId}' → '{pending.Value.objectId}' rackUid={rackPosUid}");
                 }
                 return;
@@ -148,8 +148,8 @@ internal static class Patch_Server_ServerInsertedInRack
             {
                 if (!string.IsNullOrEmpty(installed.Value.objectId) && instanceId != installed.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.ServerID = installed.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.ServerID = installed.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] ServerInsertedInRack: restored clone ID (dict fallback) '{instanceId}' → '{installed.Value.objectId}' rackUid={rackPosUid}");
                 }
             }
@@ -169,10 +169,10 @@ internal static class Patch_Server_ServerInsertedInRack
             string prefix = idx > 0 ? srvName.Substring(0, idx) : srvName;
             for (int i = 0; i < mgr.serverPrefabs.Count; i++)
             {
-                try { if (mgr.serverPrefabs[i]?.name == prefix) return i; } catch { }
+                try { if (mgr.serverPrefabs[i]?.name == prefix) return i; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return 0;
     }
 }
@@ -187,9 +187,9 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
             string currentId = __instance?.switchId ?? "";
 
             int rackPosUid = -1;
-            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { }
+            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             CrashLog.Log($"SwitchInsertedInRack [diag]: switchId={currentId}, rackUid={rackPosUid}");
 
@@ -198,8 +198,8 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
             {
                 if (!string.IsNullOrEmpty(pending.Value.objectId) && currentId != pending.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.switchId = pending.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.switchId = pending.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] SwitchInsertedInRack: restored clone ID '{currentId}' → '{pending.Value.objectId}' rackUid={rackPosUid}");
                 }
                 return;
@@ -210,8 +210,8 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
             {
                 if (!string.IsNullOrEmpty(installed.Value.objectId) && currentId != installed.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.switchId = installed.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.switchId = installed.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] SwitchInsertedInRack: restored clone ID (dict fallback) '{currentId}' → '{installed.Value.objectId}' rackUid={rackPosUid}");
                 }
             }
@@ -230,9 +230,9 @@ internal static class Patch_PatchPanel_InsertedInRack
             string currentId = __instance?.patchPanelId ?? "";
 
             int rackPosUid = -1;
-            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { }
-            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { }
+            try { rackPosUid = __instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (rackPosUid <= 0) try { rackPosUid = __0?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             CrashLog.Log($"PatchPanel.InsertedInRack [diag]: patchPanelId={currentId}, rackUid={rackPosUid}");
 
@@ -241,8 +241,8 @@ internal static class Patch_PatchPanel_InsertedInRack
             {
                 if (!string.IsNullOrEmpty(pending.Value.objectId) && currentId != pending.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.patchPanelId = pending.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.patchPanelId = pending.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] PatchPanel.InsertedInRack: restored clone ID '{currentId}' → '{pending.Value.objectId}' rackUid={rackPosUid}");
                 }
                 return;
@@ -253,8 +253,8 @@ internal static class Patch_PatchPanel_InsertedInRack
             {
                 if (!string.IsNullOrEmpty(installed.Value.objectId) && currentId != installed.Value.objectId)
                 {
-                    try { if (__instance != null) __instance.patchPanelId = installed.Value.objectId; } catch { }
-                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { }
+                    try { if (__instance != null) __instance.patchPanelId = installed.Value.objectId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (__instance != null) __instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     CrashLog.Log($"[WorldSync] PatchPanel.InsertedInRack: restored clone ID (dict fallback) '{currentId}' → '{installed.Value.objectId}' rackUid={rackPosUid}");
                 }
             }
@@ -394,7 +394,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                             break;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -412,7 +412,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                             break;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -430,7 +430,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                             break;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -480,7 +480,7 @@ internal static class Patch_RackPosition_InteractOnClick
             _prevNumObjects = pm.numberOfObjectsInHand;
             _prevObjectInHand = (int)pm.objectInHand;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     internal static void Postfix(RackPosition __instance)
@@ -603,11 +603,11 @@ internal static class SpawnedObjectTracker
                         if (swName.EndsWith("(Clone)")) swName = swName.Substring(0, swName.Length - 7);
                         for (int i = 0; i < mgr.switchesPrefabs.Count; i++)
                         {
-                            try { if (mgr.switchesPrefabs[i]?.name == swName) { prefabId = i; break; } } catch { }
+                            try { if (mgr.switchesPrefabs[i]?.name == swName) { prefabId = i; break; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             else
             {
@@ -632,7 +632,7 @@ internal static class SpawnedObjectTracker
                             if (prefabGo != null) prefabId = pp.patchPanelType;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 else return; // not a tracked type
             }
@@ -1070,7 +1070,7 @@ internal static class Patch_UsableObject_InteractOnClick
                                 break;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                     if (pickupRackUid > 0)
                     {
@@ -1101,7 +1101,7 @@ internal static class Patch_UsableObject_InteractOnClick
                                         break;
                                 }
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         // Object is leaving the rack — remove from tracking
                         Patch_Rack_MarkPositionAsUsed.RemoveInstalledObject(pickupRackUid);

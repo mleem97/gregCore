@@ -34,7 +34,7 @@ internal static class GregUiManager
                 es.enabled = false;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void OnUpdate()
@@ -44,7 +44,7 @@ internal static class GregUiManager
             _reenableCounter--;
             if (_reenableCounter <= 0 && _disabledEventSystem != null)
             {
-                try { _disabledEventSystem.enabled = true; } catch { }
+                try { _disabledEventSystem.enabled = true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 _disabledEventSystem = null;
             }
         }

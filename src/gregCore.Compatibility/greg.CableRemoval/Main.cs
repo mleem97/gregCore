@@ -254,7 +254,7 @@ namespace greg.CableRemoval
 
         private void TryDisconnectOnNetworkSwitch(NetworkSwitch sw)
         {
-            try { sw.DisconnectCables(); } catch { }
+            try { sw.DisconnectCables(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         private void TryDisconnectOnPatchPanel(PatchPanel p)
@@ -270,7 +270,7 @@ namespace greg.CableRemoval
                     }
                 }
             } 
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         private void TryDisconnectAllInWorld()

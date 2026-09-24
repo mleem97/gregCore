@@ -125,7 +125,7 @@ namespace gregCore.Infrastructure.Social
                 _pipe = null;
                 MelonLogger.Msg("[Discord] Disconnected.");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

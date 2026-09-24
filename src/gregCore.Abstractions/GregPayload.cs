@@ -36,7 +36,7 @@ public sealed class GregPayload
         
         if (payload is gregCore.Core.Models.EventPayload ep && ep.Data.TryGetValue(fieldName, out var val))
         {
-            try { return (T)System.Convert.ChangeType(val, typeof(T)); } catch { }
+            try { return (T)System.Convert.ChangeType(val, typeof(T)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         return fallback;

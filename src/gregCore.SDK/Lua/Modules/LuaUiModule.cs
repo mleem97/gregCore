@@ -39,7 +39,7 @@ public static class LuaUiModule
         uiTable["log"] = (Action<string, string?>)((message, type) =>
         {
             try { API.GregAPI.Log(message, type ?? "INFO"); }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         });
 
         // greg.ui.log_info(message)

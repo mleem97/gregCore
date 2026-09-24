@@ -58,6 +58,6 @@ public sealed class GregPersistenceService : IGregPersistenceService
     public void Delete(string key)
     {
         try { File.Delete(GetSafePath(key)); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

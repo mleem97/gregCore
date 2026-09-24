@@ -195,4 +195,155 @@ public class LuaSdkTests
         }
         finally { DeleteTempDir(dir); }
     }
+
+    [Fact]
+    public void Patch_Register_And_Defaults()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaPatchModule.Register(greg, script, "test");
+        var patch = greg.Get("patch").Table;
+        foreach (var fn in new[] { "get_all", "get_list", "count", "find_by_id", "has_cable" })
+            patch.Get(fn).Type.Should().BeOneOf(DataType.Function, DataType.ClrFunction);
+        Call(patch, "count").Number.Should().Be(0);
+        Call(patch, "find_by_id", "nope").IsNil().Should().BeTrue();
+        Call(patch, "has_cable", "nope").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Customer_Bases_Empty_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaCustomerModule.Register(greg, script, "test");
+        var customer = greg.Get("customer").Table;
+        Call(customer, "bases").Table.Length.Should().Be(0);
+        Call(customer, "is_ip_present", 1, "10.0.0.1").Boolean.Should().BeFalse();
+        Call(customer, "app_id_for_ip", 1, "10.0.0.1").Number.Should().Be(-1);
+        Call(customer, "register_subnet", 1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Economy_Nil_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaEconomyModule.Register(greg, script, "test");
+        var economy = greg.Get("economy").Table;
+        Call(economy, "sheet").IsNil().Should().BeTrue();
+        Call(economy, "history").Table.Length.Should().Be(0);
+    }
+
+    [Fact]
+    public void Shop_Empty_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaShopModule.Register(greg, script, "test");
+        var shop = greg.Get("shop").Table;
+        foreach (var fn in new[] { "items", "unlock", "buy", "cart", "cart_add", "cart_remove" })
+            shop.Get(fn).Type.Should().BeOneOf(DataType.Function, DataType.ClrFunction);
+        Call(shop, "items").Table.Length.Should().Be(0);
+        Call(shop, "buy", 1).Boolean.Should().BeFalse();
+        Call(shop, "cart").Table.Length.Should().Be(0);
+    }
+
+    [Fact]
+    public void Net_Empty_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaNetModule.Register(greg, script, "test");
+        var net = greg.Get("net").Table;
+        foreach (var fn in new[] { "routers", "firewalls", "sfps", "lacps", "cables" })
+            Call(net, fn).Table.Length.Should().Be(0);
+    }
+
+    [Fact]
+    public void Mods_Registry_And_Deps()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaModsModule.Register(greg, script, "test");
+        var mods = greg.Get("mods").Table;
+        Call(mods, "is_loaded", "nope").Boolean.Should().BeFalse();
+        Call(mods, "version", "nope").String.Should().Be("");
+        Call(mods, "declare", script.DoString("return {{mod='x', min_version='1.0'}}")).Boolean.Should().BeTrue();
+        var check = Call(mods, "check");
+        check.Type.Should().Be(DataType.Table);
+        var ok = Call(mods, "ensure", script.DoString("return {mod='x'}"));
+        ok.Type.Should().Be(DataType.Tuple);
+    }
+
+    [Fact]
+    public void Tablet_Open_Fails_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaTabletModule.Register(greg, script, "test");
+        Call(greg, "tablet_open", "T").String.Should().Be("");
+        Call(greg, "widget_open", "W", 1.0, 2.0).String.Should().Be("");
+        Call(greg, "panel_visible", "nope").Boolean.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Subnet_Pure_Math_Works_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaSubnetModule.Register(greg, script, "test");
+        var subnet = greg.Get("subnet").Table;
+        Call(subnet, "mask_from_cidr", 24).String.Should().Be("255.255.255.0");
+        // Live-Game nötig: headless kommen leere Defaults zurück.
+        Call(subnet, "first_usable", "192.168.1.0/24").String.Should().Be("");
+        Call(subnet, "usable_ips", "192.168.1.0/30").Table.Length.Should().Be(0);
+    }
+
+    [Fact]
+    public void Requests_Empty_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaRequestsModule.Register(greg, script, "test");
+        var req = greg.Get("requests").Table;
+        Call(req, "list").Table.Length.Should().Be(0);
+        Call(req, "current_number").Number.Should().Be(0);
+    }
+
+    [Fact]
+    public void Items_Register_Fails_Headless_Without_Game()
+    {
+        string dir = NewTempDir();
+        try
+        {
+            var script = NewScript();
+            var greg = NewGreg(script);
+            LuaItemsModule.Register(greg, script, "test", dir);
+            var items = greg.Get("items").Table;
+            var spec = script.DoString("return {name='T', price=100}");
+            Call(items, "register_shop_item", " meshes", spec).Boolean.Should().BeFalse();
+            Call(items, "register_static_item", "meshes", spec).Boolean.Should().BeFalse();
+        }
+        finally { DeleteTempDir(dir); }
+    }
+
+    [Fact]
+    public void Tech_Extended_List_Headless()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaTechModule.Register(greg, script, "test");
+        // base functions from the first batch still behave
+        Call(greg.Get("tech").Table, "free_count").Number.Should().Be(0);
+    }
+
+    [Fact]
+    public void World_Open_All_Walls_Registered()
+    {
+        var script = NewScript();
+        var greg = NewGreg(script);
+        LuaWorldModule.Register(greg, script, "test");
+        greg.Get("world").Table.Get("open_all_walls").Type
+            .Should().BeOneOf(DataType.Function, DataType.ClrFunction);
+    }
 }

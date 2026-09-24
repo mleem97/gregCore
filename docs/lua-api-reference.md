@@ -66,12 +66,68 @@ Define these functions globally in `main.lua` (all optional):
 ### `greg.cable`
 - `get_all() -> table` / `count() -> number` / `get_next_id() -> number`
 
+### `greg.patch`
+- `get_all() -> table`: array of `{id, hash, x, y, z}`.
+- `get_list() -> table`: array of patch panel IDs.
+- `count() -> number`
+- `find_by_id(id) -> table or nil`
+- `has_cable(id) -> bool`
+
+### `greg.customer`
+- `bases() -> table`: array of `{base_id, customer_id, money_speed, all_met, wants_internet, satisfied}`.
+- `is_ip_present(baseId, ip) -> bool` / `app_id_for_ip(baseId, ip) -> number` (-1 unknown)
+- `register_subnet(baseId, vlanId, routeKey, ips) -> bool` / `unregister_subnet(baseId, routeKey) -> bool`
+
+### `greg.economy` (read-only)
+- `sheet() -> table or nil`: `{total_salary, months}`.
+- `history() -> table`: array of `{month, day, salary, repair, shop}`.
+
+### `greg.shop`
+- `items() -> table`: array of `{idx, name, price, xp, type, id, unlocked}` (1-based `idx`, order is best-effort).
+- `unlock(idx) -> bool` / `buy(idx) -> bool`
+- `cart() -> table`: array of `{ref, name, price, qty, total}`.
+- `cart_add(ref) -> bool` / `cart_remove(ref) -> bool`
+
+### `greg.net` (read-only save data)
+- `routers() -> table`: array of `{asn, next_route_id, routes, owned}`.
+- `firewalls() -> table`: array of `{cluster_ip, rules}`.
+- `sfps() -> table`: array of `{prefab, x, y, z, inserted}`.
+- `lacps() -> table`: array of group ids.
+- `cables() -> table`: array of `{id, maxspeed}`.
+
+### `greg.mods`
+- `list() -> table`: array of `{id, name, version}` (gregCore registry).
+- `is_loaded(modIdOrName) -> bool` / `version(modIdOrName) -> string`
+- `declare({{mod=, min_version=, required=}, ...}) -> bool`
+- `ensure({mod=, min_version=?, required=?}) -> ok, detail`
+- `check() -> table`: array of `{owner, mod, detail}` problems (empty = ok).
+
+### `greg.requests` (read-only)
+- `list() -> table`: array of `{number, state, short, long, rewarded, done, progress}`.
+- `current_number() -> number`
+
+### `greg.subnet`
+- `mask_from_cidr(cidr) -> string` (pure math, no game needed)
+- `usable_ips(subnet) -> table` (needs a running game; hard-capped at 65536 entries — mind large subnets)
+- `first_usable(subnet) -> string` (needs a running game, "" when none)
+
+### `greg.items` (register custom items; meshes ship as files in the mod folder)
+- `register_shop_item(subfolder, spec) -> bool` — spec keys: `name, price, xp, size_u, mass, scale, model, texture, icon, type` (snake_case or PascalCase).
+- `register_static_item(subfolder, spec) -> bool`
+
+### Tablets & widgets (handles, `greg.tablet_*` / `greg.widget_*` / `greg.panel_*`)
+- `tablet_open(title) -> id` / `widget_open(title, x?, y?) -> id` ("" = failed)
+- `panel_add_label(id, text)` / `panel_add_section(id, title)` / `panel_add_spacer(id, height?)` → bool
+- `panel_add_button(id, label, fn)` / `panel_add_toggle(id, label, value, fn)` / `panel_add_slider(id, label, min, max, value, fn)` → bool
+- `panel_toggle(id) -> bool` (new visibility) / `panel_visible(id) -> bool` / `panel_close(id) -> bool`
+
 ### `greg.world`
 - `time_of_day() -> number` / `day() -> number` / `seconds_in_day() -> number`
 - `set_seconds_in_day(val)` / `time_scale() -> number` / `set_time_scale(val)`
 - `pause()` / `resume()` / `is_paused() -> bool`
 - `scene() -> string` / `difficulty() -> number` / `save() -> bool` (triggers a game save)
 - `server_count()` / `rack_count()` / `switch_count() -> number`
+- `open_all_walls() -> bool`
 
 ## 4. UI & Logging (`greg.ui.*`)
 - `notify(message, duration?)`
@@ -107,6 +163,9 @@ Mod-to-mod and game events:
 `require("name")` loads `<modDir>/<name>.lua`; `require("@shared/name")` loads from the shared folder. Results are cached per path; avoid circular requires.
 
 ## 10. Out of scope (by design)
-- Placing/spawning racks, devices or cables from Lua (use C# mods for world editing).
+- Spawning racks/devices into the world from Lua (shop buying and item registration are covered; direct spawning needs C#).
+- Physical cable operations from Lua (no stable link identity; use C# for world editing).
+- Keyboard input capture (input belongs to the game/mods, not scripts).
+- Anything outside `<modId>/data/` (sandbox enforced, traversal rejected).
 - Keyboard input capture (input belongs to the game/mods, not scripts).
 - Anything outside `<modId>/data/` (sandbox enforced, traversal rejected).

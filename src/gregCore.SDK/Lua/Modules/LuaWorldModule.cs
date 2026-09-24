@@ -121,6 +121,21 @@ public static class LuaWorldModule
             catch { return 0; }
         });
 
+        // greg.world.open_all_walls() → bool
+        worldTable["open_all_walls"] = (Func<bool>)(() =>
+        {
+            try
+            {
+                global::greg.Sdk.GregPublicAPI.OpenAllWalls();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] world.open_all_walls() failed: {ex.Message}");
+                return false;
+            }
+        });
+
         greg["world"] = worldTable;
     }
 }

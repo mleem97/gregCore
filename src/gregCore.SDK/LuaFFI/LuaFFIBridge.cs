@@ -91,17 +91,22 @@ public sealed class LuaFFIBridge
                 var gregTable = new Table(script);
                 script.Globals["greg"] = gregTable;
 
-                // 3. Register Core Modules
+                // 3. Register Core Modules (modDir; modules resolve data/ + migrate legacy data/data)
                 GregEventLuaModule.Register(gregTable, script, API.GregAPI.EventBus!, id);
-                GregIoLuaModule.Register(gregTable, script, id, Path.Combine(dir, "data"));
+                GregIoLuaModule.Register(gregTable, script, id, dir);
 
                 // 4. Register Domain Modules
                 LuaPlayerModule.Register(gregTable, script, id);
                 LuaWorldModule.Register(gregTable, script, id);
                 LuaRackModule.Register(gregTable, script, id);
                 LuaServerModule.Register(gregTable, script, id);
+                LuaSwitchModule.Register(gregTable, script, id);
+                LuaTechModule.Register(gregTable, script, id);
                 LuaCableModule.Register(gregTable, script, id);
                 LuaUiModule.Register(gregTable, script, id);
+                LuaJsonModule.Register(gregTable, script, id);
+                LuaConfigModule.Register(gregTable, script, id, dir);
+                LuaSaveModule.Register(gregTable, script, id, dir);
 
                 // 5. Register Auto-Hooks
                 _hookGenerator?.RegisterInScript(script, gregTable, id);
@@ -241,17 +246,22 @@ public sealed class LuaFFIBridge
             var gregTable = new Table(newScript);
             newScript.Globals["greg"] = gregTable;
 
-            // 3. Register Core Modules
+            // 3. Register Core Modules (modDir; modules resolve data/ + migrate legacy data/data)
             GregEventLuaModule.Register(gregTable, newScript, API.GregAPI.EventBus!, id);
-            GregIoLuaModule.Register(gregTable, newScript, id, Path.Combine(Path.GetDirectoryName(mainFile)!, "data"));
+            GregIoLuaModule.Register(gregTable, newScript, id, Path.GetDirectoryName(mainFile)!);
 
             // 4. Register Domain Modules
             LuaPlayerModule.Register(gregTable, newScript, id);
             LuaWorldModule.Register(gregTable, newScript, id);
             LuaRackModule.Register(gregTable, newScript, id);
             LuaServerModule.Register(gregTable, newScript, id);
+            LuaSwitchModule.Register(gregTable, newScript, id);
+            LuaTechModule.Register(gregTable, newScript, id);
             LuaCableModule.Register(gregTable, newScript, id);
             LuaUiModule.Register(gregTable, newScript, id);
+            LuaJsonModule.Register(gregTable, newScript, id);
+            LuaConfigModule.Register(gregTable, newScript, id, Path.GetDirectoryName(mainFile)!);
+            LuaSaveModule.Register(gregTable, newScript, id, Path.GetDirectoryName(mainFile)!);
 
             // 5. Register Auto-Hooks
             _hookGenerator?.RegisterInScript(newScript, gregTable, id);

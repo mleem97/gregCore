@@ -1,9 +1,18 @@
-# gregCore Lua API Reference (v1.1.0)
+# gregCore Lua API Reference
 
-This document covers the high-level `greg.*` API provided by the modernized gregCore framework.
+This document describes EXACTLY what the `greg.*` table provides in Lua mods.
+Function names here match the implementation 1:1 — if a name is not listed,
+it does not exist. Numbers cross the boundary as Lua numbers, strings as
+Lua strings, lists as 1-indexed Lua tables. Every call is guarded: outside
+the game (or on errors) functions return safe defaults (`0`, `false`, `""`,
+empty table or `nil`) instead of throwing.
+
+Mod layout: a folder under `UserData/gregCore/Mods/Lua/<modId>/` with
+`main.lua` (or `mod.json` with a custom `entrypoint`). Per-mod files live
+under `<modId>/data/` (sandboxed — no access outside).
 
 ## 1. Core Lifecycle
-Mods should define these functions globally in `main.lua`:
+Define these functions globally in `main.lua` (all optional):
 
 | Function | Description |
 | :--- | :--- |
@@ -13,67 +22,91 @@ Mods should define these functions globally in `main.lua`:
 | `on_shutdown()` | Called before mod reload or game exit. |
 | `on_reload()` | Called after a successful hot-reload. |
 
----
-
-## 2. Global Services
-
-### `greg.log_*`
-- `greg.log_info(msg)`: Standard log.
-- `greg.log_warning(msg)`: Yellow log in console.
-- `greg.log_error(msg)`: Red log, shows in error overlay.
-
-### `greg.wait / every / coroutine`
-- `greg.wait(seconds)`: Yields the current coroutine for `n` seconds.
-- `greg.every(seconds, callback)`: Executes `callback` every `n` seconds.
-- `greg.start_coroutine(func)`: Spawns a new non-blocking execution thread.
-
----
+## 2. Coroutines & Timers (`greg.*`)
+- `greg.wait(seconds, callback)`: Calls `callback` once after `n` seconds.
+- `greg.every(seconds, callback)`: Calls `callback` every `n` seconds.
+- `greg.start_coroutine(func)`: Runs `func` as a coroutine (use `coroutine.yield()` / return-wait values inside).
 
 ## 3. Domain Modules
 
 ### `greg.player`
-- `get_money() -> number`: Returns current balance.
-- `set_money(val)`: Sets player money.
-- `get_xp() -> number`: Returns total XP.
-- `get_reputation() -> number`: Returns reputation level.
+- `position() -> table`: `{x, y, z}` of the player.
+- `money() -> number` / `set_money(val)` / `add_money(amount)`
+- `xp() -> number` / `set_xp(val)`
+- `reputation() -> number` / `set_reputation(val)`
+- `teleport(x, y, z)`
+- `is_crouching() -> bool` / `is_sitting() -> bool`
 
 ### `greg.server`
-- `get_count() -> int`: Total number of servers in the world.
-- `get_broken_count() -> int`: Number of servers with `isBroken = true`.
-- `dispatch_repair_all() -> bool`: Sends technicians to fix all broken servers.
-- `get_list() -> table`: Returns list of all server IDs.
+- `get_all() -> table`: array of `{id, hash, is_on, is_broken, size_u?, x, y, z}`.
+- `get_list() -> table`: array of server IDs.
+- `count() -> number` / `broken_count() -> number`
+- `find_by_id(id) -> table or nil` / `find_by_ip(ip) -> table or nil`
+- `repair(id) -> bool` / `repair_all() -> number`
+- `power_on(id) -> bool` / `power_off(id) -> bool`
+- `set_ip(id, ip) -> bool` / `set_customer(id, customerId) -> bool`
+
+### `greg.switch`
+- `get_all() -> table`: array of `{id, hash, is_on, is_broken, x, y, z}`.
+- `get_list() -> table`: array of switch IDs.
+- `count() -> number` / `broken_count() -> number`
+- `find_by_id(id) -> table or nil`
+- `repair(id) -> bool` / `repair_all() -> number`
+
+### `greg.tech` (technicians)
+- `free_count() -> number` / `total_count() -> number`
+- `dispatch_server() -> 1/0` / `dispatch_switch() -> 1/0`: sends a technician to one broken device.
 
 ### `greg.rack`
-- `get_count() -> int`: Total number of racks.
-- `is_pos_free(x, y, z) -> bool`: Checks if a position is available for placement.
+- `get_all() -> table` / `count() -> number`
+- `is_position_available(rackId, position) -> bool`
+- `get_used_count(rackId) -> number`
+- `mark_used(rackId, position)` / `mark_free(rackId, position)`
 
----
+### `greg.cable`
+- `get_all() -> table` / `count() -> number` / `get_next_id() -> number`
 
-## 4. Hook System (`greg.hooks.*`)
-The framework automatically binds all game-side Harmony patches.
+### `greg.world`
+- `time_of_day() -> number` / `day() -> number` / `seconds_in_day() -> number`
+- `set_seconds_in_day(val)` / `time_scale() -> number` / `set_time_scale(val)`
+- `pause()` / `resume()` / `is_paused() -> bool`
+- `scene() -> string` / `difficulty() -> number` / `save() -> bool` (triggers a game save)
+- `server_count()` / `rack_count()` / `switch_count() -> number`
 
-**Syntax:** `greg.hooks.[system]_[event](callback)`
+## 4. UI & Logging (`greg.ui.*`)
+- `notify(message, duration?)`
+- `log(message, type?)` / `log_info(message)` / `log_warning(message)` / `log_error(message)` (DevConsole + log file)
+- `register_mod_config_tab(tab_id, label, builder_fn)`
 
-**Examples:**
-- `greg.hooks.rack_placed(function(rackId) ... end)`
-- `greg.hooks.player_xp_gain(function(payload) ... end)`
+## 5. Config & Save Data
+Per-mod JSON files under `<modId>/data/` (created on demand, write-through).
 
----
+`greg.config.*` (`config.json` — user-facing settings):
+`greg.save.*` (`save.json` — runtime state):
+- `get(key) -> string or nil` / `get_or(key, default) -> string`
+- `set(key, value)` / `delete(key) -> bool` / `has(key) -> bool` / `keys() -> table`
+- `greg.save.save_now() -> bool` (force flush; `set`/`delete` already write through)
 
-## 5. Persistence (`greg.io.*`)
-All I/O is sandboxed to `UserData/gregCore/Mods/Lua/[ModID]/data/`.
+## 6. Files (`greg.io.*`, sandboxed to `<modId>/data/`)
+- `read_file(path) -> string` (`read_text` is an alias)
+- `write_file(path, content)` (`write_text` is an alias)
+- `append_file(path, content)` / `delete_file(path)` / `file_exists(path) -> bool`
+- `list_files(pattern?) -> table` / `data_dir -> string` (read-only)
+- `read_json(path) -> table or nil` / `write_json(path, table) -> bool`
 
-- `read_text(filename) -> string`
-- `write_text(filename, content)`
-- `read_json(filename) -> table`
-- `write_json(filename, data_table)`
-- `delete_file(filename)`
+## 7. JSON (`greg.json.*`)
+- `parse(text) -> table/string/number/boolean or nil`
+- `stringify(value) -> string` ("" on failure)
 
----
+## 8. Events & Hooks
+Mod-to-mod and game events:
+- `greg.on(hookName, callback)` / `greg.once(hookName, callback)` / `greg.fire(hookName, dataTable)`
+- `greg.hooks.<group>.on_<event>(callback)` — auto-generated per game-hook group, plus `greg.hooks.<group>.list()` to discover available hooks.
 
-## 6. Events (`greg.events.*`)
-Used for mod-to-mod communication.
+## 9. Modules (`require`)
+`require("name")` loads `<modDir>/<name>.lua`; `require("@shared/name")` loads from the shared folder. Results are cached per path; avoid circular requires.
 
-- `on(eventName, callback)`: Listen to an event.
-- `fire(eventName, data)`: Dispatch an event.
-- `once(eventName, callback)`: Listen once.
+## 10. Out of scope (by design)
+- Placing/spawning racks, devices or cables from Lua (use C# mods for world editing).
+- Keyboard input capture (input belongs to the game/mods, not scripts).
+- Anything outside `<modId>/data/` (sandbox enforced, traversal rejected).

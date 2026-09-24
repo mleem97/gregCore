@@ -1,3 +1,17 @@
+/// <file-summary>
+/// Schicht:      GameLayer (Patches/Hardware)
+/// Zweck:        Stabile Geraete-Identitaet fuer NetworkSwitch/PatchPanel/
+///               Server. Vanilla haengt GetInstanceID-Suffixe an
+///               (pro Session anders) — ohne Bereinigung zeigen
+///               Kabel-Endpunkte nach Save/Load auf tote IDs.
+///               Single-Scheme-System: Es gibt genau ein stabiles Schema
+///               (gregID:...). Alles ohne gregID-Praefix — leer,
+///               vanilla-generiert oder fremd — wird exakt einmal auf
+///               gregID ueberfuehrt (Live-Objekte bei Start/Awake,
+///               Save-Daten beim Laden inkl. Kabel-Endpunkten).
+///               Screens bleiben frei von ID-Tokens. Alles best-effort.
+/// </file-summary>
+
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppSystem.Collections.Generic;
@@ -10,26 +24,37 @@ namespace gregCore.GameLayer.Patches.Hardware;
 
 public static class HardwareIdPersistencePatch
 {
-    private static readonly System.Collections.Generic.HashSet<int> PatchedDevices = new();
+    private static readonly System.Collections.Generic.HashSet<string> _loggedIds = new();
     private const string SwitchPrefix = "gregID:Switch:";
     private const string PatchPanelPrefix = "gregID:PatchPanel:";
     private const string ServerPrefix = "gregID:Server:";
 
-    private static string CleanId(string prefix, string deviceId, int hashCode)
+    // Eigene IDs (beliebiges Praefix, case-insensitiv).
+    internal static bool HasPrefix(string prefix, string deviceId)
     {
-        if (deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        return !string.IsNullOrEmpty(deviceId)
+            && deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Entfernt GetInstanceID-Suffixe ("Name_123456", auch negativ "-123").
+    // Strikter als Split('_')[0]: Suffixe mit Buchstaben (Nutzer-Benennung
+    // wie "Core_Switch_A") bleiben erhalten.
+    private static string CleanId(string prefix, string deviceId)
+    {
+        if (!HasPrefix(prefix, deviceId)) return deviceId;
+        int cut = deviceId.LastIndexOf('_');
+        if (cut < 0 || cut + 1 >= deviceId.Length) return deviceId;
+        string suffix = deviceId.Substring(cut + 1);
+        if (!int.TryParse(suffix, System.Globalization.NumberStyles.Integer,
+                System.Globalization.CultureInfo.InvariantCulture, out _))
+            return deviceId;
+
+        string cleanId = deviceId.Substring(0, cut);
+        if (_loggedIds.Add(prefix + "|" + cleanId))
         {
-            if (deviceId.Contains('_'))
-            {
-                string cleanId = deviceId.Split('_')[0];
-                if (!PatchedDevices.Contains(hashCode))
-                {
-                    MelonLogger.Msg($"Unity Id Removal | Cleaned Device Id | {deviceId} -> {cleanId}");
-                }
-                return cleanId;
-            }
+            MelonLogger.Msg($"[gregCore][HwId] Suffix entfernt: {deviceId} -> {cleanId}");
         }
-        return deviceId;
+        return cleanId;
     }
 
     public static string GenerateGregId(string prefix)
@@ -49,8 +74,10 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.switchId;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(SwitchPrefix, StringComparison.OrdinalIgnoreCase))
+                if (HasPrefix(SwitchPrefix, currentId)) return;
                 {
+                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
+                    // ueberfuehrt (leer, vanilla oder fremd).
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
                     __instance.switchId = uniqueId!;
                     // Display-Trennung: gameObject.name bleibt Vanilla (Persistenz
@@ -80,9 +107,7 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 if (string.IsNullOrEmpty(__result)) return;
-                int instanceKey = __instance.GetHashCode();
-                __result = CleanId(SwitchPrefix, __result, instanceKey);
-                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+                __result = CleanId(SwitchPrefix, __result);
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueSwitchIdPatch), ex); }
         }
@@ -93,7 +118,7 @@ public static class HardwareIdPersistencePatch
     #region PATCH PANEL ID PERSISTENCE
 
     [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.Awake))]
-    internal static class NewPatchPanelIdpatch
+    internal static class NewPatchPanelIdPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.PatchPanel __instance)
@@ -102,8 +127,10 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.patchPanelId;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(PatchPanelPrefix, StringComparison.OrdinalIgnoreCase))
+                if (HasPrefix(PatchPanelPrefix, currentId)) return;
                 {
+                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
+                    // ueberfuehrt (leer, vanilla oder fremd).
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
                     __instance.patchPanelId = uniqueId!;
                     // Display-Trennung: gameObject.name bleibt Vanilla (siehe Switch).
@@ -116,7 +143,7 @@ public static class HardwareIdPersistencePatch
                     }
                 }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewPatchPanelIdpatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewPatchPanelIdPatch), ex); }
         }
     }
 
@@ -130,9 +157,7 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 if (string.IsNullOrEmpty(__result)) return;
-                int instanceKey = __instance.GetHashCode();
-                __result = CleanId(PatchPanelPrefix, __result, instanceKey);
-                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+                __result = CleanId(PatchPanelPrefix, __result);
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniquePatchPanelIdPatch), ex); }
         }
@@ -152,8 +177,10 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 string currentId = __instance.ServerID;
-                if (string.IsNullOrEmpty(currentId) || !currentId.StartsWith(ServerPrefix, StringComparison.OrdinalIgnoreCase))
+                if (HasPrefix(ServerPrefix, currentId)) return;
                 {
+                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
+                    // ueberfuehrt (leer, vanilla oder fremd).
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
                     __instance.ServerID = uniqueId!;
 
@@ -183,9 +210,7 @@ public static class HardwareIdPersistencePatch
             {
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
                 if (string.IsNullOrEmpty(__result)) return;
-                int instanceKey = __instance.GetHashCode();
-                __result = CleanId(ServerPrefix, __result, instanceKey);
-                if (!PatchedDevices.Contains(instanceKey)) PatchedDevices.Add(instanceKey);
+                __result = CleanId(ServerPrefix, __result);
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueServerIdPatch), ex); }
         }
@@ -279,64 +304,105 @@ public static class MapDataHealing
             if (networkData == null || networkData.Pointer == IntPtr.Zero) return;
             var data = networkData;
 
-            MelonLogger.Msg("Checking for legacy IDs in map data...");
+            MelonLogger.Msg("[gregCore][HwId] Pruefe Kartendaten auf Legacy-IDs...");
 
-            foreach (var swData in data.switches)
+            // Geheilt wird jede ID ohne gregID-Praefix (leer ausgenommen —
+            // leere IDs vergibt der Start-Patch). Fremde Schemata werden
+            // dabei wie Vanilla behandelt: einmalig auf gregID ueberfuehrt,
+            // Kabel-Endpunkte wandern mit. Null-Guards pro Eintrag: Ein
+            // kaputter Eintrag darf nie das gesamte Healing abbrechen.
+            if (data.switches != null)
             {
-                string oldId = swData.switchID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(SwitchPrefix, StringComparison.OrdinalIgnoreCase))
+                foreach (var swData in data.switches)
                 {
-                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
-                    swData.switchID = newGuid;
-                    int healedCables = 0;
-                    foreach (var cable in data.cables)
+                    try
                     {
-                        if (cable.startPoint.switchID == oldId) { cable.startPoint.switchID = newGuid; healedCables++; }
-                        if (cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
+                        if (swData == null) continue;
+                        string oldId = swData.switchID;
+                        if (string.IsNullOrEmpty(oldId)
+                            || HardwareIdPersistencePatch.HasPrefix(SwitchPrefix, oldId))
+                            continue;
+                        string newGuid = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
+                        swData.switchID = newGuid;
+                        int healedCables = 0;
+                        if (data.cables != null)
+                        {
+                            foreach (var cable in data.cables)
+                            {
+                                if (cable == null) continue;
+                                if (cable.startPoint != null && cable.startPoint.switchID == oldId) { cable.startPoint.switchID = newGuid; healedCables++; }
+                                if (cable.endPoint != null && cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
+                            }
+                        }
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | Switch: {oldId} -> {newGuid} | Kabel: {healedCables}");
                     }
-                    MelonLogger.Msg($"Legacy Mapping | Switch: {oldId} -> {newGuid} | Healed Cables: {healedCables}");
+                    catch { }
                 }
             }
 
-            foreach (var ppData in data.patchPanels)
+            if (data.patchPanels != null)
             {
-                string oldId = ppData.patchPanelID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(PatchPanelPrefix, StringComparison.OrdinalIgnoreCase))
+                foreach (var ppData in data.patchPanels)
                 {
-                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
-                    ppData.patchPanelID = newGuid;
-                    int healedCables = 0;
-                    foreach (var cable in data.cables)
+                    try
                     {
-                        if (cable.startPoint.switchID != null && cable.startPoint.switchID.StartsWith(oldId))
+                        if (ppData == null) continue;
+                        string oldId = ppData.patchPanelID;
+                        if (string.IsNullOrEmpty(oldId)
+                            || HardwareIdPersistencePatch.HasPrefix(PatchPanelPrefix, oldId))
+                            continue;
+                        string newGuid = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
+                        ppData.patchPanelID = newGuid;
+                        int healedCables = 0;
+                        if (data.cables != null)
                         {
-                            cable.startPoint.switchID = cable.startPoint.switchID.Replace(oldId, newGuid);
-                            healedCables++;
+                            foreach (var cable in data.cables)
+                            {
+                                if (cable == null) continue;
+                                if (cable.startPoint != null && cable.startPoint.switchID != null && cable.startPoint.switchID.StartsWith(oldId))
+                                {
+                                    cable.startPoint.switchID = cable.startPoint.switchID.Replace(oldId, newGuid);
+                                    healedCables++;
+                                }
+                                if (cable.endPoint != null && cable.endPoint.switchID != null && cable.endPoint.switchID.StartsWith(oldId))
+                                {
+                                    cable.endPoint.switchID = cable.endPoint.switchID.Replace(oldId, newGuid);
+                                    healedCables++;
+                                }
+                            }
                         }
-                        if (cable.endPoint.switchID != null && cable.endPoint.switchID.StartsWith(oldId))
-                        {
-                            cable.endPoint.switchID = cable.endPoint.switchID.Replace(oldId, newGuid);
-                            healedCables++;
-                        }
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | PatchPanel: {oldId} -> {newGuid} | Kabel: {healedCables}");
                     }
-                    MelonLogger.Msg($"Legacy Mapping | Patch Panel: {oldId} -> {newGuid} | Healed Cables: {healedCables}");
+                    catch { }
                 }
             }
 
-            foreach (var serverData in data.servers)
+            if (data.servers != null)
             {
-                string oldId = serverData.serverID;
-                if (!string.IsNullOrEmpty(oldId) && !oldId.StartsWith(ServerPrefix, StringComparison.OrdinalIgnoreCase))
+                foreach (var serverData in data.servers)
                 {
-                    string newGuid = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
-                    serverData.serverID = newGuid;
-                    int healedCables = 0;
-                    foreach (var cable in data.cables)
+                    try
                     {
-                        if (cable.startPoint.serverID == oldId) { cable.startPoint.serverID = newGuid; healedCables++; }
-                        if (cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
+                        if (serverData == null) continue;
+                        string oldId = serverData.serverID;
+                        if (string.IsNullOrEmpty(oldId)
+                            || HardwareIdPersistencePatch.HasPrefix(ServerPrefix, oldId))
+                            continue;
+                        string newGuid = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
+                        serverData.serverID = newGuid;
+                        int healedCables = 0;
+                        if (data.cables != null)
+                        {
+                            foreach (var cable in data.cables)
+                            {
+                                if (cable == null) continue;
+                                if (cable.startPoint != null && cable.startPoint.serverID == oldId) { cable.startPoint.serverID = newGuid; healedCables++; }
+                                if (cable.endPoint != null && cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
+                            }
+                        }
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | Server: {oldId} -> {newGuid} | Kabel: {healedCables}");
                     }
-                    MelonLogger.Msg($"Legacy Mapping | Server: {oldId} -> {newGuid} | Healed Cables: {healedCables}");
+                    catch { }
                 }
             }
         }

@@ -4,6 +4,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
 
 ## [Unreleased]
 
+### Changed
+
+- Hardware-IDs (`HardwareIdPersistencePatch`) als eigenstaendiges
+  Single-Scheme-System: Genau ein stabiles Schema (`gregID:...`); jede andere
+  ID (leer, vanilla, fremd) wird exakt einmal ueberfuehrt — live bei
+  Start/Awake, Save-Daten beim Laden inkl. Kabel-Endpunkten. Keine
+  Koexistenz-/Adoptionslogik fuer Fremd-Schemata mehr.
+- `CleanId` strippt nur noch numerische GetInstanceID-Suffixe
+  (`Name_123456`); Nutzer-Benennung mit Buchstaben (`Core_Switch_A`) bleibt.
+- Healing mit Null-Guards pro Eintrag (Listen, Eintraege, Kabel, Endpunkte):
+  Ein kaputter Eintrag bricht nie das gesamte Healing ab.
+- Log-Dedup per ID-String statt `GetHashCode`; Logs im
+  `[gregCore][HwId]`-Format; `NewPatchPanelIdpatch`-Typo korrigiert.
+
 ### Added
 
 - EntityInventory (`GregEntityInventory`): beim Laden wird alles

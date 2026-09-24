@@ -43,6 +43,73 @@ namespace greg.UI.Settings
             }
         }
 
+        public static GregSettingsHub? Instance => _instance;
+
+        public static bool IsVisibleNow()
+        {
+            try { return _instance != null && _instance._isVisible; }
+            catch { return false; }
+        }
+
+        // Einstellungs-Tab anhand Mod-Menü-ID oder Mod-Name suchen
+        // (z.B. Menü "backplanes" -> Tab "backplanes.settings").
+        public static string FindTabForMenu(string menuId, string modName)
+        {
+            try
+            {
+                if (_tabs == null || _tabs.Count == 0) return null;
+                foreach (var tab in _tabs)
+                {
+                    if (tab == null || string.IsNullOrEmpty(tab.Id)) continue;
+                    if (!string.IsNullOrEmpty(menuId)
+                        && (string.Equals(tab.Id, menuId, StringComparison.OrdinalIgnoreCase)
+                            || tab.Id.StartsWith(menuId + ".", StringComparison.OrdinalIgnoreCase)))
+                        return tab.Id;
+                }
+
+                if (!string.IsNullOrEmpty(modName))
+                {
+                    foreach (var tab in _tabs)
+                    {
+                        if (tab == null) continue;
+                        if (string.Equals(tab.Label, modName, StringComparison.OrdinalIgnoreCase))
+                            return tab.Id;
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        // Settings-Hub öffnen, optional direkt auf einem Tab.
+        public static bool ShowTab(string tabId)
+        {
+            try
+            {
+                if (_instance == null) Initialize();
+                if (_instance == null) return false;
+                if (!string.IsNullOrEmpty(tabId))
+                {
+                    for (int i = 0; i < _tabs.Count; i++)
+                    {
+                        if (_tabs[i] != null && string.Equals(_tabs[i].Id, tabId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _instance._selectedTabIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                _instance.Show();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[GregSettingsHub] ShowTab failed: {ex.GetBaseException().Message}");
+                return false;
+            }
+        }
+
         public static void RegisterTab(string tabId, string label, Action<GregPanelBuilder> buildFn)
         {
             var existing = _tabs.FindIndex(t => t.Id == tabId);

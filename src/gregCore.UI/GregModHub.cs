@@ -103,9 +103,17 @@ public static class GregModHub
         title.style.color = new Color(0.53f, 0.81f, 0.92f, 1f);
         title.style.fontSize = 17;
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
-        title.style.marginBottom = 8;
+        title.style.marginBottom = 2;
         if (font != null) { try { title.style.unityFont = font; } catch { } }
         card.Add(title);
+
+        var hint = new Label("Menüs hier öffnen/schließen · Einstellungen (Toggles) auf F8 oder pro Mod über „Settings“");
+        hint.style.color = new Color(0.6f, 0.65f, 0.7f, 1f);
+        hint.style.fontSize = 11;
+        hint.style.marginBottom = 8;
+        hint.style.whiteSpace = WhiteSpace.Normal;
+        if (font != null) { try { hint.style.unityFont = font; } catch { } }
+        card.Add(hint);
 
         var scroll = new ScrollView(ScrollViewMode.Vertical);
         scroll.style.flexGrow = 1;
@@ -177,7 +185,7 @@ public static class GregModHub
                 if (byMod.TryGetValue(mod.Name, out var ml))
                     foreach (var m in ml)
                     {
-                        var r = MenuRow(font, m);
+                        var r = MenuRow(font, m, mod.Name);
                         r.style.marginBottom = 6;
                         _body.Add(r);
                     }
@@ -190,7 +198,7 @@ public static class GregModHub
             }
             foreach (var m in orphan)
             {
-                var r = MenuRow(font, m);
+                var r = MenuRow(font, m, null);
                 r.style.marginBottom = 6;
                 _body.Add(r);
             }
@@ -210,9 +218,23 @@ public static class GregModHub
         }
     }
 
-    private static VisualElement MenuRow(Font font, GregMenuRegistry.MenuInfo m)
+    private static VisualElement MenuRow(Font font, GregMenuRegistry.MenuInfo m, string ownerModName)
     {
         string captured = m.MenuId;
+        string settingsTab = null;
+        try { settingsTab = greg.UI.Settings.GregSettingsHub.FindTabForMenu(captured, ownerModName); } catch { }
+        System.Action settingsAction = null;
+        if (!string.IsNullOrEmpty(settingsTab))
+        {
+            string capturedTab = settingsTab;
+            settingsAction = () =>
+            {
+                try { Close(); } catch { }
+                try { greg.UI.Settings.GregSettingsHub.ShowTab(capturedTab); } catch { }
+                try { Rebuild(); } catch { }
+            };
+        }
+
         // Ehrliche Buttons: "Schliessen" nur mit registriertem Closer (und nur
         // dann ist auch der Offen-Status verlaesslich). Sonst "Oeffnen" ohne
         // Status-Anzeige statt gelogenem "Zu".
@@ -220,19 +242,20 @@ public static class GregModHub
         {
             if (m.Open)
                 return Row(font, $"  {m.MenuId}  [Offen]", "Schliessen",
-                    () => { GregMenuRegistry.TryClose(captured); Rebuild(); });
+                    () => { GregMenuRegistry.TryClose(captured); Rebuild(); }, settingsAction);
             if (m.HasOpener)
                 return Row(font, $"  {m.MenuId}  [Zu]", "Oeffnen",
-                    () => { GregMenuRegistry.TryOpen(captured); Rebuild(); });
-            return Row(font, $"  {m.MenuId}  [Zu]", null, null);
+                    () => { GregMenuRegistry.TryOpen(captured); Rebuild(); }, settingsAction);
+            return Row(font, $"  {m.MenuId}  [Zu]", null, null, settingsAction);
         }
         if (m.HasOpener)
             return Row(font, $"  {m.MenuId}", "Oeffnen",
-                () => { GregMenuRegistry.TryOpen(captured); Rebuild(); });
-        return Row(font, $"  {m.MenuId}", null, null);
+                () => { GregMenuRegistry.TryOpen(captured); Rebuild(); }, settingsAction);
+        return Row(font, $"  {m.MenuId}", null, null, settingsAction);
     }
 
-    private static VisualElement Row(Font font, string text, string buttonLabel, System.Action onClick)
+    private static VisualElement Row(Font font, string text, string buttonLabel, System.Action onClick,
+        System.Action settingsAction = null)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -249,24 +272,33 @@ public static class GregModHub
 
         if (buttonLabel != null && onClick != null)
         {
-            var btn = new Button();
-            btn.text = buttonLabel;
-            btn.style.backgroundColor = new Color(0.04f, 0.51f, 0.63f, 1f);
-            btn.style.color = Color.white;
-            btn.style.fontSize = 12;
-            if (font != null) { try { btn.style.unityFont = font; } catch { } }
-            btn.RegisterCallback<ClickEvent>(new System.Action<ClickEvent>(_ =>
-            {
-                try
-                {
-                    GregClickRouter.MarkRealClick(ref _lastRealClickUtc);
-                    onClick();
-                }
-                catch { }
-            }));
-            _clickables.Add(new GregClickRouter.Clickable { Element = btn, Action = onClick });
-            row.Add(btn);
+            row.Add(MakeButton(font, buttonLabel, onClick));
+        }
+        if (settingsAction != null)
+        {
+            row.Add(MakeButton(font, "Settings", settingsAction));
         }
         return row;
+    }
+
+    private static Button MakeButton(Font font, string buttonLabel, System.Action onClick)
+    {
+        var btn = new Button();
+        btn.text = buttonLabel;
+        btn.style.backgroundColor = new Color(0.04f, 0.51f, 0.63f, 1f);
+        btn.style.color = Color.white;
+        btn.style.fontSize = 12;
+        if (font != null) { try { btn.style.unityFont = font; } catch { } }
+        btn.RegisterCallback<ClickEvent>(new System.Action<ClickEvent>(_ =>
+        {
+            try
+            {
+                GregClickRouter.MarkRealClick(ref _lastRealClickUtc);
+                onClick();
+            }
+            catch { }
+        }));
+        _clickables.Add(new GregClickRouter.Clickable { Element = btn, Action = onClick });
+        return btn;
     }
 }

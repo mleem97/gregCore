@@ -38,8 +38,12 @@ mod carries any of these, a hard dependency deletes real code:
 ## Per-mod verdicts (Sept 2026)
 
 - **HexViewer**: done (template for everyone else).
-- **MusicPlayer, Backplanes, NoEOL**: carry standalone UI layers —
+- **MusicPlayer, Backplanes**: carry standalone UI layers —
   biggest deletion candidates, decision open.
+- **NoEOL**: done (v2.0.0 hard dep; probe/guards/theme gone).
+- **Speedtest**: born hard-dep; uses `GregCables.FindByServer`.
+- Defensive patching: `GregPatches.TryPatchPrefix/TryPatchPostfix`
+  (adopted by NoEOL `EolHider`; pattern for CableThrottle-style mods).
 - **IPAM**: custom IMGUI overlay must stay (no core ImGui framework);
   already optimal (additive use only).
 - **MoreSpools/Modules/Servers, NoCostShop, CableThrottle, CableTracer,

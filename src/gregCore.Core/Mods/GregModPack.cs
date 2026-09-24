@@ -37,15 +37,15 @@ public static class GregModPack
 
     public sealed class StaticItem
     {
-        public string ItemName = "";
-        public float ModelScale = 1f;
-        public float[] ColliderSize = Array.Empty<float>();
-        public float[] ColliderCenter = Array.Empty<float>();
-        public string ModelFile = "";
-        public string TextureFile = "";
-        public float[] Position = Array.Empty<float>();
-        public float[] Rotation = Array.Empty<float>();
-        public bool IsKinematic;
+        public string ItemName { get; set; } = "";
+        public float ModelScale { get; set; } = 1f;
+        public float[] ColliderSize { get; set; } = Array.Empty<float>();
+        public float[] ColliderCenter { get; set; } = Array.Empty<float>();
+        public string ModelFile { get; set; } = "";
+        public string TextureFile { get; set; } = "";
+        public float[] Position { get; set; } = Array.Empty<float>();
+        public float[] Rotation { get; set; } = Array.Empty<float>();
+        public bool IsKinematic { get; set; }
     }
 
     public sealed class DllRef

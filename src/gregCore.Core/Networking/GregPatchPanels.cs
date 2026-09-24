@@ -22,11 +22,11 @@ public static class GregPatchPanels
 
     public sealed class PatchPanelSave
     {
-        public string PatchPanelID = "";
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public int RackPositionUID = -1;
-        public int PatchPanelType;
+        public string PatchPanelID { get; set; } = "";
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public int RackPositionUID { get; set; } = -1;
+        public int PatchPanelType { get; set; }
     }
 
     // ── Erzeugen / Fuellen / Lesen ───────────────────────────────────────────

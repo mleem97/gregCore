@@ -21,39 +21,39 @@ public static class GregRackAndSfp
 
     public sealed class TemplateDevice
     {
-        public int Kind;
-        public int PrefabID;
-        public int PositionIndex;
-        public int SizeInU;
-        public string Label = "";
+        public int Kind { get; set; }
+        public int PrefabID { get; set; }
+        public int PositionIndex { get; set; }
+        public int SizeInU { get; set; }
+        public string Label { get; set; } = "";
     }
 
     public sealed class TemplateSfp
     {
-        public int DeviceIndex;
-        public Vector3 PortLocalPos;
-        public int SfpType;
+        public int DeviceIndex { get; set; }
+        public Vector3 PortLocalPos { get; set; }
+        public int SfpType { get; set; }
     }
 
     public sealed class TemplateCable
     {
-        public int DeviceIndexA;
-        public Vector3 PortLocalPosA;
-        public int DeviceIndexB;
-        public Vector3 PortLocalPosB;
-        public Color Color = Color.white;
-        public List<Vector3> Waypoints = new List<Vector3>();
+        public int DeviceIndexA { get; set; }
+        public Vector3 PortLocalPosA { get; set; }
+        public int DeviceIndexB { get; set; }
+        public Vector3 PortLocalPosB { get; set; }
+        public Color Color { get; set; } = Color.white;
+        public List<Vector3> Waypoints { get; set; } = new List<Vector3>();
     }
 
     public sealed class RackTemplateDto
     {
-        public string TemplateId = "";
-        public int Price;
-        public bool HasCustomColor;
-        public Color RackColor = Color.white;
-        public List<TemplateDevice> Devices = new List<TemplateDevice>();
-        public List<TemplateSfp> Sfps = new List<TemplateSfp>();
-        public List<TemplateCable> Cables = new List<TemplateCable>();
+        public string TemplateId { get; set; } = "";
+        public int Price { get; set; }
+        public bool HasCustomColor { get; set; }
+        public Color RackColor { get; set; } = Color.white;
+        public List<TemplateDevice> Devices { get; set; } = new List<TemplateDevice>();
+        public List<TemplateSfp> Sfps { get; set; } = new List<TemplateSfp>();
+        public List<TemplateCable> Cables { get; set; } = new List<TemplateCable>();
     }
 
     // ── Finden ───────────────────────────────────────────────────────────────

@@ -22,20 +22,20 @@ public static class GregServers
 
     public sealed class ServerSave
     {
-        public string ServerID = "";
-        public int CustomerID;
-        public string Ip = "";
-        public int ServerType;
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public int RackPositionUID = -1;
-        public int PrefabID;
-        public bool IsOn = true;
-        public bool IsBroken;
-        public int TimeToBrake;
-        public int EolTime;
-        public bool IsWarningCleared;
-        public string Label = "";
+        public string ServerID { get; set; } = "";
+        public int CustomerID { get; set; }
+        public string Ip { get; set; } = "";
+        public int ServerType { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public int RackPositionUID { get; set; } = -1;
+        public int PrefabID { get; set; }
+        public bool IsOn { get; set; } = true;
+        public bool IsBroken { get; set; }
+        public int TimeToBrake { get; set; }
+        public int EolTime { get; set; }
+        public bool IsWarningCleared { get; set; }
+        public string Label { get; set; } = "";
     }
 
     // ── Erzeugen / Fuellen / Lesen ───────────────────────────────────────────

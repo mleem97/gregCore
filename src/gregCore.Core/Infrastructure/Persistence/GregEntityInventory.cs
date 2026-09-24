@@ -41,10 +41,10 @@ public static partial class GregEntityInventory
 
     public sealed class Entry
     {
-        public readonly InventoryKind Kind;
-        public readonly string NativeKey;
-        public readonly string Uid;
-        public readonly string Hint;
+        public InventoryKind Kind { get; }
+        public string NativeKey { get; }
+        public string Uid { get; }
+        public string Hint { get; }
 
         public Entry(InventoryKind kind, string nativeKey, string uid, string hint)
         {
@@ -55,10 +55,10 @@ public static partial class GregEntityInventory
         }
     }
 
-    public const string ServerPrefix = "gregID:Server:";
-    public const string SwitchPrefix = "gregID:Switch:";
-    public const string PatchPanelPrefix = "gregID:PatchPanel:";
-    public const string UidPrefix = "gregUID:";
+    public static string ServerPrefix { get; } = "gregID:Server:";
+    public static string SwitchPrefix { get; } = "gregID:Switch:";
+    public static string PatchPanelPrefix { get; } = "gregID:PatchPanel:";
+    public static string UidPrefix { get; } = "gregUID:";
 
     private const string SidecarModId = "inventory";
 

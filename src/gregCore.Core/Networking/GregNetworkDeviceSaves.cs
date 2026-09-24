@@ -30,26 +30,26 @@ public static partial class GregNetworkDeviceSaves
 
     public sealed class OwnedSubnet
     {
-        public int VlanId;
-        public string SubnetCidr = "";
+        public int VlanId { get; set; }
+        public string SubnetCidr { get; set; } = "";
     }
 
     public sealed class RouteEntry
     {
-        public int RouteId;
-        public int SourceVlanId;
-        public string SourceIp = "";
-        public int TargetVlanId;
-        public string TargetIp = "";
+        public int RouteId { get; set; }
+        public int SourceVlanId { get; set; }
+        public string SourceIp { get; set; } = "";
+        public int TargetVlanId { get; set; }
+        public string TargetIp { get; set; } = "";
     }
 
     public sealed class RouterSave
     {
-        public int Asn;
-        public int NextRouteId;
-        public List<SubnetRoute> RoutingTable = new List<SubnetRoute>();
-        public List<OwnedSubnet> OwnedSubnets = new List<OwnedSubnet>();
-        public List<RouteEntry> Routes = new List<RouteEntry>();
+        public int Asn { get; set; }
+        public int NextRouteId { get; set; }
+        public List<SubnetRoute> RoutingTable { get; set; } = new List<SubnetRoute>();
+        public List<OwnedSubnet> OwnedSubnets { get; set; } = new List<OwnedSubnet>();
+        public List<RouteEntry> Routes { get; set; } = new List<RouteEntry>();
     }
 
     public sealed class FilterRule
@@ -65,8 +65,8 @@ public static partial class GregNetworkDeviceSaves
 
     public sealed class FirewallSave
     {
-        public string ClusterIP = "";
-        public List<FilterRule> FilterRules = new List<FilterRule>();
+        public string ClusterIP { get; set; } = "";
+        public List<FilterRule> FilterRules { get; set; } = new List<FilterRule>();
     }
 
     public sealed class SfpSave

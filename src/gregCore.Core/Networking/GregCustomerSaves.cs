@@ -20,26 +20,26 @@ public static class GregCustomerSaves
 
     public sealed class CustomerBase
     {
-        public int CustomerBaseID;
-        public int CustomerID;
-        public Dictionary<int, string> SubnetsPerApp = new Dictionary<int, string>();
-        public Dictionary<int, int> VlanIdsPerApp = new Dictionary<int, int>();
-        public float[] AppsSpeedRequirements = Array.Empty<float>();
-        public int[] AppTypes = Array.Empty<int>();
-        public int Difficulty;
-        public Dictionary<int, int> AppObjectiveIDs = new Dictionary<int, int>();
-        public int[] AppsTimeBelowRequirements = Array.Empty<int>();
-        public bool[] AppReputationAwarded = Array.Empty<bool>();
-        public bool WantsInternet;
-        public List<int> InternetApps = new List<int>();
+        public int CustomerBaseID { get; set; }
+        public int CustomerID { get; set; }
+        public Dictionary<int, string> SubnetsPerApp { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, int> VlanIdsPerApp { get; set; } = new Dictionary<int, int>();
+        public float[] AppsSpeedRequirements { get; set; } = Array.Empty<float>();
+        public int[] AppTypes { get; set; } = Array.Empty<int>();
+        public int Difficulty { get; set; }
+        public Dictionary<int, int> AppObjectiveIDs { get; set; } = new Dictionary<int, int>();
+        public int[] AppsTimeBelowRequirements { get; set; } = Array.Empty<int>();
+        public bool[] AppReputationAwarded { get; set; } = Array.Empty<bool>();
+        public bool WantsInternet { get; set; }
+        public List<int> InternetApps { get; set; } = new List<int>();
     }
 
     public sealed class CustomerRecord
     {
-        public int CustomerID;
-        public string CustomerName = "";
-        public float Revenue;
-        public float Penalties;
+        public int CustomerID { get; set; }
+        public string CustomerName { get; set; } = "";
+        public float Revenue { get; set; }
+        public float Penalties { get; set; }
     }
 
     // ── CustomerBase ─────────────────────────────────────────────────────────

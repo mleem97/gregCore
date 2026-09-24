@@ -23,12 +23,12 @@ public static class GregAttackEscalation
 
     public sealed class EscalationConfig
     {
-        public float TierSeconds = 300f;
-        public float IntervalFactor = 0.9f;
-        public float MinIntervalSeconds = 20f;
-        public float RateGrowthPerTier = 0.15f;
-        public float SpeedGrowthPerTier = 0.10f;
-        public int MaxTier = 10;
+        public float TierSeconds { get; set; } = 300f;
+        public float IntervalFactor { get; set; } = 0.9f;
+        public float MinIntervalSeconds { get; set; } = 20f;
+        public float RateGrowthPerTier { get; set; } = 0.15f;
+        public float SpeedGrowthPerTier { get; set; } = 0.10f;
+        public int MaxTier { get; set; } = 10;
     }
 
     public sealed class TierStats

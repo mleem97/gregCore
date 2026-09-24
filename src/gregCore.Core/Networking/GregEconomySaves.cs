@@ -29,8 +29,8 @@ public static class GregEconomySaves
 
     public sealed class BalanceSheet
     {
-        public List<MonthlySnapshot> History = new List<MonthlySnapshot>();
-        public float TotalMonthlySalary;
+        public List<MonthlySnapshot> History { get; set; } = new List<MonthlySnapshot>();
+        public float TotalMonthlySalary { get; set; }
     }
 
     // ── MonthlySnapshot ──────────────────────────────────────────────────────

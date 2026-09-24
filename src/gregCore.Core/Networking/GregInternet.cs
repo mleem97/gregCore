@@ -20,12 +20,12 @@ public static class GregInternet
 
     public sealed class InternetEndpointInfo
     {
-        public string ServerID = "";
-        public string IP = "";
-        public int ServerType;
-        public int AppID = -1;
-        public float MaxProcessingSpeed;
-        public float CurrentProcessingSpeed;
+        public string ServerID { get; set; } = "";
+        public string IP { get; set; } = "";
+        public int ServerType { get; set; }
+        public int AppID { get; set; } = -1;
+        public float MaxProcessingSpeed { get; set; }
+        public float CurrentProcessingSpeed { get; set; }
     }
 
     // ── Internet-Endpunkte ───────────────────────────────────────────────────

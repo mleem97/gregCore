@@ -325,73 +325,73 @@ public partial class GameAPIManager : IDisposable
     private delegate void SetGamePausedDelegate(uint paused);
 
     // prevent GC while rust holds pointers
-    private readonly LogDelegate _logInfo, _logWarning, _logError;
-    private readonly GetDoubleDelegate _getPlayerMoney, _getPlayerXP, _getPlayerReputation;
-    private readonly SetDoubleDelegate _setPlayerMoney, _setPlayerXP, _setPlayerReputation;
-    private readonly GetFloatDelegate _getTimeScale, _getTimeOfDay, _getSecondsInFullDay;
-    private readonly SetFloatDelegate _setTimeScale, _setSecondsInFullDay;
-    private readonly GetUIntDelegate _getServerCount, _getRackCount, _getDay, _getSwitchCount, _getSatisfiedCustomerCount;
-    private readonly GetUIntDelegate _isNetWatchEnabled, _getNetWatchStats;
-    private readonly SetUIntDelegate _setNetWatchEnabled;
-    private readonly GetStringDelegate _getCurrentScene;
+    private LogDelegate _logInfo, _logWarning, _logError;
+    private GetDoubleDelegate _getPlayerMoney, _getPlayerXP, _getPlayerReputation;
+    private SetDoubleDelegate _setPlayerMoney, _setPlayerXP, _setPlayerReputation;
+    private GetFloatDelegate _getTimeScale, _getTimeOfDay, _getSecondsInFullDay;
+    private SetFloatDelegate _setTimeScale, _setSecondsInFullDay;
+    private GetUIntDelegate _getServerCount, _getRackCount, _getDay, _getSwitchCount, _getSatisfiedCustomerCount;
+    private GetUIntDelegate _isNetWatchEnabled, _getNetWatchStats;
+    private SetUIntDelegate _setNetWatchEnabled;
+    private GetStringDelegate _getCurrentScene;
     // v4
-    private readonly GetUIntDelegate _getBrokenServerCount, _getBrokenSwitchCount, _getEolServerCount, _getEolSwitchCount;
-    private readonly GetUIntDelegate _getFreeTechnicianCount, _getTotalTechnicianCount;
-    private readonly GetIntDelegate _dispatchRepairServer, _dispatchRepairSwitch, _dispatchReplaceServer, _dispatchReplaceSwitch;
+    private GetUIntDelegate _getBrokenServerCount, _getBrokenSwitchCount, _getEolServerCount, _getEolSwitchCount;
+    private GetUIntDelegate _getFreeTechnicianCount, _getTotalTechnicianCount;
+    private GetIntDelegate _dispatchRepairServer, _dispatchRepairSwitch, _dispatchReplaceServer, _dispatchReplaceSwitch;
     // v5
-    private readonly RegisterCustomEmployeeDelegate _registerCustomEmployee;
-    private readonly IsCustomEmployeeHiredDelegate _isCustomEmployeeHired;
-    private readonly FireCustomEmployeeDelegate _fireCustomEmployee;
-    private readonly RegisterSalaryDelegate _registerSalary;
+    private RegisterCustomEmployeeDelegate _registerCustomEmployee;
+    private IsCustomEmployeeHiredDelegate _isCustomEmployeeHired;
+    private FireCustomEmployeeDelegate _fireCustomEmployee;
+    private RegisterSalaryDelegate _registerSalary;
     // v6
-    private readonly ShowNotificationDelegate _showNotification;
-    private readonly GetFloatDelegate _getMoneyPerSecond, _getExpensesPerSecond, _getXpPerSecond;
-    private readonly GetUIntDelegate _isGamePaused2;
-    private readonly SetGamePausedDelegate _setGamePaused;
-    private readonly GetIntDelegate _getDifficulty, _triggerSave;
+    private ShowNotificationDelegate _showNotification;
+    private GetFloatDelegate _getMoneyPerSecond, _getExpensesPerSecond, _getXpPerSecond;
+    private GetUIntDelegate _isGamePaused2;
+    private SetGamePausedDelegate _setGamePaused;
+    private GetIntDelegate _getDifficulty, _triggerSave;
     // v7
-    private readonly GetULongDelegate _steamGetMyId;
-    private readonly GetStringFromU64Delegate _steamGetFriendName;
-    private readonly CreateLobbyDelegate _steamCreateLobby;
-    private readonly JoinLobbyDelegate _steamJoinLobby;
-    private readonly VoidDelegate _steamLeaveLobby;
-    private readonly GetULongDelegate _steamGetLobbyId;
-    private readonly GetULongDelegate _steamGetLobbyOwner;
-    private readonly GetUIntDelegate _steamGetLobbyMemberCount;
-    private readonly GetLobbyMemberDelegate _steamGetLobbyMemberByIndex;
-    private readonly SetLobbyDataDelegate _steamSetLobbyData;
-    private readonly GetLobbyDataDelegate _steamGetLobbyData;
-    private readonly SendP2PDelegate _steamSendP2P;
-    private readonly IsP2PAvailableDelegate _steamIsP2PAvailable;
-    private readonly ReadP2PDelegate _steamReadP2P;
-    private readonly AcceptP2PDelegate _steamAcceptP2P;
-    private readonly PollEventDelegate _steamPollEvent;
-    private readonly GetPlayerPositionDelegate _getPlayerPosition;
+    private GetULongDelegate _steamGetMyId;
+    private GetStringFromU64Delegate _steamGetFriendName;
+    private CreateLobbyDelegate _steamCreateLobby;
+    private JoinLobbyDelegate _steamJoinLobby;
+    private VoidDelegate _steamLeaveLobby;
+    private GetULongDelegate _steamGetLobbyId;
+    private GetULongDelegate _steamGetLobbyOwner;
+    private GetUIntDelegate _steamGetLobbyMemberCount;
+    private GetLobbyMemberDelegate _steamGetLobbyMemberByIndex;
+    private SetLobbyDataDelegate _steamSetLobbyData;
+    private GetLobbyDataDelegate _steamGetLobbyData;
+    private SendP2PDelegate _steamSendP2P;
+    private IsP2PAvailableDelegate _steamIsP2PAvailable;
+    private ReadP2PDelegate _steamReadP2P;
+    private AcceptP2PDelegate _steamAcceptP2P;
+    private PollEventDelegate _steamPollEvent;
+    private GetPlayerPositionDelegate _getPlayerPosition;
     // v8
-    private readonly ConfigRegisterBoolDelegate _configRegisterBool;
-    private readonly ConfigRegisterIntDelegate _configRegisterInt;
-    private readonly ConfigRegisterFloatDelegate _configRegisterFloat;
-    private readonly ConfigGetBoolDelegate _configGetBool;
-    private readonly ConfigGetIntDelegate _configGetInt;
-    private readonly ConfigGetFloatDelegate _configGetFloat;
-    private readonly SpawnCharacterDelegate _spawnCharacter;
-    private readonly DestroyEntityDelegate _destroyEntity;
-    private readonly SetEntityPositionDelegate _setEntityPosition;
-    private readonly IsEntityReadyDelegate _isEntityReady;
-    private readonly SetEntityAnimationDelegate _setEntityAnimation;
-    private readonly GetPrefabCountDelegate _getPrefabCount;
-    private readonly SetEntityNameDelegate _setEntityName;
-    private readonly GetPlayerCarryStateDelegate _getPlayerCarryState;
-    private readonly GetPlayerCrouchingDelegate _getPlayerCrouching;
-    private readonly GetPlayerSittingDelegate _getPlayerSitting;
-    private readonly SetEntityCrouchingDelegate _setEntityCrouching;
-    private readonly SetEntitySittingDelegate _setEntitySitting;
-    private readonly SetEntityCarryAnimDelegate _setEntityCarryAnim;
-    private readonly CreateEntityCarryVisualDelegate _createEntityCarryVisual;
-    private readonly DestroyEntityCarryVisualDelegate _destroyEntityCarryVisual;
+    private ConfigRegisterBoolDelegate _configRegisterBool;
+    private ConfigRegisterIntDelegate _configRegisterInt;
+    private ConfigRegisterFloatDelegate _configRegisterFloat;
+    private ConfigGetBoolDelegate _configGetBool;
+    private ConfigGetIntDelegate _configGetInt;
+    private ConfigGetFloatDelegate _configGetFloat;
+    private SpawnCharacterDelegate _spawnCharacter;
+    private DestroyEntityDelegate _destroyEntity;
+    private SetEntityPositionDelegate _setEntityPosition;
+    private IsEntityReadyDelegate _isEntityReady;
+    private SetEntityAnimationDelegate _setEntityAnimation;
+    private GetPrefabCountDelegate _getPrefabCount;
+    private SetEntityNameDelegate _setEntityName;
+    private GetPlayerCarryStateDelegate _getPlayerCarryState;
+    private GetPlayerCrouchingDelegate _getPlayerCrouching;
+    private GetPlayerSittingDelegate _getPlayerSitting;
+    private SetEntityCrouchingDelegate _setEntityCrouching;
+    private SetEntitySittingDelegate _setEntitySitting;
+    private SetEntityCarryAnimDelegate _setEntityCarryAnim;
+    private CreateEntityCarryVisualDelegate _createEntityCarryVisual;
+    private DestroyEntityCarryVisualDelegate _destroyEntityCarryVisual;
 
-    private readonly GetDefaultSpawnPositionDelegate _getDefaultSpawnPosition;
-    private readonly WarpLocalPlayerDelegate _warpLocalPlayer;
+    private GetDefaultSpawnPositionDelegate _getDefaultSpawnPosition;
+    private WarpLocalPlayerDelegate _warpLocalPlayer;
 
     GetEntityPositionDelegate _getEntityPosition;
     AddEntityColliderDelegate _addEntityCollider;
@@ -412,36 +412,49 @@ public partial class GameAPIManager : IDisposable
     WorldDropObjectDelegate _worldDropObject;
     GetIntDelegate _worldEnsureRackUIDs;
 
-    private readonly ObjFindByTypeDelegate _objFindByType;
-    private readonly ObjGetStringFieldDelegate _objGetStringField;
-    private readonly ObjIsActiveDelegate _objIsActive;
-    private readonly ObjSetActiveDelegate _objSetActive;
-    private readonly ObjGetPositionDelegate _objGetPosition;
-    private readonly ObjSetPositionDelegate _objSetPosition;
-    private readonly ObjSetRotationDelegate _objSetRotation;
-    private readonly ObjSetParentToWorldDelegate _objSetParentToWorld;
-    private readonly RbSetKinematicDelegate _rbSetKinematic;
-    private readonly RbSetGravityDelegate _rbSetGravity;
-    private readonly RbWakeUpDelegate _rbWakeUp;
+    private ObjFindByTypeDelegate _objFindByType;
+    private ObjGetStringFieldDelegate _objGetStringField;
+    private ObjIsActiveDelegate _objIsActive;
+    private ObjSetActiveDelegate _objSetActive;
+    private ObjGetPositionDelegate _objGetPosition;
+    private ObjSetPositionDelegate _objSetPosition;
+    private ObjSetRotationDelegate _objSetRotation;
+    private ObjSetParentToWorldDelegate _objSetParentToWorld;
+    private RbSetKinematicDelegate _rbSetKinematic;
+    private RbSetGravityDelegate _rbSetGravity;
+    private RbWakeUpDelegate _rbWakeUp;
     ObjFindByIdDelegate _objFindById;
 
-    private readonly GetHeldObjectDelegate _getHeldObject;
-    private readonly ObjGetRotationDelegate _objGetRotation;
+    private GetHeldObjectDelegate _getHeldObject;
+    private ObjGetRotationDelegate _objGetRotation;
 
-    private readonly ObjSetParentDelegate _objSetParent;
-    private readonly ObjSetLocalPositionDelegate _objSetLocalPosition;
-    private readonly ObjSetLocalRotationDelegate _objSetLocalRotation;
-    private readonly RackFindPositionDelegate _rackFindPosition;
-    private readonly RackGameInstallDelegate _rackGameInstall;
-    private readonly RackGameUninstallDelegate _rackGameUninstall;
-    private readonly ObjSetStringFieldDelegate _objSetStringField2;
+    private ObjSetParentDelegate _objSetParent;
+    private ObjSetLocalPositionDelegate _objSetLocalPosition;
+    private ObjSetLocalRotationDelegate _objSetLocalRotation;
+    private RackFindPositionDelegate _rackFindPosition;
+    private RackGameInstallDelegate _rackGameInstall;
+    private RackGameUninstallDelegate _rackGameUninstall;
+    private ObjSetStringFieldDelegate _objSetStringField2;
 
     private readonly MelonLogger.Instance _logger;
     private IntPtr _currentScenePtr = IntPtr.Zero;
     public GameAPIManager(MelonLogger.Instance logger)
     {
         _logger = logger;
+        BindSystem();
+        BindMaintenance();
+        BindCrew();
+        BindGame();
+        BindSteam();
+        BindConfig();
+        BindEntities();
+        BindWorld();
+        BindRacks();
+        BuildTable();
+    }
 
+    private void BindSystem()
+    {
         _logInfo = LogInfoImpl;
         _logWarning = LogWarningImpl;
         _logError = LogErrorImpl;
@@ -465,7 +478,10 @@ public partial class GameAPIManager : IDisposable
         _setNetWatchEnabled = SetNetWatchEnabledImpl;
         _isNetWatchEnabled = IsNetWatchEnabledImpl;
         _getNetWatchStats = GetNetWatchStatsImpl;
+    }
 
+    private void BindMaintenance()
+    {
         _getBrokenServerCount = GetBrokenServerCountImpl;
         _getBrokenSwitchCount = GetBrokenSwitchCountImpl;
         _getEolServerCount = GetEolServerCountImpl;
@@ -476,12 +492,18 @@ public partial class GameAPIManager : IDisposable
         _dispatchRepairSwitch = DispatchRepairSwitchImpl;
         _dispatchReplaceServer = DispatchReplaceServerImpl;
         _dispatchReplaceSwitch = DispatchReplaceSwitchImpl;
+    }
 
+    private void BindCrew()
+    {
         _registerCustomEmployee = RegisterCustomEmployeeImpl;
         _isCustomEmployeeHired = IsCustomEmployeeHiredImpl;
         _fireCustomEmployee = FireCustomEmployeeImpl;
         _registerSalary = RegisterSalaryImpl;
+    }
 
+    private void BindGame()
+    {
         _showNotification = ShowNotificationImpl;
         _getMoneyPerSecond = GetMoneyPerSecondImpl;
         _getExpensesPerSecond = GetExpensesPerSecondImpl;
@@ -490,7 +512,10 @@ public partial class GameAPIManager : IDisposable
         _setGamePaused = SetGamePausedImpl;
         _getDifficulty = GetDifficultyImpl;
         _triggerSave = TriggerSaveImpl;
+    }
 
+    private void BindSteam()
+    {
         _steamGetMyId = SteamGetMyIdImpl;
         _steamGetFriendName = SteamGetFriendNameImpl;
         _steamCreateLobby = SteamCreateLobbyImpl;
@@ -508,14 +533,20 @@ public partial class GameAPIManager : IDisposable
         _steamAcceptP2P = SteamAcceptP2PImpl;
         _steamPollEvent = SteamPollEventImpl;
         _getPlayerPosition = GetPlayerPositionImpl;
+    }
 
+    private void BindConfig()
+    {
         _configRegisterBool = ConfigRegisterBoolImpl;
         _configRegisterInt = ConfigRegisterIntImpl;
         _configRegisterFloat = ConfigRegisterFloatImpl;
         _configGetBool = ConfigGetBoolImpl;
         _configGetInt = ConfigGetIntImpl;
         _configGetFloat = ConfigGetFloatImpl;
+    }
 
+    private void BindEntities()
+    {
         _spawnCharacter = SpawnCharacterImpl;
         _destroyEntity = DestroyEntityImpl;
         _setEntityPosition = SetEntityPositionImpl;
@@ -536,6 +567,10 @@ public partial class GameAPIManager : IDisposable
         _getEntityPosition = GetEntityPositionImpl;
         _addEntityCollider = AddEntityColliderImpl;
         _setEntityCarryTransform = SetEntityCarryTransformImpl;
+    }
+
+    private void BindWorld()
+    {
         // v13
         _worldGetObjectCount = WorldGetObjectCountImpl;
         _worldGetObjectHashes = WorldGetObjectHashesImpl;
@@ -565,7 +600,10 @@ public partial class GameAPIManager : IDisposable
         _objFindById = ObjFindByIdImpl;
         _getHeldObject = GetHeldObjectImpl;
         _objGetRotation = ObjGetRotationImpl;
+    }
 
+    private void BindRacks()
+    {
         _objSetParent = ObjSetParentImpl;
         _objSetLocalPosition = ObjSetLocalPositionImpl;
         _objSetLocalRotation = ObjSetLocalRotationImpl;
@@ -573,139 +611,174 @@ public partial class GameAPIManager : IDisposable
         _rackGameInstall = RackGameInstallImpl;
         _rackGameUninstall = RackGameUninstallImpl;
         _objSetStringField2 = ObjSetStringFieldImpl;
+    }
 
+    private void BuildTable()
+    {
         _table = new GameAPITable
         {
             ApiVersion = API_VERSION,
-            LogInfo = Marshal.GetFunctionPointerForDelegate(_logInfo),
-            LogWarning = Marshal.GetFunctionPointerForDelegate(_logWarning),
-            LogError = Marshal.GetFunctionPointerForDelegate(_logError),
-            GetPlayerMoney = Marshal.GetFunctionPointerForDelegate(_getPlayerMoney),
-            SetPlayerMoney = Marshal.GetFunctionPointerForDelegate(_setPlayerMoney),
-            GetTimeScale = Marshal.GetFunctionPointerForDelegate(_getTimeScale),
-            SetTimeScale = Marshal.GetFunctionPointerForDelegate(_setTimeScale),
-            GetServerCount = Marshal.GetFunctionPointerForDelegate(_getServerCount),
-            GetRackCount = Marshal.GetFunctionPointerForDelegate(_getRackCount),
-            GetCurrentScene = Marshal.GetFunctionPointerForDelegate(_getCurrentScene),
-            GetPlayerXP = Marshal.GetFunctionPointerForDelegate(_getPlayerXP),
-            SetPlayerXP = Marshal.GetFunctionPointerForDelegate(_setPlayerXP),
-            GetPlayerReputation = Marshal.GetFunctionPointerForDelegate(_getPlayerReputation),
-            SetPlayerReputation = Marshal.GetFunctionPointerForDelegate(_setPlayerReputation),
-            GetTimeOfDay = Marshal.GetFunctionPointerForDelegate(_getTimeOfDay),
-            GetDay = Marshal.GetFunctionPointerForDelegate(_getDay),
-            GetSecondsInFullDay = Marshal.GetFunctionPointerForDelegate(_getSecondsInFullDay),
-            SetSecondsInFullDay = Marshal.GetFunctionPointerForDelegate(_setSecondsInFullDay),
-            GetSwitchCount = Marshal.GetFunctionPointerForDelegate(_getSwitchCount),
-            GetSatisfiedCustomerCount = Marshal.GetFunctionPointerForDelegate(_getSatisfiedCustomerCount),
-            SetNetWatchEnabled = Marshal.GetFunctionPointerForDelegate(_setNetWatchEnabled),
-            IsNetWatchEnabled = Marshal.GetFunctionPointerForDelegate(_isNetWatchEnabled),
-            GetNetWatchStats = Marshal.GetFunctionPointerForDelegate(_getNetWatchStats),
-            GetBrokenServerCount = Marshal.GetFunctionPointerForDelegate(_getBrokenServerCount),
-            GetBrokenSwitchCount = Marshal.GetFunctionPointerForDelegate(_getBrokenSwitchCount),
-            GetEolServerCount = Marshal.GetFunctionPointerForDelegate(_getEolServerCount),
-            GetEolSwitchCount = Marshal.GetFunctionPointerForDelegate(_getEolSwitchCount),
-            GetFreeTechnicianCount = Marshal.GetFunctionPointerForDelegate(_getFreeTechnicianCount),
-            GetTotalTechnicianCount = Marshal.GetFunctionPointerForDelegate(_getTotalTechnicianCount),
-            DispatchRepairServer = Marshal.GetFunctionPointerForDelegate(_dispatchRepairServer),
-            DispatchRepairSwitch = Marshal.GetFunctionPointerForDelegate(_dispatchRepairSwitch),
-            DispatchReplaceServer = Marshal.GetFunctionPointerForDelegate(_dispatchReplaceServer),
-            DispatchReplaceSwitch = Marshal.GetFunctionPointerForDelegate(_dispatchReplaceSwitch),
-            RegisterCustomEmployee = Marshal.GetFunctionPointerForDelegate(_registerCustomEmployee),
-            IsCustomEmployeeHired = Marshal.GetFunctionPointerForDelegate(_isCustomEmployeeHired),
-            FireCustomEmployee = Marshal.GetFunctionPointerForDelegate(_fireCustomEmployee),
-            RegisterSalary = Marshal.GetFunctionPointerForDelegate(_registerSalary),
-            ShowNotification = Marshal.GetFunctionPointerForDelegate(_showNotification),
-            GetMoneyPerSecond = Marshal.GetFunctionPointerForDelegate(_getMoneyPerSecond),
-            GetExpensesPerSecond = Marshal.GetFunctionPointerForDelegate(_getExpensesPerSecond),
-            GetXpPerSecond = Marshal.GetFunctionPointerForDelegate(_getXpPerSecond),
-            IsGamePaused = Marshal.GetFunctionPointerForDelegate(_isGamePaused2),
-            SetGamePaused = Marshal.GetFunctionPointerForDelegate(_setGamePaused),
-            GetDifficulty = Marshal.GetFunctionPointerForDelegate(_getDifficulty),
-            TriggerSave = Marshal.GetFunctionPointerForDelegate(_triggerSave),
-            SteamGetMyId = Marshal.GetFunctionPointerForDelegate(_steamGetMyId),
-            SteamGetFriendName = Marshal.GetFunctionPointerForDelegate(_steamGetFriendName),
-            SteamCreateLobby = Marshal.GetFunctionPointerForDelegate(_steamCreateLobby),
-            SteamJoinLobby = Marshal.GetFunctionPointerForDelegate(_steamJoinLobby),
-            SteamLeaveLobby = Marshal.GetFunctionPointerForDelegate(_steamLeaveLobby),
-            SteamGetLobbyId = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyId),
-            SteamGetLobbyOwner = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyOwner),
-            SteamGetLobbyMemberCount = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyMemberCount),
-            SteamGetLobbyMemberByIndex = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyMemberByIndex),
-            SteamSetLobbyData = Marshal.GetFunctionPointerForDelegate(_steamSetLobbyData),
-            SteamGetLobbyData = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyData),
-            SteamSendP2P = Marshal.GetFunctionPointerForDelegate(_steamSendP2P),
-            SteamIsP2PAvailable = Marshal.GetFunctionPointerForDelegate(_steamIsP2PAvailable),
-            SteamReadP2P = Marshal.GetFunctionPointerForDelegate(_steamReadP2P),
-            SteamAcceptP2P = Marshal.GetFunctionPointerForDelegate(_steamAcceptP2P),
-            SteamPollEvent = Marshal.GetFunctionPointerForDelegate(_steamPollEvent),
-            GetPlayerPosition = Marshal.GetFunctionPointerForDelegate(_getPlayerPosition),
-            ConfigRegisterBool = Marshal.GetFunctionPointerForDelegate(_configRegisterBool),
-            ConfigRegisterInt = Marshal.GetFunctionPointerForDelegate(_configRegisterInt),
-            ConfigRegisterFloat = Marshal.GetFunctionPointerForDelegate(_configRegisterFloat),
-            ConfigGetBool = Marshal.GetFunctionPointerForDelegate(_configGetBool),
-            ConfigGetInt = Marshal.GetFunctionPointerForDelegate(_configGetInt),
-            ConfigGetFloat = Marshal.GetFunctionPointerForDelegate(_configGetFloat),
-            SpawnCharacter = Marshal.GetFunctionPointerForDelegate(_spawnCharacter),
-            DestroyEntity = Marshal.GetFunctionPointerForDelegate(_destroyEntity),
-            SetEntityPosition = Marshal.GetFunctionPointerForDelegate(_setEntityPosition),
-            IsEntityReady = Marshal.GetFunctionPointerForDelegate(_isEntityReady),
-            SetEntityAnimation = Marshal.GetFunctionPointerForDelegate(_setEntityAnimation),
-            GetPrefabCount = Marshal.GetFunctionPointerForDelegate(_getPrefabCount),
-            SetEntityName = Marshal.GetFunctionPointerForDelegate(_setEntityName),
-            GetPlayerCarryState = Marshal.GetFunctionPointerForDelegate(_getPlayerCarryState),
-            GetPlayerCrouching = Marshal.GetFunctionPointerForDelegate(_getPlayerCrouching),
-            GetPlayerSitting = Marshal.GetFunctionPointerForDelegate(_getPlayerSitting),
-            SetEntityCrouching = Marshal.GetFunctionPointerForDelegate(_setEntityCrouching),
-            SetEntitySitting = Marshal.GetFunctionPointerForDelegate(_setEntitySitting),
-            SetEntityCarryAnim = Marshal.GetFunctionPointerForDelegate(_setEntityCarryAnim),
-            CreateEntityCarryVisual = Marshal.GetFunctionPointerForDelegate(_createEntityCarryVisual),
-            DestroyEntityCarryVisual = Marshal.GetFunctionPointerForDelegate(_destroyEntityCarryVisual),
-            GetDefaultSpawnPosition = Marshal.GetFunctionPointerForDelegate(_getDefaultSpawnPosition),
-            WarpLocalPlayer = Marshal.GetFunctionPointerForDelegate(_warpLocalPlayer),
-            GetEntityPosition = Marshal.GetFunctionPointerForDelegate(_getEntityPosition),
-            AddEntityCollider = Marshal.GetFunctionPointerForDelegate(_addEntityCollider),
-            SetEntityCarryTransform = Marshal.GetFunctionPointerForDelegate(_setEntityCarryTransform),
-
-            WorldGetObjectCount = Marshal.GetFunctionPointerForDelegate(_worldGetObjectCount),
-            WorldGetObjectHashes = Marshal.GetFunctionPointerForDelegate(_worldGetObjectHashes),
-            WorldGetObjectState = Marshal.GetFunctionPointerForDelegate(_worldGetObjectState),
-            WorldSpawnObject = Marshal.GetFunctionPointerForDelegate(_worldSpawnObject),
-            WorldDestroyObject = Marshal.GetFunctionPointerForDelegate(_worldDestroyObject),
-            WorldPlaceInRack = Marshal.GetFunctionPointerForDelegate(_worldPlaceInRack),
-            WorldRemoveFromRack = Marshal.GetFunctionPointerForDelegate(_worldRemoveFromRack),
-            WorldSetPower = Marshal.GetFunctionPointerForDelegate(_worldSetPower),
-            WorldSetProperty = Marshal.GetFunctionPointerForDelegate(_worldSetProperty),
-            WorldConnectCable = Marshal.GetFunctionPointerForDelegate(_worldConnectCable),
-            WorldDisconnectCable = Marshal.GetFunctionPointerForDelegate(_worldDisconnectCable),
-            WorldPickupObject = Marshal.GetFunctionPointerForDelegate(_worldPickupObject),
-            WorldDropObject = Marshal.GetFunctionPointerForDelegate(_worldDropObject),
-            WorldEnsureRackUIDs = Marshal.GetFunctionPointerForDelegate(_worldEnsureRackUIDs),
-            ObjFindByType = Marshal.GetFunctionPointerForDelegate(_objFindByType),
-            ObjGetStringField = Marshal.GetFunctionPointerForDelegate(_objGetStringField),
-            ObjIsActive = Marshal.GetFunctionPointerForDelegate(_objIsActive),
-            ObjSetActive = Marshal.GetFunctionPointerForDelegate(_objSetActive),
-            ObjGetPosition = Marshal.GetFunctionPointerForDelegate(_objGetPosition),
-            ObjSetPosition = Marshal.GetFunctionPointerForDelegate(_objSetPosition),
-            ObjSetRotation = Marshal.GetFunctionPointerForDelegate(_objSetRotation),
-            ObjSetParentToWorld = Marshal.GetFunctionPointerForDelegate(_objSetParentToWorld),
-            RbSetKinematic = Marshal.GetFunctionPointerForDelegate(_rbSetKinematic),
-            RbSetGravity = Marshal.GetFunctionPointerForDelegate(_rbSetGravity),
-            RbWakeUp = Marshal.GetFunctionPointerForDelegate(_rbWakeUp),
-            ObjFindById = Marshal.GetFunctionPointerForDelegate(_objFindById),
-            GetHeldObject = Marshal.GetFunctionPointerForDelegate(_getHeldObject),
-            ObjGetRotation = Marshal.GetFunctionPointerForDelegate(_objGetRotation),
-
-            ObjSetParent = Marshal.GetFunctionPointerForDelegate(_objSetParent),
-            ObjSetLocalPosition = Marshal.GetFunctionPointerForDelegate(_objSetLocalPosition),
-            ObjSetLocalRotation = Marshal.GetFunctionPointerForDelegate(_objSetLocalRotation),
-            RackFindPosition = Marshal.GetFunctionPointerForDelegate(_rackFindPosition),
-            RackGameInstall = Marshal.GetFunctionPointerForDelegate(_rackGameInstall),
-            RackGameUninstall = Marshal.GetFunctionPointerForDelegate(_rackGameUninstall),
-            ObjSetStringField = Marshal.GetFunctionPointerForDelegate(_objSetStringField2),
         };
-
+        FillTableSystem();
+        FillTableDevices();
+        FillTableSteam();
+        FillTableConfig();
+        FillTableEntities();
+        FillTableWorld();
+        FillTableRacks();
         _tablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GameAPITable>());
         Marshal.StructureToPtr(_table, _tablePtr, false);
+    }
+
+    private void FillTableSystem()
+    {
+        _table.LogInfo = Marshal.GetFunctionPointerForDelegate(_logInfo);
+        _table.LogWarning = Marshal.GetFunctionPointerForDelegate(_logWarning);
+        _table.LogError = Marshal.GetFunctionPointerForDelegate(_logError);
+        _table.GetPlayerMoney = Marshal.GetFunctionPointerForDelegate(_getPlayerMoney);
+        _table.SetPlayerMoney = Marshal.GetFunctionPointerForDelegate(_setPlayerMoney);
+        _table.GetTimeScale = Marshal.GetFunctionPointerForDelegate(_getTimeScale);
+        _table.SetTimeScale = Marshal.GetFunctionPointerForDelegate(_setTimeScale);
+        _table.GetServerCount = Marshal.GetFunctionPointerForDelegate(_getServerCount);
+        _table.GetRackCount = Marshal.GetFunctionPointerForDelegate(_getRackCount);
+        _table.GetCurrentScene = Marshal.GetFunctionPointerForDelegate(_getCurrentScene);
+        _table.GetPlayerXP = Marshal.GetFunctionPointerForDelegate(_getPlayerXP);
+        _table.SetPlayerXP = Marshal.GetFunctionPointerForDelegate(_setPlayerXP);
+        _table.GetPlayerReputation = Marshal.GetFunctionPointerForDelegate(_getPlayerReputation);
+        _table.SetPlayerReputation = Marshal.GetFunctionPointerForDelegate(_setPlayerReputation);
+        _table.GetTimeOfDay = Marshal.GetFunctionPointerForDelegate(_getTimeOfDay);
+        _table.GetDay = Marshal.GetFunctionPointerForDelegate(_getDay);
+        _table.GetSecondsInFullDay = Marshal.GetFunctionPointerForDelegate(_getSecondsInFullDay);
+        _table.SetSecondsInFullDay = Marshal.GetFunctionPointerForDelegate(_setSecondsInFullDay);
+        _table.GetSwitchCount = Marshal.GetFunctionPointerForDelegate(_getSwitchCount);
+        _table.GetSatisfiedCustomerCount = Marshal.GetFunctionPointerForDelegate(_getSatisfiedCustomerCount);
+        _table.SetNetWatchEnabled = Marshal.GetFunctionPointerForDelegate(_setNetWatchEnabled);
+        _table.IsNetWatchEnabled = Marshal.GetFunctionPointerForDelegate(_isNetWatchEnabled);
+        _table.GetNetWatchStats = Marshal.GetFunctionPointerForDelegate(_getNetWatchStats);
+    }
+
+    private void FillTableDevices()
+    {
+        _table.GetBrokenServerCount = Marshal.GetFunctionPointerForDelegate(_getBrokenServerCount);
+        _table.GetBrokenSwitchCount = Marshal.GetFunctionPointerForDelegate(_getBrokenSwitchCount);
+        _table.GetEolServerCount = Marshal.GetFunctionPointerForDelegate(_getEolServerCount);
+        _table.GetEolSwitchCount = Marshal.GetFunctionPointerForDelegate(_getEolSwitchCount);
+        _table.GetFreeTechnicianCount = Marshal.GetFunctionPointerForDelegate(_getFreeTechnicianCount);
+        _table.GetTotalTechnicianCount = Marshal.GetFunctionPointerForDelegate(_getTotalTechnicianCount);
+        _table.DispatchRepairServer = Marshal.GetFunctionPointerForDelegate(_dispatchRepairServer);
+        _table.DispatchRepairSwitch = Marshal.GetFunctionPointerForDelegate(_dispatchRepairSwitch);
+        _table.DispatchReplaceServer = Marshal.GetFunctionPointerForDelegate(_dispatchReplaceServer);
+        _table.DispatchReplaceSwitch = Marshal.GetFunctionPointerForDelegate(_dispatchReplaceSwitch);
+        _table.RegisterCustomEmployee = Marshal.GetFunctionPointerForDelegate(_registerCustomEmployee);
+        _table.IsCustomEmployeeHired = Marshal.GetFunctionPointerForDelegate(_isCustomEmployeeHired);
+        _table.FireCustomEmployee = Marshal.GetFunctionPointerForDelegate(_fireCustomEmployee);
+        _table.RegisterSalary = Marshal.GetFunctionPointerForDelegate(_registerSalary);
+        _table.ShowNotification = Marshal.GetFunctionPointerForDelegate(_showNotification);
+        _table.GetMoneyPerSecond = Marshal.GetFunctionPointerForDelegate(_getMoneyPerSecond);
+        _table.GetExpensesPerSecond = Marshal.GetFunctionPointerForDelegate(_getExpensesPerSecond);
+        _table.GetXpPerSecond = Marshal.GetFunctionPointerForDelegate(_getXpPerSecond);
+        _table.IsGamePaused = Marshal.GetFunctionPointerForDelegate(_isGamePaused2);
+        _table.SetGamePaused = Marshal.GetFunctionPointerForDelegate(_setGamePaused);
+        _table.GetDifficulty = Marshal.GetFunctionPointerForDelegate(_getDifficulty);
+        _table.TriggerSave = Marshal.GetFunctionPointerForDelegate(_triggerSave);
+    }
+
+    private void FillTableSteam()
+    {
+        _table.SteamGetMyId = Marshal.GetFunctionPointerForDelegate(_steamGetMyId);
+        _table.SteamGetFriendName = Marshal.GetFunctionPointerForDelegate(_steamGetFriendName);
+        _table.SteamCreateLobby = Marshal.GetFunctionPointerForDelegate(_steamCreateLobby);
+        _table.SteamJoinLobby = Marshal.GetFunctionPointerForDelegate(_steamJoinLobby);
+        _table.SteamLeaveLobby = Marshal.GetFunctionPointerForDelegate(_steamLeaveLobby);
+        _table.SteamGetLobbyId = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyId);
+        _table.SteamGetLobbyOwner = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyOwner);
+        _table.SteamGetLobbyMemberCount = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyMemberCount);
+        _table.SteamGetLobbyMemberByIndex = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyMemberByIndex);
+        _table.SteamSetLobbyData = Marshal.GetFunctionPointerForDelegate(_steamSetLobbyData);
+        _table.SteamGetLobbyData = Marshal.GetFunctionPointerForDelegate(_steamGetLobbyData);
+        _table.SteamSendP2P = Marshal.GetFunctionPointerForDelegate(_steamSendP2P);
+        _table.SteamIsP2PAvailable = Marshal.GetFunctionPointerForDelegate(_steamIsP2PAvailable);
+        _table.SteamReadP2P = Marshal.GetFunctionPointerForDelegate(_steamReadP2P);
+        _table.SteamAcceptP2P = Marshal.GetFunctionPointerForDelegate(_steamAcceptP2P);
+        _table.SteamPollEvent = Marshal.GetFunctionPointerForDelegate(_steamPollEvent);
+        _table.GetPlayerPosition = Marshal.GetFunctionPointerForDelegate(_getPlayerPosition);
+    }
+
+    private void FillTableConfig()
+    {
+        _table.ConfigRegisterBool = Marshal.GetFunctionPointerForDelegate(_configRegisterBool);
+        _table.ConfigRegisterInt = Marshal.GetFunctionPointerForDelegate(_configRegisterInt);
+        _table.ConfigRegisterFloat = Marshal.GetFunctionPointerForDelegate(_configRegisterFloat);
+        _table.ConfigGetBool = Marshal.GetFunctionPointerForDelegate(_configGetBool);
+        _table.ConfigGetInt = Marshal.GetFunctionPointerForDelegate(_configGetInt);
+        _table.ConfigGetFloat = Marshal.GetFunctionPointerForDelegate(_configGetFloat);
+    }
+
+    private void FillTableEntities()
+    {
+        _table.SpawnCharacter = Marshal.GetFunctionPointerForDelegate(_spawnCharacter);
+        _table.DestroyEntity = Marshal.GetFunctionPointerForDelegate(_destroyEntity);
+        _table.SetEntityPosition = Marshal.GetFunctionPointerForDelegate(_setEntityPosition);
+        _table.IsEntityReady = Marshal.GetFunctionPointerForDelegate(_isEntityReady);
+        _table.SetEntityAnimation = Marshal.GetFunctionPointerForDelegate(_setEntityAnimation);
+        _table.GetPrefabCount = Marshal.GetFunctionPointerForDelegate(_getPrefabCount);
+        _table.SetEntityName = Marshal.GetFunctionPointerForDelegate(_setEntityName);
+        _table.GetPlayerCarryState = Marshal.GetFunctionPointerForDelegate(_getPlayerCarryState);
+        _table.GetPlayerCrouching = Marshal.GetFunctionPointerForDelegate(_getPlayerCrouching);
+        _table.GetPlayerSitting = Marshal.GetFunctionPointerForDelegate(_getPlayerSitting);
+        _table.SetEntityCrouching = Marshal.GetFunctionPointerForDelegate(_setEntityCrouching);
+        _table.SetEntitySitting = Marshal.GetFunctionPointerForDelegate(_setEntitySitting);
+        _table.SetEntityCarryAnim = Marshal.GetFunctionPointerForDelegate(_setEntityCarryAnim);
+        _table.CreateEntityCarryVisual = Marshal.GetFunctionPointerForDelegate(_createEntityCarryVisual);
+        _table.DestroyEntityCarryVisual = Marshal.GetFunctionPointerForDelegate(_destroyEntityCarryVisual);
+        _table.GetDefaultSpawnPosition = Marshal.GetFunctionPointerForDelegate(_getDefaultSpawnPosition);
+        _table.WarpLocalPlayer = Marshal.GetFunctionPointerForDelegate(_warpLocalPlayer);
+        _table.GetEntityPosition = Marshal.GetFunctionPointerForDelegate(_getEntityPosition);
+        _table.AddEntityCollider = Marshal.GetFunctionPointerForDelegate(_addEntityCollider);
+        _table.SetEntityCarryTransform = Marshal.GetFunctionPointerForDelegate(_setEntityCarryTransform);
+    }
+
+    private void FillTableWorld()
+    {
+        _table.WorldGetObjectCount = Marshal.GetFunctionPointerForDelegate(_worldGetObjectCount);
+        _table.WorldGetObjectHashes = Marshal.GetFunctionPointerForDelegate(_worldGetObjectHashes);
+        _table.WorldGetObjectState = Marshal.GetFunctionPointerForDelegate(_worldGetObjectState);
+        _table.WorldSpawnObject = Marshal.GetFunctionPointerForDelegate(_worldSpawnObject);
+        _table.WorldDestroyObject = Marshal.GetFunctionPointerForDelegate(_worldDestroyObject);
+        _table.WorldPlaceInRack = Marshal.GetFunctionPointerForDelegate(_worldPlaceInRack);
+        _table.WorldRemoveFromRack = Marshal.GetFunctionPointerForDelegate(_worldRemoveFromRack);
+        _table.WorldSetPower = Marshal.GetFunctionPointerForDelegate(_worldSetPower);
+        _table.WorldSetProperty = Marshal.GetFunctionPointerForDelegate(_worldSetProperty);
+        _table.WorldConnectCable = Marshal.GetFunctionPointerForDelegate(_worldConnectCable);
+        _table.WorldDisconnectCable = Marshal.GetFunctionPointerForDelegate(_worldDisconnectCable);
+        _table.WorldPickupObject = Marshal.GetFunctionPointerForDelegate(_worldPickupObject);
+        _table.WorldDropObject = Marshal.GetFunctionPointerForDelegate(_worldDropObject);
+        _table.WorldEnsureRackUIDs = Marshal.GetFunctionPointerForDelegate(_worldEnsureRackUIDs);
+        _table.ObjFindByType = Marshal.GetFunctionPointerForDelegate(_objFindByType);
+        _table.ObjGetStringField = Marshal.GetFunctionPointerForDelegate(_objGetStringField);
+        _table.ObjIsActive = Marshal.GetFunctionPointerForDelegate(_objIsActive);
+        _table.ObjSetActive = Marshal.GetFunctionPointerForDelegate(_objSetActive);
+        _table.ObjGetPosition = Marshal.GetFunctionPointerForDelegate(_objGetPosition);
+        _table.ObjSetPosition = Marshal.GetFunctionPointerForDelegate(_objSetPosition);
+        _table.ObjSetRotation = Marshal.GetFunctionPointerForDelegate(_objSetRotation);
+        _table.ObjSetParentToWorld = Marshal.GetFunctionPointerForDelegate(_objSetParentToWorld);
+        _table.RbSetKinematic = Marshal.GetFunctionPointerForDelegate(_rbSetKinematic);
+        _table.RbSetGravity = Marshal.GetFunctionPointerForDelegate(_rbSetGravity);
+        _table.RbWakeUp = Marshal.GetFunctionPointerForDelegate(_rbWakeUp);
+        _table.ObjFindById = Marshal.GetFunctionPointerForDelegate(_objFindById);
+        _table.GetHeldObject = Marshal.GetFunctionPointerForDelegate(_getHeldObject);
+        _table.ObjGetRotation = Marshal.GetFunctionPointerForDelegate(_objGetRotation);
+    }
+
+    private void FillTableRacks()
+    {
+        _table.ObjSetParent = Marshal.GetFunctionPointerForDelegate(_objSetParent);
+        _table.ObjSetLocalPosition = Marshal.GetFunctionPointerForDelegate(_objSetLocalPosition);
+        _table.ObjSetLocalRotation = Marshal.GetFunctionPointerForDelegate(_objSetLocalRotation);
+        _table.RackFindPosition = Marshal.GetFunctionPointerForDelegate(_rackFindPosition);
+        _table.RackGameInstall = Marshal.GetFunctionPointerForDelegate(_rackGameInstall);
+        _table.RackGameUninstall = Marshal.GetFunctionPointerForDelegate(_rackGameUninstall);
+        _table.ObjSetStringField = Marshal.GetFunctionPointerForDelegate(_objSetStringField2);
     }
 
     public IntPtr GetTablePointer() => _tablePtr;

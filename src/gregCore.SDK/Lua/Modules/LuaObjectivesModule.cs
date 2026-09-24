@@ -98,6 +98,25 @@ public static class LuaObjectivesModule
             catch { return false; }
         });
 
+        // greg.objectives.play_video(index, in_pause_menu) → bool
+        objectives["play_video"] = (Func<int, bool, bool>)((index, inPause) =>
+        {
+            try { return gregCore.Core.Networking.GregTutorials.PlayVideo(index, inPause); }
+            catch { return false; }
+        });
+
+        // greg.objectives.show_in_pause(index) / stop_video_in_pause() → bool
+        objectives["show_in_pause"] = (Func<int, bool>)((index) =>
+        {
+            try { return gregCore.Core.Networking.GregTutorials.ShowTutorialInPauseMenu(index); }
+            catch { return false; }
+        });
+        objectives["stop_video_in_pause"] = (Func<bool>)(() =>
+        {
+            try { return gregCore.Core.Networking.GregTutorials.StopVideoInPauseMenu(); }
+            catch { return false; }
+        });
+
         greg["objectives"] = objectives;
     }
 

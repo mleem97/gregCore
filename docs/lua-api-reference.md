@@ -151,6 +151,7 @@ Define these functions globally in `main.lua` (all optional):
 - `active() -> table` (objective UIDs) / `tutorial_in_progress() -> bool`
 - `create({loc=, uid=, x=, y=, z=, xp=?, rep=?, sub=?}) -> bool`
 - `start(uid, x, y, z) -> bool` / `clear() -> bool`
+- `play_video(index, in_pause_menu) -> bool` / `show_in_pause(index) -> bool` / `stop_video_in_pause() -> bool`
 
 ### `greg.tooltip`
 - `overlay(text, x, y, z, xOffset?) -> bool` / `hide() -> bool`

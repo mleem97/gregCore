@@ -510,6 +510,9 @@ public class LuaSdkTests
         Call(obj, "create", script.DoString("return {loc=1, uid=2}")).Boolean.Should().BeFalse();
         Call(obj, "start", 1, 0.0, 0.0, 0.0).Boolean.Should().BeFalse();
         Call(obj, "clear").Boolean.Should().BeFalse();
+        Call(obj, "play_video", 1, false).Boolean.Should().BeFalse();
+        Call(obj, "show_in_pause", 1).Boolean.Should().BeFalse();
+        Call(obj, "stop_video_in_pause").Boolean.Should().BeFalse();
     }
 
     [Fact]

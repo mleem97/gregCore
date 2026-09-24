@@ -45,6 +45,10 @@ Define these functions globally in `main.lua` (all optional):
 - `repair(id) -> bool` / `repair_all() -> number`
 - `power_on(id) -> bool` / `power_off(id) -> bool`
 - `set_ip(id, ip) -> bool` / `set_customer(id, customerId) -> bool`
+- `set_app(id, appId) -> bool` / `clear_warning(id) -> bool`
+- `has_cable(id) -> bool` / `valid_position(id) -> bool`
+- `capture(id) -> table or nil` (full snapshot)
+- `insert_into_rack(id, spec) -> bool` (spec: `rack_uid`, `prefab`, `is_on`, ...)
 
 ### `greg.switch`
 - `get_all() -> table`: array of `{id, hash, is_on, is_broken, x, y, z}`.
@@ -59,6 +63,7 @@ Define these functions globally in `main.lua` (all optional):
 - `list() -> table`: array of `{id, name, salary, state, busy}`.
 - `send_to_server(technicianId, serverId) -> bool` / `send_to_switch(technicianId, switchId) -> bool`
 - `hire(index) -> bool` / `fire(technicianId) -> bool`
+- `request_next_job(technicianId) -> bool`
 
 ### `greg.rack`
 - `get_all() -> table` / `count() -> number`
@@ -74,7 +79,8 @@ Define these functions globally in `main.lua` (all optional):
 - `get_list() -> table`: array of patch panel IDs.
 - `count() -> number`
 - `find_by_id(id) -> table or nil`
-- `has_cable(id) -> bool`
+- `has_cable(id) -> bool` / `valid_position(id) -> bool`
+- `capture(id) -> table or nil` / `insert_into_rack(id, spec) -> bool`
 
 ### `greg.customer`
 - `bases() -> table`: array of `{base_id, customer_id, money_speed, all_met, wants_internet, satisfied}`.
@@ -90,6 +96,10 @@ Define these functions globally in `main.lua` (all optional):
 - `unlock(idx) -> bool` / `buy(idx) -> bool`
 - `cart() -> table`: array of `{ref, name, price, qty, total}`.
 - `cart_add(ref) -> bool` / `cart_remove(ref) -> bool`
+- `mod_items() -> table`: array of `{ref, name, price, mod_id}`.
+- `buy_mod_item(ref) -> bool`
+- `picker_is_open() -> bool` / `picker_open() -> bool` / `picker_cancel() -> bool`
+- `picker_color() -> {r,g,b,a} or nil` / `picker_set_color(r,g,b,a) -> bool`
 
 ### `greg.net` (read-only save data)
 - `routers() -> table`: array of `{asn, next_route_id, routes, owned}`.
@@ -113,6 +123,14 @@ Define these functions globally in `main.lua` (all optional):
 - `mask_from_cidr(cidr) -> string` (pure math, no game needed)
 - `usable_ips(subnet) -> table` (needs a running game; hard-capped at 65536 entries — mind large subnets)
 - `first_usable(subnet) -> string` (needs a running game, "" when none)
+
+### `greg.setip` (vanilla keypad UI flow)
+- `show_for(serverId) -> bool` / `cancel() -> bool`
+
+### `greg.modsave` (per-save mod data, travels with the savegame)
+- `list(folder) -> table`: array of `{folder, position{x,y,z}}`.
+- `upsert(folder, spec) -> bool` (spec: `position{x,y,z}`, `rotation{x,y,z}`, `values[]`, `ints[]`, `ints2[]`).
+- `remove(folder) -> bool`
 
 ### `greg.items` (register custom items; meshes ship as files in the mod folder)
 - `register_shop_item(subfolder, spec) -> bool` — spec keys: `name, price, xp, size_u, mass, scale, model, texture, icon, type` (snake_case or PascalCase).

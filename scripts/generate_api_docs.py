@@ -95,7 +95,6 @@ def main() -> None:
     parser.add_argument("--version", default="?", help="Current framework version")
     args = parser.parse_args()
 
-    game_hooks = load_json(args.game_hooks)
     greg_hooks = load_json(args.greg_hooks)
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)

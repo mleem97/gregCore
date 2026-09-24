@@ -117,7 +117,7 @@ for a in "Releases/gregCore.dll:gregCore.dll" \
          "CHANGELOG.md:CHANGELOG.md" \
          "README.md:README.md" \
          "VERSION:VERSION"; do
-  src="${a%%:*}"; dst="${a##*:}"
+  src="${a%%:*}"
   if [ -f "$src" ]; then
     ASSETS+=("$src")
   fi

@@ -17,4 +17,7 @@ RUN npm run build
 FROM ${NGINX_IMAGE} AS serve
 COPY --from=build /site/dist /usr/share/nginx/html
 COPY wiki-site/nginx.conf /etc/nginx/conf.d/default.conf
+RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run
+USER nginx
+HEALTHCHECK CMD wget -qO- http://localhost/ || exit 1
 EXPOSE 80

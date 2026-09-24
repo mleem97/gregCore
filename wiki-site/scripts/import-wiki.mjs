@@ -6,7 +6,8 @@
 // - rewrites [[Wiki Links]] to relative markdown links, validated against
 //   the page list (warns on dangling targets instead of failing)
 // Run: `node scripts/import-wiki.mjs` (also via `npm run sync` / `npm run build`).
-import { readdirSync, readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+/* global process, console */ // Node.js runtime globals
+import { readdirSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 

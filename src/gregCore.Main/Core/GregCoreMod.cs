@@ -52,6 +52,7 @@ namespace gregCore.Core
             // Kompatibilitaetswache: alten 404-ID-Mod entpatchen, falls vorhanden
             // (erneut beim Szenen-Laden fuer spaet geladene Mods).
             try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { }
+            MelonLogger.Msg("[gregCore][HwId] Eigenes Hardware-ID-System aktiv (gregID-Schema: Switch/PatchPanel/Server).");
 
             // Verzeichnis-Policy: Layout sicherstellen + Verstoesse melden.
             try

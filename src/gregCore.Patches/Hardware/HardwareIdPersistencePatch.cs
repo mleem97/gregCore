@@ -1,5 +1,6 @@
 /// <file-summary>
 /// Schicht:      GameLayer (Patches/Hardware)
+/// Design:       Eigene GregCore-Implementierung (gregID-Schema).
 /// Zweck:        Stabile Geraete-Identitaet fuer NetworkSwitch/PatchPanel/
 ///               Server. Vanilla haengt GetInstanceID-Suffixe an
 ///               (pro Session anders) — ohne Bereinigung zeigen
@@ -65,7 +66,7 @@ public static class HardwareIdPersistencePatch
     #region SWITCH ID PERSISTENCE
 
     [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.Start))]
-    internal static class NewSwitchIdPatch
+    internal static class GregSwitchIdAssignPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance)
@@ -93,12 +94,12 @@ public static class HardwareIdPersistencePatch
                     __instance.UpdateScreenUI();
                 }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewSwitchIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregSwitchIdAssignPatch), ex); }
         }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.GenerateUniqueSwitchId))]
-    internal static class UniqueSwitchIdPatch
+    internal static class GregSwitchIdCleanPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance, ref string __result)
@@ -109,7 +110,7 @@ public static class HardwareIdPersistencePatch
                 if (string.IsNullOrEmpty(__result)) return;
                 __result = CleanId(SwitchPrefix, __result);
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueSwitchIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregSwitchIdCleanPatch), ex); }
         }
     }
 
@@ -118,7 +119,7 @@ public static class HardwareIdPersistencePatch
     #region PATCH PANEL ID PERSISTENCE
 
     [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.Awake))]
-    internal static class NewPatchPanelIdPatch
+    internal static class GregPatchPanelIdAssignPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.PatchPanel __instance)
@@ -143,12 +144,12 @@ public static class HardwareIdPersistencePatch
                     }
                 }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewPatchPanelIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregPatchPanelIdAssignPatch), ex); }
         }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.PatchPanel), nameof(global::Il2Cpp.PatchPanel.GenerateUniquePatchPanelId))]
-    internal static class UniquePatchPanelIdPatch
+    internal static class GregPatchPanelIdCleanPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.PatchPanel __instance, ref string __result)
@@ -159,7 +160,7 @@ public static class HardwareIdPersistencePatch
                 if (string.IsNullOrEmpty(__result)) return;
                 __result = CleanId(PatchPanelPrefix, __result);
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniquePatchPanelIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregPatchPanelIdCleanPatch), ex); }
         }
     }
 
@@ -168,7 +169,7 @@ public static class HardwareIdPersistencePatch
     #region SERVER ID PERSISTENCE
 
     [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.Start))]
-    internal static class NewServerIdPatch
+    internal static class GregServerIdAssignPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.Server __instance)
@@ -196,12 +197,12 @@ public static class HardwareIdPersistencePatch
                     __instance.UpdateServerScreenUI();
                 }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(NewServerIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregServerIdAssignPatch), ex); }
         }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.GenerateUniqueServerId))]
-    internal static class UniqueServerIdPatch
+    internal static class GregServerIdCleanPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.Server __instance, ref string __result)
@@ -212,7 +213,7 @@ public static class HardwareIdPersistencePatch
                 if (string.IsNullOrEmpty(__result)) return;
                 __result = CleanId(ServerPrefix, __result);
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(UniqueServerIdPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregServerIdCleanPatch), ex); }
         }
     }
 
@@ -240,7 +241,7 @@ public static class HardwareIdPersistencePatch
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.Server), nameof(global::Il2Cpp.Server.UpdateServerScreenUI))]
-    internal static class ServerScreenScrubPatch
+    internal static class GregServerScreenScrubPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.Server __instance)
@@ -257,12 +258,12 @@ public static class HardwareIdPersistencePatch
                 string designation = VanillaDesignation(__instance.gameObject, "Server");
                 try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(ServerScreenScrubPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregServerScreenScrubPatch), ex); }
         }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.NetworkSwitch), nameof(global::Il2Cpp.NetworkSwitch.UpdateScreenUI))]
-    internal static class SwitchScreenScrubPatch
+    internal static class GregSwitchScreenScrubPatch
     {
         [HarmonyPostfix]
         internal static void Postfix(global::Il2Cpp.NetworkSwitch __instance)
@@ -279,7 +280,7 @@ public static class HardwareIdPersistencePatch
                 string designation = VanillaDesignation(__instance.gameObject, "Switch");
                 try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
             }
-            catch (Exception ex) { HookIntegration.LogPatchError(nameof(SwitchScreenScrubPatch), ex); }
+            catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregSwitchScreenScrubPatch), ex); }
         }
     }
 
@@ -287,7 +288,7 @@ public static class HardwareIdPersistencePatch
 }
 
 [HarmonyPatch(typeof(global::Il2Cpp.WaypointInitializationSystem), nameof(global::Il2Cpp.WaypointInitializationSystem.LoadNetworkState))]
-public static class MapDataHealing
+public static class GregNetworkIdHealing
 {
     private const string SwitchPrefix = "gregID:Switch:";
     private const string PatchPanelPrefix = "gregID:PatchPanel:";
@@ -408,7 +409,7 @@ public static class MapDataHealing
         }
         catch (Exception ex)
         {
-            HookIntegration.LogPatchError(nameof(MapDataHealing), ex);
+            HookIntegration.LogPatchError(nameof(GregNetworkIdHealing), ex);
         }
     }
 
@@ -421,7 +422,7 @@ public static class MapDataHealing
         }
         catch (Exception ex)
         {
-            HookIntegration.LogPatchError(nameof(MapDataHealing), ex);
+            HookIntegration.LogPatchError(nameof(GregNetworkIdHealing), ex);
         }
     }
 }

@@ -21,6 +21,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
   404-PersistentID-Mod (Name/Assembly) und entpatcht ihn (`UnpatchSelf`) — bei
   Mod-Init und erneut beim Szenen-Laden — damit gregID das einzige ID-System
   bleibt. Warnung in Log + Toast, einmal pro Sitzung.
+- Sichtbar eigene Implementierung: Patch-Klassen mit `Greg*`-Namen
+  (`GregSwitchIdAssignPatch`, `GregNetworkIdHealing`, …), Startup-Kennung
+  `[gregCore][HwId]` im Log, Doku in `docs/modding/hardware-ids.md`.
 
 ### Added
 

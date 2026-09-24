@@ -108,3 +108,15 @@ gregCore.Core.Networking.GregShopItems.AddButton(template, parent,
 Rules: prefab results must be inactive holder children (never live scene
 objects — orphans pollute saves, see MoreSpools v1.2.1). Item IDs and shop
 guids are never reused (section 5).
+
+### Adoption note: standalone vs hard dependency
+
+The API above replaces vanilla code paths (prefab routing, button
+creation), so — unlike additive APIs (`GregMenuBinding`, toasts,
+sidecars) — it cannot sit behind a `GregHost.HasCore` guard with a
+vanilla fallback without duplicating the logic. Adopting it means a
+hard dependency: add `references/gregCore.dll` + csproj `Reference`
+(`Private=false`), keep the DLL in `Mods/` next to yours, and fail
+fast with a clear error when it is missing. Recommended for new shop
+mods; existing standalone shop mods (MoreSpools, MoreModules,
+MoreServers) stay on their local implementation until they opt in.

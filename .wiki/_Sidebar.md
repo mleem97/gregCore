@@ -1,6 +1,17 @@
 # Wiki sidebar
 
 - [[Home]]
+- Hooks
+  - [[Hooks Reference]]
+  - [[Core Events]]
+  - [[Developer Events Hooks Guide]]
+  - [[Guidebook Lua 02 Events]]
+- [[Glossary]]
+- FAQ + Help
+  - [[FAQ Troubleshooting]]
+  - [[Guidebook Debugging]]
+  - [[Guidebook Modelling Troubleshooting]]
+  - [[Guidebook Porting Matrix]]
 - [[Guidebook]]
   - [[Guidebook Prerequisites]]
   - Lua track
@@ -21,6 +32,9 @@
   - JS track
     - [[Guidebook JS 01 Setup]]
     - [[Guidebook JS 02 Project]]
+  - Rust track
+    - [[Guidebook Rust 01 Setup]]
+    - [[Guidebook Rust 02 Project]]
   - Modelling track (OBJ, static only)
     - [[Guidebook Modelling Overview]]
     - [[Guidebook Modelling OBJ Blender]]
@@ -38,7 +52,6 @@
   - [[Player Mod Users Guide]]
 - Core
   - [[Core Overview]]
-  - [[Core Events]]
   - [[Core Save Engine]]
 - Developers
   - [[Developer Getting Started]]
@@ -46,7 +59,6 @@
   - [[Developer First Lua Mod]]
   - [[Developer First CSharp Mod]]
   - [[Developer Timers Coroutines]]
-  - [[Developer Events Hooks Guide]]
   - [[Developer Data Storage]]
   - [[Developer UI Panels HUD]]
   - [[Developer Shop Items]]
@@ -56,7 +68,3 @@
   - [[Developer Native Coop]]
   - [[Developer Best Practices]]
   - [[Developer Publishing]]
-- Reference
-  - [[Hooks Reference]]
-  - [[Glossary]]
-  - [[FAQ Troubleshooting]]

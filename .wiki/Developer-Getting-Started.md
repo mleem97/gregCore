@@ -7,14 +7,11 @@ Who this is for: programmers who want to **write** Data Center mods on gregCore.
 | Language | Extension | Runtime | Status | Pick it when… |
 |---|---|---|---|---|
 | **Lua** | `.lua` | MoonSharp 2.0.0 (soft sandbox) | Production Ready, full API | You start fresh — biggest API, examples, REPL, hot-reload |
-<<<<<<< HEAD
-| **JavaScript** | `.js` | Jint 4.8.0 | Beta, basic (`logInfo/on/fire`) | You prefer JS and need only events + logging so far |
-=======
 | **JavaScript/TypeScript** | `.js` (+ `.ts` via `tsc`) | Jint 4.8.0 | UI-focused SDK (toasts, panels, menus, settings, hooks) + main-menu HotLoad | You prefer JS/TS and build UI mods fast |
->>>>>>> agent/gregcore-integration
 | **Python** | `.py` | pythonnet 3.0.5 | Beta, basic | You prefer Python and need only the small bridge surface |
 | **C#** | `.dll` / `.cs` | MelonLoader + Harmony | Production Ready | You edit the world (spawn, cables, patches), need max power |
-| **Rust / Go** | FFI | C ABI (`GameApiTable`) | Alpha | You ship native logic via the FFI bridge |
+| **Rust** | `.dll` (from `.rs` via cargo) | Native cdylib (`RustFFIBridge`) | Native SDK (economy, world, tech, time, game, UI, events, hooks, config) | You ship native logic with a safe bindings layer |
+| **Go** | FFI | C ABI (`GameApiTable`) | Alpha | You ship native logic via the FFI bridge |
 
 Lua is the recommended default. C# is required for world editing (spawning, cable ops, custom Harmony patches) — Lua deliberately cannot do those (see [[Core Events]] “Out of scope”).
 

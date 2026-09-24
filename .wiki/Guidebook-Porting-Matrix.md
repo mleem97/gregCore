@@ -4,11 +4,7 @@ The same features in Lua, C#, and JS — use it to switch tracks or split work a
 
 ## Events
 
-<<<<<<< HEAD
-| Task | Lua (full) | C# (full) | JS (beta) |
-=======
 | Task | Lua (full) | C# (full) | JS (UI SDK) |
->>>>>>> agent/gregcore-integration
 |---|---|---|---|
 | Subscribe | `greg.on("greg.PLAYER.CoinChanged", fn)` → token | `On(id, fn)` (base helper) → `IDisposable`; or `[GregHook(id)]` | `greg.on("greg.PLAYER.CoinChanged", function (p) {...})` |
 | Once | `greg.once(id, fn)` | Dispose inside the handler after first fire | n/a (count + ignore after first) |
@@ -20,61 +16,37 @@ The same features in Lua, C#, and JS — use it to switch tracks or split work a
 
 | Task | Lua | C# | JS |
 |---|---|---|---|
-<<<<<<< HEAD
-| Info/warn/error | `greg.ui.log_info / log_warning / log_error` | `Logger.Info / Warning / Error` (protected `IGregLogger`) | `greg.logInfo / logWarning / logError` |
-| Toast | `greg.ui.notify(msg, secs)` | `GregNotificationManager.Show(msg, duration)` | n/a (fire an event; companion notifies) |
-=======
 | Info/warn/error | `greg.ui.log_info / log_warning / log_error` | `Logger.Info / Warning / Error` (protected `IGregLogger`) | `greg.log / warn / error` |
 | Toast | `greg.ui.notify(msg, secs)` | `GregNotificationManager.Show(msg, duration)` | `greg.toast(msg, secs)` / `greg.toastRich(top, title, sub, secs)` / `greg.notify(title, msg, secs)` |
->>>>>>> agent/gregcore-integration
 
 ## Scheduling
 
 | Task | Lua | C# | JS |
 |---|---|---|---|
-<<<<<<< HEAD
-| Once / repeat | `greg.wait(s, fn)` / `greg.every(s, fn)` | Throttled `OnUpdate` + cached state (no per-frame scans) | n/a (event-driven counting) |
-=======
 | Once / repeat | `greg.wait(s, fn)` / `greg.every(s, fn)` | Throttled `OnUpdate` + cached state (no per-frame scans) | Throttled `onUpdate(dt)` + cached state |
->>>>>>> agent/gregcore-integration
 | Coroutine | `greg.start_coroutine(fn)` + `coroutine.yield(greg.WAIT)` | `MainThread.Enqueue` for marshaling | n/a |
 
 ## Storage
 
 | Task | Lua | C# | JS |
 |---|---|---|---|
-<<<<<<< HEAD
-| Settings | `greg.config.*` (`config.json`) | `GregModSettingsService` / `GregConfigService` | n/a |
-| State | `greg.save.*` (`save.json`) + `save_now()` | `GregModSave`, `GregSaveEngine`, `RegisterSidecar` | n/a |
-=======
 | Settings | `greg.config.*` (`config.json`) | `GregModSettingsService` / `GregConfigService` | `greg.registerToggle/registerSlider/registerKey` |
 | State | `greg.save.*` (`save.json`) + `save_now()` | `GregModSave`, `GregSaveEngine`, `RegisterSidecar` | n/a (stateless scripts; persist via fired events to Lua/C#) |
->>>>>>> agent/gregcore-integration
 | Files/JSON | `greg.io.*` sandbox + `greg.json.*` | Newtonsoft (configs) / System.Text.Json (runtime) | n/a |
 
 ## UI
 
 | Task | Lua | C# | JS |
 |---|---|---|---|
-<<<<<<< HEAD
-| Panel | `tablet_open / widget_open / panel_add_*` handles | `GregPanelBuilder` + click-router + font + input-lock | n/a |
-| Hub/HUD | automatic via tablet (Hub lists Lua mods) | `GregMenuBinding` + `GregHudRegistry` | n/a (announce via `fire`; companion shows UI) |
-| Settings tab | `greg.ui.register_mod_config_tab` | `GregSettingsHub.RegisterTab` | n/a |
-=======
 | Panel | `tablet_open / widget_open / panel_add_*` handles | `GregPanelBuilder` + click-router + font + input-lock | `greg.createPanel(title)` (chainable builder, same Toolkit) |
 | Hub/HUD | automatic via tablet (Hub lists Lua mods) | `GregMenuBinding` + `GregHudRegistry` | `greg.bindMenu(id, toggle, isOpen)` + `greg.reportMenu(id, open)` |
 | Settings tab | `greg.ui.register_mod_config_tab` | `GregSettingsHub.RegisterTab` | via `registerToggle/Slider/Key` (core settings UI) |
->>>>>>> agent/gregcore-integration
 
 ## Game systems
 
 | Task | Lua | C# | JS |
 |---|---|---|---|
-<<<<<<< HEAD
-| Read economy/hardware | `greg.player / server / switch / tech / rack / cable / patch / customer / economy / shop / net / requests / subnet / world` | `greg` facade modules + `GregServers / GregShop / GregTechnicians / …` bridges + `GregEntityInventory` | n/a (payloads only) |
-=======
 | Read economy/hardware | `greg.player / server / switch / tech / rack / cable / patch / customer / economy / shop / net / requests / subnet / world` | `greg` facade modules + `GregServers / GregShop / GregTechnicians / …` bridges + `GregEntityInventory` | n/a (hook payloads only) |
->>>>>>> agent/gregcore-integration
 | Drive repairs/shop | `repair_all()`, `dispatch_server()`, `shop.buy(idx)` | `GregServers.FindAll / Repair`, `GregShop.CartAddOne / BuyItem`, `GregTechnicians` | n/a |
 | World edits, spawning, cable ops, patches | Not available (by design) | `GregMod` + `SafePatch` + grid/wall systems | Not available |
 
@@ -89,8 +61,4 @@ The same features in Lua, C#, and JS — use it to switch tracks or split work a
 
 - Lua → C#: move timers to throttled updates, tablets to `GregPanelBuilder`, `config/save` to services + sidecars; keep hook IDs identical.
 - C# → Lua: replace patches with subscriptions where events exist; move world edits out (Lua cannot do them — keep a C# companion).
-<<<<<<< HEAD
-- Either → JS: keep only observe/log/announce; pair with a Lua/C# companion for the rest.
-=======
 - Either → JS: UI work (panels, toasts, menus, settings) ports 1:1; world edits, spawning, saves and patches stay Lua/C# (fire hooks across).
->>>>>>> agent/gregcore-integration

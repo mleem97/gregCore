@@ -23,26 +23,15 @@ Debug any mod in any language: logs, consoles, reload, and the per-language erro
 - `Logger.Info / Warning / Error` (with exception) is your printf; `GregDoctor` covers boot-level causes; `DisposeSubscriptions()` + `OnUnload` hygiene prevents ghost callbacks after reload.
 - After a **game update**: vanilla-first test, re-copy interop assemblies, regenerate `GameApi` + hooks, `validate_contracts.py`, full test run.
 
-<<<<<<< HEAD
-## JS (beta)
-
-- Errors surface as `[JsBridge] JS-Fehler: …` in the loader log — check there first; only five entry points exist (`logInfo/logWarning/logError/on/fire`), so an unknown call is always the bug.
-- No REPL, no reload shortcut: restart the game after editing `UserLibs/Js/*.js`.
-=======
 ## JS/TS
 
 - Errors surface as `[gregCore][JS] <modId>/<file>: …` in the loader log — check there first (mod-tagged, per file).
 - No restart needed: edit + save, return to the **main menu**, watch for `Reloaded`. Mid-game edits stay queued. Raw `.ts` warns and skips — compile with `tsc` first.
->>>>>>> agent/gregcore-integration
 
 ## The debugging loop
 
 1. Reproduce once, note versions (game, framework via `` ` `` → `version`, loader, mod list via `mods`).
 2. Read the log excerpt top-down: registration → patcher → your lines → first error.
 3. Shrink: REPL (Lua) or minimal subscription until the failure reappears.
-<<<<<<< HEAD
-4. Fix, reload (Lua/JS-edit-then-restart), re-run your chapter checkpoint.
-=======
 4. Fix, reload (Lua HotLoad, JS main-menu HotLoad, C# restart), re-run your chapter checkpoint.
->>>>>>> agent/gregcore-integration
 5. Still stuck → [[FAQ Troubleshooting]] → mod tracker (single-mod bug) or gregCore tracker (Hub/HUD/saves) with versions + log excerpt.

@@ -20,12 +20,9 @@ Rule of thumb: fast iteration and game-state automation → **Lua**. Spawning, c
 - **Lua track**: 01 First Mod → 02 Events → 03 Timers + Storage → 04 UI → 05 Game Systems → [[Guidebook Lua Complete Project]] (one fully annotated mod).
 - **C# track**: 01 Setup → 02 Lifecycle → 03 UI → 04 Patches → 05 Saves + Shop → [[Guidebook CSharp Complete Project]] → [[Guidebook CSharp 06 Deploy Debug]] (deploy + debug).
 - **JS track**: 01 Setup → [[Guidebook JS 02 Project]] (panel + settings + menu project).
-<<<<<<< HEAD
+- **Rust track**: 01 Setup → [[Guidebook Rust 02 Project]] (native events + hooks project).
 - **Modelling track** (OBJ, static only): [[Guidebook Modelling Overview]] → OBJ + Blender → Shop Item → Static Item → Troubleshooting.
 - **Shipping** (everyone): [[Guidebook Debugging]] (all languages) → [[Guidebook Computer UI]] (shortcuts + apps) → [[Guidebook Porting Matrix]] (same feature in 3 languages) → [[Guidebook Release]] (package, version, Workshop) → [[Guidebook Next Languages]].
-=======
-- **Shipping** (everyone): [[Guidebook Debugging]] (all languages) → [[Guidebook Porting Matrix]] (same feature in 3 languages) → [[Guidebook Release]] (package, version, Workshop) → [[Guidebook Next Languages]].
->>>>>>> agent/gregcore-integration
 
 Each chapter ends with a checkpoint: something runnable you can verify in-game before moving on.
 

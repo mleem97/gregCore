@@ -21,11 +21,12 @@ From working mod to Workshop release. (Oxide equivalent: "Plugin Guidelines" rel
 - **Lua:** zip the mod folder (`mod.json` + `main.lua` + modules + `data/` defaults, no absolute paths). Players extract to `UserData/gregCore/Mods/Lua/<modId>/`.
 - **C#:** ship the DLL (+ declared deps); soft-dep on `gregCore.dll` unless you consciously went hard-dep (see `docs/modding/hard-dependency.md`).
 - **Custom items:** meshes/textures/icons as files in the mod folder or pack folder (`GregCustomItems` mesh pre-check, traversal guard).
+- **Mod packs:** optional `Mods/manifest.json` (`Name` + `Mods`/`Library`/`Plugins` paths relative to `Mods/`) for curated sets; entries are validated and `Library` folders feed dependency probing. Never list anything under `.deactivated`.
 - Repo scripts: `scripts/Package-SdkAssets.ps1`, `Create-SDK-Packs.ps1`, `Publish-LocalRelease.ps1`, `Deploy-Release-ToDataCenter.ps1` (local test) and `Deploy-Release-ToWorkshop.ps1` / `Copy-WorkshopUploaderToGame.ps1` / `Update-ReleaseMetadata.ps1` + `steamdesc.md` for Workshop copy.
 
 ## 4. Release flow (framework convention, recommended for mods)
 
-`dev → pre-release → main`; GitHub Releases carry the downloads (dev builds are never presented as stable). Mirror/CI (`.forgejo` = source, GitHub = passive mirror via `gregMirror.Sync.sh`) and branch protection (`docs/maintainers/branch-protection.md`) apply to gregCore itself — mirror the discipline: small reviewable PRs, screenshots/logs for UI/behavior changes, security reports via `SECURITY.md` (never public issues).
+`dev → pre-release → main`; GitHub Releases carry the downloads (dev builds are never presented as stable). Workshop releases join the [GregCore Collection on Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=3701575419) so players can subscribe instead of handling files. Mirror/CI (`.forgejo` = source, GitHub = passive mirror via `gregMirror.Sync.sh`) and branch protection (`docs/maintainers/branch-protection.md`) apply to gregCore itself — mirror the discipline: small reviewable PRs, screenshots/logs for UI/behavior changes, security reports via `SECURITY.md` (never public issues).
 
 ## 5. Post-release
 

@@ -8,19 +8,11 @@ Host: `GregLuaHost` (`HostId "lua"`, `.lua`) → `LuaFFIBridge` (`UserData/gregC
 
 Namespaces: `greg.player / greg.server / greg.switch / greg.tech / greg.rack / greg.cable / greg.patch / greg.customer / greg.economy (read-only) / greg.shop / greg.net (read-only) / greg.mods / greg.requests (read-only) / greg.subnet / greg.items / greg.world / greg.ui / greg.config / greg.save / greg.io / greg.json`, events (`on / once / off / fire`, `greg.hooks.<group>.*`), timers (`wait / every / start_coroutine`), tablets/widgets (`tablet_open / widget_open / panel_add_*`). Exact signatures: [[Hooks Reference]].
 
-<<<<<<< HEAD
-## JavaScript — beta (Jint 4.8.0)
-
-Host: `GregJsHost` (`HostId "javascript"`, `.js`/`.ts` — `.ts` is **not** transpiled, warning only; 4 MB memory limit). `JsBridge` exposes `greg.logInfo / logWarning / logError`, `greg.on(hook, cb)`, `greg.fire(hook, dict)`; loads `./UserLibs/Js/*.js` (legacy `./Plugins/Js` is ignored with a warning).
-
-> Caution: `examples/Js/example_mod/main.js` still uses the stale `greg.subscribe / fire_event / log` + numeric `Events` form and does **not** match the current bridge. Treat [[Hooks Reference]] + `JsBridge.cs` as truth, not the example.
-=======
 ## JavaScript/TypeScript — UI-focused SDK (Jint 4.8.0)
 
 Host: `GregJsHost` (`HostId "javascript"`). Layout: `UserData/gregCore/Mods/JS/<modId>/*.js` (one isolated engine per mod, 16 MB cap). Write TS against `templates/js/greg.d.ts`, compile with `tsc`, ship `.js` (raw `.ts` warns and skips). API: `log/warn/error`, `toast/toastRich/notify`, `createPanel` (chainable Toolkit builder), `bindMenu/reportMenu`, `registerToggle/registerSlider/registerKey`, `on` (hook bus), `onUpdate/onSceneLoaded` callbacks. HotLoad: edit + save, applied on next main-menu entry (queued otherwise). Full guide: [[Guidebook JS 01 Setup]] + [[Guidebook JS 02 Project]].
 
 > Legacy flat path `UserLibs/Js/*.js` (`JsBridge`: `logInfo/logWarning/logError/on/fire`) still loads untouched. New mods use the per-mod layout above.
->>>>>>> agent/gregcore-integration
 
 ## Python — beta (pythonnet 3.0.5)
 
@@ -28,16 +20,16 @@ Host: `GregJsHost` (`HostId "javascript"`). Layout: `UserData/gregCore/Mods/JS/<
 
 > Same staleness warning: `examples/Python/example_mod/main.py` mirrors the old JS example shape, not the current snake_case bridge.
 
-## Rust / Go / C# scripts — alpha
+## Rust — native SDK (cdylib via `RustFFIBridge`)
 
-- **Rust** (`RustFFIBridge`) / **Go** (`GoFFIBridge`): C ABI via `GameApiTable` (`ApiTableVersion`, `API_VERSION = 19` compat table v1–v13). v7 Steam/P2P slots are inert no-ops for ABI stability ([[Developer Native Coop]]). Examples: `examples/Rust/greg_example/src/lib.rs`, `examples/Go/example_mod/main.go`.
+Host: `GregRustHost` (`HostId "rust"`, `.rs`/`.rmod` trigger files). Layout: compiled `<modId>.dll` in `UserLibs/Rust/` (legacy `Plugins/Rust/` is ignored with a warning). Start from `templates/rust/` (`Cargo.toml` + `src/greg.rs` safe bindings + `src/lib.rs` example): `cargo build --release --target x86_64-pc-windows-msvc`, drop the DLL in. The bindings mirror the `GregCoreAPI` table field-for-field (ABI v1, compile-time layout asserts); unbound slots (`unsubscribe_event`, `config_*_int/float/string`) are safe no-ops. Exports: `greg_mod_info/init/update/scene_loaded/shutdown` (+ optional `greg_mod_event`). Full guide: [[Guidebook Rust 01 Setup]] + [[Guidebook Rust 02 Project]].
+
+## Go / C# scripts — alpha
+
+- **Go** (`GoFFIBridge`): C ABI via `GameApiTable` (`ApiTableVersion`, `API_VERSION = 19` compat table v1–v13). v7 Steam/P2P slots are inert no-ops for ABI stability ([[Developer Native Coop]]). Example: `examples/Go/example_mod/main.go`.
 - **C# scripts** (`GregCSharpScriptBridge`, `GregCSharpCompiler`, `IGregCSharpMod`): Roslyn runtime, unverified — prefer compiled C# mods ([[Developer First CSharp Mod]]) for anything serious.
 - **Native mods** (`NativeModLoader`, `Win32FfiBridge`, `GregNativeModService`, `IGregNativeModService` / `IGregNativePlugin`): discovered via `AssemblyScanner` + `GregDependencyResolver`; `sdk/packs/greg-*-sdk.zip` ship the per-language SDKs.
 
 ## Choosing
 
-<<<<<<< HEAD
-Need world edits, spawning, cable ops, or custom patches → **C#**. Need full game API with fast iteration → **Lua**. Need JS/Python/Rust/Go → prototype against the small current surface first and pin `min_framework_version`; expect alpha/beta edges and verify every call in the REPL/log before shipping.
-=======
-Need world edits, spawning, cable ops, or custom patches → **C#**. Need full game API with fast iteration → **Lua**. Need JS → use the UI SDK (`greg.d.ts`) and verify every call in the log before shipping. Need Python/Rust/Go → prototype against the small current surface first and pin `min_framework_version`; expect alpha/beta edges.
->>>>>>> agent/gregcore-integration
+Need world edits, spawning, cable ops, or custom patches → **C#**. Need full game API with fast iteration → **Lua**. Need JS → use the UI SDK (`greg.d.ts`) and verify every call in the log before shipping. Need Rust → use the native SDK (`templates/rust`) and verify every call in the log before shipping. Need Python/Go → prototype against the small current surface first and pin `min_framework_version`; expect alpha/beta edges.

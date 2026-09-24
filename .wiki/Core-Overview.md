@@ -49,6 +49,7 @@ Supporting pieces: `src/GlobalUsings.cs`, `src/NullablePolyfills.cs`, root `greg
 - `GregLogger` (`gregCore.Shared`): `Msg / Warn / Error / Debug / Section / PatchApplied / HookFired`, plus per-mod `GregModLogger`. MoonSharp/Lua surface: `greg.ui.log_info / log_warning / log_error / log`.
 - `DevLog` for development-only chatter; `MelonLoggerAdapter` bridges to the loader log.
 - `GregDoctor` runs boot self-checks (directories, hook files present, incompatible mods). `IncompatibleModGuard` detects the old standalone 404-PersistentID mod and unpatches it so `gregID` stays the only ID system (log + one toast per session).
+- Directory policy (`GregDirectoryPolicy`): manual mods live directly in `./Mods`, gregNative packages in `./Mods/gregNative`, runtime libs in `./UserLibs`, MelonLoader plugins in `./Plugins`, data in `./UserData`. A `.deactivated` folder next to a mod disables it — loaders never read from it; only gregCore moves files in/out on explicit user activation (`GregModActivationService`). Optional pack file `Mods/manifest.json` (`Name`/`Mods`/`Library`/`Plugins`, validated, `.deactivated` never loaded) additionally feeds dependency probing.
 - What to grep in logs: `[gregCore]`, `[gregCore][HwId]`, `[DynamicPatcher]`, `HWID SYSTEM ACTIVE`.
 
 ## Configuration

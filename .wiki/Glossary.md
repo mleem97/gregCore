@@ -68,6 +68,18 @@ Custom meshes as shop or static items: `.obj` files (≤ 64 MB, no traversal esc
 
 `gregCore.Compatibility`: legacy `DataCenterModLoader` shim (`GameAPI`, `API_VERSION = 19`, `EventSystem`, `ModConfigSystem` F8 panel) + bundled QoL mods, forwarding to current Core.
 
+### `.deactivated`
+
+A folder named `.deactivated` placed next to a mod disables it: no plugin or script is ever loaded from inside it. Only gregCore moves files in/out, and only on explicit user activation. See [[Player Mod Users Guide]].
+
+### Custom-color preset
+
+An automatically saved shop entry for a custom-color purchase (`UserData/gregCore/CustomItemPresets.json`): item type, ID, price and color. Shown in the shop `Mods` category (unlock-gated) and rebuyable with its color.
+
+### Modpack manifest
+
+Optional `Mods/manifest.json` (`Name`, `Mods`, `Library`, `Plugins` — paths relative to `Mods/`). Entries are validated (`.dll` only, no traversal, never `.deactivated`); `Library` folders additionally feed dependency probing.
+
 ## Development
 
 ### GregModAttribute / GregHookAttribute / GregDependsOnAttribute

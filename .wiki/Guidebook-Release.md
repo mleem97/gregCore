@@ -4,13 +4,8 @@ From working mod to a release others can install. Companion: [[Developer Publish
 
 ## 1. Pre-release checklist (all languages)
 
-<<<<<<< HEAD
-- [ ] Unique mod ID; identity complete (Lua `mod.json`, C# `[GregMod]` + registry, JS `MOD_ID` prefix on custom events).
-- [ ] Cold start + hot-reload clean; no errors; `mods` (or log) confirms registration.
-=======
 - [ ] Unique mod ID; identity complete (Lua `mod.json`, C# `[GregMod]` + registry, JS folder name = mod ID).
 - [ ] Cold start + HotLoad clean; no errors; log confirms registration (`Loaded mod` / `Reloaded`).
->>>>>>> agent/gregcore-integration
 - [ ] Save round-trip: save → load → remove mod → vanilla still loads (Lua/C# with state; JS trivially safe — no state).
 - [ ] UI truthful: Hub Open/Close, HUD row ↔ real hotkey, input restored after close.
 - [ ] Co-op scope documented (SP-only vs co-op-tested; identical mod sets for co-op).
@@ -18,11 +13,7 @@ From working mod to a release others can install. Companion: [[Developer Publish
 
 ## 2. Versioning
 
-<<<<<<< HEAD
-- SemVer everywhere: manifest `Version`, `[GregMod]` version, JS `version` in your ready-event.
-=======
 - SemVer everywhere: manifest `Version`, `[GregMod]` version, JS folder/version noted in README.
->>>>>>> agent/gregcore-integration
 - Framework floor: document the gregCore version you built against (1.2.3) in the README (Lua `ApiVersion`/`Loader` fields and C# `[GregDependsOn("gregCore", "1.2.3")]` state it in-repo).
 - Never reuse shop/item IDs or GUIDs; never rename a shipped custom event — add a new one.
 
@@ -32,11 +23,7 @@ From working mod to a release others can install. Companion: [[Developer Publish
 |---|---|---|
 | Lua | Zip of `<modId>/` (`mod.json` + `main.lua` + modules; no absolute paths) | `UserData/gregCore/Mods/Lua/<modId>/` |
 | C# | DLL (+ declared deps); soft-dep unless consciously hard | Per `Deploy-Release-ToDataCenter.ps1` conventions |
-<<<<<<< HEAD
-| JS | Single `*.js` file | `UserLibs/Js/` (never `Plugins/Js`) |
-=======
 | JS/TS | Folder `<modId>/` with compiled `*.js` (+ `greg.d.ts`-checked `.ts` sources in your repo) | `UserData/gregCore/Mods/JS/<modId>/` (legacy flat `UserLibs/Js/` still loads) |
->>>>>>> agent/gregcore-integration
 
 Custom-item meshes/textures/icons ship as files in the mod/pack folder (mesh pre-check + traversal guard apply).
 

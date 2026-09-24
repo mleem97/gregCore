@@ -16,11 +16,7 @@ Verify: the loader log shows `HWID SYSTEM ACTIVE` and `[DynamicPatcher]` lines; 
 | Track | Tools | Check |
 |---|---|---|
 | Lua | Any text editor (VS Code recommended). No SDK, no build. | You can create folders under `UserData/gregCore/Mods/Lua/`. |
-<<<<<<< HEAD
-| JS (beta) | Any text editor. No build. | `UserLibs/Js/` exists in the game root (created at boot by `JsBridge`; legacy `Plugins/Js` is ignored). |
-=======
 | JS/TS | Any text editor + `tsc` for TypeScript. No game build. | You can create folders under `UserData/gregCore/Mods/JS/`. Types: `templates/js/greg.d.ts`. |
->>>>>>> agent/gregcore-integration
 | C# | .NET 6 SDK + local game + loader install. Copy `MelonLoader/Il2CppAssemblies/` and `MelonLoader/net6/` into the repo's `references/` once. | `dotnet build -c Release` succeeds; `python3 scripts/validate_version.py 1.2.3` exits 0. |
 
 Full C# environment (GameApi regeneration, coverage, mirror/CI): [[Developer Environment]].
@@ -33,12 +29,8 @@ Full C# environment (GameApi regeneration, coverage, mirror/CI): [[Developer Env
 ├── UserData/gregCore/Mods/Lua/<modId>/main.lua + mod.json  (Lua mods)
 ├── UserData/gregCore/Mods/Lua/@shared/                     (Lua shared modules)
 ├── UserData/gregCore/Mods/Scripts/                         (general scripts)
-<<<<<<< HEAD
-└── UserLibs/Js/*.js                                        (JS mods — flat files)
-=======
 ├── UserData/gregCore/Mods/JS/<modId>/*.js                     (JS/TS mods — one folder per mod)
 └── UserLibs/Js/*.js                                        (JS legacy — flat files, still loaded)
->>>>>>> agent/gregcore-integration
 ```
 
 C# mods ship as compiled DLLs (built from `templates/csharp/`) and are deployed per `scripts/Deploy-Release-ToDataCenter.ps1` conventions.

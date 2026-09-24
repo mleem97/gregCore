@@ -2,6 +2,33 @@
 
 Sell custom hardware in the vanilla shop: stable IDs, prefab routing, cart, save compatibility.
 
+## The easy path: `greg.CommonShop`
+
+For template-based items (no custom mesh), skip the manual flow below and register directly:
+
+```csharp
+greg.CommonShop.ShopAPI.RegisterItem(new greg.CommonShop.CustomShopItem
+{
+    Name = "QSFP28 100Gbps",
+    Price = 1000,
+    TemplateType = PlayerManager.ObjectInHand.SFPModule,
+    TemplateID = 0,
+    ResultItemID = 100,          // your stable custom ID (optional)
+    Category = "Hardware",       // or item.SetCategory(VanillaCategory.Switches)
+    SubCategory = "SFP Modules",
+    BackgroundColor = new Color(0.2f, 0.5f, 1f),  // card tint (optional)
+    Icon = mySprite,             // card icon (optional, else template sprite)
+    CustomPrefab = myPrefab,     // full card replacement (optional)
+    OnBuy = () => { /* runs on purchase */ },
+    OnUIReady = (card) => { /* tweak the card GameObject */ },
+    OnCheckout = (qty) => { /* runs at checkout with quantity */ },
+});
+```
+
+Call `ShopAPI.Initialize(HarmonyInstance)` once if you ship standalone (inside gregCore it is already wired). Injection, real category containers, layout repair, cart stacking and checkout routing are handled. Custom (non-vanilla) enum values are claimed persistently (`UserData/gregCore/CommonShop_CustomIDs.json`) with cross-mod collision protection — a conflicting claim logs an error and skips the item instead of corrupting saves.
+
+Custom-color purchases are captured automatically as presets (shop category `Mods`, unlock-gated, rebuyable with their color).
+
 ## ID ranges (never reuse)
 
 High, stable, unique per item: `100`, `1000/2000/3000` series, `9001+`. Never reuse an ID or GUID once shipped — saves and sidecars reference them.

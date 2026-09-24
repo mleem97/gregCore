@@ -2,6 +2,8 @@
 
 Step-by-step installation of gregCore for **MelonLoader** and **BepInEx**, on Windows and Linux.
 
+> Easiest path: subscribe to the [GregCore Collection on Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=3701575419) — framework plus curated mods in one click. The manual steps below remain the fallback (and the only path for non-Workshop setups).
+
 ## 1. Install a loader
 
 Install **exactly one** loader into your Data Center game folder:

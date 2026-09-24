@@ -23,7 +23,7 @@ gregCore is a framework mod for the game **Data Center**. It does three things f
 
 1. **Install** — [[Player Installation]] (extract one ZIP into the game folder, launch once).
 2. **Verify** — launch the game, check the MelonLoader log for `HWID SYSTEM ACTIVE` and the `[DynamicPatcher]` lines, press **F1** to see the Mod Hub.
-3. **Add mods** — [[Player Mod Users Guide]] (where Lua mods live, how the HUD key bar works, how to open mod settings, how to report issues).
+3. **Add mods** — [[Player Mod Users Guide]] (where Lua mods live, how the HUD key bar works, how to open mod settings, how to report issues). The fastest source is the [GregCore Collection on Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=3701575419) — subscribe to what you want, no manual file handling.
 
 ## Key bindings (defaults)
 

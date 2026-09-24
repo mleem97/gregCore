@@ -13,6 +13,12 @@ How to use mods day-to-day once gregCore is installed: the Hub, the HUD, setting
 
 If F1 does nothing, check [[FAQ Troubleshooting]] (usually another overlay locked input, or the DLL/JSON files are misplaced).
 
+## Enabling and disabling mods (`.deactivated`)
+
+Any mod or plugin can be switched off without deleting it: move its file or folder into a `.deactivated` folder sitting next to it (e.g. `Mods/.deactivated/MyMod.dll`, or `UserData/gregCore/Mods/Lua/.deactivated/<modId>/`). To re-enable, move it back out. Restart the game afterwards.
+
+Rules: nothing is ever loaded from a `.deactivated` folder (by design — a disabled mod stays fully inert); only gregCore itself moves files in and out, and only when you ask it to. A mod that still loads after you moved it is loading from a second copy somewhere else — search the folder for duplicates.
+
 ## The key bar (HUD)
 
 `GregHud` renders a slim key bar at the **right screen edge** (`right=8, top=64`, HUD layer, click-through):

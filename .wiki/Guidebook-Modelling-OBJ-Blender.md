@@ -6,12 +6,12 @@ The OBJ contract enforced by `GregObjImport` (`src/gregCore.Core/Mods/GregObjImp
 
 | Rule | Source | Failure log |
 |---|---|---|
-| Extension must be `.obj` (case-insensitive) | `TryValidatePath` | `Kein .obj-Pfad` |
-| File must exist and be ≤ **64 MB** (`MaxObjBytes`) | `TryValidatePath` | `Datei nicht gefunden` / `Datei zu gross` |
-| Path must stay inside the pack/mod folder (`..` escapes rejected) | `ImportMeshForPack` | `bricht aus dem Pack-Ordner aus` |
-| Vanilla `ObjImporter.ImportOBJ` must return non-null with `vertexCount > 0` | `ImportMesh` | `Import fehlgeschlagen` / `lieferte null` / `ohne Vertices` |
+| Extension must be `.obj` (case-insensitive) | `TryValidatePath` | `No .obj path` |
+| File must exist and be ≤ **64 MB** (`MaxObjBytes`) | `TryValidatePath` | `File not found` / `File too large` |
+| Path must stay inside the pack/mod folder (`..` escapes rejected) | `ImportMeshForPack` | `Path escapes the pack folder` |
+| Vanilla `ObjImporter.ImportOBJ` must return non-null with `vertexCount > 0` | `ImportMesh` | `Import failed` / `Import returned null` / `Import has no vertices` |
 
-All paths funnel through `ImportMeshForPack(folderPath, modelFile)` before `GregCustomItems` touches the vanilla `ModLoader` — a negative pre-check aborts registration (`Mesh-Vorabcheck negativ — Registrierung abgebrochen`). Warnings are prefixed `[gregCore][Mods] ObjImport:` / `CustomItems:`.
+All paths funnel through `ImportMeshForPack(folderPath, modelFile)` before `GregCustomItems` touches the vanilla `ModLoader` — a negative pre-check aborts registration (`Mesh precheck negative - registration aborted`). Warnings are prefixed `[gregCore][Mods] ObjImport:` / `CustomItems:`.
 
 ## Blender export checklist
 

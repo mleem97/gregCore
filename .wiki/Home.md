@@ -19,6 +19,7 @@ This wiki is the complete guidebook for gregCore, structured after the Oxide doc
 | Play with mods, install gregCore, use the Mod Hub | [[Player Getting Started]] → [[Player Installation]] → [[Player Mod Users Guide]] |
 | Write my first Lua mod | [[Developer First Lua Mod]] (then [[Developer Events Hooks Guide]]) |
 | Write a C# mod | [[Developer First CSharp Mod]] (then [[Developer Harmony IL2CPP]]) |
+| Write a Rust mod | [[Guidebook Rust 01 Setup]] (then [[Guidebook Rust 02 Project]]) |
 | Understand the framework internals | [[Core Overview]] → [[Core Events]] → [[Core Save Engine]] |
 | Look up an event or API call | [[Hooks Reference]] + [[Glossary]] |
 | Fix something broken | [[FAQ Troubleshooting]] |
@@ -35,6 +36,7 @@ This wiki is the complete guidebook for gregCore, structured after the Oxide doc
 ## Repository map
 
 - Main repo: `https://github.com/mleem97/gregCore`
+- GregCore Collection on Steam (mods + framework, one click): `https://steamcommunity.com/sharedfiles/filedetails/?id=3701575419`
 - Framework source: `src/` (`gregCore.Main`, `gregCore.Core`, `gregCore.UI`, `gregCore.Bridge`, `gregCore.Hooks`, `gregCore.Patches`, `gregCore.Mod`, `gregCore.Abstractions`, `gregCore.Compatibility`, `gregCore.GameApi`, `gregCore.Shared`, `gregCore.SDK`)
 - Canonical hook registry: `framework/greg_hooks.json` · patchable method dump: `game_hooks.json`
 - Examples (6 languages): `examples/` · starter templates: `templates/csharp`, `templates/lua/example-mod`

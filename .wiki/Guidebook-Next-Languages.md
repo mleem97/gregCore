@@ -1,6 +1,6 @@
 # Guidebook Next Languages
 
-What "more languages coming" means concretely: Python, Rust, Go, and C# scripts exist as **preview** surfaces today. Build production mods in Lua/C#/JS; prototype here only, pinned and verified.
+What "more languages coming" means concretely: Python, Go, and C# scripts exist as **preview** surfaces today. Build production mods in Lua/C#/JS/Rust; prototype here only, pinned and verified.
 
 ## Python — beta, small bridge (`PythonFFIBridge`, pythonnet 3.0.5)
 
@@ -8,9 +8,13 @@ Snake-case calls: `log_info / warning / error`, `get/set_player_money`, `get/set
 
 > Staleness warning: `examples/Python/example_mod/main.py` mirrors the retired subscribe/numeric-`Events` shape, not this bridge. Verify every call against `PythonFFIBridge.cs` before shipping anything.
 
-## Rust / Go — alpha FFI (`RustFFIBridge` / `GoFFIBridge`)
+## Rust — native SDK (graduated)
 
-C ABI via the versioned `GameApiTable` (`ApiTableVersion`; compat table `API_VERSION = 19`, v1–v13). v7 Steam/P2P slots are inert no-ops for ABI stability — the game owns networking ([[Developer Native Coop]]). Sketches: `examples/Rust/greg_example/src/lib.rs`, `examples/Go/example_mod/main.go`. Per-language SDKs: `sdk/packs/greg-*-sdk.zip`.
+Rust has its own track: [[Guidebook Rust 01 Setup]] + [[Guidebook Rust 02 Project]] (`templates/rust/`: `Cargo.toml`, safe `greg.rs` bindings, example `lib.rs`). The bridge table stays ABI v1; unbound slots are safe no-ops.
+
+## Go — alpha FFI (`GoFFIBridge`)
+
+C ABI via the versioned `GameApiTable` (`ApiTableVersion`; compat table `API_VERSION = 19`, v1–v13). v7 Steam/P2P slots are inert no-ops for ABI stability — the game owns networking ([[Developer Native Coop]]). Sketch: `examples/Go/example_mod/main.go`. Per-language SDKs: `sdk/packs/greg-*-sdk.zip`.
 
 ## C# scripts — alpha, unverified (`GregCSharpScriptBridge`, `GregCSharpCompiler`, `IGregCSharpMod`)
 

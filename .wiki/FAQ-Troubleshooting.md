@@ -10,6 +10,8 @@ Symptom → cause → fix. (Oxide equivalent: "Reporting Issues" + owner trouble
 | F1 Hub never opens | Misplaced files, or another overlay locked input | Verify install; close Pause/Escape/Options overlays; check `GregMenuRegistry` lock state in log |
 | `HWID SYSTEM ACTIVE` missing | Framework did not boot | Re-extract release ZIP; confirm loader version (MelonLoader 0.7.2+ / BepInEx 6+); read full loader log |
 | Toast about incompatible ID mod | Old standalone 404-PersistentID mod present | Remove it — `IncompatibleModGuard` already unpatched it; gregID must be the only ID system |
+| Mod placed but never loads, no error | File sits under a `.deactivated` folder | By design — loaders never read `.deactivated`; move the mod back out and restart ([[Player Mod Users Guide]]) |
+| `[gregCore][Manifest]` warnings at boot | `Mods/manifest.json` entry missing, not a `.dll`, or deactivated | Fix the path, or remove the entry; deactivated entries must be activated first |
 
 ## Lua mods
 

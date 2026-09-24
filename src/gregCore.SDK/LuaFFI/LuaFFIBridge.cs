@@ -1,8 +1,8 @@
 /// <file-summary>
-/// Schicht:      Bridge
-/// Zweck:        Zentraler Orchestrator für die Lua-Modding-Umgebung.
-/// Maintainer:   Initialisiert Loader, Scheduler, Hot-Reload und Dev-Tools.
-///               Verbindet C#-Hooks mit der Lua-VM.
+/// Layer:       Bridge
+/// Purpose:      Central orchestrator for the Lua modding environment.
+/// Maintainer:   Initializes loader, scheduler, hot-reload and dev tools.
+///               Connects C# hooks to the Lua VM.
 /// </file-summary>
 
 using System;
@@ -112,7 +112,15 @@ public sealed class LuaFFIBridge
                 LuaSubnetModule.Register(gregTable, script, id);
                 LuaUiModule.Register(gregTable, script, id);
                 LuaTabletModule.Register(gregTable, script, id);
+                LuaComputerModule.Register(gregTable, script, id);
                 LuaModsModule.Register(gregTable, script, id);
+                LuaModSaveModule.Register(gregTable, script, id);
+                LuaInternetModule.Register(gregTable, script, id);
+                LuaSettingsModule.Register(gregTable, script, id);
+                LuaObjectivesModule.Register(gregTable, script, id);
+                LuaTooltipModule.Register(gregTable, script, id);
+                LuaCoopModule.Register(gregTable, script, id);
+                LuaMiscModule.Register(gregTable, script, id);
                 LuaItemsModule.Register(gregTable, script, id, dir);
                 LuaJsonModule.Register(gregTable, script, id);
                 LuaConfigModule.Register(gregTable, script, id, dir);
@@ -145,6 +153,17 @@ public sealed class LuaFFIBridge
 
                 SafeCall(plugin, plugin.OnInit);
                 _plugins.Add(plugin);
+
+                // Make Lua mods visible in greg.mods.list() (best-effort).
+                try
+                {
+                    gregCore.Core.Mods.GregModRegistry.Register(
+                        id,
+                        manifest.Name ?? id,
+                        manifest.Version ?? "0.0.0",
+                        new string[0]);
+                }
+                catch { /* ignored: registry best-effort */ }
 
                 // Hot-reload registration
                 _hotReload?.RegisterPlugin(id, script, mainFile);
@@ -202,6 +221,7 @@ public sealed class LuaFFIBridge
         foreach (var plugin in _plugins)
         {
             GregEventLuaModule.UnregisterAll(plugin.Id, API.GregAPI.EventBus!);
+            LuaComputerModule.UnregisterAll(plugin.Id);
             try { plugin.OnShutdown?.Call(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         _plugins.Clear();
@@ -218,6 +238,7 @@ public sealed class LuaFFIBridge
         if (existing != null)
         {
             GregEventLuaModule.UnregisterAll(existing.Id, API.GregAPI.EventBus!);
+            LuaComputerModule.UnregisterAll(existing.Id);
             try { existing.OnShutdown?.Call(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _plugins.Remove(existing);
         }
@@ -277,7 +298,15 @@ public sealed class LuaFFIBridge
             LuaSubnetModule.Register(gregTable, newScript, id);
             LuaUiModule.Register(gregTable, newScript, id);
             LuaTabletModule.Register(gregTable, newScript, id);
+            LuaComputerModule.Register(gregTable, newScript, id);
             LuaModsModule.Register(gregTable, newScript, id);
+            LuaModSaveModule.Register(gregTable, newScript, id);
+            LuaInternetModule.Register(gregTable, newScript, id);
+            LuaSettingsModule.Register(gregTable, newScript, id);
+            LuaObjectivesModule.Register(gregTable, newScript, id);
+            LuaTooltipModule.Register(gregTable, newScript, id);
+            LuaCoopModule.Register(gregTable, newScript, id);
+            LuaMiscModule.Register(gregTable, newScript, id);
             LuaItemsModule.Register(gregTable, newScript, id, Path.GetDirectoryName(mainFile)!);
             LuaJsonModule.Register(gregTable, newScript, id);
             LuaConfigModule.Register(gregTable, newScript, id, Path.GetDirectoryName(mainFile)!);

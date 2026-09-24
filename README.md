@@ -41,9 +41,9 @@
 - Lua, JS and Python scripting bridges
 - Native Data Center co-op compatibility without a replacement networking stack
 - Tasten-HUD (`GregHud`) und zentrales Mod-Hub (F1)
-- Eigenes Hardware-ID-System (`gregID:`-Schema): stabile Geraete-Identitaet
-  fuer Switches, PatchPanels und Server ueber Save/Load hinweg
-  (siehe `docs/modding/hardware-ids.md`)
+- Own hardware ID system (`gregID:` schema): stable device identity
+  for switches, patch panels and servers across save/load
+  (see `docs/modding/hardware-ids.md`)
 
 ## Installation
 

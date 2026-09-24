@@ -1,44 +1,44 @@
-# Hardware-IDs — eigenes GregCore-System (`gregID:`)
+# Hardware IDs — own GregCore system (`gregID:`)
 
-> Eigene GregCore-Implementierung. Code:
+> Own GregCore implementation. Code:
 > `src/gregCore.Patches/Hardware/HardwareIdPersistencePatch.cs`,
-> Kompatibilitaetswache: `src/gregCore.Patches/Hardware/IncompatibleModGuard.cs`.
+> compatibility guard: `src/gregCore.Patches/Hardware/IncompatibleModGuard.cs`.
 
 ## Problem
 
-Vanilla vergibt Geraete-IDs mit Unity-`GetInstanceID`-Suffixen
-(z.B. `Switch_123456`). Diese Suffixe sind pro Session anders — nach
-Save/Load zeigen Kabel-Endpunkte auf tote IDs, Netzwerk-Topologien brechen.
+Vanilla assigns device IDs with Unity `GetInstanceID` suffixes
+(e.g. `Switch_123456`). Suffixes differ every session — after
+save/load, cable endpoints point at dead IDs and topologies break.
 
-## Design (Single-Scheme)
+## Design (single-scheme)
 
-Es gibt genau **ein** stabiles Schema: `gregID:<Typ>:<12 HEX>`, z.B.
-`gregID:Switch:A3F9C41B2E77`. Jede ID ohne `gregID:`-Praefix — leer,
-vanilla-generiert oder fremd — wird exakt einmal ueberfuehrt:
+Exactly **one** stable schema: `gregID:<Type>:<12 HEX>`, e.g.
+`gregID:Switch:A3F9C41B2E77`. Any ID without the `gregID:` prefix is
+converted exactly once:
 
-- **Live-Objekte** bei `Start`/`Awake` (`GregSwitchIdAssignPatch`,
+- **Live objects** at `Start`/`Awake` (`GregSwitchIdAssignPatch`,
   `GregPatchPanelIdAssignPatch`, `GregServerIdAssignPatch`).
-  `gameObject.name` bleibt Vanilla (Display-Trennung); Screens werden per
-  Scrub-Patches (`GregServerScreenScrubPatch`, `GregSwitchScreenScrubPatch`)
-  von ID-Tokens freigehalten.
-- **Save-Daten** beim Laden (`GregNetworkIdHealing` auf
-  `WaypointInitializationSystem.LoadNetworkState`): Legacy-IDs in
-  `NetworkSaveData` (Switches, PatchPanels, Server) werden umgeschrieben,
-  Kabel-Endpunkte wandern mit, danach `RequestRouteEvaluation()`.
-- **Suffix-Bereinigung** (`Greg*CleanPatch` auf `GenerateUnique*`):
-  Nur numerische Suffixe werden gestrippt (`Switch_123` → `Switch`);
-  Nutzer-Benennung mit Buchstaben (`Core_Switch_A`) bleibt erhalten.
-- **Persistenz der IDs** ueber `SaveSystem.displayToRawMap`.
+  `gameObject.name` stays vanilla (display separation); scrub patches
+  (`GregServerScreenScrubPatch`, `GregSwitchScreenScrubPatch`) keep
+  screens ID-token-free.
+- **Save data** on load (`GregNetworkIdHealing` on
+  `WaypointInitializationSystem.LoadNetworkState`): legacy IDs in
+  `NetworkSaveData` are rewritten, cable endpoints follow, then
+  `RequestRouteEvaluation()`.
+- **Suffix cleanup** (`Greg*CleanPatch` on `GenerateUnique*`):
+  only numeric suffixes are stripped (`Switch_123` → `Switch`);
+  lettered user names (`Core_Switch_A`) survive.
+- **ID persistence** via `SaveSystem.displayToRawMap`.
 
-Alles best-effort (Null-/Pointer-Checks, pro-Eintrag-Guards im Healing,
-`HookIntegration.LogPatchError`) — das ID-System kann nie Save oder Start
-reissen. Status im Log: `[gregCore][HwId]`.
+All best-effort (null/pointer checks, per-entry guards in healing,
+`HookIntegration.LogPatchError`) — the ID system can never break
+saves or startup. Status in log: `[gregCore][HwId]`.
 
-## Inkompatible Fremd-Mods
+## Incompatible third-party mods
 
-Ein zweites ID-System darf niemals gleichzeitig laufen (ID-Churn,
-Kabelbrueche). `IncompatibleModGuard` erkennt den alten separaten
-404-PersistentID-Mod (Mod-/Assembly-Name) und entpatcht ihn per
-`HarmonyInstance.UnpatchSelf()` — bei Mod-Init und erneut beim
-Szenen-Laden (einmal pro Sitzung, Warnung in Log + Toast).
-Danach ist `gregID` garantiert das einzige ID-System.
+A second ID system must never run alongside (ID churn, broken
+cables). `IncompatibleModGuard` detects the old separate
+404-PersistentID mod (mod/assembly name) and unpatches it via
+`HarmonyInstance.UnpatchSelf()` — at mod init and again on scene
+load (once per session, log + toast warning).
+After that, `gregID` is guaranteed the only ID system.

@@ -1,11 +1,10 @@
 /// <file-summary>
-/// Schicht:      GameLayer (Patches/Hardware)
-/// Zweck:        Kompatibilitaetswache fuer das gregID-System. Erkennt den
-///               alten separaten 404-PersistentID-Mod und entpatcht ihn
-///               (Harmony-UnpatchSelf), damit niemals zwei ID-Systeme
-///               gleichzeitig Geraete umbenennen (ID-Churn, Kabelbrueche).
-///               Laeuft bei Mod-Init (frueh geladene Mods) und erneut beim
-///               Szenen-Laden (spaet geladene Mods). Best-effort, nie fatal.
+/// Layer:   GameLayer (Patches/Hardware)
+/// Purpose: Compatibility guard for the gregID system. Detects the old
+///          separate 404-PersistentID mod and unpatches it (Harmony
+///          UnpatchSelf) so two ID systems never rename devices at once
+///          (ID churn, broken cables). Runs at mod init and again on
+///          scene load. Best-effort, never fatal.
 /// </file-summary>
 
 using System;
@@ -16,9 +15,8 @@ namespace gregCore.GameLayer.Patches.Hardware;
 
 public static class IncompatibleModGuard
 {
-    // Erkennungsmerkmale des alten 404-Mods (Mod-Name oder Assembly-Name,
-    // case-insensitiv, Teiltreffer). Eng gefasst — trifft nichts Eigenes
-    // ("gregCore" kommt in keinem Marker vor).
+    // Fingerprints of the old 404 mod (mod or assembly name,
+    // case-insensitive, substring). Tight — never matches own code.
     private static readonly string[] Markers =
     {
         "persistentid",
@@ -26,8 +24,8 @@ public static class IncompatibleModGuard
         "404nyanfound",
     };
 
-    // Bereits behandelte Assembly-Namen (Sitzung): UnpatchSelf ist idempotent,
-    // aber Log + Toast sollen nur einmal kommen.
+    // Already handled assemblies (session): UnpatchSelf is idempotent,
+    // but log + toast fire only once.
     private static readonly HashSet<string> _handled =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -49,7 +47,7 @@ public static class IncompatibleModGuard
                     try { asmName = melon.GetType()?.Assembly?.GetName()?.Name ?? ""; } catch { }
                     if (string.IsNullOrEmpty(modName) && string.IsNullOrEmpty(asmName)) continue;
 
-                    // Eigene Assembly nie anfassen (Selbstschutz).
+                    // Never touch own assembly (self-protection).
                     if (string.Equals(asmName, "gregCore", StringComparison.OrdinalIgnoreCase))
                         continue;
 
@@ -73,25 +71,25 @@ public static class IncompatibleModGuard
                         {
                             harmony.UnpatchSelf();
                             anyDisabled = true;
-                            MelonLogger.Warning($"[gregCore][HwId] Inkompatibler ID-Mod erkannt " +
-                                $"('{modName}' v{version}): Patches entfernt — gregID bleibt das einzige ID-System.");
+                            MelonLogger.Warning($"[gregCore][HwId] Incompatible ID mod found " +
+                                $"('{modName}' v{version}): patches removed — gregID stays the only ID system.");
                             try
                             {
                                 gregCore.UI.GregNotificationManager.Show(
-                                    $"Inkompatibler ID-Mod '{modName}' deaktiviert — gregID aktiv.",
+                                    $"Incompatible ID mod '{modName}' disabled — gregID active.",
                                     gregCore.UI.GregNotificationManager.GregToastType.Warning, 6f);
                             }
                             catch { }
                         }
                         else
                         {
-                            MelonLogger.Msg($"[gregCore][HwId] '{modName}' erkannt, aber keine Harmony-Instanz " +
-                                "(inert, nichts zu entpatchen).");
+                            MelonLogger.Msg($"[gregCore][HwId] '{modName}' found, but no Harmony instance " +
+                                "(inert, nothing to unpatch).");
                         }
                     }
                     catch (Exception ex)
                     {
-                        MelonLogger.Warning($"[gregCore][HwId] Entpatchen von '{modName}' fehlgeschlagen: " +
+                        MelonLogger.Warning($"[gregCore][HwId] Failed to unpatch '{modName}': " +
                             $"{ex.GetBaseException().Message}");
                     }
                 }

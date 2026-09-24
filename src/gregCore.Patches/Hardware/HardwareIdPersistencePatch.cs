@@ -1,16 +1,13 @@
 /// <file-summary>
-/// Schicht:      GameLayer (Patches/Hardware)
-/// Design:       Eigene GregCore-Implementierung (gregID-Schema).
-/// Zweck:        Stabile Geraete-Identitaet fuer NetworkSwitch/PatchPanel/
-///               Server. Vanilla haengt GetInstanceID-Suffixe an
-///               (pro Session anders) — ohne Bereinigung zeigen
-///               Kabel-Endpunkte nach Save/Load auf tote IDs.
-///               Single-Scheme-System: Es gibt genau ein stabiles Schema
-///               (gregID:...). Alles ohne gregID-Praefix — leer,
-///               vanilla-generiert oder fremd — wird exakt einmal auf
-///               gregID ueberfuehrt (Live-Objekte bei Start/Awake,
-///               Save-Daten beim Laden inkl. Kabel-Endpunkten).
-///               Screens bleiben frei von ID-Tokens. Alles best-effort.
+/// Layer:   GameLayer (Patches/Hardware)
+/// Design:  Own GregCore implementation (gregID schema).
+/// Purpose: Stable device identity for NetworkSwitch/PatchPanel/Server.
+///          Vanilla appends GetInstanceID suffixes (different every session)
+///          which kills cable endpoints after save/load.
+///          Single-scheme: exactly one stable schema (gregID:...). Anything
+///          without it is converted to gregID exactly once (live objects at
+///          Start/Awake, save data on load incl. cable endpoints).
+///          Screens stay ID-token-free. All best-effort.
 /// </file-summary>
 
 using HarmonyLib;
@@ -30,16 +27,15 @@ public static class HardwareIdPersistencePatch
     private const string PatchPanelPrefix = "gregID:PatchPanel:";
     private const string ServerPrefix = "gregID:Server:";
 
-    // Eigene IDs (beliebiges Praefix, case-insensitiv).
+    // Own IDs (any prefix, case-insensitive).
     internal static bool HasPrefix(string prefix, string deviceId)
     {
         return !string.IsNullOrEmpty(deviceId)
             && deviceId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
     }
 
-    // Entfernt GetInstanceID-Suffixe ("Name_123456", auch negativ "-123").
-    // Strikter als Split('_')[0]: Suffixe mit Buchstaben (Nutzer-Benennung
-    // wie "Core_Switch_A") bleiben erhalten.
+    // Strips GetInstanceID suffixes ("Name_123456", incl. negative).
+    // Stricter than Split('_')[0]: letter suffixes ("Core_Switch_A") survive.
     private static string CleanId(string prefix, string deviceId)
     {
         if (!HasPrefix(prefix, deviceId)) return deviceId;
@@ -53,7 +49,7 @@ public static class HardwareIdPersistencePatch
         string cleanId = deviceId.Substring(0, cut);
         if (_loggedIds.Add(prefix + "|" + cleanId))
         {
-            MelonLogger.Msg($"[gregCore][HwId] Suffix entfernt: {deviceId} -> {cleanId}");
+            MelonLogger.Msg($"[gregCore][HwId] Suffix stripped: {deviceId} -> {cleanId}");
         }
         return cleanId;
     }
@@ -77,12 +73,10 @@ public static class HardwareIdPersistencePatch
                 string currentId = __instance.switchId;
                 if (HasPrefix(SwitchPrefix, currentId)) return;
                 {
-                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
-                    // ueberfuehrt (leer, vanilla oder fremd).
+                    // Single-scheme: any non-gregID becomes gregID exactly once.
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(SwitchPrefix);
                     __instance.switchId = uniqueId!;
-                    // Display-Trennung: gameObject.name bleibt Vanilla (Persistenz
-                    // steckt in switchId + Inventar-UID, unsichtbar dahinter).
+                    // Display separation: gameObject.name stays vanilla.
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -130,11 +124,10 @@ public static class HardwareIdPersistencePatch
                 string currentId = __instance.patchPanelId;
                 if (HasPrefix(PatchPanelPrefix, currentId)) return;
                 {
-                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
-                    // ueberfuehrt (leer, vanilla oder fremd).
+                    // Single-scheme: any non-gregID becomes gregID exactly once.
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(PatchPanelPrefix);
                     __instance.patchPanelId = uniqueId!;
-                    // Display-Trennung: gameObject.name bleibt Vanilla (siehe Switch).
+                    // Display separation: gameObject.name stays vanilla.
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -180,12 +173,11 @@ public static class HardwareIdPersistencePatch
                 string currentId = __instance.ServerID;
                 if (HasPrefix(ServerPrefix, currentId)) return;
                 {
-                    // Single-Scheme: jede Nicht-gregID wird exakt einmal
-                    // ueberfuehrt (leer, vanilla oder fremd).
+                    // Single-scheme: any non-gregID becomes gregID exactly once.
                     string uniqueId = HardwareIdPersistencePatch.GenerateGregId(ServerPrefix);
                     __instance.ServerID = uniqueId!;
 
-                    // Display-Trennung: gameObject.name bleibt Vanilla (siehe Switch).
+                    // Display separation: gameObject.name stays vanilla.
 
                     if (global::Il2Cpp.SaveSystem.displayToRawMap != null)
                     {
@@ -221,12 +213,9 @@ public static class HardwareIdPersistencePatch
 
     #region DISPLAY SCRUB (Vanilla-Bezeichnung auf Screens)
 
-    // Screens duerfen nie gregIDs zeigen: Falls ein Screen-Text ein gregID-
-    // Token enthaelt (ServerID-Durchgriff), wird nur das Token durch die
-    // Vanilla-Bezeichnung ersetzt. Vanilla-Texte ohne Token: No-Op.
-    // HINWEIS: Aeltere Saves/Sessions mit umbenannten Objekten (Name =
-    // gregID) fallen auf "Server"/"Switch" zurueck - einmalig, danach ist
-    // der Name wieder Vanilla (Namen werden nicht gespeichert).
+    // Screens must never show gregIDs: if a screen text contains one,
+    // only the token is replaced with the vanilla designation.
+    // Vanilla texts without tokens: no-op.
 
     private static string VanillaDesignation(global::UnityEngine.GameObject go, string fallback)
     {
@@ -305,13 +294,11 @@ public static class GregNetworkIdHealing
             if (networkData == null || networkData.Pointer == IntPtr.Zero) return;
             var data = networkData;
 
-            MelonLogger.Msg("[gregCore][HwId] Pruefe Kartendaten auf Legacy-IDs...");
+            MelonLogger.Msg("[gregCore][HwId] Scanning map data for legacy IDs...");
 
-            // Geheilt wird jede ID ohne gregID-Praefix (leer ausgenommen —
-            // leere IDs vergibt der Start-Patch). Fremde Schemata werden
-            // dabei wie Vanilla behandelt: einmalig auf gregID ueberfuehrt,
-            // Kabel-Endpunkte wandern mit. Null-Guards pro Eintrag: Ein
-            // kaputter Eintrag darf nie das gesamte Healing abbrechen.
+            // Heals every ID without gregID prefix (empty excluded — the
+            // Start patch assigns those). Endpoints follow. Per-entry
+            // null-guards: one bad entry never aborts the whole healing.
             if (data.switches != null)
             {
                 foreach (var swData in data.switches)
@@ -335,7 +322,7 @@ public static class GregNetworkIdHealing
                                 if (cable.endPoint != null && cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | Switch: {oldId} -> {newGuid} | Kabel: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | Switch: {oldId} -> {newGuid} | Cables: {healedCables}");
                     }
                     catch { }
                 }
@@ -372,7 +359,7 @@ public static class GregNetworkIdHealing
                                 }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | PatchPanel: {oldId} -> {newGuid} | Kabel: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | PatchPanel: {oldId} -> {newGuid} | Cables: {healedCables}");
                     }
                     catch { }
                 }
@@ -401,7 +388,7 @@ public static class GregNetworkIdHealing
                                 if (cable.endPoint != null && cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
                             }
                         }
-                        MelonLogger.Msg($"[gregCore][HwId] Legacy-Mapping | Server: {oldId} -> {newGuid} | Kabel: {healedCables}");
+                        MelonLogger.Msg($"[gregCore][HwId] Legacy remap | Server: {oldId} -> {newGuid} | Cables: {healedCables}");
                     }
                     catch { }
                 }

@@ -6,24 +6,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: siehe
 
 ### Changed
 
-- Hardware-IDs (`HardwareIdPersistencePatch`) als eigenstaendiges
-  Single-Scheme-System: Genau ein stabiles Schema (`gregID:...`); jede andere
-  ID (leer, vanilla, fremd) wird exakt einmal ueberfuehrt — live bei
-  Start/Awake, Save-Daten beim Laden inkl. Kabel-Endpunkten. Keine
-  Koexistenz-/Adoptionslogik fuer Fremd-Schemata mehr.
-- `CleanId` strippt nur noch numerische GetInstanceID-Suffixe
-  (`Name_123456`); Nutzer-Benennung mit Buchstaben (`Core_Switch_A`) bleibt.
-- Healing mit Null-Guards pro Eintrag (Listen, Eintraege, Kabel, Endpunkte):
-  Ein kaputter Eintrag bricht nie das gesamte Healing ab.
-- Log-Dedup per ID-String statt `GetHashCode`; Logs im
-  `[gregCore][HwId]`-Format; `NewPatchPanelIdpatch`-Typo korrigiert.
-- Kompatibilitaetswache (`IncompatibleModGuard`): Erkennt den alten separaten
-  404-PersistentID-Mod (Name/Assembly) und entpatcht ihn (`UnpatchSelf`) — bei
-  Mod-Init und erneut beim Szenen-Laden — damit gregID das einzige ID-System
-  bleibt. Warnung in Log + Toast, einmal pro Sitzung.
-- Sichtbar eigene Implementierung: Patch-Klassen mit `Greg*`-Namen
-  (`GregSwitchIdAssignPatch`, `GregNetworkIdHealing`, …), Startup-Kennung
-  `[gregCore][HwId]` im Log, Doku in `docs/modding/hardware-ids.md`.
+- Hardware IDs (`HardwareIdPersistencePatch`) as standalone single-scheme
+  system: exactly one stable schema (`gregID:...`); any other ID is converted
+  exactly once — live at Start/Awake, save data on load incl. cable endpoints.
+  No coexistence/adoption logic for foreign schemas.
+- `CleanId` strips numeric GetInstanceID suffixes only; lettered user names
+  (`Core_Switch_A`) survive.
+- Healing with per-entry null-guards (lists, entries, cables, endpoints):
+  one bad entry never aborts the whole healing.
+- Log dedup by ID string instead of `GetHashCode`; `[gregCore][HwId]` logs;
+  `NewPatchPanelIdpatch` typo fixed.
+- Compatibility guard (`IncompatibleModGuard`): detects the old separate
+  404-PersistentID mod (name/assembly) and unpatches it (`UnpatchSelf`) — at
+  mod init and again on scene load — keeping gregID the only ID system.
+  Log + toast warning, once per session.
+- Clearly own implementation: `Greg*` patch class names
+  (`GregSwitchIdAssignPatch`, `GregNetworkIdHealing`, …), `HWID SYSTEM ACTIVE`
+  startup line in log, docs in `docs/modding/hardware-ids.md`.
 
 ### Added
 

@@ -53,7 +53,7 @@ public static class LuaServerModule
                             info["z"] = (double)pos.z;
                             result[i++] = info;
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 return result;
@@ -108,7 +108,7 @@ public static class LuaServerModule
                                 return true;
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 return false;
@@ -140,7 +140,7 @@ public static class LuaServerModule
                                 repaired++;
                             }
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
                 return repaired;
@@ -163,7 +163,7 @@ public static class LuaServerModule
             var field = t.GetField(name);
             if (field != null) return field.GetValue(target);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return null;
     }
 }

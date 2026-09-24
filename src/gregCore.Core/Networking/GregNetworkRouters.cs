@@ -35,7 +35,7 @@ public static class GregNetworkRouters
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(r);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -57,7 +57,7 @@ public static class GregNetworkRouters
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(f);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -214,7 +214,7 @@ public static class GregNetworkRouters
                 && Enum.TryParse<global::Il2Cpp.Firewall.Protocol>(protocol, true, out var p))
                 proto = p;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             var _ = firewall.gameObject; // liveness
@@ -257,7 +257,7 @@ public static class GregNetworkRouters
                 && Enum.TryParse<global::Il2Cpp.Firewall.Protocol>(protocol, true, out var p))
                 proto = p;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             var _ = firewall.gameObject; // liveness
@@ -320,7 +320,7 @@ public static class GregNetworkRouters
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Routers: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Routers: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -328,7 +328,7 @@ public static class GregNetworkRouters
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Routers-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Routers-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

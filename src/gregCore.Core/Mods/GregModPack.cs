@@ -21,37 +21,37 @@ public static class GregModPack
 
     public sealed class ShopItem
     {
-        public string ItemName = "";
-        public int Price;
-        public int XpToUnlock;
-        public int SizeInU = 1;
-        public float Mass = 1f;
-        public float ModelScale = 1f;
-        public float[] ColliderSize = Array.Empty<float>();
-        public float[] ColliderCenter = Array.Empty<float>();
-        public string ModelFile = "";
-        public string TextureFile = "";
-        public string IconFile = "";
-        public string ObjectType = "";
+        public string ItemName { get; set; } = "";
+        public int Price { get; set; }
+        public int XpToUnlock { get; set; }
+        public int SizeInU { get; set; } = 1;
+        public float Mass { get; set; } = 1f;
+        public float ModelScale { get; set; } = 1f;
+        public float[] ColliderSize { get; set; } = Array.Empty<float>();
+        public float[] ColliderCenter { get; set; } = Array.Empty<float>();
+        public string ModelFile { get; set; } = "";
+        public string TextureFile { get; set; } = "";
+        public string IconFile { get; set; } = "";
+        public string ObjectType { get; set; } = "";
     }
 
     public sealed class StaticItem
     {
-        public string ItemName = "";
-        public float ModelScale = 1f;
-        public float[] ColliderSize = Array.Empty<float>();
-        public float[] ColliderCenter = Array.Empty<float>();
-        public string ModelFile = "";
-        public string TextureFile = "";
-        public float[] Position = Array.Empty<float>();
-        public float[] Rotation = Array.Empty<float>();
-        public bool IsKinematic;
+        public string ItemName { get; set; } = "";
+        public float ModelScale { get; set; } = 1f;
+        public float[] ColliderSize { get; set; } = Array.Empty<float>();
+        public float[] ColliderCenter { get; set; } = Array.Empty<float>();
+        public string ModelFile { get; set; } = "";
+        public string TextureFile { get; set; } = "";
+        public float[] Position { get; set; } = Array.Empty<float>();
+        public float[] Rotation { get; set; } = Array.Empty<float>();
+        public bool IsKinematic { get; set; }
     }
 
     public sealed class DllRef
     {
-        public string FileName = "";
-        public string EntryClass = "";
+        public string FileName { get; set; } = "";
+        public string EntryClass { get; set; } = "";
     }
 
     public sealed class Snapshot
@@ -68,7 +68,7 @@ public static class GregModPack
     {
         global::Il2Cpp.ModPackConfig cfg = null;
         try { cfg = new global::Il2Cpp.ModPackConfig(); } catch { return null; }
-        try { cfg.modName = modName ?? ""; } catch { }
+        try { cfg.modName = modName ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         EnsureLists(cfg);
         return cfg;
     }
@@ -77,9 +77,9 @@ public static class GregModPack
     public static void EnsureLists(global::Il2Cpp.ModPackConfig cfg)
     {
         if (cfg == null) return;
-        try { if (cfg.shopItems == null) cfg.shopItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ShopItemConfig>(); } catch { }
-        try { if (cfg.staticItems == null) cfg.staticItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.StaticItemConfig>(); } catch { }
-        try { if (cfg.dlls == null) cfg.dlls = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.DllEntry>(); } catch { }
+        try { if (cfg.shopItems == null) cfg.shopItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ShopItemConfig>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { if (cfg.staticItems == null) cfg.staticItems = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.StaticItemConfig>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { if (cfg.dlls == null) cfg.dlls = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.DllEntry>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // ── Builder: DTO -> Spieltyp (jeweils best-effort pro Feld) ──────────────
@@ -154,7 +154,7 @@ public static class GregModPack
             if (list == null) return;
             foreach (var item in list)
             {
-                try { snap.ShopItems.Add(ReadShopItem(item)); } catch { }
+                try { snap.ShopItems.Add(ReadShopItem(item)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() =>
@@ -163,7 +163,7 @@ public static class GregModPack
             if (list == null) return;
             foreach (var item in list)
             {
-                try { snap.StaticItems.Add(ReadStaticItem(item)); } catch { }
+                try { snap.StaticItems.Add(ReadStaticItem(item)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() =>
@@ -180,7 +180,7 @@ public static class GregModPack
                         EntryClass = entry != null ? entry.entryClass ?? "" : "",
                     });
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return snap;
@@ -291,7 +291,7 @@ public static class GregModPack
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Mods] ModPack-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Mods] ModPack-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

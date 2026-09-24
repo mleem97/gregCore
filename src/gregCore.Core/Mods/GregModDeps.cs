@@ -20,9 +20,9 @@ public static class GregModDeps
 
     public sealed class Dependency
     {
-        public string ModId = "";
-        public string MinVersion = "";
-        public bool Required = true;
+        public string ModId { get; set; } = "";
+        public string MinVersion { get; set; } = "";
+        public bool Required { get; set; } = true;
     }
 
     public sealed class Problem
@@ -94,7 +94,7 @@ public static class GregModDeps
                     return true;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return false;
     }
 
@@ -114,7 +114,7 @@ public static class GregModDeps
                 try { return melon.Info?.Version ?? ""; } catch { return ""; }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return "";
     }
 
@@ -172,7 +172,7 @@ public static class GregModDeps
                     });
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         return problems;
     }
@@ -190,7 +190,7 @@ public static class GregModDeps
             foreach (var p in problems)
             {
                 allOk = false;
-                try { MelonLogger.Error($"[gregCore][Mods] Fehlende Abhängigkeit: {p}"); } catch { }
+                try { MelonLogger.Error($"[gregCore][Mods] Fehlende Abhängigkeit: {p}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         return allOk;
@@ -216,10 +216,10 @@ public static class GregModDeps
                     if (string.IsNullOrWhiteSpace(name)) continue;
                     result.Add(new ModEntry { Id = name, Version = melon.Info?.Version ?? "" });
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         result.Sort((a, b) => string.Compare(a.Id, b.Id, StringComparison.OrdinalIgnoreCase));
         return result;
     }
@@ -270,7 +270,7 @@ public static class GregModDeps
         foreach (var e in entries)
         {
             if (e == null || string.IsNullOrWhiteSpace(e.Id)) continue;
-            try { map[e.Id] = e.Version ?? ""; } catch { }
+            try { map[e.Id] = e.Version ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         return map;
     }

@@ -27,7 +27,7 @@ public static class GregSteamLobby
         try { return global::Il2Cpp.SteamFriendLobbies.LoadSteamAvatar(friendId); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] LoadSteamAvatar fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] LoadSteamAvatar fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return null;
         }
     }
@@ -38,7 +38,7 @@ public static class GregSteamLobby
         try { return global::Il2Cpp.SteamFriendLobbies.BuildTextureFromHandle(handle); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] BuildTextureFromHandle fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] BuildTextureFromHandle fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return null;
         }
     }

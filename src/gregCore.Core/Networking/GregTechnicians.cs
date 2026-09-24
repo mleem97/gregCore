@@ -47,7 +47,7 @@ public static class GregTechnicians
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(t);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -89,7 +89,7 @@ public static class GregTechnicians
         {
             foreach (var t in FindAll())
             {
-                try { result.Add(Read(t)); } catch { }
+                try { result.Add(Read(t)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -121,8 +121,8 @@ public static class GregTechnicians
         {
             var _ = tech.gameObject; // liveness
             var job = new global::Il2Cpp.TechnicianManager.RepairJob();
-            try { job.networkSwitch = networkSwitch; } catch { }
-            try { job.server = server; } catch { }
+            try { job.networkSwitch = networkSwitch; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { job.server = server; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             tech.AssignJob(job);
             return true;
         }
@@ -223,7 +223,7 @@ public static class GregTechnicians
                     var e = GregJobSaves.CreateRepairJob(j);
                     if (e != null) list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch { return false; }
@@ -261,7 +261,7 @@ public static class GregTechnicians
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -342,7 +342,7 @@ public static class GregTechnicians
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Technicians: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Technicians: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -350,7 +350,7 @@ public static class GregTechnicians
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Technicians-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Technicians-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

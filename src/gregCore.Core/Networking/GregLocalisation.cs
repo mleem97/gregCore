@@ -42,7 +42,7 @@ public static class GregLocalisation
         }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] ChangeLocalisation fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] ChangeLocalisation fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return false;
         }
     }

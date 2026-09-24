@@ -23,12 +23,12 @@ public static class GregAttackEscalation
 
     public sealed class EscalationConfig
     {
-        public float TierSeconds = 300f;
-        public float IntervalFactor = 0.9f;
-        public float MinIntervalSeconds = 20f;
-        public float RateGrowthPerTier = 0.15f;
-        public float SpeedGrowthPerTier = 0.10f;
-        public int MaxTier = 10;
+        public float TierSeconds { get; set; } = 300f;
+        public float IntervalFactor { get; set; } = 0.9f;
+        public float MinIntervalSeconds { get; set; } = 20f;
+        public float RateGrowthPerTier { get; set; } = 0.15f;
+        public float SpeedGrowthPerTier { get; set; } = 0.10f;
+        public int MaxTier { get; set; } = 10;
     }
 
     public sealed class TierStats
@@ -88,7 +88,7 @@ public static class GregAttackEscalation
         {
             yield return wait;
             if (!_running) yield break;
-            try { Tick(1f); } catch { }
+            try { Tick(1f); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -135,23 +135,23 @@ public static class GregAttackEscalation
         {
             if (stats.AttackInterval > 0f) mgr.attackInterval = stats.AttackInterval;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             if (stats.SpawnRate > 0f) mgr.spawnRate = stats.SpawnRate;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             if (stats.MoveSpeed > 0f) mgr.moveSpeed = stats.MoveSpeed;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
             MelonLogger.Msg($"[gregCore][Net] Angriffs-Eskalation: Stufe {tier} " +
                 $"(Intervall {stats.AttackInterval:F0}s, Rate x{(stats.SpawnRate / Math.Max(0.001f, _baseRate)):F2}).");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // ── Reine Stufenmathe (ohne Spiel testbar) ───────────────────────────────

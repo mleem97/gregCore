@@ -59,7 +59,7 @@ public static class GregAudioClipCache
                 Entry old;
                 if (_cache.TryGetValue(filePath, out old) && old != null && old.Clip != null && old.Clip != clip)
                 {
-                    try { UnityEngine.Object.Destroy(old.Clip); } catch { }
+                    try { UnityEngine.Object.Destroy(old.Clip); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 _cache[filePath] = new Entry { Clip = clip, LastUsed = ++_tick };
                 while (_cache.Count > Capacity)
@@ -78,14 +78,14 @@ public static class GregAudioClipCache
                     Entry ev;
                     if (_cache.TryGetValue(lru, out ev) && ev != null && ev.Clip != null)
                     {
-                        try { UnityEngine.Object.Destroy(ev.Clip); } catch { }
+                        try { UnityEngine.Object.Destroy(ev.Clip); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                     _cache.Remove(lru);
                     MelonLogger.Msg("[MusicPlayer] ClipCache: Evict '" + lru + "'.");
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Clear()
@@ -97,11 +97,11 @@ public static class GregAudioClipCache
                 foreach (var kv in _cache)
                 {
                     try { if (kv.Value != null && kv.Value.Clip != null) UnityEngine.Object.Destroy(kv.Value.Clip); }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 _cache.Clear();
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

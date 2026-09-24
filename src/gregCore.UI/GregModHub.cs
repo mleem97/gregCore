@@ -42,14 +42,14 @@ public static class GregModHub
         try
         {
             VisualElement layer = null;
-            try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Dialog); } catch { }
+            try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Dialog); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (layer == null) return;
             EnsureOverlay(layer);
             if (_overlay == null) return;
             _overlay.style.display = DisplayStyle.Flex;
             _open = true;
             GregMenuRegistry.SetOpen(MenuId, true);
-            try { GregInputLock.Refresh(); } catch { }
+            try { GregInputLock.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             Rebuild();
         }
         catch (System.Exception ex)
@@ -64,17 +64,17 @@ public static class GregModHub
         {
             if (_overlay != null) _overlay.style.display = DisplayStyle.None;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         _open = false;
         GregMenuRegistry.SetOpen(MenuId, false);
-        try { GregInputLock.Refresh(); } catch { }
+        try { GregInputLock.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void EnsureOverlay(VisualElement layer)
     {
         _overlay = layer.Q<VisualElement>(OverlayName);
         Font font = null;
-        try { font = GregFontLoader.DefaultUGUIFont; } catch { }
+        try { font = GregFontLoader.DefaultUGUIFont; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         if (_overlay != null) return;
 
         _overlay = new VisualElement { name = OverlayName };
@@ -103,8 +103,8 @@ public static class GregModHub
         title.style.color = new Color(0.53f, 0.81f, 0.92f, 1f);
         title.style.fontSize = 17;
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
-        title.style.marginBottom = 2;
-        if (font != null) { try { title.style.unityFont = font; } catch { } }
+        title.style.marginBottom = 8;
+        if (font != null) { try { title.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
         card.Add(title);
 
         var hint = new Label("Menüs hier öffnen/schließen · Einstellungen (Toggles) auf F8 oder pro Mod über „Settings“");
@@ -135,7 +135,7 @@ public static class GregModHub
     public static void PollClicks()
     {
         if (!_open || _clickables.Count == 0) return;
-        try { GregClickRouter.RouteClicks(_clickables, ref _lastRealClickUtc); } catch { }
+        try { GregClickRouter.RouteClicks(_clickables, ref _lastRealClickUtc); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Rebuild()
@@ -147,7 +147,7 @@ public static class GregModHub
             _body.Clear();
             _clickables.Clear();
             Font font = null;
-            try { font = GregFontLoader.DefaultUGUIFont; } catch { }
+            try { font = GregFontLoader.DefaultUGUIFont; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             var mods = Core.Mods.GregModRegistry.All().ToList();
             var menus = GregMenuRegistry.Snapshot();
 
@@ -208,7 +208,7 @@ public static class GregModHub
                 var empty = new Label("Keine Mods registriert.");
                 empty.style.color = new Color(0.7f, 0.7f, 0.7f, 1f);
                 empty.style.fontSize = 13;
-                if (font != null) { try { empty.style.unityFont = font; } catch { } }
+                if (font != null) { try { empty.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
                 _body.Add(empty);
             }
         }
@@ -267,7 +267,7 @@ public static class GregModHub
         lab.style.fontSize = 13;
         lab.style.flexGrow = 1;
         lab.style.marginRight = 8;
-        if (font != null) { try { lab.style.unityFont = font; } catch { } }
+        if (font != null) { try { lab.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
         row.Add(lab);
 
         if (buttonLabel != null && onClick != null)

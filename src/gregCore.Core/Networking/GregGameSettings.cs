@@ -34,7 +34,7 @@ public static class GregGameSettings
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -102,7 +102,7 @@ public static class GregGameSettings
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] GameSettings: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] GameSettings: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -110,7 +110,7 @@ public static class GregGameSettings
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] GameSettings-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] GameSettings-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

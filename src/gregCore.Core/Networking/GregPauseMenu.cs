@@ -43,7 +43,7 @@ public static class GregPauseMenu
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -160,7 +160,7 @@ public static class GregPauseMenu
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] PauseMenu: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] PauseMenu: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -168,7 +168,7 @@ public static class GregPauseMenu
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] PauseMenu-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] PauseMenu-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

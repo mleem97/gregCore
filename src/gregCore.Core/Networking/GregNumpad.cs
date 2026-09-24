@@ -34,7 +34,7 @@ public static class GregNumpad
                         break;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return found;
@@ -127,7 +127,7 @@ public static class GregNumpad
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Numpad: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Numpad: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -135,7 +135,7 @@ public static class GregNumpad
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Numpad-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Numpad-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

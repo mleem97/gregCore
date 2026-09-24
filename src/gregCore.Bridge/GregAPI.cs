@@ -30,11 +30,14 @@ namespace gregCore.API
         // Ohne Verdrahtung faellt Log() auf den MelonLogger zurueck.
         public static Action<string, string>? LogSink { get; set; }
 
+        public static void Initialize(IGregLogger logger)
+            => Initialize(logger, null, null, null);
+
         public static void Initialize(
             IGregLogger logger,
-            GregEventBus? eventBus = null,
-            GregHookBus? hookBus = null,
-            IGregPersistenceService? persistence = null)
+            GregEventBus? eventBus,
+            GregHookBus? hookBus,
+            IGregPersistenceService? persistence)
         {
             _logger = logger.ForContext("API");
             EventBus = eventBus ?? new GregEventBus(_logger);
@@ -60,7 +63,7 @@ namespace gregCore.API
             if (sink != null)
             {
                 try { sink(msg, type); return; }
-                catch { }
+                catch { /* ignored: sink failure falls through to MelonLogger below */ }
             }
             if (type == "WARN") _logger.Warning(msg);
             else if (type == "ERROR") _logger.Error(msg);
@@ -86,7 +89,9 @@ namespace gregCore.API
 
         internal static GregHookBus? HookBus { get; set; }
 
-        public static void FireEvent(string id, object? data = null)
+        public static void FireEvent(string id) => FireEvent(id, null);
+
+        public static void FireEvent(string id, object? data)
         {
             try
             {
@@ -124,6 +129,7 @@ namespace gregCore.API
                     case "OnCoinsChanged": gregNativeEventHooks.OnCoinsChanged += callback; break;
                     case "OnXpChanged": gregNativeEventHooks.OnXpChanged += callback; break;
                     case "OnReputationChanged": gregNativeEventHooks.OnReputationChanged += callback; break;
+                    default: break; // other hooks handled generically via EventBus above
                 }
             }
             catch (Exception ex)
@@ -283,7 +289,7 @@ namespace gregCore.API
                 int busyCount = 0;
                 foreach (var t in tm.technicians)
                 {
-                    try { if (t != null && t.Pointer != IntPtr.Zero && t.isBusy) busyCount++; } catch { }
+                    try { if (t != null && t.Pointer != IntPtr.Zero && t.isBusy) busyCount++; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return (uint)Math.Max(0, tm.technicians.Count - busyCount);
             }
@@ -319,7 +325,7 @@ namespace gregCore.API
                             return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return 0;
             }
@@ -344,7 +350,7 @@ namespace gregCore.API
                             return 1; // Return after dispatching one, no defensive copy needed since we break
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return 0;
             }
@@ -465,12 +471,13 @@ namespace gregCore.API
         }
 
         // ─── Config (Persisted via ModConfigSystem) ──────────────────────
+        // Compatibility shims: intentionally inert until ModConfigSystem wires them.
 
-        public static void ConfigSetBool(string m, string k, bool v) { }
+        public static void ConfigSetBool(string m, string k, bool v) { /* shim, wired later */ }
         public static bool ConfigGetBool(string m, string k, bool d) => d;
-        public static void ConfigSetInt(string m, string k, int v) { }
+        public static void ConfigSetInt(string m, string k, int v) { /* shim, wired later */ }
         public static int ConfigGetInt(string m, string k, int d) => d;
-        public static void ConfigSetString(string m, string k, string v) { }
+        public static void ConfigSetString(string m, string k, string v) { /* shim, wired later */ }
         public static string ConfigGetString(string m, string k, string d) => d;
 
         // ─── Internal References (set by GregCoreMod) ────────────────────
@@ -480,23 +487,34 @@ namespace gregCore.API
 
     public class GregSettingsProxy
     {
-        public void RegisterToggle(string modId, string k, string n, bool def, Action<bool> cb, string cat = "General", string desc = "") { }
-        public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb, string cat = "General", string desc = "") { }
-        public void RegisterToggle(string k, string n, string d, bool def) { }
-        public void RegisterSlider(string k, string n, string d, float min, float max, float def) { }
+        public sealed class SliderOptions
+        {
+            public string Cat { get; set; } = "General";
+            public string Desc { get; set; } = "";
+        }
+
+        public void RegisterToggle(string modId, string k, string n, bool def, Action<bool> cb)
+            => RegisterToggle(modId, k, n, def, cb, "General", "");
+        public void RegisterToggle(string modId, string k, string n, bool def, Action<bool> cb, string cat, string desc) { /* shim, wired later */ }
+        public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb)
+            => RegisterSlider(modId, k, n, min, max, def, cb, new SliderOptions());
+        public void RegisterSlider(string modId, string k, string n, float min, float max, float def, Action<float> cb, SliderOptions opts) { /* shim, wired later */ }
+        public void RegisterToggle(string k, string n, string d, bool def) { /* shim, wired later */ }
+        public void RegisterSlider(string k, string n, string d, float min, float max, float def) { /* shim, wired later */ }
     }
 
     public class GregHooksProxy
     {
-        public void Fire(string id, object? data = null) => GregAPI.FireEvent(id, data);
+        public void Fire(string id) => GregAPI.FireEvent(id);
+        public void Fire(string id, object? data) => GregAPI.FireEvent(id, data);
         public void On(string id, Action<object> cb) => GregAPI.On(id, cb);
     }
 
     public class HookEventArgs
     {
-        public string HookName = "";
-        public string Trigger = "";
-        public object? Data;
+        public string HookName { get; set; } = "";
+        public string Trigger { get; set; } = "";
+        public object? Data { get; set; }
     }
 
     public enum GregEventId { None, OnCoinsChanged, system_GameLoaded, ServerBroken, ServerRepaired }

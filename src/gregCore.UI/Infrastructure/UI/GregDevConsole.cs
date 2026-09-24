@@ -98,7 +98,7 @@ namespace gregCore.Infrastructure.UI
                     _pendingLines.Enqueue((line, type));
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         private void FlushLogFeed()
@@ -123,7 +123,7 @@ namespace gregCore.Infrastructure.UI
                     AddRaw(next.line);
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         private void Update()
@@ -167,9 +167,9 @@ namespace gregCore.Infrastructure.UI
                     ShowCursor = true,
                 });
                 GregMenuRegistry.SetOpen(MenuId, true);
-                try { GregInputLock.Refresh(); } catch { }
+                try { GregInputLock.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _panel?.Show();
             _visible = true;
             _inputField?.Focus();
@@ -182,9 +182,9 @@ namespace gregCore.Infrastructure.UI
             try
             {
                 GregMenuRegistry.SetOpen(MenuId, false);
-                try { GregInputLock.Refresh(); } catch { }
+                try { GregInputLock.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         private void BuildUI()

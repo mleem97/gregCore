@@ -73,7 +73,7 @@ public sealed class GregPanel
         {
             if (Root != null) Root.style.width = Options.PanelWidth;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         GregMenuRegistry.RegisterMenu(MenuId, Options);
         if (IsVisible) SnapPosition();
     }
@@ -163,7 +163,7 @@ public sealed class GregPanel
         lock (_all) { copy = _all.ToArray(); }
         foreach (var p in copy)
         {
-            try { p?.Tick(dt); } catch { }
+            try { p?.Tick(dt); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -206,7 +206,7 @@ public sealed class GregPanel
             }
             if (IsVisible && Options.Draggable) TickDrag();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void TickDrag()
@@ -230,7 +230,7 @@ public sealed class GregPanel
                         _dragOffset = new Vector2(pos.x - r.x, pos.y - r.y);
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return;
             }
             if (_dragging)
@@ -250,7 +250,7 @@ public sealed class GregPanel
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private float DockLeft()
@@ -280,7 +280,7 @@ public sealed class GregPanel
                 Root.style.top = 60f;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static float EaseOut(float t)
@@ -293,7 +293,7 @@ public sealed class GregPanel
     private void BuildChrome(string title)
     {
         VisualElement layer = null;
-        try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Panel); } catch { }
+        try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.Panel); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         if (layer == null)
         {
             MelonLogger.Error("[gregCore][UI] Panel-Layer nicht verfuegbar.");
@@ -324,7 +324,7 @@ public sealed class GregPanel
         root.style.display = DisplayStyle.None;
 
         var header = new Label(string.IsNullOrEmpty(title) ? MenuId.ToUpper() : title.ToUpper());
-        try { GregUITheme.ApplyTextStyle(header, true); } catch { }
+        try { GregUITheme.ApplyTextStyle(header, true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         root.Add(header);
         _dragHandle = header;
 

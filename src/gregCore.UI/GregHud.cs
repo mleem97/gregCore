@@ -24,7 +24,7 @@ public static class GregHud
         try
         {
             VisualElement layer = null;
-            try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.HUD); } catch { }
+            try { layer = GregUILayerManager.Instance.GetLayerRoot(GregUILayerType.HUD); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (layer == null) return;
 
             _container = layer.Q<VisualElement>(ContainerName);
@@ -42,7 +42,7 @@ public static class GregHud
             _container.Clear();
 
             Font font = null;
-            try { font = GregFontLoader.DefaultUGUIFont; } catch { }
+            try { font = GregFontLoader.DefaultUGUIFont; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (font == null && Time.realtimeSinceStartup > _fontRetryAt)
                 _fontRetryAt = Time.realtimeSinceStartup + 2f;
 
@@ -83,7 +83,7 @@ public static class GregHud
                         key.style.unityFont = font;
                         lab.style.unityFont = font;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
 
                 line.Add(key);
@@ -111,7 +111,7 @@ public static class GregHud
             if (Time.realtimeSinceStartup >= _fontRetryAt)
             {
                 Font font = null;
-                try { font = GregFontLoader.DefaultUGUIFont; } catch { }
+                try { font = GregFontLoader.DefaultUGUIFont; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 if (font != null)
                 {
                     _fontRetryAt = Time.realtimeSinceStartup + 30f;
@@ -123,6 +123,6 @@ public static class GregHud
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

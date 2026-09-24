@@ -98,7 +98,7 @@ public static class CustomEmployeeManager
         if (entry.IsHired) return -2;
 
         float playerRep = 0f;
-        try { playerRep = PlayerManager.instance?.playerClass?.reputation ?? 0f; } catch { }
+        try { playerRep = PlayerManager.instance?.playerClass?.reputation ?? 0f; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         if (playerRep < entry.RequiredReputation)
         {
@@ -111,7 +111,7 @@ public static class CustomEmployeeManager
         CrashLog.Log($"CustomEmployee hired: {id} ({entry.Name})");
         MelonLogger.Msg($"[CustomEmployee] Hired: {entry.Name}");
 
-        try { BalanceSheet.instance?.RegisterSalary((int)entry.SalaryPerHour); } catch { }
+        try { BalanceSheet.instance?.RegisterSalary((int)entry.SalaryPerHour); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         EventDispatcher.FireCustomEmployeeHired(id);
         SaveState();
@@ -566,10 +566,10 @@ public static class CustomEmployeeManager
 
             // Skip button sub-trees
             if (child.GetComponent<UnityEngine.UI.Button>() != null) continue;
-            try { if (child.GetComponent<ButtonExtended>() != null) continue; } catch { }
+            try { if (child.GetComponent<ButtonExtended>() != null) continue; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             bool hasText = false;
-            try { if (child.GetComponent<TextMeshProUGUI>() != null) hasText = true; } catch { }
+            try { if (child.GetComponent<TextMeshProUGUI>() != null) hasText = true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             if (hasText) result.Add(child);
 
@@ -1066,7 +1066,7 @@ public static class CustomEmployeeManager
                         if (comp != null)
                             compNames.Add(comp.GetIl2CppType().Name);
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -1076,10 +1076,10 @@ public static class CustomEmployeeManager
             for (int i = 0; i < t.childCount; i++)
             {
                 try { LogHierarchy(t.GetChild(i), depth + 1); }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         if (depth == 0)
             CrashLog.Log("=== end hierarchy dump ===");

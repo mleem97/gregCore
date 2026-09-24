@@ -84,11 +84,11 @@ public static class GregUIInputSystem
         var action = new InputAction(name, type, controlType);
         foreach (string b in bindings)
         {
-            try { action.AddBinding(b); } catch { }
+            try { action.AddBinding(b); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
-        try { action.Enable(); } catch { }
+        try { action.Enable(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         var reference = ScriptableObject.CreateInstance<InputActionReference>();
-        try { reference.Set(action); } catch { }
+        try { reference.Set(action); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return reference;
     }
 }

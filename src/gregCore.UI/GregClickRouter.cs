@@ -34,7 +34,7 @@ namespace gregCore.UI
                 {
                     if ((DateTime.UtcNow - lastRealClickUtc).TotalMilliseconds < 500.0) return false;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 Vector2 pos = mouse.position.ReadValue();
                 pos.y = Screen.height - pos.y;
                 for (int i = clickables.Count - 1; i >= 0; i--)
@@ -48,20 +48,20 @@ namespace gregCore.UI
                         if (b.width <= 0f || b.height <= 0f) continue;
                         if (b.Contains(pos))
                         {
-                            try { c.Action(); } catch { }
+                            try { c.Action(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                             return true;
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return false;
         }
 
         public static void MarkRealClick(ref DateTime lastRealClickUtc)
         {
-            try { lastRealClickUtc = DateTime.UtcNow; } catch { }
+            try { lastRealClickUtc = DateTime.UtcNow; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

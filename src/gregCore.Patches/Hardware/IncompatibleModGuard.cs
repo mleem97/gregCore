@@ -44,7 +44,7 @@ public static class IncompatibleModGuard
                     string modName = "";
                     try { modName = melon.Info?.Name ?? ""; } catch { continue; }
                     string asmName = "";
-                    try { asmName = melon.GetType()?.Assembly?.GetName()?.Name ?? ""; } catch { }
+                    try { asmName = melon.GetType()?.Assembly?.GetName()?.Name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     if (string.IsNullOrEmpty(modName) && string.IsNullOrEmpty(asmName)) continue;
 
                     // Never touch own assembly (self-protection).
@@ -63,7 +63,7 @@ public static class IncompatibleModGuard
                     if (!_handled.Add(key)) continue; // schon behandelt
 
                     string version = "";
-                    try { version = melon.Info?.Version ?? ""; } catch { }
+                    try { version = melon.Info?.Version ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     try
                     {
                         var harmony = melon.HarmonyInstance;
@@ -79,7 +79,7 @@ public static class IncompatibleModGuard
                                     $"'{modName}' disabled — gregID active.",
                                     gregCore.UI.GregNotificationManager.GregToastType.Warning, 6f);
                             }
-                            catch { }
+                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                         else
                         {
@@ -92,10 +92,10 @@ public static class IncompatibleModGuard
                             $"{ex.GetBaseException().Message}");
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return anyDisabled;
     }
 }

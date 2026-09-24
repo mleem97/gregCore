@@ -15,7 +15,7 @@ public static class GregDoctor
             if (document.RootElement.TryGetProperty("manifestVersion", out var version))
                 manifestVersion = version.ToString();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         var manifestFingerprint = "";
         var manifestUnity = "UNKNOWN";
@@ -30,7 +30,7 @@ public static class GregDoctor
             if (root.TryGetProperty("melonLoaderVersion", out var melon)) manifestMelon = melon.GetString() ?? melon.ToString();
             if (root.TryGetProperty("il2CppInteropVersion", out var interop)) manifestInterop = interop.GetString() ?? interop.ToString();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         var fingerprintMatch = manifestFingerprint is "" or "UNKNOWN" ? "unknown" :
             string.Equals(manifestFingerprint, fingerprint.CombinedSha256, StringComparison.OrdinalIgnoreCase) ? "match" : "mismatch";
         var knownBuild = fingerprintMatch == "match";

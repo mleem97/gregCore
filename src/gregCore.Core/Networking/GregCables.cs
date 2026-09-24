@@ -23,20 +23,20 @@ public static class GregCables
 
     public sealed class LinkInfo
     {
-        public string SwitchID = "";
-        public string Type = "";
-        public float ConnectionSpeed;
-        public int CustomerID = -1;
-        public bool IsStartOrEnd;
-        public bool IsEndPoint;
-        public bool IsSFPPort;
-        public int SfpTypeInserted = -1;
-        public int SfpTypeSupported = -1;
-        public bool IsFibrePort;
-        public int CableIDsOnLink;
-        public string ParentServerID = "";
-        public string ParentSwitchID = "";
-        public string ParentPatchPanelID = "";
+        public string SwitchID { get; set; } = "";
+        public string Type { get; set; } = "";
+        public float ConnectionSpeed { get; set; }
+        public int CustomerID { get; set; } = -1;
+        public bool IsStartOrEnd { get; set; }
+        public bool IsEndPoint { get; set; }
+        public bool IsSFPPort { get; set; }
+        public int SfpTypeInserted { get; set; } = -1;
+        public int SfpTypeSupported { get; set; } = -1;
+        public bool IsFibrePort { get; set; }
+        public int CableIDsOnLink { get; set; }
+        public string ParentServerID { get; set; } = "";
+        public string ParentSwitchID { get; set; } = "";
+        public string ParentPatchPanelID { get; set; } = "";
     }
 
     // ── Finden ───────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ public static class GregCables
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(l);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -75,7 +75,7 @@ public static class GregCables
                 try { id = l.switchID; } catch { continue; }
                 if (string.Equals(id, switchID, StringComparison.OrdinalIgnoreCase))
                 {
-                    try { result.Add(l); } catch { }
+                    try { result.Add(l); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         });
@@ -94,7 +94,7 @@ public static class GregCables
                 try { t = l.typeOfLink.ToString(); } catch { continue; }
                 if (string.Equals(t, typeOfLink, StringComparison.OrdinalIgnoreCase))
                 {
-                    try { result.Add(l); } catch { }
+                    try { result.Add(l); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         });
@@ -131,7 +131,7 @@ public static class GregCables
         {
             foreach (var l in FindAll())
             {
-                try { result.Add(Read(l)); } catch { }
+                try { result.Add(Read(l)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -228,7 +228,7 @@ public static class GregCables
             var _ = link.gameObject; // liveness
             if (createIfMissing)
             {
-                try { link.CreateRopeAttachPoint(); } catch { }
+                try { link.CreateRopeAttachPoint(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             return link.GetRopeAttachPoint();
         }
@@ -246,7 +246,7 @@ public static class GregCables
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Cables: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Cables: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -254,7 +254,7 @@ public static class GregCables
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Cables-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Cables-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

@@ -222,7 +222,7 @@ public static class HardwareIdPersistencePatch
         try
         {
             string n = null;
-            try { n = go != null ? go.name : null; } catch { }
+            try { n = go != null ? go.name : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             string clean = GregEntityInventory.CleanDisplayName(n);
             return string.IsNullOrEmpty(clean) ? fallback : clean;
         }
@@ -245,7 +245,7 @@ public static class HardwareIdPersistencePatch
                 if (string.IsNullOrEmpty(cur)
                     || cur.IndexOf("gregID:", StringComparison.OrdinalIgnoreCase) < 0) return;
                 string designation = VanillaDesignation(__instance.gameObject, "Server");
-                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
+                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregServerScreenScrubPatch), ex); }
         }
@@ -267,7 +267,7 @@ public static class HardwareIdPersistencePatch
                 if (string.IsNullOrEmpty(cur)
                     || cur.IndexOf("gregID:", StringComparison.OrdinalIgnoreCase) < 0) return;
                 string designation = VanillaDesignation(__instance.gameObject, "Switch");
-                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { }
+                try { txt.text = GregEntityInventory.ScrubGregIds(cur, designation); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             catch (Exception ex) { HookIntegration.LogPatchError(nameof(GregSwitchScreenScrubPatch), ex); }
         }
@@ -324,7 +324,7 @@ public static class GregNetworkIdHealing
                         }
                         MelonLogger.Msg($"[gregCore][HwId] Remap Switch {oldId} -> {newGuid} ({healedCables} cables)");
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -361,7 +361,7 @@ public static class GregNetworkIdHealing
                         }
                         MelonLogger.Msg($"[gregCore][HwId] Remap PatchPanel {oldId} -> {newGuid} ({healedCables} cables)");
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 
@@ -390,7 +390,7 @@ public static class GregNetworkIdHealing
                         }
                         MelonLogger.Msg($"[gregCore][HwId] Remap Server {oldId} -> {newGuid} ({healedCables} cables)");
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         }

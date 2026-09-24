@@ -39,7 +39,7 @@ namespace gregCore.UI
             var s = new GUIStyle();
             s.fontSize = size;
             s.normal.textColor = color ?? Text;
-            try { s.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal; } catch { }
+            try { s.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return s;
         }
 
@@ -47,7 +47,7 @@ namespace gregCore.UI
         {
             var s = new GUIStyle();
             s.fontSize = 13;
-            try { s.fontStyle = FontStyle.Bold; } catch { }
+            try { s.fontStyle = FontStyle.Bold; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             s.alignment = TextAnchor.MiddleCenter;
             s.border = Inset(6);
             s.padding = Inset(8);
@@ -88,8 +88,8 @@ namespace gregCore.UI
                 t.SetPixel(0, 0, c);
                 t.Apply();
             }
-            catch { }
-            try { UnityEngine.Object.DontDestroyOnLoad(t); } catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { UnityEngine.Object.DontDestroyOnLoad(t); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _texCache[c] = t;
             return t;
         }

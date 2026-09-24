@@ -51,11 +51,31 @@ public static class RustFFIBridge
     {
         _apiTable = new GregCoreAPI { api_version = 1 };
 
+        BindApiLogging();
+        BindApiEconomy();
+        BindApiWorld();
+        BindApiTechnicians();
+        BindApiTime();
+        BindApiGame();
+        BindApiUiEvents();
+        BindApiHooks();
+        BindApiConfig();
+
+        // Alloc and store pointer
+        _apiTablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GregCoreAPI>());
+        Marshal.StructureToPtr(_apiTable, _apiTablePtr, false);
+    }
+
+    private static void BindApiLogging()
+    {
         // Logging
         _apiTable.log_info = AddDelegate<LogDelegate>(ptr => GregAPI.LogInfo(Marshal.PtrToStringAnsi(ptr) ?? ""));
         _apiTable.log_warning = AddDelegate<LogDelegate>(ptr => GregAPI.LogWarning(Marshal.PtrToStringAnsi(ptr) ?? ""));
         _apiTable.log_error = AddDelegate<LogDelegate>(ptr => GregAPI.LogError(Marshal.PtrToStringAnsi(ptr) ?? ""));
+    }
 
+    private static void BindApiEconomy()
+    {
         // Economy
         _apiTable.get_player_money = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerMoney());
         _apiTable.set_player_money = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerMoney(val));
@@ -63,26 +83,38 @@ public static class RustFFIBridge
         _apiTable.set_player_xp = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerXp(val));
         _apiTable.get_player_reputation = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerReputation());
         _apiTable.set_player_reputation = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerReputation(val));
+    }
 
+    private static void BindApiWorld()
+    {
         // World
         _apiTable.get_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetServerCount());
         _apiTable.get_rack_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetRackCount());
         _apiTable.get_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetSwitchCount());
         _apiTable.get_broken_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenServerCount());
         _apiTable.get_broken_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenSwitchCount());
+    }
 
+    private static void BindApiTechnicians()
+    {
         // Technicians
         _apiTable.get_free_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetFreeTechnicianCount());
         _apiTable.get_total_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetTotalTechnicianCount());
         _apiTable.dispatch_repair_server = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairServer());
         _apiTable.dispatch_repair_switch = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairSwitch());
+    }
 
+    private static void BindApiTime()
+    {
         // Time
         _apiTable.get_time_of_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeOfDay());
         _apiTable.get_day = AddDelegate<GetUintDelegate>(() => GregAPI.GetDay());
         _apiTable.get_seconds_in_full_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetSecondsInFullDay());
         _apiTable.set_seconds_in_full_day = AddDelegate<SetFloatDelegate>(val => GregAPI.SetSecondsInFullDay(val));
+    }
 
+    private static void BindApiGame()
+    {
         // Game
         _apiTable.get_current_scene = AddDelegate<GetStringDelegate>(() => Marshal.StringToHGlobalAnsi(GregAPI.GetCurrentScene()));
         _apiTable.is_game_paused = AddDelegate<GetUintDelegate>(() => GregAPI.IsGamePaused() ? 1u : 0u);
@@ -96,7 +128,10 @@ public static class RustFFIBridge
             var pos = GregAPI.GetPlayerPosition();
             x = pos.x; y = pos.y; z = pos.z; ry = pos.y;
         });
+    }
 
+    private static void BindApiUiEvents()
+    {
         // UI
         _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
 
@@ -106,7 +141,10 @@ public static class RustFFIBridge
             GregAPI.Subscribe(((GregEventId)eventId).ToString(), data => callback(eventId, (ulong)data));
         });
         _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
+    }
 
+    private static void BindApiHooks()
+    {
         // Hook API (New)
         _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
@@ -130,16 +168,15 @@ public static class RustFFIBridge
             var payload = new gregCore.Sdk.Models.GregPayload(hookName, "RustMod") { Data = data };
             GregAPI.Hooks.Fire(hookName, payload);
         });
+    }
 
+    private static void BindApiConfig()
+    {
         // Config
         _apiTable.config_set_bool = AddDelegate<ConfigSetBoolDelegate>((modId, key, val) =>
             GregAPI.ConfigSetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", val > 0));
         _apiTable.config_get_bool = AddDelegate<ConfigGetBoolDelegate>((modId, key, def) =>
             GregAPI.ConfigGetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", def > 0) ? 1u : 0u);
-
-        // Alloc and store pointer
-        _apiTablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GregCoreAPI>());
-        Marshal.StructureToPtr(_apiTable, _apiTablePtr, false);
     }
 
     private static IntPtr AddDelegate<T>(T del) where T : Delegate
@@ -160,7 +197,7 @@ public static class RustFFIBridge
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.dll").Length > 0)
                 MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Veraltet: Rust-Dateien unter ./Plugins/Rust werden ignoriert - bitte nach ./UserLibs/Rust verschieben.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         foreach (string file in global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(rustDir, ".dll"))
         {

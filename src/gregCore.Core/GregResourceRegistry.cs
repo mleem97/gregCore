@@ -18,7 +18,7 @@ public sealed class GregResourceRegistry : IDisposable
         _disposed = true;
         foreach (var resource in Enumerable.Reverse(_resources.ToArray()))
         {
-            try { resource.Dispose(); } catch { }
+            try { resource.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         _resources.Clear();
     }

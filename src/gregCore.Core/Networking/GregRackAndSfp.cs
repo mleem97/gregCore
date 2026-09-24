@@ -21,39 +21,39 @@ public static class GregRackAndSfp
 
     public sealed class TemplateDevice
     {
-        public int Kind;
-        public int PrefabID;
-        public int PositionIndex;
-        public int SizeInU;
-        public string Label = "";
+        public int Kind { get; set; }
+        public int PrefabID { get; set; }
+        public int PositionIndex { get; set; }
+        public int SizeInU { get; set; }
+        public string Label { get; set; } = "";
     }
 
     public sealed class TemplateSfp
     {
-        public int DeviceIndex;
-        public Vector3 PortLocalPos;
-        public int SfpType;
+        public int DeviceIndex { get; set; }
+        public Vector3 PortLocalPos { get; set; }
+        public int SfpType { get; set; }
     }
 
     public sealed class TemplateCable
     {
-        public int DeviceIndexA;
-        public Vector3 PortLocalPosA;
-        public int DeviceIndexB;
-        public Vector3 PortLocalPosB;
-        public Color Color = Color.white;
-        public List<Vector3> Waypoints = new List<Vector3>();
+        public int DeviceIndexA { get; set; }
+        public Vector3 PortLocalPosA { get; set; }
+        public int DeviceIndexB { get; set; }
+        public Vector3 PortLocalPosB { get; set; }
+        public Color Color { get; set; } = Color.white;
+        public List<Vector3> Waypoints { get; set; } = new List<Vector3>();
     }
 
     public sealed class RackTemplateDto
     {
-        public string TemplateId = "";
-        public int Price;
-        public bool HasCustomColor;
-        public Color RackColor = Color.white;
-        public List<TemplateDevice> Devices = new List<TemplateDevice>();
-        public List<TemplateSfp> Sfps = new List<TemplateSfp>();
-        public List<TemplateCable> Cables = new List<TemplateCable>();
+        public string TemplateId { get; set; } = "";
+        public int Price { get; set; }
+        public bool HasCustomColor { get; set; }
+        public Color RackColor { get; set; } = Color.white;
+        public List<TemplateDevice> Devices { get; set; } = new List<TemplateDevice>();
+        public List<TemplateSfp> Sfps { get; set; } = new List<TemplateSfp>();
+        public List<TemplateCable> Cables { get; set; } = new List<TemplateCable>();
     }
 
     // ── Finden ───────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ public static class GregRackAndSfp
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(o);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -276,7 +276,7 @@ public static class GregRackAndSfp
                 {
                     if (!string.IsNullOrEmpty(kv.Key)) result.Add(kv.Key);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         result.Sort(StringComparer.OrdinalIgnoreCase);
@@ -307,11 +307,11 @@ public static class GregRackAndSfp
             {
                 if (d == null) continue;
                 var td = new TemplateDevice();
-                try { td.Kind = d.kind; } catch { }
-                try { td.PrefabID = d.prefabID; } catch { }
-                try { td.PositionIndex = d.positionIndex; } catch { }
-                try { td.SizeInU = d.sizeInU; } catch { }
-                try { td.Label = d.label ?? ""; } catch { }
+                try { td.Kind = d.kind; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { td.PrefabID = d.prefabID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { td.PositionIndex = d.positionIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { td.SizeInU = d.sizeInU; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { td.Label = d.label ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.Devices.Add(td);
             }
         });
@@ -323,9 +323,9 @@ public static class GregRackAndSfp
             {
                 if (s == null) continue;
                 var ts = new TemplateSfp();
-                try { ts.DeviceIndex = s.deviceIndex; } catch { }
-                try { ts.PortLocalPos = s.portLocalPos; } catch { }
-                try { ts.SfpType = s.sfpType; } catch { }
+                try { ts.DeviceIndex = s.deviceIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { ts.PortLocalPos = s.portLocalPos; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { ts.SfpType = s.sfpType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.Sfps.Add(ts);
             }
         });
@@ -337,21 +337,21 @@ public static class GregRackAndSfp
             {
                 if (c == null) continue;
                 var tc = new TemplateCable();
-                try { tc.DeviceIndexA = c.deviceIndexA; } catch { }
-                try { tc.PortLocalPosA = c.portLocalPosA; } catch { }
-                try { tc.DeviceIndexB = c.deviceIndexB; } catch { }
-                try { tc.PortLocalPosB = c.portLocalPosB; } catch { }
-                try { tc.Color = c.color; } catch { }
+                try { tc.DeviceIndexA = c.deviceIndexA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { tc.PortLocalPosA = c.portLocalPosA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { tc.DeviceIndexB = c.deviceIndexB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { tc.PortLocalPosB = c.portLocalPosB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { tc.Color = c.color; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 try
                 {
                     var wps = c.waypointRackLocalPos;
                     if (wps != null)
                         foreach (var v in wps)
                         {
-                            try { tc.Waypoints.Add(v); } catch { }
+                            try { tc.Waypoints.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dto.Cables.Add(tc);
             }
         });
@@ -428,7 +428,7 @@ public static class GregRackAndSfp
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] RackAndSfp: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] RackAndSfp: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -436,7 +436,7 @@ public static class GregRackAndSfp
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] RackAndSfp-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] RackAndSfp-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

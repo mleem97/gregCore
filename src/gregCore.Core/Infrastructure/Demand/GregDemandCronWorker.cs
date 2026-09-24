@@ -175,7 +175,7 @@ public sealed class GregDemandCronWorker : MonoBehaviour
             if (customer == null) return;
 
             int customerId = -1;
-            try { customerId = customer.customerID; } catch { }
+            try { customerId = customer.customerID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             // Shift-Art wuerfeln (Surge/Dip/NewService)
             bool hasPool = _productAppIds != null && _productAppIds.Length > 0;

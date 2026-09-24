@@ -34,7 +34,7 @@ internal static class GregBootstrapper
                 if (File.Exists(targetPath)) {
                     return Assembly.LoadFrom(targetPath);
                 }
-            } catch { }
+            } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return null;
         };
 

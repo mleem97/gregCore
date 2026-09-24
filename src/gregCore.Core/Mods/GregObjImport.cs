@@ -87,7 +87,7 @@ public static class GregObjImport
             return false;
         }
         string candidate = filePath;
-        try { candidate = Path.GetFullPath(filePath); } catch { }
+        try { candidate = Path.GetFullPath(filePath); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         if (!string.Equals(Path.GetExtension(candidate), ".obj", StringComparison.OrdinalIgnoreCase))
         {
             Warn($"Kein .obj-Pfad ('{Short(filePath)}').");
@@ -108,7 +108,7 @@ public static class GregObjImport
                 return false;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         full = candidate;
         return true;
     }
@@ -130,6 +130,6 @@ public static class GregObjImport
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Mods] ObjImport: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Mods] ObjImport: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

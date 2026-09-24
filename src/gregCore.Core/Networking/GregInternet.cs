@@ -20,12 +20,12 @@ public static class GregInternet
 
     public sealed class InternetEndpointInfo
     {
-        public string ServerID = "";
-        public string IP = "";
-        public int ServerType;
-        public int AppID = -1;
-        public float MaxProcessingSpeed;
-        public float CurrentProcessingSpeed;
+        public string ServerID { get; set; } = "";
+        public string IP { get; set; } = "";
+        public int ServerType { get; set; }
+        public int AppID { get; set; } = -1;
+        public float MaxProcessingSpeed { get; set; }
+        public float CurrentProcessingSpeed { get; set; }
     }
 
     // ── Internet-Endpunkte ───────────────────────────────────────────────────
@@ -46,7 +46,7 @@ public static class GregInternet
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(ep);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -72,7 +72,7 @@ public static class GregInternet
         {
             foreach (var ep in FindAllEndpoints())
             {
-                try { result.Add(ReadEndpoint(ep)); } catch { }
+                try { result.Add(ReadEndpoint(ep)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -83,7 +83,7 @@ public static class GregInternet
         if (ep == null) return false;
         try
         {
-            var _ = ep.gameObject; // liveness
+            _ = ep.gameObject; // liveness
             ep.UpdateAppID(appID);
             return true;
         }
@@ -122,7 +122,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.SetAutoRepairMode(mode);
             return true;
         }
@@ -139,7 +139,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ToggleClearWarningAuto(isOn);
             return true;
         }
@@ -156,7 +156,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ButtonUpgradeCommandCenter();
             return true;
         }
@@ -173,7 +173,7 @@ public static class GregInternet
         if (cc == null) return false;
         try
         {
-            var _ = cc.gameObject; // liveness
+            _ = cc.gameObject; // liveness
             cc.ButtonDowngradeCommandCenter();
             return true;
         }
@@ -219,7 +219,7 @@ public static class GregInternet
         if (mgr == null || firewall == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             return mgr.MaliciousAllowed(firewall);
         }
         catch { return false; }
@@ -231,7 +231,7 @@ public static class GregInternet
         if (mgr == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.LaunchAttack();
             return true;
         }
@@ -249,7 +249,7 @@ public static class GregInternet
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Internet: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Internet: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -257,7 +257,7 @@ public static class GregInternet
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Internet-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Internet-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

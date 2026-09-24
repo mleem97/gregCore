@@ -19,18 +19,18 @@ public static class GregEconomySaves
 
     public sealed class MonthlySnapshot
     {
-        public int Month;
-        public int Day;
-        public List<GregCustomerSaves.CustomerRecord> Records = new List<GregCustomerSaves.CustomerRecord>();
-        public float SalaryExpense;
-        public float RepairExpense;
-        public float ShopExpense;
+        public int Month { get; set; }
+        public int Day { get; set; }
+        public List<GregCustomerSaves.CustomerRecord> Records { get; set; } = new List<GregCustomerSaves.CustomerRecord>();
+        public float SalaryExpense { get; set; }
+        public float RepairExpense { get; set; }
+        public float ShopExpense { get; set; }
     }
 
     public sealed class BalanceSheet
     {
-        public List<MonthlySnapshot> History = new List<MonthlySnapshot>();
-        public float TotalMonthlySalary;
+        public List<MonthlySnapshot> History { get; set; } = new List<MonthlySnapshot>();
+        public float TotalMonthlySalary { get; set; }
     }
 
     // ── MonthlySnapshot ──────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ public static class GregEconomySaves
                     var e = GregCustomerSaves.CreateRecord(r);
                     if (e != null) list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.records = list;
         });
@@ -79,7 +79,7 @@ public static class GregEconomySaves
             if (list == null) return;
             foreach (var e in list)
             {
-                try { dto.Records.Add(GregCustomerSaves.ReadRecord(e)); } catch { }
+                try { dto.Records.Add(GregCustomerSaves.ReadRecord(e)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() => dto.SalaryExpense = entry.salaryExpense);
@@ -111,7 +111,7 @@ public static class GregEconomySaves
                     var e = CreateSnapshot(s);
                     if (e != null) list.Add(e);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.history = list;
         });
@@ -128,7 +128,7 @@ public static class GregEconomySaves
             if (list == null) return;
             foreach (var e in list)
             {
-                try { dto.History.Add(ReadSnapshot(e)); } catch { }
+                try { dto.History.Add(ReadSnapshot(e)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         Try(() => dto.TotalMonthlySalary = entry.totalMonthlySalary);
@@ -140,7 +140,7 @@ public static class GregEconomySaves
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] EconomySaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] EconomySaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

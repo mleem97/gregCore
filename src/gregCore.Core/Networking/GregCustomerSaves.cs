@@ -20,26 +20,26 @@ public static class GregCustomerSaves
 
     public sealed class CustomerBase
     {
-        public int CustomerBaseID;
-        public int CustomerID;
-        public Dictionary<int, string> SubnetsPerApp = new Dictionary<int, string>();
-        public Dictionary<int, int> VlanIdsPerApp = new Dictionary<int, int>();
-        public float[] AppsSpeedRequirements = Array.Empty<float>();
-        public int[] AppTypes = Array.Empty<int>();
-        public int Difficulty;
-        public Dictionary<int, int> AppObjectiveIDs = new Dictionary<int, int>();
-        public int[] AppsTimeBelowRequirements = Array.Empty<int>();
-        public bool[] AppReputationAwarded = Array.Empty<bool>();
-        public bool WantsInternet;
-        public List<int> InternetApps = new List<int>();
+        public int CustomerBaseID { get; set; }
+        public int CustomerID { get; set; }
+        public Dictionary<int, string> SubnetsPerApp { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, int> VlanIdsPerApp { get; set; } = new Dictionary<int, int>();
+        public float[] AppsSpeedRequirements { get; set; } = Array.Empty<float>();
+        public int[] AppTypes { get; set; } = Array.Empty<int>();
+        public int Difficulty { get; set; }
+        public Dictionary<int, int> AppObjectiveIDs { get; set; } = new Dictionary<int, int>();
+        public int[] AppsTimeBelowRequirements { get; set; } = Array.Empty<int>();
+        public bool[] AppReputationAwarded { get; set; } = Array.Empty<bool>();
+        public bool WantsInternet { get; set; }
+        public List<int> InternetApps { get; set; } = new List<int>();
     }
 
     public sealed class CustomerRecord
     {
-        public int CustomerID;
-        public string CustomerName = "";
-        public float Revenue;
-        public float Penalties;
+        public int CustomerID { get; set; }
+        public string CustomerName { get; set; } = "";
+        public float Revenue { get; set; }
+        public float Penalties { get; set; }
     }
 
     // ── CustomerBase ─────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ public static class GregCustomerSaves
             var list = new Il2CppSystem.Collections.Generic.List<int>();
             foreach (var id in dto.InternetApps ?? new List<int>())
             {
-                try { list.Add(id); } catch { }
+                try { list.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             entry.internetApps = list;
         });
@@ -98,7 +98,7 @@ public static class GregCustomerSaves
             if (list == null) return;
             foreach (var id in list)
             {
-                try { dto.InternetApps.Add(id); } catch { }
+                try { dto.InternetApps.Add(id); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return dto;
@@ -112,7 +112,7 @@ public static class GregCustomerSaves
         {
             foreach (var entry in list)
             {
-                try { result.Add(ReadBase(entry)); } catch { }
+                try { result.Add(ReadBase(entry)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -180,7 +180,7 @@ public static class GregCustomerSaves
         if (src == null) return dst;
         foreach (var kv in src)
         {
-            try { dst.Add(kv.Key, kv.Value ?? ""); } catch { }
+            try { dst.Add(kv.Key, kv.Value ?? ""); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         return dst;
     }
@@ -191,7 +191,7 @@ public static class GregCustomerSaves
         if (src == null) return dst;
         foreach (var kv in src)
         {
-            try { dst.Add(kv.Key, kv.Value); } catch { }
+            try { dst.Add(kv.Key, kv.Value); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         return dst;
     }
@@ -204,10 +204,10 @@ public static class GregCustomerSaves
         {
             foreach (var kv in src)
             {
-                try { dst[kv.Key] = kv.Value ?? ""; } catch { }
+                try { dst[kv.Key] = kv.Value ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return dst;
     }
 
@@ -219,10 +219,10 @@ public static class GregCustomerSaves
         {
             foreach (var kv in src)
             {
-                try { dst[kv.Key] = kv.Value; } catch { }
+                try { dst[kv.Key] = kv.Value; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return dst;
     }
 
@@ -231,7 +231,7 @@ public static class GregCustomerSaves
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] CustomerSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] CustomerSaves-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

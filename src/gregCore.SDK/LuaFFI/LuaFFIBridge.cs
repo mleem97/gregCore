@@ -177,7 +177,7 @@ public sealed class LuaFFIBridge
         if (!_initialized) return;
         foreach (var plugin in _plugins)
         {
-            try { plugin.OnSceneLoaded?.Call(name); } catch { }
+            try { plugin.OnSceneLoaded?.Call(name); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -187,7 +187,7 @@ public sealed class LuaFFIBridge
         foreach (var plugin in _plugins)
         {
             GregEventLuaModule.UnregisterAll(plugin.Id, API.GregAPI.EventBus!);
-            try { plugin.OnShutdown?.Call(); } catch { }
+            try { plugin.OnShutdown?.Call(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         _plugins.Clear();
         _hotReload?.Stop();
@@ -203,7 +203,7 @@ public sealed class LuaFFIBridge
         if (existing != null)
         {
             GregEventLuaModule.UnregisterAll(existing.Id, API.GregAPI.EventBus!);
-            try { existing.OnShutdown?.Call(); } catch { }
+            try { existing.OnShutdown?.Call(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _plugins.Remove(existing);
         }
 

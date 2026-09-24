@@ -48,8 +48,8 @@ public static class GameHooks
                 if (cmp != 0) return cmp;
 
                 string nameA = "", nameB = "";
-                try { nameA = a.rack?.gameObject?.name ?? ""; } catch { }
-                try { nameB = b.rack?.gameObject?.name ?? ""; } catch { }
+                try { nameA = a.rack?.gameObject?.name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { nameB = b.rack?.gameObject?.name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return string.Compare(nameA, nameB, StringComparison.Ordinal);
             });
 
@@ -87,7 +87,7 @@ public static class GameHooks
                             }
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 if (updated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {updated} server rackPositionUID references");
@@ -116,7 +116,7 @@ public static class GameHooks
                             }
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 if (swUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {swUpdated} switch rackPositionUID references");
@@ -145,7 +145,7 @@ public static class GameHooks
                             }
                         }
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 if (ppUpdated > 0)
                     CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: updated {ppUpdated} patchpanel rackPositionUID references");
@@ -178,7 +178,7 @@ public static class GameHooks
             var player = PlayerManager.instance?.playerClass;
             if (player != null) player.money = value;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static float GetPlayerXP()
@@ -194,7 +194,7 @@ public static class GameHooks
             var player = PlayerManager.instance?.playerClass;
             if (player != null) player.xp = value;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static float GetPlayerReputation()
@@ -210,7 +210,7 @@ public static class GameHooks
             var player = PlayerManager.instance?.playerClass;
             if (player != null) player.reputation = value;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static float GetTimeOfDay()
@@ -238,7 +238,7 @@ public static class GameHooks
             var tc = TimeController.instance;
             if (tc != null) tc.secondsInFullDay = value;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static int[] GetDeviceCounts()
@@ -346,7 +346,7 @@ public static class GameHooks
                     // eolTime counts down; <= 0 means at/past EOL
                     if (server.eolTime <= 0) count++;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             return count;
         }
@@ -379,11 +379,11 @@ public static class GameHooks
                     bool isEol = sw.existingWarningSigns > 0;
                     if (!isEol)
                     {
-                        try { isEol = sw.eolTime <= 0; } catch { }
+                        try { isEol = sw.eolTime <= 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                     if (isEol) count++;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             // Periodic diagnostic dump when EOL switches exist (every ~30s = 6 scans)
@@ -425,7 +425,7 @@ public static class GameHooks
                 int activeCount = activeJobs != null ? activeJobs.Count : 0;
                 return (uint)Math.Max(0, total - activeCount);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             // Fallback: iterate isBusy per-technician (pre-update behaviour)
             uint count = 0;
@@ -436,7 +436,7 @@ public static class GameHooks
                     var tech = techs[i];
                     if (tech != null && !tech.isBusy) count++;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             return count;
         }
@@ -504,11 +504,11 @@ public static class GameHooks
                             if (aj.assignedTechnician != null)
                                 activeTechIds.Add(aj.assignedTechnician.technicianID);
                         }
-                        catch { }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             int assigned = 0;
             for (int i = 0; i < techs.Count && pending.Count > 0; i++)
@@ -522,7 +522,7 @@ public static class GameHooks
                     bool busy = activeTechIds.Contains(tech.technicianID);
                     if (!busy)
                     {
-                        try { busy = tech.isBusy; } catch { }
+                        try { busy = tech.isBusy; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                     if (busy) continue;
 
@@ -535,9 +535,9 @@ public static class GameHooks
                     {
                         CrashLog.Log($"ForceProcessPendingQueue: assigned '{job.DeviceName}' → tech #{tech.technicianID} ({tech.technicianName})");
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             if (assigned > 0)
@@ -582,7 +582,7 @@ public static class GameHooks
                     ForceProcessPendingQueue(tm);
                     return 1;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (skipped > 0)
                 CrashLog.Log($"DispatchRepairServer: no target — {skipped}/{keys.Count} device(s) already assigned in queue");
@@ -622,7 +622,7 @@ public static class GameHooks
                     ForceProcessPendingQueue(tm);
                     return 1;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (skipped > 0)
                 CrashLog.Log($"DispatchRepairSwitch: no target — {skipped}/{keys.Count} device(s) already assigned in queue");
@@ -664,7 +664,7 @@ public static class GameHooks
                     ForceProcessPendingQueue(tm);
                     return 1;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (skipped > 0)
                 CrashLog.Log($"DispatchReplaceServer: no target — {skipped}/{keys.Count} device(s) already assigned in queue");
@@ -702,7 +702,7 @@ public static class GameHooks
                     bool isEol = sw.existingWarningSigns > 0;
                     if (!isEol)
                     {
-                        try { isEol = sw.eolTime <= 0; } catch { }
+                        try { isEol = sw.eolTime <= 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     }
                     if (!isEol) continue; // not EOL
 
@@ -712,7 +712,7 @@ public static class GameHooks
                     ForceProcessPendingQueue(tm);
                     return 1;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (skipped > 0)
                 CrashLog.Log($"DispatchReplaceSwitch: no target — {skipped}/{keys.Count} device(s) already assigned in queue");
@@ -749,16 +749,16 @@ public static class GameHooks
                     if (sw == null) { MelonLoader.MelonLogger.Msg($"[SwitchDiag]   key={key} => null"); continue; }
 
                     bool broken = false;
-                    try { broken = sw.isBroken; } catch { }
+                    try { broken = sw.isBroken; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                     int warningSigns = -999;
-                    try { warningSigns = sw.existingWarningSigns; } catch { }
+                    try { warningSigns = sw.existingWarningSigns; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                     float eolTime = float.NaN;
-                    try { eolTime = sw.eolTime; } catch { }
+                    try { eolTime = sw.eolTime; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                     bool assigned = false;
-                    try { if (tm != null) assigned = tm.IsDeviceAlreadyAssigned(sw, null); } catch { }
+                    try { if (tm != null) assigned = tm.IsDeviceAlreadyAssigned(sw, null); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                     MelonLoader.MelonLogger.Msg(
                         $"[SwitchDiag]   key={key} broken={broken} warningSigns={warningSigns} eolTime={eolTime:F1} assigned={assigned}"
@@ -785,15 +785,15 @@ public static class GameHooks
                     {
                         var sw = brokenDict[key];
                         float eolTime = float.NaN;
-                        try { eolTime = sw.eolTime; } catch { }
+                        try { eolTime = sw.eolTime; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                         int warningSigns = -999;
-                        try { warningSigns = sw.existingWarningSigns; } catch { }
+                        try { warningSigns = sw.existingWarningSigns; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
                         MelonLoader.MelonLogger.Msg(
                             $"[SwitchDiag]   BROKEN key={key} warningSigns={warningSigns} eolTime={eolTime:F1}"
                         );
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
 

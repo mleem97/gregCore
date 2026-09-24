@@ -144,15 +144,12 @@ public static class GregSaveGuard
 
             // Save-Inventar: nach dem Healing (Prefix) sind alle Device-IDs
             // final - hier wird alles im Save inventarisiert + mit stabilen
-            // UIDs versehen (unsichtbar, Sidecar + Speicher).
+            // UIDs versehen (unsichtbar, Sidecar + Speicher). Extrahiert
+            // (Codeline-Limit): nur Hook-Registrierung bleibt hier.
             var loadNetworkState = AccessTools.Method(typeof(global::Il2Cpp.WaypointInitializationSystem),
                 "LoadNetworkState");
-            if (loadNetworkState != null)
-            {
-                harmony.Patch(loadNetworkState,
-                    postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+            if (loadNetworkState != null && PatchLoadNetworkState(harmony, loadNetworkState))
                 installed++;
-            }
 
             if (installed == 0)
             {
@@ -254,6 +251,18 @@ public static class GregSaveGuard
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Inventar (LoadNetworkState): " + ex.Message); }
     }
 
+    private static bool PatchLoadNetworkState(HarmonyLib.Harmony harmony, System.Reflection.MethodInfo loadNetworkState)
+    {
+        try
+        {
+            if (harmony == null || loadNetworkState == null) return false;
+            harmony.Patch(loadNetworkState,
+                postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+            return true;
+        }
+        catch { return false; }
+    }
+
     /// <summary>
     /// Normalisiert networkData.sfpModules[].prefabID. Ungueltige Mod-Ids
     /// werden entweder ueber eine registrierte Mod-Map oder generisch auf die
@@ -317,7 +326,7 @@ public static class GregSaveGuard
             foreach (var m in _vanillaMaps)
             {
                 int? r = null;
-                try { r = m.ToVanilla(customId); } catch { }
+                try { r = m.ToVanilla(customId); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 if (r.HasValue) return r.Value;
             }
         }
@@ -342,13 +351,13 @@ public static class GregSaveGuard
                 {
                     string path = SidecarPath(dir, name, kv.Key);
                     string content = null;
-                    try { if (File.Exists(path)) content = File.ReadAllText(path); } catch { }
+                    try { if (File.Exists(path)) content = File.ReadAllText(path); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     if (content == null) continue;
-                    try { kv.Value.Load(content); } catch { }
+                    try { kv.Value.Load(content); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void WriteSidecars(string dir, string name)
@@ -373,11 +382,11 @@ public static class GregSaveGuard
                             File.Delete(path);
                         File.Move(tmp, path);
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void BackupVanillaSave(string dir, string name)
@@ -433,11 +442,11 @@ public static class GregSaveGuard
             dirs.Sort(StringComparer.Ordinal);
             while (dirs.Count > Math.Max(1, MaxBackupsPerSave))
             {
-                try { Directory.Delete(dirs[0], true); } catch { }
+                try { Directory.Delete(dirs[0], true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 dirs.RemoveAt(0);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     internal static string SidecarPath(string dir, string save, string modId)

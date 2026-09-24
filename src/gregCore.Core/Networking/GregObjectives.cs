@@ -119,7 +119,7 @@ public static class GregObjectives
             if (set == null) return;
             foreach (var uid in set)
             {
-                try { result.Add(uid); } catch { }
+                try { result.Add(uid); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -227,7 +227,7 @@ public static class GregObjectives
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Objectives: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Objectives: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -235,7 +235,7 @@ public static class GregObjectives
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Objectives-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Objectives-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

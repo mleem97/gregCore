@@ -80,7 +80,7 @@ public static class GregAudioService
                 return mgr;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         _cachedManager = null;
         return null;
     }
@@ -149,16 +149,16 @@ public static class GregAudioService
                 if (!audible && active != null)
                     audible = active.clip != null && active.isPlaying;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _currentTitle = title;
             _currentPath = filePath;
-            try { TrackStarted?.Invoke(filePath, title); } catch { }
+            try { TrackStarted?.Invoke(filePath, title); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (!audible || _fadeSource == null || active == null)
             {
                 _fading = false;
                 if (active != null)
                 {
-                    try { active.Stop(); } catch { }
+                    try { active.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     active.clip = clip;
                     active.volume = volume;
                     active.loop = false;
@@ -170,7 +170,7 @@ public static class GregAudioService
                 AudioSource to = _activeIsA ? _fadeSource : FindAudioManager()?.musicAudioSource;
                 if (to == null || to == active)
                 {
-                    try { active.Stop(); } catch { }
+                    try { active.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     active.clip = clip;
                     active.volume = volume;
                     active.loop = false;
@@ -189,7 +189,7 @@ public static class GregAudioService
                         to.loop = false;
                         to.Play();
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     _fading = true;
                 }
             }
@@ -210,16 +210,16 @@ public static class GregAudioService
                 _fadeT += dt / CrossfadeDuration;
                 float k = _fadeT >= 1f ? 1f : _fadeT;
                 k = k * k * (3f - 2f * k);
-                if (_fadeFrom != null) { try { _fadeFrom.volume = _fadeVol * (1f - k); } catch { } }
-                if (_fadeTo != null) { try { _fadeTo.volume = _fadeVol * k; } catch { } }
+                if (_fadeFrom != null) { try { _fadeFrom.volume = _fadeVol * (1f - k); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+                if (_fadeTo != null) { try { _fadeTo.volume = _fadeVol * k; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
                 if (_fadeT >= 1f)
                 {
-                    try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { }
+                    try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     _activeIsA = !_activeIsA;
                     _fading = false;
                 }
             }
-            if (PollEnded()) { try { TrackEnded?.Invoke(); } catch { } }
+            if (PollEnded()) { try { TrackEnded?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
         }
         catch { _fading = false; }
     }
@@ -247,8 +247,8 @@ public static class GregAudioService
     private static void SnapFade()
     {
         if (!_fading) return;
-        try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { }
-        try { if (_fadeTo != null) _fadeTo.volume = _fadeVol; } catch { }
+        try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { if (_fadeTo != null) _fadeTo.volume = _fadeVol; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         _activeIsA = !_activeIsA;
         _fading = false;
     }
@@ -263,7 +263,7 @@ public static class GregAudioService
             src.Pause();
             _wasPlaying = false;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Resume(float volume)
@@ -276,7 +276,7 @@ public static class GregAudioService
             src.UnPause();
             _wasPlaying = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Stop()
@@ -286,14 +286,14 @@ public static class GregAudioService
             CancelPreload();
             SnapFade();
             var a = FindAudioManager()?.musicAudioSource;
-            try { if (a != null) { a.Stop(); a.clip = null; } } catch { }
-            try { if (_fadeSource != null) { _fadeSource.Stop(); _fadeSource.clip = null; } } catch { }
+            try { if (a != null) { a.Stop(); a.clip = null; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { if (_fadeSource != null) { _fadeSource.Stop(); _fadeSource.clip = null; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _wasPlaying = false;
             _currentTitle = "";
             _currentPath = "";
             _activeIsA = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void ApplyVolume(float volume)
@@ -303,10 +303,10 @@ public static class GregAudioService
             if (volume < 0f) volume = 0f;
             if (volume > 1f) volume = 1f;
             var src = ActiveSource();
-            if (src != null) { try { src.volume = volume; } catch { } }
+            if (src != null) { try { src.volume = volume; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
             _fadeVol = volume;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static string ProgressText()
@@ -385,7 +385,7 @@ public static class GregAudioService
             src.time = fraction * len;
             _wasPlaying = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static string ToFileUrl(string path)
@@ -416,7 +416,7 @@ public static class GregAudioService
                     fail = "Download: " + req.error;
                 else
                 {
-                    try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { }
+                    try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                     if (data == null || data.Length == 0) fail = "Leer";
                 }
             }
@@ -453,7 +453,7 @@ public static class GregAudioService
             if (clip == null || !clip.SetData(samples, 0))
             {
                 MelonLogger.Warning("[gregCore][Audio] Clip-Erstellung fehlgeschlagen (" + title + ")");
-                try { if (clip != null) UnityEngine.Object.Destroy(clip); } catch { }
+                try { if (clip != null) UnityEngine.Object.Destroy(clip); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return null;
             }
             return clip;
@@ -484,7 +484,7 @@ public static class GregAudioService
             _preloadingPath = filePath;
             MelonCoroutines.Start(PreloadSlices(filePath, title));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void CancelPreload()
@@ -506,7 +506,7 @@ public static class GregAudioService
         bool ok = false;
         try { ok = req.result == UnityWebRequest.Result.Success; } catch { ok = false; }
         if (!ok) { if (_preloadingPath == path) _preloadingPath = null; yield break; }
-        try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { }
+        try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         if (data == null || data.Length == 0) { if (_preloadingPath == path) _preloadingPath = null; yield break; }
 
         string ext = Path.GetExtension(path).ToLowerInvariant();
@@ -546,14 +546,14 @@ public static class GregAudioService
                 }
                 finally
                 {
-                    try { if (mpeg != null) mpeg.Dispose(); } catch { }
-                    try { if (ms != null) ms.Dispose(); } catch { }
+                    try { if (mpeg != null) mpeg.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    try { if (ms != null) ms.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
             else
             {
-                try { if (mpeg != null) mpeg.Dispose(); } catch { }
-                try { if (ms != null) ms.Dispose(); } catch { }
+                try { if (mpeg != null) mpeg.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                try { if (ms != null) ms.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (_preloadingPath != path || all.Count == 0 || ch <= 0 || rate <= 0)
             {
@@ -595,13 +595,13 @@ public static class GregAudioService
             if (clip == null) return;
             if (!clip.SetData(samples, 0))
             {
-                try { UnityEngine.Object.Destroy(clip); } catch { }
+                try { UnityEngine.Object.Destroy(clip); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return;
             }
             GregAudioClipCache.Put(path, clip);
             MelonLogger.Msg("[gregCore][Audio] Vorgeladen: '" + title + "'.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         finally
         {
             if (_preloadingPath == path) _preloadingPath = null;

@@ -57,7 +57,7 @@ public static class LuaCableModule
                         info["z"] = (double)pos.z;
                         result[i++] = info;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return result;
             }

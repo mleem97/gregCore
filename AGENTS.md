@@ -4,7 +4,7 @@ Repo: [https://github.com/mleem97/gregCore](https://github.com/mleem97/gregCore)
 
 ## Pflichten
 
-1. **Erst lesen:** `README.md`, `docs/INDEX.md`, `CONTRIBUTING.md` — danach erst ändern.
+1. **Erst lesen:** `README.md`, `docs/INDEX.md`, [CONTRIBUTING.md](CONTRIBUTING.md) — danach erst ändern.
 2. **Keine Secrets committen** (Keys, Tokens, `.env`). Key-Nutzung nur via Umgebungsvariablen.
 3. **Historie erhalten:** kein `push --force`, kein History-Rewrite ohne Auftrag.
 4. **Änderungen belegen:** vor dem Fertigmelden bauen/testen, was das Repo hergibt (`QUICKSTART.md`).

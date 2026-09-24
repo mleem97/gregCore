@@ -45,7 +45,7 @@ public static class GregDirectoryPolicy
                 string dir = Path.Combine(gameRoot, sub);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -53,9 +53,9 @@ public static class GregDirectoryPolicy
     {
         var result = new List<Violation>();
         if (string.IsNullOrWhiteSpace(gameRoot) || !Directory.Exists(gameRoot)) return result;
-        try { AuditModsDir(Path.Combine(gameRoot, "Mods"), result); } catch { }
-        try { AuditFlatDir(Path.Combine(gameRoot, "Plugins"), "plugin"); } catch { }
-        try { AuditFlatDir(Path.Combine(gameRoot, "UserLibs"), "userlib"); } catch { }
+        try { AuditModsDir(Path.Combine(gameRoot, "Mods"), result); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { AuditFlatDir(Path.Combine(gameRoot, "Plugins"), "plugin"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { AuditFlatDir(Path.Combine(gameRoot, "UserLibs"), "userlib"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return result;
     }
 
@@ -72,7 +72,7 @@ public static class GregDirectoryPolicy
             foreach (var v in violations.Take(20))
                 MelonLogger.Warning("[gregCore][Dirs] " + v);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // Mods/: DLLs nur top-level. Ausnahme: gregNative-Baum (eigene Regel).
@@ -129,7 +129,7 @@ public static class GregDirectoryPolicy
                         b = resolved.BaseType;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch { return "unknown"; }

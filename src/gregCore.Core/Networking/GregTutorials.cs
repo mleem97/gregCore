@@ -128,6 +128,6 @@ public static class GregTutorials
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Tutorials: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Tutorials: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

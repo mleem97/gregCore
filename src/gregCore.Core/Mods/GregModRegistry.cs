@@ -16,10 +16,10 @@ public static class GregModRegistry
 {
     public sealed class Entry
     {
-        public string Id;
-        public string Name;
-        public string Version;
-        public string[] Menus = System.Array.Empty<string>();
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Version { get; set; }
+        public string[] Menus { get; set; } = System.Array.Empty<string>();
     }
 
     private static readonly Dictionary<string, Entry> _mods =

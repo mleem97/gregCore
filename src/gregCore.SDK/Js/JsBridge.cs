@@ -41,7 +41,7 @@ public sealed class JsBridge : IGregLanguageBridge
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.js").Length > 0)
                 MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Veraltet: JS-Dateien unter ./Plugins/Js werden ignoriert - bitte nach ./UserLibs/Js verschieben.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
         foreach (var file in global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(jsDir, ".js"))
         {

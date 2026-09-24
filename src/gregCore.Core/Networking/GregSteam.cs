@@ -81,6 +81,6 @@ public static class GregSteam
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Steam: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Steam: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

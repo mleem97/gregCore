@@ -45,7 +45,7 @@ public static class GregGates
                     if (go != null && go.scene.IsValid() && go.scene.isLoaded)
                         result.Add(o);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         });
         return result;
@@ -155,7 +155,7 @@ public static class GregGates
 
     private static void Warn(string message)
     {
-        try { MelonLogger.Warning($"[gregCore][Net] Gates: {message}"); } catch { }
+        try { MelonLogger.Warning($"[gregCore][Net] Gates: {message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Try(Action action)
@@ -163,7 +163,7 @@ public static class GregGates
         try { action?.Invoke(); }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Net] Gates-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Net] Gates-Feld fehlgeschlagen: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

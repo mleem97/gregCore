@@ -63,7 +63,7 @@ public class GregInputBindingService
             if (key.HasValue)
                 return kb[key.Value].wasPressedThisFrame;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return false;
     }
 

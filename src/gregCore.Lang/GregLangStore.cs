@@ -42,7 +42,7 @@ public sealed class GregLangStore
     /// </summary>
     public string Translate(string modId, string key, string defaultText, string language, params object[] args)
     {
-        string text = Lookup(modId, key, language);
+        string? text = Lookup(modId, key, language);
         if (text == null)
             text = defaultText ?? key ?? "";
 
@@ -60,7 +60,7 @@ public sealed class GregLangStore
         var result = new List<string>();
         try
         {
-            string dir = ModDir(modId);
+            string? dir = ModDir(modId);
             if (dir == null || !Directory.Exists(dir))
                 return result;
             foreach (var file in Directory.GetFiles(dir, "*.json"))
@@ -89,7 +89,7 @@ public sealed class GregLangStore
         catch { /* best-effort */ }
     }
 
-    private string Lookup(string modId, string key, string language)
+    private string? Lookup(string modId, string key, string language)
     {
         try
         {
@@ -120,11 +120,11 @@ public sealed class GregLangStore
         string cacheKey = (modId ?? "") + "|" + (lang ?? "");
         lock (_gate)
         {
-            if (_cache.TryGetValue(cacheKey, out var cached))
+            if (_cache.TryGetValue(cacheKey, out var cached) && cached != null)
                 return cached;
         }
 
-        var loaded = LoadTable(modId, lang);
+        var loaded = LoadTable(modId ?? "", lang ?? LangCodes.Fallback);
 
         lock (_gate) { _cache[cacheKey] = loaded; }
         return loaded;
@@ -135,7 +135,7 @@ public sealed class GregLangStore
         var empty = new Dictionary<string, string>(StringComparer.Ordinal);
         try
         {
-            string dir = ModDir(modId);
+            string? dir = ModDir(modId);
             if (dir == null)
                 return empty;
             string file = Path.Combine(dir, lang + ".json");
@@ -166,7 +166,7 @@ public sealed class GregLangStore
     }
 
     /// <summary>Validated mod directory, or null when the id is unsafe.</summary>
-    private string ModDir(string modId)
+    private string? ModDir(string modId)
     {
         try
         {

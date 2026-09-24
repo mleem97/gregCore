@@ -85,10 +85,16 @@ namespace gregCore.UI
 
         /// <summary>
         /// Create a scrollable list container.
+        /// Takes available flex space (min 150px) and caps at maxHeight —
+        /// safe both in fixed-height parents and auto-height layouts
+        /// (never collapses to zero, never grows unbounded).
         /// </summary>
         public static ScrollView CreateScrollableList(float maxHeight = 400f)
         {
             var scrollView = new ScrollView();
+            scrollView.style.flexGrow = 1;
+            scrollView.style.flexShrink = 1;
+            scrollView.style.minHeight = 150;
             scrollView.style.maxHeight = maxHeight;
             scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
             scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;

@@ -1,20 +1,10 @@
 /// <file-summary>
-/// Layer:       Core (Networking)
-<<<<<<< HEAD
 /// Purpose:     Cable bridge (live CableLink): find (all/by switchId/
 ///               by type), read state (speed, type, parents, SFP),
 ///               actions (set speed, insert/remove SFP, second/label action,
 ///               rope anchor). All best-effort.
 /// Note:        CableIDComponent has no public members (only private
 ///               CableId/SwitchId) — intentionally omitted.
-=======
-/// Purpose:     Cable bridge (live CableLink): find (all/per switchId/
-///               per type), read state (speed, type, parents, SFP),
-///               actions (set speed, insert/remove SFP, second/label action,
-///               rope anchors). All best-effort.
-/// Note:        CableIDComponent has no public members (only private
-///               CableId/SwitchId) — deliberately omitted.
->>>>>>> agent/gregcore-integration
 /// </file-summary>
 
 using System;
@@ -48,11 +38,7 @@ public static class GregCables
         public string ParentPatchPanelID { get; set; } = "";
     }
 
-<<<<<<< HEAD
     // ── Find ───────────────────────────────────────────────────────────────
-=======
-    // ── Find ─────────────────────────────────────────────────────────────────
->>>>>>> agent/gregcore-integration
 
     public static List<global::Il2Cpp.CableLink> FindAll()
     {
@@ -95,7 +81,8 @@ public static class GregCables
         return result;
     }
 
-    public static List<global::Il2Cpp.CableLink> FindByType(string typeOfLink)    {
+    public static List<global::Il2Cpp.CableLink> FindByType(string typeOfLink)
+    {
         var result = new List<global::Il2Cpp.CableLink>();
         if (string.IsNullOrWhiteSpace(typeOfLink)) return result;
         Try(() =>
@@ -113,9 +100,6 @@ public static class GregCables
         return result;
     }
 
-<<<<<<< HEAD
-    // ── Read ────────────────────────────────────────────────────────────────
-=======
     public static List<global::Il2Cpp.CableLink> FindByServer(global::Il2Cpp.Server server)
     {
         var result = new List<global::Il2Cpp.CableLink>();
@@ -138,8 +122,6 @@ public static class GregCables
         });
         return result;
     }
->>>>>>> agent/gregcore-integration
-
     // ── Read ─────────────────────────────────────────────────────────────────
     public static LinkInfo Read(global::Il2Cpp.CableLink link)
     {
@@ -175,11 +157,7 @@ public static class GregCables
         return result;
     }
 
-<<<<<<< HEAD
     // ── Actions ─────────────────────────────────────────────────────────────
-=======
-    // ── Actions ──────────────────────────────────────────────────────────────
->>>>>>> agent/gregcore-integration
 
     public static bool SetConnectionSpeed(global::Il2Cpp.CableLink link, float speed)
     {

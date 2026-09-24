@@ -1,12 +1,7 @@
 /// <file-summary>
 /// Layer:       Infrastructure
-<<<<<<< HEAD
 /// Purpose:     UI overlay for Lua errors.
 /// Maintainer:   Shows errors with stack trace, auto-hide after 10 seconds.
-=======
-/// Purpose:      UI overlay for Lua errors.
-/// Maintainer:   Displays errors with stack trace, auto-hide after 10 seconds.
->>>>>>> agent/gregcore-integration
 ///               UI Toolkit-based, semi-transparent.
 /// </file-summary>
 

@@ -11,6 +11,36 @@ namespace gregCore.UI
     /// </summary>
     public static class GregUIAnimations
     {
+        // Pending hide callbacks per element: a re-Show before the hide
+        // fires cancels it, so rapid toggles never get stuck hidden.
+        private static readonly System.Collections.Generic.Dictionary<VisualElement, IVisualElementScheduledItem> _pendingHides =
+            new System.Collections.Generic.Dictionary<VisualElement, IVisualElementScheduledItem>();
+
+        private static void TrackHide(VisualElement element, IVisualElementScheduledItem item)
+        {
+            try
+            {
+                if (_pendingHides.TryGetValue(element, out var prev))
+                {
+                    try { prev?.Pause(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
+                if (_pendingHides.Count > 64) _pendingHides.Clear();
+                _pendingHides[element] = item;
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+
+        private static void CancelHide(VisualElement element)
+        {
+            try
+            {
+                if (element != null && _pendingHides.Remove(element, out var pending))
+                {
+                    try { pending?.Pause(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
         private static Il2CppSystem.Collections.Generic.List<TimeValue> MakeTimeValueList(float durationMs)
         {
             var list = new Il2CppSystem.Collections.Generic.List<TimeValue>();
@@ -31,6 +61,7 @@ namespace gregCore.UI
         public static void FadeIn(VisualElement element, float durationMs = 300)
         {
             if (element == null) return;
+            CancelHide(element);
             element.style.opacity = 0;
             element.style.display = DisplayStyle.Flex;
             element.schedule.Execute(new Action<TimerState>(_ =>

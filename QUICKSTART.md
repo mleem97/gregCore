@@ -242,6 +242,9 @@ greg.hooks.audio.list()      -- Hooks in group "Audio"
 ### `dotnet test` fails with missing .NET 6 runtime
 - Set `DOTNET_ROLL_FORWARD=Major dotnet test` (see section 2).
 
+### `dotnet test` schlägt fehl mit fehlendem .NET-6-Runtime
+- `DOTNET_ROLL_FORWARD=Major dotnet test` setzen (siehe Abschnitt 2).
+
 ---
 
 ## 8. Further Links

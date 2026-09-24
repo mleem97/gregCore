@@ -42,6 +42,7 @@ namespace gregCore.UI
                 _container.style.right = 20;
                 _container.style.top = 20;
                 _container.style.width = 350;
+                _container.style.maxWidth = new Length(90, LengthUnit.Percent);
                 _container.style.flexDirection = FlexDirection.Column;
                 root.Add(_container);
 

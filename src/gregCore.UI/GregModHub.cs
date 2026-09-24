@@ -89,6 +89,7 @@ public static class GregModHub
 
         var card = new VisualElement();
         card.style.width = 420;
+        card.style.maxWidth = new Length(92, LengthUnit.Percent);
         card.style.maxHeight = 560;
         card.style.backgroundColor = new Color(0.03f, 0.10f, 0.14f, 0.97f);
         card.style.borderTopLeftRadius = 8;

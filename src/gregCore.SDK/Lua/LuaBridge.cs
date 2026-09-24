@@ -1,10 +1,6 @@
 /// <file-summary>
 /// Layer:       Infrastructure
-<<<<<<< HEAD
 /// Purpose:     Lua scripting bridge.
-=======
-/// Purpose:      Lua scripting bridge.
->>>>>>> agent/gregcore-integration
 /// Maintainer:   Enables modding via Lua scripts.
 /// </file-summary>
 

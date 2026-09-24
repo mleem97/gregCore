@@ -27,6 +27,7 @@ namespace gregCore.UI
 
             var labelElem = new Label(label);
             labelElem.style.width = 80;
+            labelElem.style.flexShrink = 0;
             labelElem.style.color = new Color(0.88f, 0.88f, 0.88f);
             labelElem.style.fontSize = 12;
             container.Add(labelElem);
@@ -50,6 +51,7 @@ namespace gregCore.UI
 
             var valueLabel = new Label($"{currentValue:F0}/{maxValue:F0}");
             valueLabel.style.width = 60;
+            valueLabel.style.flexShrink = 0;
             valueLabel.style.color = new Color(0.7f, 0.7f, 0.7f);
             valueLabel.style.fontSize = 11;
             valueLabel.style.unityTextAlign = TextAnchor.MiddleRight;
@@ -178,6 +180,7 @@ namespace gregCore.UI
             var descLabel = new Label(description);
             descLabel.style.color = new Color(0.8f, 0.8f, 0.82f);
             descLabel.style.fontSize = 12;
+            descLabel.style.whiteSpace = WhiteSpace.Normal;
             container.Add(descLabel);
 
             return container;

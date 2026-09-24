@@ -8,11 +8,7 @@ namespace gregCore.Infrastructure.Scripting.Lua;
 
 /// <summary>
 /// Implements a require() system for Lua mods with sandbox checks.
-<<<<<<< HEAD
 /// Searches the mod-owned directory and supports the @shared/ prefix.
-=======
-/// Searches the mod's own directory and supports the @shared/ prefix.
->>>>>>> agent/gregcore-integration
 /// </summary>
 public class LuaModuleLoader
 {

@@ -39,11 +39,7 @@ public sealed class JsBridge : IGregLanguageBridge
         try
         {
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.js").Length > 0)
-<<<<<<< HEAD
                 MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Deprecated: JS files under ./Plugins/Js are ignored - please move them to ./UserLibs/Js.");
-=======
-                MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Deprecated: JS files under ./Plugins/Js are ignored - move them to ./UserLibs/Js.");
->>>>>>> agent/gregcore-integration
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 

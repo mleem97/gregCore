@@ -41,7 +41,6 @@ public sealed class GregCSharpScriptBridge
         }
 
         LoadMods(csharpDir);
-        StartWatching();
         _initialized = true;
     }
 
@@ -181,29 +180,15 @@ public sealed class GregCSharpScriptBridge
         }
         catch { }
     }
-
-    private static void LoadMods(string csharpDir)
-    {
-        foreach (string modDir in global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateDirectories(csharpDir))
-        {
-<<<<<<< HEAD
-            // Guard: niemals aus `.deactivated` laden.
-            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(modDir)) continue;
-            string modId = Path.GetFileName(modDir);
-            if (modId.StartsWith("@") || modId.StartsWith(".")) continue;
-=======
-            LoadOne(modDir);
-        }
-    }
-
     private static void LoadOne(string modDir)
     {
         string modId = "";
         try
         {
+            // Guard: never load from `.deactivated`.
+            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(modDir)) return;
             modId = Path.GetFileName(modDir);
             if (modId.StartsWith("@") || modId.StartsWith(".")) return;
->>>>>>> agent/gregcore-integration
 
             string[] csFiles = global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(modDir, ".cs", SearchOption.TopDirectoryOnly).ToArray();
             if (csFiles.Length == 0) return;
@@ -243,11 +228,25 @@ public sealed class GregCSharpScriptBridge
         catch (ReflectionTypeLoadException ex)
         {
             MelonLogger.Error("[CSharpScriptBridge] Type load error in mod '" + modId + "': " + ex.Message);
+            if (ex.LoaderExceptions != null)
+            {
+                foreach (var le in ex.LoaderExceptions.Take(3))
+                {
+                    if (le != null)
+                        MelonLogger.Error("    -> " + le.Message);
+                }
+            }
         }
         catch (Exception ex)
         {
             MelonLogger.Error("[CSharpScriptBridge] Failed to load mod '" + modId + "': " + ex.Message);
         }
+    }
+
+    private static void LoadMods(string csharpDir)
+    {
+        foreach (string modDir in Directory.GetDirectories(csharpDir))
+            LoadOne(modDir);
     }
 
     public static void OnUpdate(float dt)

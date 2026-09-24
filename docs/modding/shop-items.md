@@ -79,11 +79,57 @@ always 1), and `spawnedItems` is never cleared (stale keys!). Proven (Backplanes
 
 ## 6. Save compatibility
 
-<<<<<<< HEAD
-PrefabIDs end up in saves. Renaming/recycling breaks old saves → **never** reuse
-IDs or `ShopGuid`s. Successor mods keep aliases readable
-(RealisticModules reads MoreModules `1000–1006`).
-=======
+    if ((int)itemType != 6) return true;                    // nur eigene Typen
+    if (!Core.Registry.TryGetValue(itemID, out var entry)) return true;
+    __result = Core.BuildSpinnerPrefab(mgm, itemID, entry); // frischer Klon
+    return false;                                          // Original schlucken
+}
+```
+
+Klone aus dem Vanilla-Base-Prefab bauen (Cache `prefabID → GameObject`), Custom-Werte
+(Länge, `prefabID` am `UsableObject`) setzen. Templates **inaktiv** unter eigenem
+Holder parken (siehe [Harmony + IL2CPP](harmony-il2cpp.md)).
+
+## 3. Shop-Buttons (Sektion „HL Mods")
+
+- Template: beliebiges Vanilla-`ShopItem` klonen (`Instantiate(source.gameObject, parent)`).
+- Neues `ShopItemSO` (`CreateInstance`): `itemName`, `price`, `xpToUnlock`,
+  **eigene** `itemID`, `itemType`, `sprite`, `isCustomColor`-Flag, `eol` übernehmen.
+- `guid` eindeutig, Texte (`txtName/txtPrice/txtXpToUnlock`) setzen, `SetActive(true)`.
+- Achtung: `shopItems` ist IL2CPP-fix — per `Il2CppReferenceArray`-Kopie erweitern.
+- Custom-Color-Items brauchen den Vanilla-Farbpicker-Flow (nicht umgehen).
+
+## 4. Cart → Auslieferung
+
+- Custom-IDs brauchen oft eigene Cart-Logik (`ButtonBuyShopItem`-Prefix): Zeile per
+  `ShopCartItem.Initialize(shop, name, id, price, itemType, noCustomColor)` anlegen,
+  Menge via `BuyAnotherItem`, Summe via `UpdateCartTotal`.
+- Auslieferung am Checkout über `GetPrefabForItem` (eine Instanz pro Kauf, keine
+  Extra-Spawns — sonst Geister-Boxen).
+- **Bulk-Käufe pro Einheit zuordnen** (Vorbild Backplanes-Checkout-Snapshot):
+  Beim `SpawnAll`-Beginn eine Spec **pro Einheit** in Cart-Reihenfolge ablegen
+  (Quantity expandieren), Prefab-Familie gegen Cart-Drift prüfen (Preis-Peek nur
+  als Korrektur, nie als Primärschlüssel). So kriegt bei 30+ Einheiten aus
+  mehreren Familien zum selben Preis jede Spawn-Instanz ihre exakte Spec.
+  Pending-Queues dabei groß genug dimensionieren (Backplanes: Cap 12 → 200,
+  10-Minuten-Expiry) und nach Checkout verifizieren (Mismatch → Log + Notification).
+- Exklusivität: Wer dieselben ID-Ranges besitzt (MoreModules vs. MoreServers vs.
+  RealisticModules), weicht per `RegisteredMelons`-Check zurück (`s_disabledBySibling`,
+  Fehler ins Log) — doppelte Buttons/Käufe sind schlimmer als ein inaktiver Mod.
+
+## 5. Custom-Farben bei Mengen (stale UIDs)
+
+Vanilla ruft `ApplyColorToSpawnedItem` pro Spawn gern mit stale UID (z. B. immer 1),
+und `spawnedItems` wird nie geleert (stale Keys!). Bewährt (Backplanes):
+
+- Im Prefix auf den **frischesten Checkout-Spawn** umleiten (eigene
+  `SpawnPhysicalItem`-Postfix-Liste), nicht auf ±1-Heuristik verlassen.
+- Im `SpawnAllPurchasedItems`-Postfix Zeilen-Quantity auf aufeinanderfolgende
+  Spawns verteilen (Unit-Offsets = kumulierte Mengen aller Zeilen davor),
+  ungefärbte per Force nachziehen. Ergebnis: 6× Custom-Rack → 6× Farbe.
+
+## 5. Save-Kompatibilität
+
 PrefabIDs landen in Saves. Umbenennen/Recyceln bricht alte Spielstände → IDs und
 `ShopGuid`s **nie** wiederverwenden. Nachfolger-Mods halten Aliase lesbar
 (RealisticModules liest MoreModules-`1000–1006`).
@@ -133,4 +179,3 @@ hard dependency: add `references/gregCore.dll` + csproj `Reference`
 fast with a clear error when it is missing. Recommended for new shop
 mods; existing standalone shop mods (MoreSpools, MoreModules,
 MoreServers) stay on their local implementation until they opt in.
->>>>>>> agent/gregcore-integration

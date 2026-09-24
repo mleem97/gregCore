@@ -177,6 +177,7 @@ namespace gregCore.UI
             label.style.color = GregUITheme.SecondaryColor;
             label.style.fontSize = 18;
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            label.style.whiteSpace = WhiteSpace.Normal;
             label.style.marginTop = GregUITheme.Spacing;
             label.style.marginBottom = GregUITheme.Spacing / 2;
             _contentContainer.Add(label);
@@ -190,6 +191,7 @@ namespace gregCore.UI
             var label = new Label(text);
             label.style.color = new Color(0.88f, 0.88f, 0.88f);
             label.style.fontSize = 14;
+            label.style.whiteSpace = WhiteSpace.Normal;
             label.style.marginBottom = GregUITheme.Spacing / 2;
             _contentContainer.Add(label);
             return this;

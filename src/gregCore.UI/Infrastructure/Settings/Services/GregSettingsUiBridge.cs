@@ -64,21 +64,25 @@ namespace gregCore.Infrastructure.Settings.Services
             };
             doc.rootVisualElement.Add(_root);
 
-            // Scroll view
+            // Search bar first (top), scrollable content below it.
+            AddSearchBar();
+
+            // Scroll view (content goes to the scroll content container —
+            // never Clear() the ScrollView itself, that would destroy
+            // the scrollers).
             var scrollView = new ScrollView(ScrollViewMode.Vertical)
             {
                 style =
                 {
                     flexGrow = 1,
+                    flexShrink = 1,
+                    minHeight = 100,
                     marginTop = 10
                 }
             };
             _root.Add(scrollView);
-            _contentContainer = scrollView;
+            _contentContainer = scrollView.contentContainer;
 
-            // Search bar
-            AddSearchBar();
-            
             // Populate mods
             RefreshUi();
         }
@@ -139,7 +143,8 @@ namespace gregCore.Infrastructure.Settings.Services
                     unityFontStyleAndWeight = FontStyle.Bold,
                     color = Color.white,
                     marginTop = 10,
-                    marginBottom = 6
+                    marginBottom = 6,
+                    whiteSpace = WhiteSpace.Normal
                 }
             };
             _contentContainer!.Add(header);
@@ -154,7 +159,8 @@ namespace gregCore.Infrastructure.Settings.Services
                     fontSize = 14,
                     color = Color.cyan,
                     marginBottom = 3,
-                    marginLeft = 10
+                    marginLeft = 10,
+                    whiteSpace = WhiteSpace.Normal
                 }
             };
             _contentContainer!.Add(entry);
@@ -162,7 +168,7 @@ namespace gregCore.Infrastructure.Settings.Services
 
         private void AddKeybindEntry(KeybindEntry keybind)
         {
-            var conflictText = keybind.HasConflict ? " [KONFLIKT]" : "";
+            var conflictText = keybind.HasConflict ? " [CONFLICT]" : "";
             var entry = new Label($"  {keybind.DisplayName}: {keybind.CurrentKey}{conflictText}")
             {
                 style =
@@ -170,7 +176,8 @@ namespace gregCore.Infrastructure.Settings.Services
                     fontSize = 14,
                     color = keybind.HasConflict ? Color.red : Color.yellow,
                     marginBottom = 3,
-                    marginLeft = 10
+                    marginLeft = 10,
+                    whiteSpace = WhiteSpace.Normal
                 }
             };
             _contentContainer!.Add(entry);

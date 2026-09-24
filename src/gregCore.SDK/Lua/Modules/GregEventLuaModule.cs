@@ -76,6 +76,15 @@ public static class GregEventLuaModule
             list.Remove(subscription);
         });
 
+        greg["off"] = (Action<string>)(token =>
+        {
+            if (!_handlers.TryGetValue(modId, out var list)) return;
+            var subscription = list.FirstOrDefault(x => x.Token == token);
+            if (subscription == null) return;
+            eventBus.Unsubscribe(subscription.HookName, subscription.Handler);
+            list.Remove(subscription);
+        });
+
         // greg.once(hookName, callback) – Subscribe once, auto-unsubscribes after first call
         greg["once"] = (Func<string, Closure, string>)((hookName, callback) =>
         {

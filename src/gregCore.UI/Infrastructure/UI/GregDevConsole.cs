@@ -297,10 +297,15 @@ namespace gregCore.Infrastructure.UI
 
             _logScrollView?.schedule.Execute(new Action<TimerState>(_ =>
             {
-                if (_logScrollView != null)
+                try
                 {
-                    _logScrollView.scrollOffset = new Vector2(0, float.MaxValue);
+                    var scroll = _logScrollView;
+                    if (scroll == null) return;
+                    var content = scroll.contentContainer;
+                    if (content != null && content.childCount > 0)
+                        scroll.ScrollTo(content[content.childCount - 1]);
                 }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }));
         }
 

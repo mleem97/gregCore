@@ -18,6 +18,7 @@ namespace greg.UI.Settings
         private static GregSettingsHub? _instance;
         private GregPanelBuilder? _panelBuilder;
         private VisualElement? _sidebar;
+        private VisualElement? _sidebarContent;
         private VisualElement? _contentArea;
         private int _selectedTabIndex = 0;
         private bool _isVisible;
@@ -209,6 +210,12 @@ namespace greg.UI.Settings
             _panelBuilder?.Show();
             _isVisible = true;
             BuildTabContent();
+            try
+            {
+                var root = _panelBuilder?.Root;
+                if (root != null) root.MarkDirtyRepaint();
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
 
         public void Hide()
@@ -236,12 +243,15 @@ namespace greg.UI.Settings
 
                 var body = new VisualElement();
                 body.style.flexGrow = 1;
+                body.style.flexShrink = 1;
+                body.style.minHeight = 0;
                 body.style.flexDirection = FlexDirection.Row;
                 root.Add(body);
 
                 _sidebar = new VisualElement();
                 _sidebar.name = "SettingsSidebar";
                 _sidebar.style.width = 220;
+                _sidebar.style.flexShrink = 0;
                 _sidebar.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f);
                 _sidebar.style.borderRightWidth = 1;
                 _sidebar.style.borderRightColor = GregUITheme.NeutralBorder;
@@ -249,14 +259,36 @@ namespace greg.UI.Settings
                 _sidebar.style.paddingBottom = 10;
                 body.Add(_sidebar);
 
-                _contentArea = new VisualElement();
+                // Scrollable tab list (many tabs must not push content out).
+                var sidebarScroll = new ScrollView(ScrollViewMode.Vertical);
+                sidebarScroll.name = "SettingsSidebarScroll";
+                sidebarScroll.style.flexGrow = 1;
+                sidebarScroll.style.flexShrink = 1;
+                sidebarScroll.style.minHeight = 0;
+                sidebarScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
+                sidebarScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+                _sidebar.Add(sidebarScroll);
+                _sidebarContent = sidebarScroll.contentContainer;
+
+                // Scrollable tab content (long settings pages scroll
+                // instead of overflowing past the panel edge).
+                var contentScroll = new ScrollView(ScrollViewMode.Vertical);
+                contentScroll.name = "SettingsContentScroll";
+                contentScroll.style.flexGrow = 1;
+                contentScroll.style.flexShrink = 1;
+                contentScroll.style.minHeight = 0;
+                contentScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
+                contentScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+                body.Add(contentScroll);
+
+                _contentArea = contentScroll.contentContainer;
                 _contentArea.name = "SettingsContent";
-                _contentArea.style.flexGrow = 1;
                 _contentArea.style.paddingLeft = GregUITheme.Padding;
                 _contentArea.style.paddingRight = GregUITheme.Padding;
                 _contentArea.style.paddingTop = GregUITheme.Padding;
                 _contentArea.style.paddingBottom = GregUITheme.Padding;
-                body.Add(_contentArea);
+                // NOTE: no flexGrow here — the ScrollView owns the sizing;
+                // the content container must size to its children.
 
                 BuildSidebar();
             }
@@ -268,8 +300,9 @@ namespace greg.UI.Settings
 
         private void BuildSidebar()
         {
-            if (_sidebar == null) return;
-            _sidebar.Clear();
+            var target = _sidebarContent ?? _sidebar;
+            if (target == null) return;
+            target.Clear();
 
             for (int i = 0; i < _tabs.Count; i++)
             {
@@ -309,7 +342,8 @@ namespace greg.UI.Settings
                     BuildTabContent();
                 }));
 
-                _sidebar.Add(btn);
+                if (_sidebarContent != null) _sidebarContent.Add(btn);
+                else _sidebar?.Add(btn);
             }
         }
 

@@ -1,10 +1,6 @@
 /// <file-summary>
 /// Layer:       Infrastructure
-<<<<<<< HEAD
 /// Purpose:     In-game Lua REPL for live debugging.
-=======
-/// Purpose:      In-game Lua REPL for live debugging.
->>>>>>> agent/gregcore-integration
 /// Maintainer:   Opens/closes via keybind (F12). UI Toolkit-based.
 ///               Evaluates Lua expressions against a persistent script context.
 /// </file-summary>

@@ -1,10 +1,6 @@
 /// <file-summary>
 /// Layer:       Infrastructure
-<<<<<<< HEAD
 /// Purpose:     Frame budget tracking for Lua mods.
-=======
-/// Purpose:      Frame-budget tracking for Lua mods.
->>>>>>> agent/gregcore-integration
 /// Maintainer:   Measures CPU time per Lua mod per frame.
 ///               Warns when the frame budget is exceeded.
 /// </file-summary>
@@ -28,11 +24,7 @@ public sealed class LuaProfiler
     /// <summary>
     /// Creates a profiler with the given frame budget.
     /// </summary>
-<<<<<<< HEAD
     /// <param name="frameBudgetMs">Max milliseconds per frame for all Lua mods combined (default: 2.0ms)</param>
-=======
-    /// <param name="frameBudgetMs">Max. milliseconds per frame for all Lua mods combined (Default: 2.0ms)</param>
->>>>>>> agent/gregcore-integration
     public LuaProfiler(float frameBudgetMs = 2.0f)
     {
         _frameBudgetMs = frameBudgetMs;
@@ -94,11 +86,7 @@ public sealed class LuaProfiler
     }
 
     /// <summary>
-<<<<<<< HEAD
     /// Returns a profiling report as string (for REPL/console).
-=======
-    /// Returns a profiling report as a string (for REPL/console).
->>>>>>> agent/gregcore-integration
     /// </summary>
     public string GetReport()
     {

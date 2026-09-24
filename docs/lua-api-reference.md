@@ -84,6 +84,7 @@ Define these functions globally in `main.lua` (all optional):
 
 ### `greg.customer`
 - `bases() -> table`: array of `{base_id, customer_id, money_speed, all_met, wants_internet, satisfied}`.
+- `find_base(baseId) -> table or nil`
 - `is_ip_present(baseId, ip) -> bool` / `app_id_for_ip(baseId, ip) -> number` (-1 unknown)
 - `register_subnet(baseId, vlanId, routeKey, ips) -> bool` / `unregister_subnet(baseId, routeKey) -> bool`
 

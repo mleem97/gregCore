@@ -38,14 +38,7 @@ public static class LuaCustomerModule
                     try
                     {
                         if (dto == null) continue;
-                        var t = new Table(script);
-                        t["base_id"] = dto.CustomerBaseID;
-                        t["customer_id"] = dto.CustomerID;
-                        t["money_speed"] = (double)dto.EffectiveMoneySpeed;
-                        t["all_met"] = dto.AllRequirementsMet;
-                        t["wants_internet"] = dto.WantsInternet;
-                        t["satisfied"] = dto.WasFullySatisfied;
-                        result[i++] = t;
+                        result[i++] = BaseToTable(script, dto);
                     }
                     catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
@@ -56,6 +49,20 @@ public static class LuaCustomerModule
                 LuaLog.Error($"[LuaMod:{modId}] customer.bases() failed: {ex.Message}");
                 return new Table(script);
             }
+        });
+
+        // greg.customer.find_base(baseId) → info table or nil
+        t["find_base"] = (Func<int, DynValue>)((baseId) =>
+        {
+            try
+            {
+                var cb = FindBaseById(baseId);
+                if (cb == null) return DynValue.Nil;
+                var dto = gregCore.Core.Networking.GregCustomers.ReadBase(cb);
+                if (dto == null) return DynValue.Nil;
+                return DynValue.FromObject(script, BaseToTable(script, dto));
+            }
+            catch { return DynValue.Nil; }
         });
     }
 
@@ -138,6 +145,24 @@ public static class LuaCustomerModule
                 return false;
             }
         });
+    }
+
+    internal static Table BaseToTable(Script script,
+        gregCore.Core.Networking.GregCustomers.BaseInfo dto)
+    {
+        try
+        {
+            if (dto == null) return null;
+            var t = new Table(script);
+            t["base_id"] = dto.CustomerBaseID;
+            t["customer_id"] = dto.CustomerID;
+            t["money_speed"] = (double)dto.EffectiveMoneySpeed;
+            t["all_met"] = dto.AllRequirementsMet;
+            t["wants_internet"] = dto.WantsInternet;
+            t["satisfied"] = dto.WasFullySatisfied;
+            return t;
+        }
+        catch { return null; }
     }
 
     internal static Il2Cpp.CustomerBase FindBaseById(int baseId)

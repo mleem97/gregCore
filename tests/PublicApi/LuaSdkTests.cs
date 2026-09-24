@@ -222,6 +222,7 @@ public class LuaSdkTests
         LuaCustomerModule.Register(greg, script, "test");
         var customer = greg.Get("customer").Table;
         Call(customer, "bases").Table.Length.Should().Be(0);
+        Call(customer, "find_base", 1).IsNil().Should().BeTrue();
         Call(customer, "is_ip_present", 1, "10.0.0.1").Boolean.Should().BeFalse();
         Call(customer, "app_id_for_ip", 1, "10.0.0.1").Number.Should().Be(-1);
         Call(customer, "register_subnet", 1, 10, "k", script.DoString("return {}")).Boolean.Should().BeFalse();

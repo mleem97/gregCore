@@ -93,7 +93,19 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Run tests
-        run: dotnet test tests/gregCore.Tests.csproj -c Release --no-restore
+        run: dotnet test tests/gregCore.Tests.csproj -c Release --no-restore --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+      - name: Upload coverage to Codacy
+        # Needs CODACY_PROJECT_TOKEN as a Forgejo Actions secret
+        # (repo Settings > Secrets). Skipped silently until set.
+        continue-on-error: true
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          if [ -z "$CODACY_PROJECT_TOKEN" ]; then echo "CODACY_PROJECT_TOKEN not set, skipping upload."; exit 0; fi
+          bash <(curl -Ls https://coverage.codacy.com/get.sh)
+          COV=$(find ./coverage -name coverage.cobertura.xml | head -1)
+          ./codacy-coverage-reporter report -l CSharp -r "$COV"
 
   docs:
     name: docs

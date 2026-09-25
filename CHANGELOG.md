@@ -1,4 +1,5 @@
 # Changelog — gregCore
+<!-- markdownlint-disable MD024 -- no-duplicate-heading does not apply to Keep-a-Changelog version sections -->
 
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [`VERSION`](VERSION).
 
@@ -6,6 +7,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
 
 ### Added
 
+- Rust native SDK: `templates/rust/` (`Cargo.toml`, safe `src/greg.rs`
+  bindings mirroring the ABI v1 table field-for-field with compile-time
+  layout asserts, example `src/lib.rs`) and refreshed
+  `examples/Rust/greg_example/` (full event/hook coverage on the new
+  bindings, fixing the old example's table-order mismatch). Verified with
+  `cargo check` + `clippy` + `rustfmt`. Guidebook track:
+  `Guidebook Rust 01 Setup` + `Guidebook Rust 02 Project`.
+- GregLint (own repo `github.com/mleem97/gregLint`): offline static
+  analysis + auto-fix for mods (GL001–GL007 IL rules via Cecil,
+  GL101–GL105 layout/manifest/mod.json rules, `--fix` with backup,
+  text/JSON output, exit codes, custom-rule extensibility). 55 tests,
+  99.05% line coverage. Guide: `.wiki/Developer-GregLint.md`.
+- Wiki: GregCore Collection on Steam linked (`Home`, `Player Getting
+  Started`, `Player Installation`, `Developer Publishing`).
 - CommonShop completion (compatible, no breaking change):
   `ShopAPI.Initialize(Harmony)` (idempotent), persistent custom ID registry
   (`UserData/gregCore/CommonShop_CustomIDs.json`, legacy migration +
@@ -38,6 +53,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
 
 ### Changed
 
+- English-only user-facing strings: remaining German `GregObjImport`
+  warnings translated (`Import returned null`, `Import has no vertices`,
+  `Path escapes the pack folder`, `Empty file path`, `File too large`);
+  Rust legacy-dir warning translated; wiki log tables updated to the
+  exact messages.
 - SaveGuard backup guarantee: no framework write (sidecars, sanitize-gated
   paths) happens without a fresh vanilla backup first — if the backup
   fails, mod writes for that save are skipped while the game's own save

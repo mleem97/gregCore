@@ -21,7 +21,7 @@ public static partial class GregComputer
             InjectShortcuts(shop);
             ShowCurrentIfNeeded();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ShowCurrentIfNeeded()
@@ -34,12 +34,12 @@ public static partial class GregComputer
             if (TryGetApp(current, out var app) && app != null)
                 ShowAppPage(app);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public static void OnComputerClosed()
     {
-        try { CloseApp(); } catch { }
+        try { CloseApp(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void RemoveStaleButtons(global::Il2Cpp.ComputerShop shop)
@@ -51,7 +51,7 @@ public static partial class GregComputer
             var wanted = CollectWantedNames();
             RemoveUnwanted(buttons, wanted);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static HashSet<string> CollectWantedNames()
@@ -61,10 +61,10 @@ public static partial class GregComputer
         {
             foreach (var s in Shortcuts())
             {
-                try { wanted.Add(ButtonName(s)); } catch { }
+                try { wanted.Add(ButtonName(s)); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return wanted;
     }
 
@@ -75,10 +75,10 @@ public static partial class GregComputer
             foreach (var b in buttons)
             {
                 try { TryRemoveOne(b, wanted); }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void TryRemoveOne(UnityEngine.UI.Button b, HashSet<string> wanted)
@@ -90,7 +90,7 @@ public static partial class GregComputer
             if (n.StartsWith(ButtonPrefix, StringComparison.Ordinal) && !wanted.Contains(n))
                 UnityEngine.Object.Destroy(b.gameObject);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void InjectShortcuts(global::Il2Cpp.ComputerShop shop)
@@ -105,7 +105,7 @@ public static partial class GregComputer
             if (container == null) return;
             InjectAll(template, container, all);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static UnityEngine.UI.Button FindTemplate(global::Il2Cpp.ComputerShop shop)
@@ -120,11 +120,11 @@ public static partial class GregComputer
                 {
                     if (IsTemplateCandidate(b)) return b;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             return null;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     private static bool IsTemplateCandidate(UnityEngine.UI.Button b)
@@ -137,7 +137,7 @@ public static partial class GregComputer
             if (string.IsNullOrEmpty(ReadLabel(b))) return false;
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void InjectAll(UnityEngine.UI.Button template, UnityEngine.Transform container, System.Collections.Generic.IReadOnlyList<ComputerShortcut> all)
@@ -147,10 +147,10 @@ public static partial class GregComputer
             foreach (var s in all)
             {
                 try { InjectOne(template, container, s); }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void InjectOne(UnityEngine.UI.Button template, UnityEngine.Transform container, ComputerShortcut s)
@@ -162,13 +162,13 @@ public static partial class GregComputer
             var clone = UnityEngine.Object.Instantiate(template.gameObject, container, false);
             if (clone == null) return;
             clone.name = name;
-            try { clone.transform.localPosition = Vector3.zero; } catch { }
-            try { clone.transform.localScale = Vector3.one; } catch { }
+            try { clone.transform.localPosition = Vector3.zero; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { clone.transform.localScale = Vector3.one; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             SetLabel(clone, s.Label);
             WireClone(clone, s);
-            try { clone.SetActive(true); } catch { }
+            try { clone.SetActive(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void WireClone(GameObject clone, ComputerShortcut s)
@@ -178,19 +178,19 @@ public static partial class GregComputer
             var btn = clone.GetComponent<UnityEngine.UI.Button>();
             if (btn == null)
             {
-                try { UnityEngine.Object.Destroy(clone); } catch { }
+                try { UnityEngine.Object.Destroy(clone); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return;
             }
-            try { btn.onClick.RemoveAllListeners(); } catch { }
+            try { btn.onClick.RemoveAllListeners(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             var captured = s;
             try
             {
                 btn.onClick.AddListener(DelegateSupport.ConvertDelegate<UnityAction>(
                     new Action(() => InvokeShortcut(captured.ModId, captured.Id))));
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static string ButtonName(ComputerShortcut s)
@@ -202,7 +202,7 @@ public static partial class GregComputer
             if (string.IsNullOrEmpty(safe)) safe = "x";
             return ButtonPrefix + safe;
         }
-        catch { return ButtonPrefix + "x"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ButtonPrefix + "x"; }
     }
 
     private static string ReadLabel(UnityEngine.UI.Button b)
@@ -214,7 +214,7 @@ public static partial class GregComputer
             var tmp = b.GetComponentInChildren<TextMeshProUGUI>(true);
             if (tmp != null && !string.IsNullOrEmpty(tmp.text)) return tmp.text;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return "";
     }
 
@@ -223,11 +223,11 @@ public static partial class GregComputer
         try
         {
             var text = root.GetComponentInChildren<UnityEngine.UI.Text>(true);
-            if (text != null) { try { text.text = label; } catch { } return; }
+            if (text != null) { try { text.text = label; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } return; }
             var tmp = root.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (tmp != null) { try { tmp.text = label; } catch { } }
+            if (tmp != null) { try { tmp.text = label; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ShowAppPage(ComputerApp app)
@@ -242,7 +242,7 @@ public static partial class GregComputer
             _appPage = builder;
             TryRegisterAppMenu(app);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void TryBuildApp(ComputerApp app, GregPanelBuilder builder)
@@ -268,7 +268,7 @@ public static partial class GregComputer
             });
             GregMenuRegistry.SetOpen(MenuIdFor(app.AppId), true);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void HideAppPage(string closingAppId)
@@ -279,14 +279,14 @@ public static partial class GregComputer
             _appPage = null;
             if (page != null)
             {
-                try { page.Hide(); } catch { }
-                try { page.Destroy(); } catch { }
+                try { page.Hide(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                try { page.Destroy(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             if (!string.IsNullOrEmpty(closingAppId))
             {
-                try { GregMenuRegistry.SetOpen(MenuIdFor(closingAppId), false); } catch { }
+                try { GregMenuRegistry.SetOpen(MenuIdFor(closingAppId), false); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

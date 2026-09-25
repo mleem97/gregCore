@@ -135,8 +135,8 @@ static TABLE: OnceLock<TablePtr> = OnceLock::new();
 /// once during `greg_mod_init` (game thread) and it lives forever.
 #[derive(Copy, Clone)]
 struct TablePtr(*const GregCoreAPI);
-unsafe impl Send for TablePtr {}
-unsafe impl Sync for TablePtr {}
+unsafe impl Send for TablePtr {} // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
+unsafe impl Sync for TablePtr {} // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
 
 /// Stores the table handed to `greg_mod_init`. Call once, before use.
 pub fn init(table: *const GregCoreAPI) -> bool {
@@ -147,7 +147,7 @@ pub fn init(table: *const GregCoreAPI) -> bool {
 }
 
 fn table() -> Option<&'static GregCoreAPI> {
-    TABLE.get().and_then(|p| unsafe { p.0.as_ref() })
+    TABLE.get().and_then(|p| unsafe { p.0.as_ref() }) // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
 }
 
 fn cstr(s: &str) -> Option<CString> {
@@ -158,7 +158,7 @@ fn lossy(ptr: *const c_char) -> String {
     if ptr.is_null() {
         return String::new();
     }
-    unsafe { CStr::from_ptr(ptr).to_string_lossy().into_owned() }
+    unsafe { CStr::from_ptr(ptr).to_string_lossy().into_owned() } // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
 }
 
 /// Decodes a hook callback triple `(hook, trigger, json)` into Strings.

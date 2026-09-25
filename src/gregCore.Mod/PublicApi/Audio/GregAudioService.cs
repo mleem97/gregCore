@@ -62,7 +62,7 @@ public static partial class GregAudioService
                 var src = ActiveSource();
                 return src != null && src.isPlaying;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
     }
 
@@ -96,7 +96,7 @@ public static partial class GregAudioService
             }
             return _fadeSource;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     private static void EnsureFadeSource()
@@ -110,7 +110,7 @@ public static partial class GregAudioService
             _fadeSource.playOnAwake = false;
             _fadeSource.loop = false;
         }
-        catch { _fadeSource = null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  _fadeSource = null; }
     }
 
     public static void PlayFile(string filePath, string title, float volume)
@@ -170,7 +170,7 @@ public static partial class GregAudioService
                 audible = active.clip != null && active.isPlaying;
             return audible;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void PlayDirect(AudioSource active, AudioClip clip, float volume)
@@ -238,7 +238,7 @@ public static partial class GregAudioService
             TickFade(dt);
             TickEnded();
         }
-        catch { _fading = false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  _fading = false; }
     }
 
     private static void TickFade(float dt)
@@ -252,7 +252,7 @@ public static partial class GregAudioService
             ApplyFadeVolumes(k);
             if (_fadeT >= 1f) CompleteFade();
         }
-        catch { _fading = false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  _fading = false; }
     }
 
     private static void ApplyFadeVolumes(float k)
@@ -262,7 +262,7 @@ public static partial class GregAudioService
             if (_fadeFrom != null) { try { _fadeFrom.volume = _fadeVol * (1f - k); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
             if (_fadeTo != null) { try { _fadeTo.volume = _fadeVol * k; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void CompleteFade()
@@ -278,13 +278,13 @@ public static partial class GregAudioService
         {
             if (PollEnded()) { try { TrackEnded?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // True exactly on the trailing edge (track ended naturally).
     public static bool Poll()
     {
-        try { return PollEnded(); } catch { return false; }
+        try { return PollEnded(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool PollEnded()
@@ -298,7 +298,7 @@ public static partial class GregAudioService
             _wasPlaying = playing;
             return ended;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void SnapFade()
@@ -372,7 +372,7 @@ public static partial class GregAudioService
         byte[] data = null;
         string fail = null;
         UnityWebRequest req = null;
-        try { req = UnityWebRequest.Get(url); } catch { fail = "Request"; }
+        try { req = UnityWebRequest.Get(url); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  fail = "Request"; }
         if (req != null)
         {
             req.timeout = 30;
@@ -469,6 +469,6 @@ public static partial class GregAudioService
     public static bool IsPreloading(string filePath)
     {
         try { return !string.IsNullOrEmpty(filePath) && _preloadingPath == filePath; }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

@@ -210,7 +210,13 @@ public static class DemandPlanner
     // Dip feed: inject surplus (requirement effectively reduced).
     // amount = share of the requirement as bonus (0.3 = 30% on top).
     public static List<(int AppId, float Amount)> ComputeDipFeed(
-        float[] required, float amount, float epsilon = DefaultEpsilon)
+        float[] required, float amount)
+    {
+        return ComputeDipFeed(required, amount, DefaultEpsilon);
+    }
+
+    public static List<(int AppId, float Amount)> ComputeDipFeed(
+        float[] required, float amount, float epsilon)
     {
         var feed = new List<(int, float)>();
         if (required == null || amount <= 0f) return feed;

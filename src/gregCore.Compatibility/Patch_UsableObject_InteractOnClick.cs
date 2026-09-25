@@ -121,7 +121,7 @@ internal static class Patch_UsableObject_InteractOnClick
             if (name.EndsWith("(Clone)")) name = name.Substring(0, name.Length - 7);
             return name;
         }
-        catch { return name; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return name; }
     }
 
     private static string ResolveStablePickupId(UsableObject __instance, string objectId, byte objectType)
@@ -139,7 +139,7 @@ internal static class Patch_UsableObject_InteractOnClick
             }
             Patch_Rack_MarkPositionAsUsed.RemoveInstalledObject(pickupRackUid);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return objectId;
     }
 
@@ -151,23 +151,23 @@ internal static class Patch_UsableObject_InteractOnClick
             if (IsSwitchType(__instance, objectType)) return CoalesceRackUid(__instance);
             if (IsPanelType(__instance, objectType)) return CoalesceRackUid(__instance);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return -1;
     }
 
     private static bool IsServerType(UsableObject instance, byte objectType)
     {
-        try { return objectType <= 3 && instance.TryCast<Server>() != null; } catch { return false; }
+        try { return objectType <= 3 && instance.TryCast<Server>() != null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool IsSwitchType(UsableObject instance, byte objectType)
     {
-        try { return objectType == 4 && instance.TryCast<NetworkSwitch>() != null; } catch { return false; }
+        try { return objectType == 4 && instance.TryCast<NetworkSwitch>() != null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool IsPanelType(UsableObject instance, byte objectType)
     {
-        try { return objectType == 7 && instance.TryCast<PatchPanel>() != null; } catch { return false; }
+        try { return objectType == 7 && instance.TryCast<PatchPanel>() != null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Prefer the live-linked rack position, otherwise the stored one.
@@ -179,7 +179,7 @@ internal static class Patch_UsableObject_InteractOnClick
             if (pos != null && pos.rackPosGlobalUID > 0) return pos.rackPosGlobalUID;
             return device.rackPositionUID;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return -1;
     }
 
@@ -197,7 +197,7 @@ internal static class Patch_UsableObject_InteractOnClick
             var srv = instance.TryCast<Server>();
             if (srv != null) srv.ServerID = objectId;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplySwitchIdentity(UsableObject instance, string objectId)
@@ -207,7 +207,7 @@ internal static class Patch_UsableObject_InteractOnClick
             var sw = instance.TryCast<NetworkSwitch>();
             if (sw != null) sw.switchId = objectId;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplyPanelIdentity(UsableObject instance, string objectId)
@@ -217,7 +217,7 @@ internal static class Patch_UsableObject_InteractOnClick
             var pp = instance.TryCast<PatchPanel>();
             if (pp != null) pp.patchPanelId = objectId;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     /// <summary>

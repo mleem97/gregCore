@@ -43,11 +43,11 @@ public static class LuaNetModule
                         if (r == null) continue;
                         var t = new Table(script);
                         int routes = 0, owned = 0;
-                        try { routes = r.routes != null ? r.routes.Count : 0; } catch { }
-                        try { owned = r.ownedSubnets != null ? r.ownedSubnets.Count : 0; } catch { }
+                        try { routes = r.routes != null ? r.routes.Count : 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                        try { owned = r.ownedSubnets != null ? r.ownedSubnets.Count : 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         int asn = 0, nextId = 0;
-                        try { asn = r.asn; } catch { }
-                        try { nextId = r.nextRouteId; } catch { }
+                        try { asn = r.asn; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                        try { nextId = r.nextRouteId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["asn"] = asn;
                         t["next_route_id"] = nextId;
                         t["routes"] = routes;
@@ -87,7 +87,7 @@ public static class LuaNetModule
                         string cluster = "";
                         int rules = 0;
                         try { cluster = f.clusterIP ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
-                        try { rules = f.filterRules != null ? f.filterRules.Count : 0; } catch { }
+                        try { rules = f.filterRules != null ? f.filterRules.Count : 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["cluster_ip"] = cluster;
                         t["rules"] = rules;
                         result[i++] = t;
@@ -124,7 +124,7 @@ public static class LuaNetModule
                         var t = new Table(script);
                         int prefab = -1;
                         bool inserted = false;
-                        try { prefab = s.prefabID; } catch { }
+                        try { prefab = s.prefabID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         try { inserted = s.isInserted; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["prefab"] = prefab;
                         t["inserted"] = inserted;
@@ -168,14 +168,14 @@ public static class LuaNetModule
                     {
                         if (g == null) continue;
                         int gid = -1;
-                        try { gid = g.groupId; } catch { }
+                        try { gid = g.groupId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         result[i++] = gid;
                     }
                     catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return result;
             }
-            catch { return new Table(script); }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return new Table(script); }
         });
     }
 
@@ -199,8 +199,8 @@ public static class LuaNetModule
                         var t = new Table(script);
                         int id = -1;
                         float speed = 0f;
-                        try { id = c.cableID; } catch { }
-                        try { speed = c.maxSpeed; } catch { }
+                        try { id = c.cableID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                        try { speed = c.maxSpeed; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["id"] = id;
                         t["maxspeed"] = (double)speed;
                         result[i++] = t;
@@ -227,6 +227,6 @@ public static class LuaNetModule
             if (data == null || data.Pointer == IntPtr.Zero) return null;
             return data;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 }

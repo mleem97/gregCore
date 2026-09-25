@@ -17,7 +17,7 @@ public static partial class GregComputer
                 return (closing, onClosed);
             }
         }
-        catch { return ("", null); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ("", null); }
     }
 
     // Looks up the OnClosed handler for the closing app id.
@@ -29,7 +29,7 @@ public static partial class GregComputer
             var app = FindAppById(closing);
             return app?.OnClosed;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     // Finds an app by id without throwing.
@@ -43,10 +43,10 @@ public static partial class GregComputer
                 {
                     if (a != null && IsAppMatch(a, appId)) return a;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return null;
     }
 
@@ -57,7 +57,7 @@ public static partial class GregComputer
         {
             return string.Equals(app.AppId, appId, StringComparison.Ordinal);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Fires close callbacks and the AppClosed event for a closing app.
@@ -70,19 +70,19 @@ public static partial class GregComputer
             InvokeAppClosed(closing);
             EmitAppClosed(closing);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Invokes the app owner OnClosed handler defensively.
     private static void InvokeCloseHandler(Action? onClosed)
     {
-        try { onClosed?.Invoke(); } catch { }
+        try { onClosed?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Invokes the static AppClosed event defensively.
     private static void InvokeAppClosed(string closing)
     {
-        try { AppClosed?.Invoke(closing); } catch { }
+        try { AppClosed?.Invoke(closing); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Emits the HookAppClosed payload defensively.
@@ -92,6 +92,6 @@ public static partial class GregComputer
         {
             SafeEmit(HookAppClosed, new Dictionary<string, object> { { "AppId", closing } });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

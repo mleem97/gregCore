@@ -130,7 +130,8 @@ public sealed class LuaFFIBridge
                 ? new gregCore.Core.Models.ModManifest { Id = Path.GetFileNameWithoutExtension(source), Name = Path.GetFileNameWithoutExtension(source), Entrypoint = Path.GetFileName(source), Loader = "Lua" }
                 : ReadManifest(manifestFile, Path.GetFileName(dir));
             string id = manifest.Id;
-            mainFile = Path.Combine(dir, string.IsNullOrWhiteSpace(manifest.Entrypoint) ? "main.lua" : manifest.Entrypoint);
+            string resolvedMain = Path.Combine(dir, string.IsNullOrWhiteSpace(manifest.Entrypoint) ? "main.lua" : manifest.Entrypoint);
+            mainFile = resolvedMain;
             var script = new Script(CoreModules.Preset_SoftSandbox);
             var gregTable = SetupScript(script, dir, luaDir, id);
             var scheduler = SetupScheduler(script, gregTable);
@@ -178,7 +179,7 @@ public sealed class LuaFFIBridge
     {
         try
         {
-            RegisterDomainBatchA(gregTable, script, id, dir);
+            RegisterDomainBatchA(gregTable, script, id);
             RegisterDomainBatchB(gregTable, script, id, dir);
         }
         catch (Exception ex)
@@ -187,7 +188,7 @@ public sealed class LuaFFIBridge
         }
     }
 
-    private static void RegisterDomainBatchA(Table gregTable, Script script, string id, string dir)
+    private static void RegisterDomainBatchA(Table gregTable, Script script, string id)
     {
         try
         {
@@ -448,14 +449,14 @@ public sealed class LuaFFIBridge
 
 public class LuaPlugin
 {
-    public string Id = "";
-    public Script Script = null!;
-    public string MainFile = "";
-    public gregCore.Core.Models.ModManifest Manifest = new();
-    public LuaCoroutineScheduler Scheduler = null!;
-    public Closure? OnInit;
-    public Closure? OnUpdate;
-    public Closure? OnSceneLoaded;
-    public Closure? OnShutdown;
-    public Closure? OnReload;
+    public string Id { get; set; } = "";
+    public Script Script { get; set; } = null!;
+    public string MainFile { get; set; } = "";
+    public gregCore.Core.Models.ModManifest Manifest { get; set; } = new();
+    public LuaCoroutineScheduler Scheduler { get; set; } = null!;
+    public Closure? OnInit { get; set; }
+    public Closure? OnUpdate { get; set; }
+    public Closure? OnSceneLoaded { get; set; }
+    public Closure? OnShutdown { get; set; }
+    public Closure? OnReload { get; set; }
 }

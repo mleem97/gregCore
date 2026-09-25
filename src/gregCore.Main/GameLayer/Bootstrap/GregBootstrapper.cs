@@ -39,7 +39,7 @@ namespace gregCore.GameLayer.Bootstrap;
             RegisterCore(container, logger, core);
             var settings = CreateSettings(logger, core.Bus);
             RegisterSettings(container, settings);
-            RegisterNative(container, logger, core.Bus, settings);
+            RegisterNative(container, logger, core.Bus);
             RegisterUi(container, logger, settings, core);
             var apiContext = CreateApiContext(container, logger, core, settings);
             settings.PluginRegistry.Configure(apiContext);
@@ -178,7 +178,7 @@ namespace gregCore.GameLayer.Bootstrap;
             catch { }
         }
 
-        private static void RegisterNative(GregServiceContainer container, ConsoleLogger logger, GregEventBus bus, SettingsBundle s)
+        private static void RegisterNative(GregServiceContainer container, ConsoleLogger logger, GregEventBus bus)
         {
             try
             {

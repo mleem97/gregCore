@@ -27,7 +27,7 @@ public sealed partial class LuaRepl
             gregTable["get_xp"] = (Func<double>)(() => API.GregAPI.GetPlayerXp());
             gregTable["get_reputation"] = (Func<double>)(() => API.GregAPI.GetPlayerReputation());
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Registers world query functions in the REPL greg table.
@@ -44,7 +44,7 @@ public sealed partial class LuaRepl
             gregTable["pause"] = (Action)(() => API.GregAPI.SetGamePaused(true));
             gregTable["resume"] = (Action)(() => API.GregAPI.SetGamePaused(false));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Redirects Lua print() into the REPL output pane.
@@ -59,10 +59,10 @@ public sealed partial class LuaRepl
                     string line = string.Join("\t", Array.ConvertAll(args, a => a.ToPrintString()));
                     AddOutput(line);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Prints the REPL welcome banner.
@@ -74,7 +74,7 @@ public sealed partial class LuaRepl
             AddOutput("Type Lua expressions. Press Enter to evaluate.");
             AddOutput("Use greg.* for API access. Type 'help()' for commands.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Registers the help() command listing available calls.
@@ -84,7 +84,7 @@ public sealed partial class LuaRepl
         {
             replScript.Globals["help"] = (Action)(() => PrintHelp());
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Prints the help listing.
@@ -103,6 +103,6 @@ public sealed partial class LuaRepl
             AddOutput("  greg.pause() / resume()");
             AddOutput("  clear()                → Clear output");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

@@ -57,12 +57,12 @@ pub extern "C" fn greg_mod_update(_dt: f32) {
 #[no_mangle]
 // SAFETY: fixed C ABI — the bridge always passes a valid scene pointer
 // (or null, which is checked). Never call from Rust code directly.
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
 pub extern "C" fn greg_mod_scene_loaded(scene: *const c_char) {
     if scene.is_null() {
         return;
     }
-    let name = unsafe { std::ffi::CStr::from_ptr(scene).to_string_lossy() };
+    let name = unsafe { std::ffi::CStr::from_ptr(scene).to_string_lossy() }; // nosemgrep: rust.lang.security.unsafe-usage.unsafe-usage -- raw FFI boundary: unsafe required to dereference native-provided pointers; no safe alternative exists at this layer.
     greg::log_info(&format!("[{MOD_ID}] scene: {name}"));
 }
 

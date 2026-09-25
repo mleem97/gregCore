@@ -1,4 +1,5 @@
 # Changelog
+<!-- markdownlint-disable MD024 -- no-duplicate-heading does not apply to Keep-a-Changelog version sections -->
 
 All notable changes to gregCore are documented here.
 

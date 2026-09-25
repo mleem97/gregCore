@@ -22,9 +22,9 @@ namespace greg.CommonShop
                 var si = clone.GetComponent<ShopItem>();
                 if (si == null) return;
                 FillLegacyShopItem(si, data);
-                try { si.Start(); } catch { }
+                try { si.Start(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 ApplyCardVisuals(clone, template, data);
-                try { data.OnUIReady?.Invoke(clone); } catch { }
+                try { data.OnUIReady?.Invoke(clone); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             catch (Exception ex)
             {
@@ -38,10 +38,10 @@ namespace greg.CommonShop
             {
                 var clone = Object.Instantiate(template.gameObject, container);
                 clone.name = "ModCard_" + data.Name;
-                try { clone.SetActive(true); } catch { }
+                try { clone.SetActive(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return clone;
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
         private static void FillLegacyShopItem(ShopItem si, CustomShopItem data)
@@ -56,13 +56,13 @@ namespace greg.CommonShop
                 if (data.Icon != null) newSo.sprite = data.Icon;
                 si.shopItemSO = newSo;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         internal static void ApplyCardVisuals(GameObject card, ShopItem template, CustomShopItem data)
         {
-            try { ApplyCardTexts(card, data); } catch { }
-            try { ApplyCardImages(card, template, data); } catch { }
+            try { ApplyCardTexts(card, data); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { ApplyCardImages(card, template, data); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplyCardTexts(GameObject card, CustomShopItem data)
@@ -78,10 +78,10 @@ namespace greg.CommonShop
                         if (n == "textprice") txt.text = $"{data.Price} $";
                         else if (n == "text") txt.text = data.Name;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplyCardImages(GameObject card, ShopItem template, CustomShopItem data)
@@ -92,10 +92,10 @@ namespace greg.CommonShop
                 {
                     if (img == null) continue;
                     if (!TryGetLowerName(img.name, out string n)) continue;
-                    try { ApplySingleImage(img, template, data, n); } catch { }
+                    try { ApplySingleImage(img, template, data, n); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplySingleImage(Image img, ShopItem template, CustomShopItem data, string lowerName)
@@ -110,14 +110,14 @@ namespace greg.CommonShop
                     img.color = Color.white;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static bool TryGetLowerName(string name, out string lower)
         {
             lower = "";
             try { lower = name.ToLower(); return true; }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
     }
 }

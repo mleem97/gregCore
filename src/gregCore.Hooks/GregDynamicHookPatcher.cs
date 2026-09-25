@@ -111,7 +111,7 @@ namespace gregCore.GameLayer.Hooks
                 DisableAll(manifest);
                 return false;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private void DisableAll(GregHooksManifest manifest)
@@ -123,7 +123,7 @@ namespace gregCore.GameLayer.Hooks
                     _report.Disabled.Add(Entry(hook, "disabled", "UnknownOrMismatchedBuild", null));
                 _logger.Warning($"Hook manifest fingerprint {_report.FingerprintMatch}; risky hooks disabled.");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private void InstallAll(GregHooksManifest manifest)
@@ -136,7 +136,7 @@ namespace gregCore.GameLayer.Hooks
                     catch (Exception ex) { _failedCount++; _report.Failed.Add(Entry(hook, "failed", ex.GetType().Name, null, ex)); _logger.Warning($"Hook {hook.Id} failed: {ex.Message}"); }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private void InstallOne(GregHookDef hook)
@@ -209,7 +209,7 @@ namespace gregCore.GameLayer.Hooks
                 // GetMethod(name, flags, binder, types, modifiers) is also safe
                 return type.GetMethod(methodName, flags, null, paramTypes, null);
             }
-            catch
+            catch /* ignored: defensive best-effort (CONVENTIONS.md) */
             {
                 return null;
             }
@@ -313,7 +313,7 @@ namespace gregCore.GameLayer.Hooks
                     return hookNames != null;
                 }
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static EventPayload BuildPayload(MethodBase method, object[] args)
@@ -347,13 +347,13 @@ namespace gregCore.GameLayer.Hooks
                     {
                         data[$"arg_{parameters[i].Name}"] = args[i] ?? "null";
                     }
-                    catch
+                    catch /* ignored: defensive best-effort (CONVENTIONS.md) */
                     {
                         data[$"arg_{i}"] = "<unavailable>";
                     }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void DispatchAll(List<string> hookNames, EventPayload payload)
@@ -372,7 +372,7 @@ namespace gregCore.GameLayer.Hooks
                     }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 

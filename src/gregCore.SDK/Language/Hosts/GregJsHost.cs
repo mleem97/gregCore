@@ -50,7 +50,7 @@ public sealed class GregJsHost : IGregLanguageHost
     {
         detail = "JS runtime binding (Jint)";
         try { return typeof(Engine) != null; }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public void Activate(string modsScriptsDir)
@@ -62,7 +62,7 @@ public sealed class GregJsHost : IGregLanguageHost
             _jsDir = Path.Combine(gameRoot, "UserData", "gregCore", "Mods", "JS");
             if (!Directory.Exists(_jsDir)) Directory.CreateDirectory(_jsDir);
         }
-        catch { _jsDir = ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  _jsDir = ""; }
         if (string.IsNullOrEmpty(_jsDir)) return;
 
         LoadAll();
@@ -84,7 +84,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 if (fn == null || fn.IsNull() || fn.IsUndefined()) continue;
                 fn.Call(JsValue.Undefined, new[] { JsValue.FromObject(mod.Engine, dt) });
             }
-            catch { mod.UpdateValid = false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  mod.UpdateValid = false; }
         }
     }
 
@@ -96,7 +96,7 @@ public sealed class GregJsHost : IGregLanguageHost
         lock (_mods) { snapshot = _mods.ToList(); }
         foreach (var mod in snapshot)
             DispatchScene(mod, sceneName);
-        try { if (IsMainMenu()) TryReloadNow(); } catch { }
+        try { if (IsMainMenu()) TryReloadNow(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void DispatchScene(ModRuntime mod, string sceneName)
@@ -108,12 +108,12 @@ public sealed class GregJsHost : IGregLanguageHost
             if (fn == null || fn.IsNull() || fn.IsUndefined()) return;
             fn.Call(JsValue.Undefined, new[] { JsValue.FromObject(mod.Engine, sceneName ?? "") });
         }
-        catch { mod.SceneValid = false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  mod.SceneValid = false; }
     }
 
     public void Shutdown()
     {
-        try { if (_watcher != null) { _watcher.EnableRaisingEvents = false; _watcher.Dispose(); _watcher = null; } } catch { }
+        try { if (_watcher != null) { _watcher.EnableRaisingEvents = false; _watcher.Dispose(); _watcher = null; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         try { if (_debounce != null) { _debounce.Stop(); _debounce.Dispose(); _debounce = null; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         lock (_mods) { _mods.Clear(); }
         IsActive = false;
@@ -122,7 +122,7 @@ public sealed class GregJsHost : IGregLanguageHost
     private static bool IsMainMenuStatic(string scene)
     {
         try { return string.Equals(scene, "MainMenu", StringComparison.OrdinalIgnoreCase); }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private bool IsMainMenu() => IsMainMenuStatic(_currentScene);
@@ -143,7 +143,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 return true;
             }
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private void LoadAll()
@@ -159,7 +159,7 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             WarnRawTypeScript(_jsDir);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void LoadOne(string modDir)
@@ -183,8 +183,8 @@ public sealed class GregJsHost : IGregLanguageHost
                 }
             }
 
-            try { rt.UpdateFn = engine.GetValue("onUpdate"); } catch { }
-            try { rt.SceneFn = engine.GetValue("onSceneLoaded"); } catch { }
+            try { rt.UpdateFn = engine.GetValue("onUpdate"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { rt.SceneFn = engine.GetValue("onSceneLoaded"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             lock (_mods)
             {
                 _mods.RemoveAll(m => string.Equals(m?.Directory, modDir, StringComparison.OrdinalIgnoreCase));
@@ -206,7 +206,7 @@ public sealed class GregJsHost : IGregLanguageHost
             foreach (var f in ts)
                 MelonLogger.Warning($"[gregCore][JS] Skipped raw TypeScript (compile with tsc first, see templates/js): {f}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void ReloadModDir(string modDir)
@@ -217,7 +217,7 @@ public sealed class GregJsHost : IGregLanguageHost
             if (Directory.Exists(modDir)) LoadOne(modDir);
             else MelonLogger.Msg($"[gregCore][JS] Unloaded removed mod '{Path.GetFileName(modDir)}'.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void StartWatching()
@@ -256,9 +256,9 @@ public sealed class GregJsHost : IGregLanguageHost
                 if (_debounce != null) { _debounce.Stop(); _debounce.Start(); }
                 else ProcessPending();
             }
-            catch { ProcessPending(); }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  ProcessPending(); }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void ProcessPending()
@@ -282,7 +282,7 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             ReloadAllEngines();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void ReloadAllEngines()
@@ -324,7 +324,7 @@ public sealed class GregJsHost : IGregLanguageHost
         });
         api["toastRich"] = (Action<string, string, string, double>)((top, title, sub, dur) =>
         {
-            try { gregCore.UI.GregNotificationManager.ShowRich(top ?? "", title ?? "", sub ?? "", null, null, (float)dur); } catch { }
+            try { gregCore.UI.GregNotificationManager.ShowRich(top ?? "", title ?? "", sub ?? "", null, null, (float)dur); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
         api["notify"] = (Action<string, string, double>)((title, msg, dur) =>
         {
@@ -333,7 +333,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 var api2 = gregCore.Core.GregCoreMod.PublicAPI;
                 if (api2 != null) api2.ShowNotification(title ?? modId, msg ?? "", (float)dur);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
     }
 
@@ -342,7 +342,7 @@ public sealed class GregJsHost : IGregLanguageHost
         api["createPanel"] = (Func<string, object>)(title =>
         {
             try { return gregCore.UI.GregPanelBuilder.Create(title ?? modId).Build(); }
-            catch { return null; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         });
         api["bindMenu"] = (Action<string, JsValue, JsValue>)((menuId, toggleFn, isOpenFn) =>
         {
@@ -352,11 +352,11 @@ public sealed class GregJsHost : IGregLanguageHost
                     ToAction(toggleFn),
                     ToFuncBool(engine, isOpenFn));
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
         api["reportMenu"] = (Action<string, bool>)((menuId, open) =>
         {
-            try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { }
+            try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
     }
 
@@ -364,11 +364,11 @@ public sealed class GregJsHost : IGregLanguageHost
     {
         api["registerToggle"] = (Action<string, string, bool>)((settingId, label, def) =>
         {
-            try { gregCore.Core.GregCoreMod.PublicAPI?.RegisterToggle(modId, settingId, label, def); } catch { }
+            try { gregCore.Core.GregCoreMod.PublicAPI?.RegisterToggle(modId, settingId, label, def); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
         api["registerSlider"] = (Action<string, string, double>)((settingId, label, def) =>
         {
-            try { gregCore.Core.GregCoreMod.PublicAPI?.RegisterSlider(modId, settingId, label, (float)def); } catch { }
+            try { gregCore.Core.GregCoreMod.PublicAPI?.RegisterSlider(modId, settingId, label, (float)def); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
         api["registerKey"] = (Action<string, string, JsValue>)((actionId, label, fn) =>
         {
@@ -377,7 +377,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 gregCore.Core.GregCoreMod.PublicAPI?.RegisterKeybind(modId, actionId, label,
                     UnityEngine.KeyCode.None, ToAction(fn));
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
     }
 
@@ -395,7 +395,7 @@ public sealed class GregJsHost : IGregLanguageHost
                     try { cb.Call(JsValue.Undefined, new[] { JsValue.FromObject(engine, payload?.Data) }); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 });
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
     }
 
@@ -408,7 +408,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 if (fn == null || fn.IsNull() || fn.IsUndefined()) return;
                 fn.Call(JsValue.Undefined, Array.Empty<JsValue>());
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         };
     }
 
@@ -422,7 +422,7 @@ public sealed class GregJsHost : IGregLanguageHost
                 var r = fn.Call(JsValue.Undefined, Array.Empty<JsValue>());
                 return r.IsBoolean() && r.AsBoolean();
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         };
     }
 
@@ -433,11 +433,11 @@ public sealed class GregJsHost : IGregLanguageHost
 
     private static void SafeWarn(string msg)
     {
-        try { MelonLoader.MelonLogger.Warning("[gregCore][JS] " + msg); } catch { }
+        try { MelonLoader.MelonLogger.Warning("[gregCore][JS] " + msg); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SafeError(string msg)
     {
-        try { MelonLoader.MelonLogger.Error("[gregCore][JS] " + msg); } catch { }
+        try { MelonLoader.MelonLogger.Error("[gregCore][JS] " + msg); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

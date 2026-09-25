@@ -68,21 +68,21 @@ public static class LuaPatchModule
                     try
                     {
                         string id = null;
-                        try { id = pp.patchPanelId; } catch { continue; }
+                        try { id = pp.patchPanelId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                         if (!string.IsNullOrEmpty(id)) result[i++] = id;
                     }
                     catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
                 return result;
             }
-            catch { return new Table(script); }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return new Table(script); }
         });
 
         // greg.patch.count() → number
         t["count"] = (Func<int>)(() =>
         {
             try { return FindAllPanels().Count; }
-            catch { return 0; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0; }
         });
     }
 
@@ -98,7 +98,7 @@ public static class LuaPatchModule
                 var info = pp != null ? PanelToTable(script, pp) : null;
                 return info != null ? DynValue.FromObject(script, info) : DynValue.Nil;
             }
-            catch { return DynValue.Nil; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return DynValue.Nil; }
         });
 
         // greg.patch.has_cable(id) → bool
@@ -109,7 +109,7 @@ public static class LuaPatchModule
                 var pp = FindById(id);
                 return pp != null && gregCore.Core.Networking.GregPatchPanels.IsAnyCableConnected(pp);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -124,7 +124,7 @@ public static class LuaPatchModule
                 var pp = FindById(id);
                 return pp != null && gregCore.Core.Networking.GregPatchPanels.ValidateRackPosition(pp);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.patch.capture(id) → snapshot table or nil
@@ -142,7 +142,7 @@ public static class LuaPatchModule
                 t["type"] = dto.PatchPanelType;
                 return DynValue.FromObject(script, t);
             }
-            catch { return DynValue.Nil; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return DynValue.Nil; }
         });
     }
 
@@ -198,12 +198,12 @@ public static class LuaPatchModule
             foreach (var pp in FindAllPanels())
             {
                 string pid = null;
-                try { pid = pp.patchPanelId; } catch { continue; }
+                try { pid = pp.patchPanelId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                 if (string.Equals(pid, id, StringComparison.OrdinalIgnoreCase)) return pp;
             }
             return null;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     internal static Table PanelToTable(Script script, Il2Cpp.PatchPanel pp)
@@ -213,7 +213,7 @@ public static class LuaPatchModule
             if (pp == null) return null;
             var info = new Table(script);
             string id = "";
-            try { id = pp.patchPanelId ?? ""; } catch { }
+            try { id = pp.patchPanelId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             info["id"] = string.IsNullOrEmpty(id) ? pp.GetHashCode().ToString() : id;
             info["hash"] = pp.GetHashCode();
             try
@@ -226,6 +226,6 @@ public static class LuaPatchModule
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return info;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 }

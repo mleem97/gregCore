@@ -15,7 +15,7 @@ namespace gregCore.UI
     {
         public sealed class Clickable
         {
-            public VisualElement Element;
+            public VisualElement Element { get; set; }
             public Action Action;
         }
 

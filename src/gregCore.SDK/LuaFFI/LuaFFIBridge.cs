@@ -89,7 +89,7 @@ public static class LuaFFIBridge
         catch (Exception ex)
         {
             MelonLogger.Error($"[LuaFFI] Error loading mod {source}: {ex.Message}");
-            try { _errorOverlay?.ReportError(Path.GetFileName(source), ex.Message); } catch { }
+            try { _errorOverlay?.ReportError(Path.GetFileName(source), ex.Message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 
@@ -108,7 +108,7 @@ public static class LuaFFIBridge
             if (!isLegacyFile && !File.Exists(mainFile)) return false;
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool IsSkippedDir(string dir, bool isLegacyFile)
@@ -118,7 +118,7 @@ public static class LuaFFIBridge
             if (isLegacyFile) return false;
             return Path.GetFileName(dir).StartsWith("@");
         }
-        catch { return true; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return true; }
     }
 
     private static void LoadSinglePlugin(string source, string dir, string luaDir, bool isLegacyFile)
@@ -278,7 +278,7 @@ public static class LuaFFIBridge
                 manifest.Version ?? "0.0.0",
                 new string[0]);
         }
-        catch { /* ignored: registry best-effort */ }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* ignored: registry best-effort */ }
     }
 
     public static void OnUpdate(float dt)

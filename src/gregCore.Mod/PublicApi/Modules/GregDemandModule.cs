@@ -76,7 +76,7 @@ public sealed class GregDemandModule
             if (cb == null) return;
             int customerId;
             try { customerId = cb.customerID; }
-            catch { return; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return; }
             result.Customers++;
             var (doRoute, doFeed, doProducts) = DemandPlanner.ResolveActions(options);
             bool observe = options.DryRun;
@@ -161,7 +161,7 @@ public sealed class GregDemandModule
             if ((doRoute || doFeed || doProducts || options.DryRun) && !options.Quiet)
                 MelonLogger.Msg("[gregCore][Demand] Scan: " + result.Summary);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // New products: provision missing desired apps via SetUpApp.
@@ -257,7 +257,7 @@ public sealed class GregDemandModule
                     customerId, appId, subnet, vlanId, ipCount, routeKey));
             return 1;
         }
-        catch { return 1; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 1; }
     }
 
     private int TryRegisterRoute(global::Il2Cpp.CustomerBase cb, int customerId, int appId, string subnet, int vlanId, string routeKey, string[] ips)
@@ -296,7 +296,7 @@ public sealed class GregDemandModule
             if (perApp == null) return null;
             Il2CppStringArray? arr;
             try { if (!perApp.TryGetValue(appId, out arr)) return null; }
-            catch { return null; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
             if (arr == null) return null;
             var managed = new string[arr.Length];
             for (int i = 0; i < arr.Length; i++) managed[i] = arr[i];

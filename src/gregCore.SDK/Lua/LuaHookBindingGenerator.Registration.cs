@@ -19,10 +19,10 @@ public sealed partial class LuaHookBindingGenerator
                 {
                     RegisterSingleGroup(script, hooksTable, modId, kvp.Key, kvp.Value);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds the table for a single hook group.
@@ -36,7 +36,7 @@ public sealed partial class LuaHookBindingGenerator
             RegisterHookList(script, groupTable, hooks);
             hooksTable[groupName] = groupTable;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Creates on_{method} subscription functions for one group.
@@ -50,10 +50,10 @@ public sealed partial class LuaHookBindingGenerator
                 {
                     RegisterOneSubscription(script, groupTable, modId, hook);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Creates a single on_{method} subscription entry.
@@ -68,7 +68,7 @@ public sealed partial class LuaHookBindingGenerator
                 SubscribeHook(script, modId, fullHookId, callback);
             });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Subscribes a Lua callback to the event bus with defensive error handling.
@@ -89,7 +89,7 @@ public sealed partial class LuaHookBindingGenerator
                 }
             });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Adds the per-group list() discovery function.
@@ -99,7 +99,7 @@ public sealed partial class LuaHookBindingGenerator
         {
             groupTable["list"] = (Func<Table>)(() => BuildHookNameList(script, hooks));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds the table returned by group list().
@@ -115,10 +115,10 @@ public sealed partial class LuaHookBindingGenerator
                 {
                     list[i++] = "on_" + ToSnakeCase(hook.MethodName);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return list;
     }
 
@@ -129,7 +129,7 @@ public sealed partial class LuaHookBindingGenerator
         {
             hooksTable["groups"] = (Func<Table>)(() => BuildGroupNameList(script));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds the table returned by groups().
@@ -145,10 +145,10 @@ public sealed partial class LuaHookBindingGenerator
                 {
                     list[i++] = group.ToLowerInvariant();
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return list;
     }
 }

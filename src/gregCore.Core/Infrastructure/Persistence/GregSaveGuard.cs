@@ -521,9 +521,10 @@ public static class GregSaveGuard
                         string tmp = path + ".tmp";
                         File.WriteAllText(tmp, content);
                         if (File.Exists(path))
+                        {
                             File.Copy(path, path + ".bak", true);
-                        if (File.Exists(path))
                             File.Delete(path);
+                        }
                         File.Move(tmp, path);
                     }
                     catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }

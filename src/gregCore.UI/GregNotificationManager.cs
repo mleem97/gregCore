@@ -115,7 +115,13 @@ namespace gregCore.UI
         // Rich toast: optional cover/thumbnail + up to three text lines
         // (e.g. now-playing: small/large/small). Cover as Texture2D.
         public static void ShowRich(string lineTop, string lineTitle, string lineSub,
-            Texture2D cover, string fallbackIcon, float duration = 5f)
+            Texture2D cover, string fallbackIcon)
+        {
+            ShowRich(lineTop, lineTitle, lineSub, cover, fallbackIcon, 5f);
+        }
+
+        public static void ShowRich(string lineTop, string lineTitle, string lineSub,
+            Texture2D cover, string fallbackIcon, float duration)
         {
             if (!_initialized) Initialize();
 

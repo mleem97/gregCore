@@ -24,7 +24,7 @@ public partial class GameAPIManager
                 comp.gameObject.SetActive(true);
 
             var ptr = new IntPtr((long)handle);
-            InstallIntoRack(objId, comp, rackPos, rack, ptr, rackUid);
+            InstallIntoRack(comp, rackPos, rack, ptr, rackUid);
 
             CrashLog.Log($"[WorldSync] PlaceInRack: '{objId}' installed at uid={rackUid} OK");
             return 1;
@@ -73,7 +73,7 @@ public partial class GameAPIManager
         return true;
     }
 
-    private void InstallIntoRack(string objId, UnityEngine.Component comp,
+    private void InstallIntoRack(UnityEngine.Component comp,
         Il2Cpp.RackPosition rackPos, Il2Cpp.Rack rack, IntPtr ptr, int rackUid)
     {
         byte guessedType = GuessRackObjectType(ptr);

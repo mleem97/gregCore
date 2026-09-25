@@ -10,7 +10,12 @@ public sealed class GregMainThreadDispatcher : IGregMainThreadDispatcher
     public bool IsMainThread => Environment.CurrentManagedThreadId == _mainThreadId;
     public void Enqueue(Action action) => _queue.Enqueue(action ?? throw new ArgumentNullException(nameof(action)));
 
-    public int Drain(int maxItems = 256)
+    public int Drain()
+    {
+        return Drain(256);
+    }
+
+    public int Drain(int maxItems)
     {
         var count = 0;
         while (count < maxItems && _queue.TryDequeue(out var action))

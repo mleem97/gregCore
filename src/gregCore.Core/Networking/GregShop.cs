@@ -42,7 +42,7 @@ public static class GregShop
         public int Quantity { get; set; } = 1;
         public int TotalPrice { get; set; }
         public Color ItemColor { get; set; } = Color.white;
-        public bool HasCustomColor;
+        public bool HasCustomColor { get; set; }
     }
 
     // ── Read ShopItemSO ──────────────────────────────────────────────────────

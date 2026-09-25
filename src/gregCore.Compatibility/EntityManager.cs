@@ -12,7 +12,7 @@ namespace DataCenterModLoader;
 
 public class BillboardNameTag : MonoBehaviour
 {
-    public Transform followTarget = null!;
+    public Transform followTarget { get; set; } = null!;
     public float offsetY { get; set; } = 1.85f;
 
     void Update()
@@ -31,7 +31,7 @@ public static partial class EntityManager
 {
     private class ManagedEntity
     {
-        public uint Id;
+        public uint Id = 0;
         public GameObject GO = null!;
         public Animator? Animator;
         public NavMeshAgent? NavAgent;

@@ -33,7 +33,7 @@ public static partial class CustomEmployeeManager
         Path.Combine(MelonEnvironment.UserDataDirectory, "custom_employees_hired.txt");
 
     private static string? _pendingEmployeeId;
-    private static bool _pendingIsHire;
+    private static bool _pendingIsHire = false;
     private static bool _salariesNeedReregistration;
 
 #pragma warning disable CS0414

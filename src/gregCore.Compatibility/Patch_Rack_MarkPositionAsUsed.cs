@@ -11,8 +11,8 @@ namespace DataCenterModLoader;
 internal static class Patch_Rack_MarkPositionAsUsed
 {
     internal static bool SuppressEvents { get; set; } = false;
-    internal static Dictionary<int, (string objectId, byte objectType)> PendingRestores = new();
-    internal static Dictionary<int, (string objectId, byte objectType)> InstalledObjects = new();
+    internal static Dictionary<int, (string objectId, byte objectType)> PendingRestores { get; } = new();
+    internal static Dictionary<int, (string objectId, byte objectType)> InstalledObjects { get; } = new();
 
     // Backward-compat property — GameAPI.cs still sets PendingCloneRestore = (...).
     internal static (string objectId, byte objectType, int rackPosUid)? PendingCloneRestore

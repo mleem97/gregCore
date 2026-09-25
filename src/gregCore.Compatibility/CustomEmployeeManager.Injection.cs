@@ -14,7 +14,7 @@ public static partial class CustomEmployeeManager
         var reused = ReuseExistingScrollContent(hrTransform);
         if (reused != null) return reused;
         CrashLog.Log("CustomEmployee: Creating ScrollView wrapper for Grid");
-        var scrollGO = BuildScrollRoot(hrTransform, grid);
+        var scrollGO = BuildScrollRoot(grid);
         var viewportRect = BuildViewport(scrollGO);
         var contentGO = BuildContent(viewportGO: viewportRect.gameObject, grid);
         MoveChildrenToContent(grid, contentGO.transform);
@@ -40,7 +40,7 @@ public static partial class CustomEmployeeManager
         catch { return null!; }
     }
 
-    private static GameObject BuildScrollRoot(Transform hrTransform, Transform grid)
+    private static GameObject BuildScrollRoot(Transform grid)
     {
         var gridRect = grid.GetComponent<RectTransform>();
         var gridParent = grid.parent;

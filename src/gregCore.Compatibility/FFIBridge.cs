@@ -43,28 +43,44 @@ public class FFIBridge : IDisposable
     private delegate void ModOnEventDelegate(uint eventId, IntPtr eventData, uint dataSize);
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct ModInfoFFI
+    private struct ModInfoFFI : IEquatable<ModInfoFFI>
     {
-        public IntPtr Id;
-        public IntPtr Name;
-        public IntPtr Version;
-        public IntPtr Author;
+        public IntPtr Id { get; set; }
+        public IntPtr Name { get; set; }
+        public IntPtr Version { get; set; }
+        public IntPtr Author { get; set; }
         public IntPtr Description;
+
+        public bool Equals(ModInfoFFI other)
+        {
+            return Id == other.Id && Name == other.Name && Version == other.Version
+                && Author == other.Author && Description == other.Description;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ModInfoFFI other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Version, Author, Description);
+        }
     }
 
     private class RustMod
     {
-        public string FilePath = "";
-        public string Id = "unknown";
-        public string Name = "Unknown";
-        public string Version = "0.0.0";
-        public string Author = "Unknown";
-        public IntPtr Handle;
-        public ModUpdateDelegate? Update;
-        public ModUpdateDelegate? FixedUpdate;
-        public ModOnSceneLoadedDelegate? OnSceneLoaded;
-        public ModShutdownDelegate? Shutdown;
-        public ModOnEventDelegate? OnEvent;
+        public string FilePath { get; set; } = "";
+        public string Id { get; set; } = "unknown";
+        public string Name { get; set; } = "Unknown";
+        public string Version { get; set; } = "0.0.0";
+        public string Author { get; set; } = "Unknown";
+        public IntPtr Handle { get; set; }
+        public ModUpdateDelegate? Update { get; set; }
+        public ModUpdateDelegate? FixedUpdate { get; set; }
+        public ModOnSceneLoadedDelegate? OnSceneLoaded { get; set; }
+        public ModShutdownDelegate? Shutdown { get; set; }
+        public ModOnEventDelegate? OnEvent { get; set; }
     }
 
     public FFIBridge(MelonLogger.Instance logger, string modsPath)

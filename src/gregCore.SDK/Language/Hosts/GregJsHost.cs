@@ -301,8 +301,8 @@ public sealed class GregJsHost : IGregLanguageHost
     {
         var api = new Dictionary<string, object>();
         RegisterLogApi(api, modId);
-        RegisterNotifyApi(api, engine, modId);
-        RegisterMenuApi(api, engine, modId);
+        RegisterNotifyApi(api, modId);
+        RegisterMenuApi(api, modId);
         RegisterSettingsApi(api, engine, modId);
         RegisterHookApi(api, engine);
         engine.SetValue("greg", api);
@@ -315,7 +315,7 @@ public sealed class GregJsHost : IGregLanguageHost
         api["error"] = (Action<string>)(msg => SafeError($"[{modId}] {msg}"));
     }
 
-    private static void RegisterNotifyApi(Dictionary<string, object> api, Engine engine, string modId)
+    private static void RegisterNotifyApi(Dictionary<string, object> api, string modId)
     {
         api["toast"] = (Action<string, double>)((msg, dur) =>
         {
@@ -336,7 +336,7 @@ public sealed class GregJsHost : IGregLanguageHost
         });
     }
 
-    private static void RegisterMenuApi(Dictionary<string, object> api, Engine engine, string modId)
+    private static void RegisterMenuApi(Dictionary<string, object> api, string modId)
     {
         api["createPanel"] = (Func<string, object>)(title =>
         {

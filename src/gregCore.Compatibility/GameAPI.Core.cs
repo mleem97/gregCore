@@ -266,6 +266,7 @@ public partial class GameAPIManager
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamSendP2PImpl(ulong target, IntPtr data, uint len, uint reliable) => 0;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private uint SteamIsP2PAvailableImpl(IntPtr outSize) => 0;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private uint SteamReadP2PImpl(IntPtr buf, uint bufLen, IntPtr outSender) => 0;

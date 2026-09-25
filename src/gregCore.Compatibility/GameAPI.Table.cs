@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace DataCenterModLoader;
 
+// ABI-CRITICAL: sequential layout mirrors the native table (see GameAPI.Bind.cs).
+// Equality members stay in this part (single declaration scope); chunk helpers
+// live in GameAPI.TableHash.cs as static methods.
 [StructLayout(LayoutKind.Sequential)]
 public partial struct GameAPITable : IEquatable<GameAPITable>
 {
@@ -131,154 +134,28 @@ public partial struct GameAPITable : IEquatable<GameAPITable>
     public IntPtr RackGameUninstall;
     public IntPtr ObjSetStringField;
 
-    private bool EqualsPart1(GameAPITable other)
-    {
-        return ApiVersion == other.ApiVersion &&
-                LogInfo == other.LogInfo &&
-                LogWarning == other.LogWarning &&
-                LogError == other.LogError &&
-                GetPlayerMoney == other.GetPlayerMoney &&
-                SetPlayerMoney == other.SetPlayerMoney &&
-                GetTimeScale == other.GetTimeScale &&
-                SetTimeScale == other.SetTimeScale &&
-                GetServerCount == other.GetServerCount &&
-                GetRackCount == other.GetRackCount &&
-                GetCurrentScene == other.GetCurrentScene &&
-                GetPlayerXP == other.GetPlayerXP &&
-                SetPlayerXP == other.SetPlayerXP &&
-                GetPlayerReputation == other.GetPlayerReputation &&
-                SetPlayerReputation == other.SetPlayerReputation &&
-                GetTimeOfDay == other.GetTimeOfDay &&
-                GetDay == other.GetDay &&
-                GetSecondsInFullDay == other.GetSecondsInFullDay &&
-                SetSecondsInFullDay == other.SetSecondsInFullDay &&
-                GetSwitchCount == other.GetSwitchCount &&
-                GetSatisfiedCustomerCount == other.GetSatisfiedCustomerCount &&
-                SetNetWatchEnabled == other.SetNetWatchEnabled &&
-                IsNetWatchEnabled == other.IsNetWatchEnabled &&
-                GetNetWatchStats == other.GetNetWatchStats &&
-                GetBrokenServerCount == other.GetBrokenServerCount &&
-                GetBrokenSwitchCount == other.GetBrokenSwitchCount &&
-                GetEolServerCount == other.GetEolServerCount &&
-                GetEolSwitchCount == other.GetEolSwitchCount &&
-                GetFreeTechnicianCount == other.GetFreeTechnicianCount &&
-                GetTotalTechnicianCount == other.GetTotalTechnicianCount &&
-                DispatchRepairServer == other.DispatchRepairServer;
-    }
-
-    private bool EqualsPart2(GameAPITable other)
-    {
-        return DispatchRepairSwitch == other.DispatchRepairSwitch &&
-                DispatchReplaceServer == other.DispatchReplaceServer &&
-                DispatchReplaceSwitch == other.DispatchReplaceSwitch &&
-                RegisterCustomEmployee == other.RegisterCustomEmployee &&
-                IsCustomEmployeeHired == other.IsCustomEmployeeHired &&
-                FireCustomEmployee == other.FireCustomEmployee &&
-                RegisterSalary == other.RegisterSalary &&
-                ShowNotification == other.ShowNotification &&
-                GetMoneyPerSecond == other.GetMoneyPerSecond &&
-                GetExpensesPerSecond == other.GetExpensesPerSecond &&
-                GetXpPerSecond == other.GetXpPerSecond &&
-                IsGamePaused == other.IsGamePaused &&
-                SetGamePaused == other.SetGamePaused &&
-                GetDifficulty == other.GetDifficulty &&
-                TriggerSave == other.TriggerSave &&
-                SteamGetMyId == other.SteamGetMyId &&
-                SteamGetFriendName == other.SteamGetFriendName &&
-                SteamCreateLobby == other.SteamCreateLobby &&
-                SteamJoinLobby == other.SteamJoinLobby &&
-                SteamLeaveLobby == other.SteamLeaveLobby &&
-                SteamGetLobbyId == other.SteamGetLobbyId &&
-                SteamGetLobbyOwner == other.SteamGetLobbyOwner &&
-                SteamGetLobbyMemberCount == other.SteamGetLobbyMemberCount &&
-                SteamGetLobbyMemberByIndex == other.SteamGetLobbyMemberByIndex &&
-                SteamSetLobbyData == other.SteamSetLobbyData &&
-                SteamGetLobbyData == other.SteamGetLobbyData &&
-                SteamSendP2P == other.SteamSendP2P &&
-                SteamIsP2PAvailable == other.SteamIsP2PAvailable &&
-                SteamReadP2P == other.SteamReadP2P &&
-                SteamAcceptP2P == other.SteamAcceptP2P &&
-                SteamPollEvent == other.SteamPollEvent;
-    }
-
-    private bool EqualsPart3(GameAPITable other)
-    {
-        return GetPlayerPosition == other.GetPlayerPosition &&
-                ConfigRegisterBool == other.ConfigRegisterBool &&
-                ConfigRegisterInt == other.ConfigRegisterInt &&
-                ConfigRegisterFloat == other.ConfigRegisterFloat &&
-                ConfigGetBool == other.ConfigGetBool &&
-                ConfigGetInt == other.ConfigGetInt &&
-                ConfigGetFloat == other.ConfigGetFloat &&
-                SpawnCharacter == other.SpawnCharacter &&
-                DestroyEntity == other.DestroyEntity &&
-                SetEntityPosition == other.SetEntityPosition &&
-                IsEntityReady == other.IsEntityReady &&
-                SetEntityAnimation == other.SetEntityAnimation &&
-                GetPrefabCount == other.GetPrefabCount &&
-                SetEntityName == other.SetEntityName &&
-                GetPlayerCarryState == other.GetPlayerCarryState &&
-                GetPlayerCrouching == other.GetPlayerCrouching &&
-                GetPlayerSitting == other.GetPlayerSitting &&
-                SetEntityCrouching == other.SetEntityCrouching &&
-                SetEntitySitting == other.SetEntitySitting &&
-                SetEntityCarryAnim == other.SetEntityCarryAnim &&
-                CreateEntityCarryVisual == other.CreateEntityCarryVisual &&
-                DestroyEntityCarryVisual == other.DestroyEntityCarryVisual &&
-                GetDefaultSpawnPosition == other.GetDefaultSpawnPosition &&
-                WarpLocalPlayer == other.WarpLocalPlayer &&
-                GetEntityPosition == other.GetEntityPosition &&
-                AddEntityCollider == other.AddEntityCollider &&
-                SetEntityCarryTransform == other.SetEntityCarryTransform &&
-                WorldGetObjectCount == other.WorldGetObjectCount &&
-                WorldGetObjectHashes == other.WorldGetObjectHashes &&
-                WorldGetObjectState == other.WorldGetObjectState &&
-                WorldSpawnObject == other.WorldSpawnObject;
-    }
-
-    private bool EqualsPart4(GameAPITable other)
-    {
-        return WorldDestroyObject == other.WorldDestroyObject &&
-                WorldPlaceInRack == other.WorldPlaceInRack &&
-                WorldRemoveFromRack == other.WorldRemoveFromRack &&
-                WorldSetPower == other.WorldSetPower &&
-                WorldSetProperty == other.WorldSetProperty &&
-                WorldConnectCable == other.WorldConnectCable &&
-                WorldDisconnectCable == other.WorldDisconnectCable &&
-                WorldPickupObject == other.WorldPickupObject &&
-                WorldDropObject == other.WorldDropObject &&
-                WorldEnsureRackUIDs == other.WorldEnsureRackUIDs &&
-                ObjFindByType == other.ObjFindByType &&
-                ObjGetStringField == other.ObjGetStringField &&
-                ObjIsActive == other.ObjIsActive &&
-                ObjSetActive == other.ObjSetActive &&
-                ObjGetPosition == other.ObjGetPosition &&
-                ObjSetPosition == other.ObjSetPosition &&
-                ObjSetRotation == other.ObjSetRotation &&
-                ObjSetParentToWorld == other.ObjSetParentToWorld &&
-                RbSetKinematic == other.RbSetKinematic &&
-                RbSetGravity == other.RbSetGravity &&
-                RbWakeUp == other.RbWakeUp &&
-                ObjFindById == other.ObjFindById &&
-                GetHeldObject == other.GetHeldObject &&
-                ObjGetRotation == other.ObjGetRotation &&
-                ObjSetParent == other.ObjSetParent &&
-                ObjSetLocalPosition == other.ObjSetLocalPosition &&
-                ObjSetLocalRotation == other.ObjSetLocalRotation &&
-                RackFindPosition == other.RackFindPosition &&
-                RackGameInstall == other.RackGameInstall &&
-                RackGameUninstall == other.RackGameUninstall &&
-                ObjSetStringField == other.ObjSetStringField;
-    }
-
     public bool Equals(GameAPITable other)
     {
-        return EqualsPart1(other) && EqualsPart2(other)
-            && EqualsPart3(other) && EqualsPart4(other);
+        return EqualsPart1(this, other) && EqualsPart2(this, other) && EqualsPart3(this, other) && EqualsPart4(this, other);
     }
 
     public override bool Equals(object obj)
     {
         return obj is GameAPITable other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(HashPart1(this), HashPart2(this), HashPart3(this), HashPart4(this));
+    }
+
+    public static bool operator ==(GameAPITable left, GameAPITable right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(GameAPITable left, GameAPITable right)
+    {
+        return !left.Equals(right);
     }
 }

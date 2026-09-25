@@ -76,7 +76,7 @@ public static class LuaTabletModule
                 b.AddLabel(text ?? "");
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -93,7 +93,7 @@ public static class LuaTabletModule
                 b.AddButton(label ?? "", () => SafeCall(modId, fn));
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.panel_add_toggle(id, label, value, fn) → bool (fn receives bool)
@@ -106,7 +106,7 @@ public static class LuaTabletModule
                 b.AddToggle(label ?? "", value, (v) => SafeCall(modId, fn, v));
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -125,7 +125,7 @@ public static class LuaTabletModule
                         (v) => SafeCall(modId, fn, (double)v));
                     return true;
                 }
-                catch { return false; }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
             });
 
         // greg.panel_add_spacer(id, height?) → bool
@@ -138,7 +138,7 @@ public static class LuaTabletModule
                 b.AddSpacer((float)height);
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -155,7 +155,7 @@ public static class LuaTabletModule
                 b.AddSection(title ?? "");
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.panel_toggle(id) → bool (new visibility)
@@ -168,7 +168,7 @@ public static class LuaTabletModule
                 b.Toggle();
                 return b.IsVisible;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -183,7 +183,7 @@ public static class LuaTabletModule
                 var b = Lookup(id);
                 return b != null && b.IsVisible;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.panel_close(id) → bool (hide + forget handle)
@@ -193,11 +193,11 @@ public static class LuaTabletModule
             {
                 var b = Lookup(id);
                 if (b == null) return false;
-                try { b.IsVisible = false; } catch { /* ignored: hide best-effort */ }
+                try { b.IsVisible = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* ignored: hide best-effort */ }
                 lock (_gate) { _panels.Remove(id ?? ""); }
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -213,7 +213,7 @@ public static class LuaTabletModule
             builder.Build();
             return Track(builder);
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     /// <summary>Hides and forgets a tablet handle (best-effort).</summary>
@@ -223,10 +223,10 @@ public static class LuaTabletModule
         {
             var b = Lookup(handle);
             if (b == null) return;
-            try { b.IsVisible = false; } catch { }
+            try { b.IsVisible = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             lock (_gate) { _panels.Remove(handle ?? ""); }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static string Track(gregCore.UI.GregUIBuilder builder)
@@ -237,7 +237,7 @@ public static class LuaTabletModule
             lock (_gate) { _panels[id] = builder; }
             return id;
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static gregCore.UI.GregUIBuilder Lookup(string id)
@@ -251,7 +251,7 @@ public static class LuaTabletModule
                 return _panels.TryGetValue(id, out builder) ? builder : null;
             }
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     private static void SafeCall(string modId, Closure fn, params object[] args)

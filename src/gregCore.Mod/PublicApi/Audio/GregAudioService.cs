@@ -24,7 +24,7 @@ namespace gregCore.PublicApi.Audio;
 public static partial class GregAudioService
 {
     public const float CrossfadeDuration = 2.5f;
-    public const int CacheCapacity = 3;
+    public static int CacheCapacity { get; } = 3;
 
     // Fires when a track ends naturally (not on stop/pause).
     public static event Action TrackEnded;

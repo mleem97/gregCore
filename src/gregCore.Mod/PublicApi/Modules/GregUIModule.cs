@@ -11,7 +11,12 @@ namespace gregCore.PublicApi.Modules
 
         public GregUIBuilder CreateBuilder(string title) => GregUIBuilder.Create(title);
 
-        public void ShowNotification(string message, float duration = 3f)
+        public void ShowNotification(string message)
+        {
+            ShowNotification(message, 3f);
+        }
+
+        public void ShowNotification(string message, float duration)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
             GregNotificationManager.Show(message, Math.Max(0.25f, duration));

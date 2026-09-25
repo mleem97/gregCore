@@ -102,7 +102,7 @@ public static class LuaJsonModule
                     return DynValue.Nil;
             }
         }
-        catch { return DynValue.Nil; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return DynValue.Nil; }
     }
 
     internal static object ToPlainObject(DynValue value)
@@ -149,7 +149,7 @@ public static class LuaJsonModule
                     return value.ToString();
             }
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     private static bool IsLuaArray(Table table)
@@ -157,14 +157,12 @@ public static class LuaJsonModule
         try
         {
             if (table == null) return true;
-            bool any = false;
             foreach (var pair in table.Pairs)
             {
-                any = true;
                 if (pair.Key.Type != DataType.Number) return false;
             }
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

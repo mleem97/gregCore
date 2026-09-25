@@ -323,7 +323,7 @@ public sealed class GregPanel
         root.style.paddingBottom = 12f;
         root.style.display = DisplayStyle.None;
 
-        var header = new Label(string.IsNullOrEmpty(title) ? MenuId.ToUpper() : title.ToUpper());
+        var header = new Label(string.IsNullOrEmpty(title) ? MenuId.ToUpperInvariant() : title.ToUpperInvariant());
         try { GregUITheme.ApplyTextStyle(header, true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         root.Add(header);
         _dragHandle = header;

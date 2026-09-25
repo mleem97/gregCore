@@ -18,7 +18,7 @@ namespace gregCore.UI;
 [ExcludeFromCodeCoverage(Justification = "Runtime UI over live game UIDocument; needs running game.")]
 public static class GregModHub
 {
-    public const string MenuId = "greg.hub";
+    public static string MenuId { get; } = "greg.hub";
     private const string OverlayName = "greg-hub";
     private const string BodyName = "greg-hub-body";
 

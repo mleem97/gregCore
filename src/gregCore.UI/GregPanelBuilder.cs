@@ -116,7 +116,7 @@ namespace gregCore.UI
             header.style.paddingLeft = GregUITheme.Padding;
             header.style.paddingRight = GregUITheme.Padding;
 
-            var titleLabel = new Label(_title.ToUpper());
+            var titleLabel = new Label(_title.ToUpperInvariant());
             titleLabel.style.color = GregUITheme.SecondaryColor;
             titleLabel.style.fontSize = 20;
             titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -186,7 +186,7 @@ namespace gregCore.UI
         {
             if (_contentContainer == null) return this;
 
-            var label = new Label(text.ToUpper());
+            var label = new Label(text.ToUpperInvariant());
             label.style.color = GregUITheme.SecondaryColor;
             label.style.fontSize = 18;
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -384,7 +384,17 @@ namespace gregCore.UI
         /// <see cref="SafeInputFields"/>) and manage focus itself
         /// (e.g. click-to-focus, Tab to switch fields).
         /// </summary>
-        public GregPanelBuilder AddSafeInputField(string label, string currentValue, Action<string> onChanged, bool multiline = false, int maxLength = 512)
+        public GregPanelBuilder AddSafeInputField(string label, string currentValue, Action<string> onChanged)
+        {
+            return AddSafeInputField(label, currentValue, onChanged, false, 512);
+        }
+
+        public GregPanelBuilder AddSafeInputField(string label, string currentValue, Action<string> onChanged, bool multiline)
+        {
+            return AddSafeInputField(label, currentValue, onChanged, multiline, 512);
+        }
+
+        public GregPanelBuilder AddSafeInputField(string label, string currentValue, Action<string> onChanged, bool multiline, int maxLength)
         {
             if (_contentContainer == null) return this;
 

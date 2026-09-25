@@ -24,7 +24,7 @@ public static class GregComputerPatch
             if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             GregComputer.Sync(__instance);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.ComputerShop), nameof(global::Il2Cpp.ComputerShop.OpenShop))]
@@ -36,20 +36,20 @@ public static class GregComputerPatch
             if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
             GregComputer.Sync(__instance);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.ComputerShop), nameof(global::Il2Cpp.ComputerShop.CloseShop))]
     [HarmonyPostfix]
     private static void CloseShopPostfix(global::Il2Cpp.ComputerShop __instance)
     {
-        try { GregComputer.OnComputerClosed(); } catch { }
+        try { GregComputer.OnComputerClosed(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     [HarmonyPatch(typeof(global::Il2Cpp.ComputerShop), nameof(global::Il2Cpp.ComputerShop.HideCanvas))]
     [HarmonyPostfix]
     private static void HideCanvasPostfix(global::Il2Cpp.ComputerShop __instance)
     {
-        try { GregComputer.OnComputerClosed(); } catch { }
+        try { GregComputer.OnComputerClosed(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

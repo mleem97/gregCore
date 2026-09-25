@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Tests
-/// Zweck:        Erweiterte Tests für den GregEventBus.
-/// Maintainer:   Testet Deferred Events, Dispose-Safety und Multi-Handler-Szenarien.
+/// Layer:       Tests
+/// Purpose:     Extended tests for GregEventBus.
+/// Maintainer:   Tests deferred events, dispose safety and multi-handler scenarios.
 /// </file-summary>
 
 using System;

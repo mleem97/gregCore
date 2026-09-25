@@ -1,0 +1,427 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using MelonLoader;
+
+namespace DataCenterModLoader;
+
+public class FFIBridge : IDisposable
+{
+    private readonly MelonLogger.Instance _logger;
+    private readonly string _modsPath;
+    private readonly GameAPIManager _apiManager;
+    private readonly List<RustMod> _loadedMods = new();
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr LoadLibrary(string lpFileName);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FreeLibrary(IntPtr hModule);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate ModInfoFFI ModInfoDelegate();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    private delegate bool ModInitDelegate(IntPtr apiTable);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ModUpdateDelegate(float deltaTime);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ModOnSceneLoadedDelegate(IntPtr sceneName);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ModShutdownDelegate();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void ModOnEventDelegate(uint eventId, IntPtr eventData, uint dataSize);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ModInfoFFI : IEquatable<ModInfoFFI>
+    {
+        public IntPtr Id { get; set; }
+        public IntPtr Name { get; set; }
+        public IntPtr Version { get; set; }
+        public IntPtr Author { get; set; }
+        public IntPtr Description;
+
+        public bool Equals(ModInfoFFI other)
+        {
+            return Id == other.Id && Name == other.Name && Version == other.Version
+                && Author == other.Author && Description == other.Description;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ModInfoFFI other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Version, Author, Description);
+        }
+    }
+
+    private class RustMod
+    {
+        public string FilePath { get; set; } = "";
+        public string Id { get; set; } = "unknown";
+        public string Name { get; set; } = "Unknown";
+        public string Version { get; set; } = "0.0.0";
+        public string Author { get; set; } = "Unknown";
+        public IntPtr Handle { get; set; }
+        public ModUpdateDelegate? Update { get; set; }
+        public ModUpdateDelegate? FixedUpdate { get; set; }
+        public ModOnSceneLoadedDelegate? OnSceneLoaded { get; set; }
+        public ModShutdownDelegate? Shutdown { get; set; }
+        public ModOnEventDelegate? OnEvent { get; set; }
+    }
+
+    public FFIBridge(MelonLogger.Instance logger, string modsPath)
+    {
+        _logger = logger;
+        _modsPath = modsPath;
+        _apiManager = new GameAPIManager(logger);
+    }
+
+    public void LoadAllMods()
+    {
+        if (!Directory.Exists(_modsPath))
+        {
+            _logger.Msg("No Mods/native/ directory found.");
+            return;
+        }
+
+        var dllFiles = global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(_modsPath, ".dll", SearchOption.AllDirectories).ToArray();
+        if (dllFiles.Length == 0)
+        {
+            _logger.Msg("No native mod DLLs found in Mods/native/.");
+            return;
+        }
+
+        _logger.Msg($"Found {dllFiles.Length} Rust mod DLL(s).");
+
+        foreach (var dllPath in dllFiles)
+        {
+            try { LoadMod(dllPath); }
+            catch (Exception ex) { _logger.Error($"Failed to load '{Path.GetFileName(dllPath)}': {ex.Message}"); }
+        }
+
+        _logger.Msg($"{_loadedMods.Count} Rust mod(s) loaded successfully.");
+    }
+
+    private void LoadMod(string dllPath)
+    {
+        if (IsDeactivated(dllPath)) return;
+        var fileName = Path.GetFileName(dllPath);
+        _logger.Msg($"Loading Rust mod: {fileName}");
+        var handle = OpenLibrary(dllPath, fileName);
+        if (handle == IntPtr.Zero) return;
+        var mod = new RustMod { FilePath = dllPath, Handle = handle };
+        ReadModInfo(mod, handle, fileName);
+        if (!RunModInit(mod, handle, fileName)) return;
+        RegisterModConfig(mod);
+        ResolveOptional(mod, handle);
+        CrashLog.Log($"LoadMod: finished loading '{mod.Name}' successfully");
+        _loadedMods.Add(mod);
+    }
+
+    private bool IsDeactivated(string dllPath)
+    {
+        try
+        {
+            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(dllPath))
+            {
+                _logger.Warning($"Rust mod skipped (deactivated): {dllPath}");
+                return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private IntPtr OpenLibrary(string dllPath, string fileName)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: about to call LoadLibrary for '{fileName}'");
+            var handle = LoadLibrary(dllPath);
+            if (handle == IntPtr.Zero)
+            {
+                var error = Marshal.GetLastWin32Error();
+                throw new InvalidOperationException($"LoadLibrary failed with error code {error}");
+            }
+            CrashLog.Log($"LoadMod: LoadLibrary succeeded for '{fileName}', handle=0x{handle.ToInt64():X}");
+            return handle;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"LoadLibrary failed for '{fileName}': {ex.Message}");
+            return IntPtr.Zero;
+        }
+    }
+
+    private void ReadModInfo(RustMod mod, IntPtr handle, string fileName)
+    {
+        try
+        {
+            var modInfoPtr = GetProcAddress(handle, "mod_info");
+            if (modInfoPtr == IntPtr.Zero)
+            {
+                _logger.Warning($"  '{fileName}' has no mod_info() export.");
+                return;
+            }
+            var info = InvokeModInfo(modInfoPtr, fileName);
+            ApplyModInfo(mod, info);
+        }
+        catch (Exception ex) { _logger.Warning($"  mod_info failed: {ex.Message}"); }
+    }
+
+    private static ModInfoFFI InvokeModInfo(IntPtr modInfoPtr, string fileName)
+    {
+        try
+        {
+            var modInfoFn = Marshal.GetDelegateForFunctionPointer<ModInfoDelegate>(modInfoPtr);
+            CrashLog.Log($"LoadMod: about to call modInfoFn() for '{fileName}'");
+            var info = modInfoFn();
+            CrashLog.Log($"LoadMod: modInfoFn() returned for '{fileName}'");
+            return info;
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Log($"LoadMod: modInfoFn() failed for '{fileName}': {ex.Message}");
+            return new ModInfoFFI();
+        }
+    }
+
+    private void ApplyModInfo(RustMod mod, ModInfoFFI info)
+    {
+        try
+        {
+            mod.Id = PtrToString(info.Id, "unknown");
+            mod.Name = PtrToString(info.Name, "Unknown");
+            mod.Version = PtrToString(info.Version, "0.0.0");
+            mod.Author = PtrToString(info.Author, "Unknown");
+            var description = PtrToString(info.Description, "");
+            _logger.Msg($"  Mod: {mod.Name} v{mod.Version} by {mod.Author}");
+            _logger.Msg($"  Description: {description}");
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private static string PtrToString(IntPtr ptr, string fallback)
+    {
+        try { return Marshal.PtrToStringAnsi(ptr) ?? fallback; }
+        catch { return fallback; }
+    }
+
+    private bool RunModInit(RustMod mod, IntPtr handle, string fileName)
+    {
+        try
+        {
+            var modInitPtr = GetProcAddress(handle, "mod_init");
+            if (modInitPtr == IntPtr.Zero)
+            {
+                _logger.Warning($"  '{fileName}' has no mod_init() export.");
+                return true;
+            }
+            var modInitFn = Marshal.GetDelegateForFunctionPointer<ModInitDelegate>(modInitPtr);
+            CrashLog.Log($"LoadMod: about to call modInitFn() for '{mod.Name}'");
+            if (!modInitFn(_apiManager.GetTablePointer()))
+            {
+                _logger.Error($"  Mod '{mod.Name}' mod_init() returned false.");
+                FreeLibrary(handle);
+                return false;
+            }
+            CrashLog.Log($"LoadMod: modInitFn() succeeded for '{mod.Name}'");
+            _logger.Msg($"  Mod '{mod.Name}' initialized.");
+            return true;
+        }
+        catch (Exception ex) { _logger.Error($"  mod_init failed: {ex.Message}"); return false; }
+    }
+
+    private void RegisterModConfig(RustMod mod)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(mod.Id) && mod.Id != "unknown")
+            {
+                ModConfigSystem.SetModInfo(mod.Id, mod.Author, mod.Version);
+            }
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void ResolveOptional(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            ResolveUpdate(mod, handle);
+            ResolveScene(mod, handle);
+            ResolveShutdown(mod, handle);
+            ResolveEvent(mod, handle);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void ResolveUpdate(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_update' for '{mod.Name}'");
+            var updatePtr = GetProcAddress(handle, "mod_update");
+            if (updatePtr != IntPtr.Zero)
+                mod.Update = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(updatePtr);
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_fixed_update' for '{mod.Name}'");
+            var fixedUpdatePtr = GetProcAddress(handle, "mod_fixed_update");
+            if (fixedUpdatePtr != IntPtr.Zero)
+                mod.FixedUpdate = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(fixedUpdatePtr);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void ResolveScene(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_on_scene_loaded' for '{mod.Name}'");
+            var sceneLoadedPtr = GetProcAddress(handle, "mod_on_scene_loaded");
+            if (sceneLoadedPtr != IntPtr.Zero)
+                mod.OnSceneLoaded = Marshal.GetDelegateForFunctionPointer<ModOnSceneLoadedDelegate>(sceneLoadedPtr);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void ResolveShutdown(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_shutdown' for '{mod.Name}'");
+            var shutdownPtr = GetProcAddress(handle, "mod_shutdown");
+            if (shutdownPtr != IntPtr.Zero)
+                mod.Shutdown = Marshal.GetDelegateForFunctionPointer<ModShutdownDelegate>(shutdownPtr);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void ResolveEvent(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_on_event' for '{mod.Name}'");
+            var onEventPtr = GetProcAddress(handle, "mod_on_event");
+            if (onEventPtr != IntPtr.Zero)
+            {
+                mod.OnEvent = Marshal.GetDelegateForFunctionPointer<ModOnEventDelegate>(onEventPtr);
+                _logger.Msg($"  Mod '{mod.Name}' supports game events.");
+            }
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    public void OnUpdate(float deltaTime)
+    {
+        try
+        {
+            foreach (var mod in _loadedMods)
+            {
+                try { mod.Update?.Invoke(deltaTime); }
+                catch (Exception ex)
+                {
+                    _logger.Error($"[{mod.Name}] mod_update crashed: {ex.Message}");
+                    CrashLog.LogException($"[{mod.Name}] mod_update", ex);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException("FFIBridge.OnUpdate outer", ex);
+        }
+    }
+
+    public void OnFixedUpdate(float deltaTime)
+    {
+        try
+        {
+            foreach (var mod in _loadedMods)
+            {
+                try { mod.FixedUpdate?.Invoke(deltaTime); }
+                catch (Exception ex)
+                {
+                    _logger.Error($"[{mod.Name}] mod_fixed_update crashed: {ex.Message}");
+                    CrashLog.LogException($"[{mod.Name}] mod_fixed_update", ex);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.LogException("FFIBridge.OnFixedUpdate outer", ex);
+        }
+    }
+
+    public void OnSceneLoaded(string sceneName)
+    {
+        var ptr = Marshal.StringToHGlobalAnsi(sceneName);
+        try
+        {
+            foreach (var mod in _loadedMods)
+            {
+                try { mod.OnSceneLoaded?.Invoke(ptr); }
+                catch (Exception ex) { _logger.Error($"[{mod.Name}] mod_on_scene_loaded crashed: {ex.Message}"); }
+            }
+        }
+        finally { Marshal.FreeHGlobal(ptr); }
+    }
+
+    public void DispatchEvent(uint eventId, IntPtr eventData, uint dataSize)
+    {
+        foreach (var mod in _loadedMods)
+        {
+            if (mod.OnEvent == null) continue;
+            try { mod.OnEvent.Invoke(eventId, eventData, dataSize); }
+            catch (Exception ex) { _logger.Error($"[{mod.Name}] mod_on_event(id={eventId}) crashed: {ex.Message}"); }
+        }
+    }
+
+    public void OnEvent(uint eventId, string payload)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(payload);
+        var ptr = Marshal.AllocHGlobal(bytes.Length);
+        try
+        {
+            Marshal.Copy(bytes, 0, ptr, bytes.Length);
+            DispatchEvent(eventId, ptr, (uint)bytes.Length);
+        }
+        finally { Marshal.FreeHGlobal(ptr); }
+    }
+
+    public void Shutdown()
+    {
+        foreach (var mod in _loadedMods)
+        {
+            try
+            {
+                _logger.Msg($"Shutting down: {mod.Name}");
+                mod.Shutdown?.Invoke();
+            }
+            catch (Exception ex) { _logger.Error($"[{mod.Name}] mod_shutdown crashed: {ex.Message}"); }
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var mod in _loadedMods)
+        {
+            if (mod.Handle != IntPtr.Zero)
+                FreeLibrary(mod.Handle);
+        }
+        _loadedMods.Clear();
+        _apiManager.Dispose();
+    }
+}

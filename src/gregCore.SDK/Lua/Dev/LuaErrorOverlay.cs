@@ -1,0 +1,283 @@
+/// <file-summary>
+/// Layer:       Infrastructure
+/// Purpose:     UI overlay for Lua errors.
+/// Maintainer:   Shows errors with stack trace, auto-hide after 10 seconds.
+///               UI Toolkit-based, semi-transparent.
+/// </file-summary>
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
+using MelonLoader;
+using gregCore.UI;
+
+namespace gregCore.Infrastructure.Scripting.Lua.Dev;
+
+public sealed class LuaErrorOverlay
+{
+    private readonly List<ErrorEntry> _errors = new();
+    private readonly int _maxErrors = 5;
+    private readonly float _autoHideDuration = 10f;
+    private VisualElement? _root;
+
+    /// <summary>
+    /// Adds a new error.
+    /// </summary>
+    public void ReportError(string modId, string message)
+    {
+        ReportError(modId, message, null);
+    }
+
+    public void ReportError(string modId, string message, string? stackTrace)
+    {
+        _errors.Add(new ErrorEntry
+        {
+            ModId = modId,
+            Message = message,
+            StackTrace = stackTrace ?? "",
+            Timestamp = Time.realtimeSinceStartup,
+            Dismissed = false
+        });
+
+        // Keep only the most recent errors
+        while (_errors.Count > _maxErrors)
+            _errors.RemoveAt(0);
+
+        BuildOrUpdateUI();
+    }
+
+    private void BuildOrUpdateUI()
+    {
+        try
+        {
+            EnsureRoot();
+            if (_root == null) return;
+            _root.Clear();
+            float currentTime = Time.realtimeSinceStartup;
+            PruneExpired(currentTime);
+            if (_errors.Count == 0) return;
+            for (int i = _errors.Count - 1; i >= 0; i--)
+            {
+                try
+                {
+                    var box = BuildErrorBox(_errors[i], currentTime);
+                    if (box != null) _root.Add(box);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"[LuaErrorOverlay] Build box failed: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaErrorOverlay] Build failed: {ex.Message}");
+        }
+    }
+
+    private void EnsureRoot()
+    {
+        try
+        {
+            if (_root != null) return;
+            _root = new VisualElement
+            {
+                name = "ErrorOverlay",
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 0,
+                    right = 0,
+                    width = 520,
+                    bottom = 0,
+                    flexDirection = FlexDirection.Column,
+                    justifyContent = Justify.FlexEnd,
+                    alignItems = Align.FlexEnd,
+                    paddingBottom = 20,
+                    paddingRight = 20,
+                    backgroundColor = Color.clear
+                }
+            };
+            GregUIManager.RegisterPanel("ErrorOverlay", _root);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaErrorOverlay] Root failed: {ex.Message}");
+        }
+    }
+
+    private void PruneExpired(float currentTime)
+    {
+        try
+        {
+            _errors.RemoveAll(e => e.Dismissed || (currentTime - e.Timestamp) > _autoHideDuration);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private VisualElement? BuildErrorBox(ErrorEntry error, float currentTime)
+    {
+        try
+        {
+            float elapsed = currentTime - error.Timestamp;
+            float alpha = Mathf.Clamp01(1f - (elapsed / _autoHideDuration) * 0.5f);
+            var box = CreateBox(error, alpha);
+            AddTitle(box, error, alpha);
+            AddStack(box, error, alpha);
+            AddDismiss(box, error);
+            AddTimer(box, elapsed, alpha);
+            return box;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaErrorOverlay] Box failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static VisualElement CreateBox(ErrorEntry error, float alpha)
+    {
+        float boxHeight = string.IsNullOrEmpty(error.StackTrace) ? 50f : 80f;
+        return new VisualElement
+        {
+            style =
+            {
+                width = 500,
+                height = boxHeight,
+                backgroundColor = new Color(0.15f, 0.05f, 0.05f, alpha * 0.9f),
+                borderTopColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderBottomColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderLeftColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderRightColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderTopWidth = 2,
+                borderBottomWidth = 2,
+                borderLeftWidth = 2,
+                borderRightWidth = 2,
+                borderTopLeftRadius = 6,
+                borderTopRightRadius = 6,
+                borderBottomLeftRadius = 6,
+                borderBottomRightRadius = 6,
+                marginBottom = 5,
+                paddingTop = 8,
+                paddingBottom = 8,
+                paddingLeft = 10,
+                paddingRight = 50,
+                position = Position.Relative
+            }
+        };
+    }
+
+    private static void AddTitle(VisualElement box, ErrorEntry error, float alpha)
+    {
+        try
+        {
+            var titleLabel = new Label($"[{error.ModId}] {error.Message}")
+            {
+                style =
+                {
+                    fontSize = 14,
+                    color = new Color(1f, 0.32f, 0.32f, alpha),
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    marginBottom = 4
+                }
+            };
+            box.Add(titleLabel);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private static void AddStack(VisualElement box, ErrorEntry error, float alpha)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(error.StackTrace)) return;
+            var stackLabel = new Label(error.StackTrace)
+            {
+                style =
+                {
+                    fontSize = 11,
+                    color = new Color(0.7f, 0.7f, 0.7f, alpha),
+                    whiteSpace = WhiteSpace.Normal
+                }
+            };
+            box.Add(stackLabel);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void AddDismiss(VisualElement box, ErrorEntry error)
+    {
+        try
+        {
+            var dismissBtn = new Button
+            {
+                text = "✕",
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 5,
+                    right = 5,
+                    width = 20,
+                    height = 20,
+                    fontSize = 12,
+                    backgroundColor = Color.clear,
+                    color = new Color(0.7f, 0.7f, 0.7f, 0.9f),
+                    borderTopWidth = 0,
+                    borderBottomWidth = 0,
+                    borderLeftWidth = 0,
+                    borderRightWidth = 0
+                }
+            };
+            dismissBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt =>
+            {
+                error.Dismissed = true;
+                BuildOrUpdateUI();
+            }));
+            box.Add(dismissBtn);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void AddTimer(VisualElement box, float elapsed, float alpha)
+    {
+        try
+        {
+            var timerLabel = new Label($"{_autoHideDuration - elapsed:F0}s")
+            {
+                style =
+                {
+                    fontSize = 10,
+                    color = new Color(0.5f, 0.5f, 0.5f, alpha),
+                    position = Position.Absolute,
+                    bottom = 2,
+                    left = 10
+                }
+            };
+            box.Add(timerLabel);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    /// <summary>
+    /// Removes all visible errors.
+    /// </summary>
+    public void DismissAll()
+    {
+        _errors.Clear();
+        _root?.Clear();
+    }
+
+    public int VisibleErrorCount => _errors.Count;
+
+    // ─── Inner Types ─────────────────────────────────────────────────
+
+    private class ErrorEntry
+    {
+        public string ModId = "";
+        public string Message = "";
+        public string StackTrace = "";
+        public float Timestamp;
+        public bool Dismissed;
+    }
+}

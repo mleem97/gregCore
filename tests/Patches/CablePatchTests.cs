@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Tests
-/// Zweck:        Tests für CablePositionsPatch ID-Generierung.
-/// Maintainer:   Testet Uniqueness, Thread-Safety und SetBaseId.
+/// Layer:       Tests
+/// Purpose:     Tests for CablePositionsPatch ID generation.
+/// Maintainer:   Tests uniqueness, thread safety and SetBaseId.
 /// </file-summary>
 
 using System;

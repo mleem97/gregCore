@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**;obj\**" />
+    <EmbeddedResource Remove="bin\**;obj\**" />
+    <None Remove="bin\**;obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\gregCore.csproj" />
+    <Reference Include="MelonLoader" HintPath="..\references\MelonLoader.dll" Private="true" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="..\references\UnityEngine.CoreModule.dll" Private="true" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,5 +25,23 @@
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <!-- Il2Cpp reference assemblies (symlinks into the live game install):
+         copied to the test output so coverlet can resolve + instrument
+         gregCore.dll and the testhost can probe game types. -->
+    <Il2CppTestRef Include="..\references\*.dll" />
+  </ItemGroup>
+
+  <Target Name="CopyIl2CppRefsForTests" AfterTargets="Build">
+    <Copy SourceFiles="@(Il2CppTestRef)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

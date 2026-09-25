@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Tests
-/// Zweck:        Tests für den GregEventBus.
-/// Maintainer:   Stellt Thread-Safety und Funktionalität sicher.
+/// Layer:       Tests
+/// Purpose:     Tests for GregEventBus.
+/// Maintainer:   Ensures thread safety and functionality.
 /// </file-summary>
 
 using System;

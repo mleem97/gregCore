@@ -87,7 +87,7 @@ public static class GregLang
     public static void Initialize()
     {
         try { EnsureInitialized(); }
-        catch { /* best-effort */ }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     /// <summary>
@@ -106,11 +106,11 @@ public static class GregLang
             lock (Gate)
             {
                 _current = resolved;
-                try { _store?.Reload(); } catch { /* best-effort */ }
+                try { _store?.Reload(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
-            try { SavePreference(normalized); } catch { /* best-effort */ }
-            try { global::MelonLoader.MelonLogger.Msg($"[gregCore.Lang] Language: {resolved} (pref: {normalized})."); } catch { }
+            try { SavePreference(normalized); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { global::MelonLoader.MelonLogger.Msg($"[gregCore.Lang] Language: {resolved} (pref: {normalized})."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 
             Action handler;
             lock (Gate) { handler = LanguageChanged; }
@@ -131,20 +131,20 @@ public static class GregLang
         try
         {
             string modsDir = "";
-            try { modsDir = global::MelonLoader.Utils.MelonEnvironment.ModsDirectory ?? ""; } catch { }
+            try { modsDir = global::MelonLoader.Utils.MelonEnvironment.ModsDirectory ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (string.IsNullOrWhiteSpace(modsDir))
             {
                 string gameRoot = "";
-                try { gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory ?? ""; } catch { }
+                try { gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 if (string.IsNullOrWhiteSpace(gameRoot))
                 {
-                    try { gameRoot = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ""; } catch { }
+                    try { gameRoot = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
-                try { modsDir = Path.Combine(gameRoot, "Mods"); } catch { }
+                try { modsDir = Path.Combine(gameRoot, "Mods"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
 
             string root = "";
-            try { root = Path.Combine(modsDir, "Data"); } catch { }
+            try { root = Path.Combine(modsDir, "Data"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             string preference = LoadPreference();
 
             string resolved = preference == LangCodes.Auto ? DetectSystemLanguage() : LangCodes.Normalize(preference);
@@ -160,7 +160,7 @@ public static class GregLang
         {
             lock (Gate)
             {
-                try { _store = new GregLangStore(""); } catch { }
+                try { _store = new GregLangStore(""); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 _current = LangCodes.Fallback;
             }
         }
@@ -176,7 +176,7 @@ public static class GregLang
             {
                 entry = cat.CreateEntry("Language", LangCodes.Auto, "Language",
                     "UI language for Greg mods (two-letter code, or 'auto' = system language). Translations: Mods/Data/<modId>/<lang>.json.");
-                try { cat.SaveToFile(false); } catch { }
+                try { cat.SaveToFile(false); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return LangCodes.Auto;
             }
             return string.IsNullOrWhiteSpace(entry.Value) ? LangCodes.Auto : entry.Value;
@@ -189,15 +189,15 @@ public static class GregLang
         try
         {
             var cat = global::MelonLoader.MelonPreferences.CreateCategory("gregCore", "gregCore");
-            var entry = cat.GetEntry<string>("Language");
-            if (entry == null)
-                entry = cat.CreateEntry("Language", normalized, "Language",
-                    "UI language for Greg mods (two-letter code, or 'auto' = system language). Translations: Mods/Data/<modId>/<lang>.json.");
+            var existing = cat.GetEntry<string>("Language");
+            if (existing != null)
+                existing.Value = normalized;
             else
-                entry.Value = normalized;
-            try { global::MelonLoader.MelonPreferences.Save(); } catch { }
+                cat.CreateEntry("Language", normalized, "Language",
+                    "UI language for Greg mods (two-letter code, or 'auto' = system language). Translations: Mods/Data/<modId>/<lang>.json.");
+            try { global::MelonLoader.MelonPreferences.Save(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
-        catch { /* best-effort */ }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static string DetectSystemLanguage()
@@ -205,7 +205,7 @@ public static class GregLang
         try
         {
             string name = "";
-            try { name = UnityEngine.Application.systemLanguage.ToString(); } catch { }
+            try { name = UnityEngine.Application.systemLanguage.ToString(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             string code = LangCodes.Normalize(name);
             return code == LangCodes.Auto ? LangCodes.Fallback : code;
         }

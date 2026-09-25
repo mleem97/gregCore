@@ -46,7 +46,7 @@ public static class GregTooltips
         if (tooltip == null || string.IsNullOrEmpty(text)) return false;
         try
         {
-            var _ = tooltip.gameObject; // liveness
+            _ = tooltip.gameObject; // liveness
             tooltip.ShowTooltipOverlayCanvas(text, position, xOffset);
             return true;
         }
@@ -63,7 +63,7 @@ public static class GregTooltips
         if (tooltip == null || string.IsNullOrEmpty(text) || transform == null) return false;
         try
         {
-            var _ = tooltip.gameObject; // liveness
+            _ = tooltip.gameObject; // liveness
             tooltip.ShowTooltipWorldCanvas(text, transform, cam);
             return true;
         }
@@ -80,7 +80,7 @@ public static class GregTooltips
         if (tooltip == null) return false;
         try
         {
-            var _ = tooltip.gameObject; // liveness
+            _ = tooltip.gameObject; // liveness
             tooltip.HideTooltip();
             return true;
         }
@@ -122,7 +122,7 @@ public static class GregTooltips
         if (tooltip == null || string.IsNullOrEmpty(text)) return false;
         try
         {
-            var _ = tooltip.gameObject; // liveness
+            _ = tooltip.gameObject; // liveness
             tooltip.ShowTooltipForInteract(text, null);
             return true;
         }
@@ -139,7 +139,7 @@ public static class GregTooltips
         if (tooltip == null) return false;
         try
         {
-            var _ = tooltip.gameObject; // liveness
+            _ = tooltip.gameObject; // liveness
             tooltip.HideTooltipForInteract();
             return true;
         }

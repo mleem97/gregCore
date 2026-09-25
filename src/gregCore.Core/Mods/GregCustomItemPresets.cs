@@ -71,7 +71,7 @@ public static class GregCustomItemPresets
                 DisplayName = displayName ?? ""
             });
             Save();
-            try { MelonLogger.Msg($"[gregCore][Presets] Saved: '{displayName}' color={hex}"); } catch { }
+            try { MelonLogger.Msg($"[gregCore][Presets] Saved: '{displayName}' color={hex}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return true;
         }
     }
@@ -87,11 +87,11 @@ public static class GregCustomItemPresets
             foreach (var p in _presets.Presets)
             {
                 Color? tint = null;
-                try { if (ColorUtility.TryParseHtmlString(p.ColorHex, out var c)) tint = c; } catch { }
+                try { if (ColorUtility.TryParseHtmlString(p.ColorHex, out var c)) tint = c; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 Sprite icon = null;
-                try { icon = FindCustomColorIcon(p); } catch { }
+                try { icon = FindCustomColorIcon(p); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 bool locked = false;
-                try { locked = IsLocked(shop, p); } catch { }
+                try { locked = IsLocked(shop, p); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 var item = new greg.CommonShop.CustomShopItem
                 {
                     Name = p.DisplayName,
@@ -130,7 +130,7 @@ public static class GregCustomItemPresets
                     return !si.isUnlocked;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return false;
     }
 
@@ -146,7 +146,7 @@ public static class GregCustomItemPresets
                     return so.sprite;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return null;
     }
 
@@ -164,7 +164,7 @@ public static class GregCustomItemPresets
                     Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                     File.Copy(LegacyStorePath, path, overwrite: false);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path);
@@ -186,7 +186,7 @@ public static class GregCustomItemPresets
         }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Presets] Load failed: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Presets] Load failed: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 
@@ -199,7 +199,7 @@ public static class GregCustomItemPresets
         }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[gregCore][Presets] Save failed: {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[gregCore][Presets] Save failed: {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
     }
 }

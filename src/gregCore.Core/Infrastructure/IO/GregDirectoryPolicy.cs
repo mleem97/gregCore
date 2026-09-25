@@ -26,9 +26,9 @@ public static class GregDirectoryPolicy
 {
     public sealed class Violation
     {
-        public string Kind;
-        public string Path;
-        public string Detail;
+        public string Kind { get; set; }
+        public string Path { get; set; }
+        public string Detail { get; set; }
         public override string ToString() => $"[{Kind}] {Path}: {Detail}";
     }
 

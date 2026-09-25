@@ -49,12 +49,9 @@ pub struct GregCoreAPI {
     pub log_warning: Option<extern "C" fn(*const c_char)>,
     pub log_error: Option<extern "C" fn(*const c_char)>,
     // Economy
-    pub get_player_money: Option<extern "C" fn() -> f64>,
-    pub set_player_money: Option<extern "C" fn(f64)>,
-    pub get_player_xp: Option<extern "C" fn() -> f64>,
-    pub set_player_xp: Option<extern "C" fn(f64)>,
-    pub get_player_reputation: Option<extern "C" fn() -> f64>,
-    pub set_player_reputation: Option<extern "C" fn(f64)>,
+    pub get_player_money: Option<extern "C" fn() -> f64>, pub set_player_money: Option<extern "C" fn(f64)>,
+    pub get_player_xp: Option<extern "C" fn() -> f64>, pub set_player_xp: Option<extern "C" fn(f64)>,
+    pub get_player_reputation: Option<extern "C" fn() -> f64>, pub set_player_reputation: Option<extern "C" fn(f64)>,
     // World
     pub get_server_count: Option<extern "C" fn() -> u32>,
     pub get_rack_count: Option<extern "C" fn() -> u32>,
@@ -90,15 +87,11 @@ pub struct GregCoreAPI {
     pub on_hook: Option<extern "C" fn(*const c_char, *const c_void)>,
     pub fire_hook: Option<extern "C" fn(*const c_char, *const c_char)>,
     // Config (bool only on table v1 — the rest is reserved null)
-    pub config_set_bool: Option<extern "C" fn(*const c_char, *const c_char, u32)>,
-    pub config_get_bool: Option<extern "C" fn(*const c_char, *const c_char, u32) -> u32>,
-    pub config_set_int: Option<extern "C" fn(*const c_char, *const c_char, i32)>,
-    pub config_get_int: Option<extern "C" fn(*const c_char, *const c_char, i32) -> i32>,
-    pub config_set_float: Option<extern "C" fn(*const c_char, *const c_char, f32)>,
-    pub config_get_float: Option<extern "C" fn(*const c_char, *const c_char, f32) -> f32>,
+    pub config_set_bool: Option<extern "C" fn(*const c_char, *const c_char, u32)>, pub config_get_bool: Option<extern "C" fn(*const c_char, *const c_char, u32) -> u32>,
+    pub config_set_int: Option<extern "C" fn(*const c_char, *const c_char, i32)>, pub config_get_int: Option<extern "C" fn(*const c_char, *const c_char, i32) -> i32>,
+    pub config_set_float: Option<extern "C" fn(*const c_char, *const c_char, f32)>, pub config_get_float: Option<extern "C" fn(*const c_char, *const c_char, f32) -> f32>,
     pub config_set_string: Option<extern "C" fn(*const c_char, *const c_char, *const c_char)>,
-    pub config_get_string:
-        Option<extern "C" fn(*const c_char, *const c_char, *const c_char) -> *mut c_char>,
+    pub config_get_string: Option<extern "C" fn(*const c_char, *const c_char, *const c_char) -> *mut c_char>,
 }
 
 /// Table version this file was written against (`RustFFIBridge` sets 1).

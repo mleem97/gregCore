@@ -91,25 +91,25 @@ public static partial class GregNetworkDeviceSaves
         public string Type = "";
         public Vector3 Position;
         public int CustomerID;
-        public string SwitchID = "";
-        public string ServerID = "";
+        public string SwitchID { get; set; } = "";
+        public string ServerID { get; set; } = "";
     }
 
     public sealed class CableSave
     {
-        public int CableID;
-        public CableEndpoint StartPoint = new CableEndpoint();
-        public CableEndpoint EndPoint = new CableEndpoint();
-        public List<Vector3> Waypoints = new List<Vector3>();
-        public List<Vector3> MidPointPositions = new List<Vector3>();
-        public float MaxSpeed;
-        public Color CableColor = Color.white;
+        public int CableID { get; set; }
+        public CableEndpoint StartPoint { get; set; } = new CableEndpoint();
+        public CableEndpoint EndPoint { get; set; } = new CableEndpoint();
+        public List<Vector3> Waypoints { get; set; } = new List<Vector3>();
+        public List<Vector3> MidPointPositions { get; set; } = new List<Vector3>();
+        public float MaxSpeed { get; set; }
+        public Color CableColor { get; set; } = Color.white;
     }
 
     public sealed class CableLinkLabel
     {
         public Vector3 Position;
-        public string LabelText = "";
+        public string LabelText { get; set; } = "";
     }
 
     public sealed class PortVlanFilter

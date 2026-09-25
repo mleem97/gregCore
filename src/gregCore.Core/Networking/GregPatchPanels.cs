@@ -198,7 +198,7 @@ public static class GregPatchPanels
         if (panel == null || entry == null) return false;
         try
         {
-            var _ = panel.gameObject; // liveness
+            _ = panel.gameObject; // liveness
             panel.InsertedInRack(entry);
             return true;
         }

@@ -22,18 +22,18 @@ public static class GregServiceRequests
 
     public sealed class RequestInfo
     {
-        public int SrNumber;
-        public string State = "";
-        public string ShortDescription = "";
-        public string LongDescription = "";
-        public bool RewardGranted;
-        public bool Completed;
-        public string ProgressText = "";
+        public int SrNumber { get; set; }
+        public string State { get; set; } = "";
+        public string ShortDescription { get; set; } = "";
+        public string LongDescription { get; set; } = "";
+        public bool RewardGranted { get; set; }
+        public bool Completed { get; set; }
+        public string ProgressText { get; set; } = "";
     }
 
     public sealed class SaveSnapshot
     {
-        public int CurrentSRNumber;
+        public int CurrentSRNumber { get; set; }
         public List<RequestInfo> Requests = new List<RequestInfo>();
     }
 

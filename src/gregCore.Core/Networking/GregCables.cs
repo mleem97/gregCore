@@ -115,7 +115,7 @@ public static class GregCables
                 try { same = parent == server; } catch { continue; }
                 if (same)
                 {
-                    try { result.Add(l); } catch { }
+                    try { result.Add(l); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 }
             }
         });

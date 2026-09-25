@@ -59,7 +59,7 @@ public static class HardwareIdPersistencePatch
 
     public static string GenerateGregId(string prefix)
     {
-        return $"{prefix}{Guid.NewGuid().ToString("N").ToUpper().Substring(0, 12)}";
+        return $"{prefix}{Guid.NewGuid().ToString("N").ToUpperInvariant().Substring(0, 12)}";
     }
 
     /// <summary>

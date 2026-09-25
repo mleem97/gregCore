@@ -12,12 +12,12 @@ namespace gregCore.GameLayer.Hooks;
 /// </summary>
 public static class NativeModLoaderHooks
 {
-    public const string LoadAllModsStarted = "greg.native.mod.loadAllModsStarted";
-    public const string LoadAllModsFinished = "greg.native.mod.loadAllModsFinished";
-    public const string LoadModPackStarted = "greg.native.mod.loadModPackStarted";
-    public const string LoadModPackFinished = "greg.native.mod.loadModPackFinished";
-    public const string LoadDllStarted = "greg.native.mod.loadDllStarted";
-    public const string LoadDllFinished = "greg.native.mod.loadDllFinished";
+    public static string LoadAllModsStarted { get; } = "greg.native.mod.loadAllModsStarted";
+    public static string LoadAllModsFinished { get; } = "greg.native.mod.loadAllModsFinished";
+    public static string LoadModPackStarted { get; } = "greg.native.mod.loadModPackStarted";
+    public static string LoadModPackFinished { get; } = "greg.native.mod.loadModPackFinished";
+    public static string LoadDllStarted { get; } = "greg.native.mod.loadDllStarted";
+    public static string LoadDllFinished { get; } = "greg.native.mod.loadDllFinished";
 
     private static bool _installed;
     private static IGregLogger? _logger;

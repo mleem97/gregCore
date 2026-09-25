@@ -10,8 +10,8 @@ public static class GregAudioClipCache
 {
     public sealed class Entry
     {
-        public AudioClip Clip;
-        public long LastUsed;
+        public AudioClip Clip { get; set; }
+        public long LastUsed { get; set; }
     }
 
     public const int Capacity = 3;

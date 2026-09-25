@@ -16,7 +16,8 @@ public interface IGregAPI
     void Fire(string hookName, GregPayload payload);
 
     // --- Mod Registration ---
-    void RegisterMod(string modId, string name, string version, object? apiObject = null);
+    void RegisterMod(string modId, string name, string version);
+    void RegisterMod(string modId, string name, string version, object? apiObject);
 
     // --- Settings & Input ---
     void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "");

@@ -23,22 +23,22 @@ public static class GregShop
 
     public sealed class ItemDefinition
     {
-        public string ItemName = "";
-        public int Price;
-        public int XpToUnlock;
-        public string ItemType = "";
-        public int ItemID;
-        public float Eol;
-        public bool IsCustomColor;
-        public bool IsUnlocked;
+        public string ItemName { get; set; } = "";
+        public int Price { get; set; }
+        public int XpToUnlock { get; set; }
+        public string ItemType { get; set; } = "";
+        public int ItemID { get; set; }
+        public float Eol { get; set; }
+        public bool IsCustomColor { get; set; }
+        public bool IsUnlocked { get; set; }
     }
 
     public sealed class CartLine
     {
-        public int ItemID;
-        public string ItemName = "";
-        public int Price;
-        public string ItemType = "";
+        public int ItemID { get; set; }
+        public string ItemName { get; set; } = "";
+        public int Price { get; set; }
+        public string ItemType { get; set; } = "";
         public int Quantity = 1;
         public int TotalPrice;
         public Color ItemColor = Color.white;
@@ -103,7 +103,7 @@ public static class GregShop
         if (si == null) return false;
         try
         {
-            var _ = si.gameObject; // liveness
+            _ = si.gameObject; // liveness
             si.UnlockButton();
             return true;
         }
@@ -119,7 +119,7 @@ public static class GregShop
         if (si == null) return false;
         try
         {
-            var _ = si.gameObject; // liveness
+            _ = si.gameObject; // liveness
             si.ButtonBuyItem();
             return true;
         }
@@ -152,7 +152,7 @@ public static class GregShop
         if (ci == null) return false;
         try
         {
-            var _ = ci.gameObject; // liveness
+            _ = ci.gameObject; // liveness
             ci.OnAddClicked();
             return true;
         }
@@ -168,7 +168,7 @@ public static class GregShop
         if (ci == null) return false;
         try
         {
-            var _ = ci.gameObject; // liveness
+            _ = ci.gameObject; // liveness
             ci.OnRemoveClicked();
             return true;
         }
@@ -212,7 +212,7 @@ public static class GregShop
         global::Il2Cpp.ShopItemConfig config = null;
         try
         {
-            var _ = mi.gameObject; // liveness
+            _ = mi.gameObject; // liveness
             config = mi.config;
         }
         catch { config = null; }
@@ -224,7 +224,7 @@ public static class GregShop
         if (mi == null) return false;
         try
         {
-            var _ = mi.gameObject; // liveness
+            _ = mi.gameObject; // liveness
             mi.ButtonBuyItem();
             return true;
         }
@@ -245,7 +245,7 @@ public static class GregShop
         {
             try
             {
-                var _ = shop.gameObject; // liveness
+                _ = shop.gameObject; // liveness
                 var picker = shop.flexibleColorPicker;
                 if (picker != null) return picker;
             }
@@ -286,7 +286,7 @@ public static class GregShop
         if (shop == null) return false;
         try
         {
-            var _ = shop.gameObject; // liveness
+            _ = shop.gameObject; // liveness
             shop.OpenColorPicker();
             return true;
         }
@@ -302,7 +302,7 @@ public static class GregShop
         if (shop == null) return false;
         try
         {
-            var _ = shop.gameObject; // liveness
+            _ = shop.gameObject; // liveness
             shop.ButtonCancelColorPicker();
             return true;
         }
@@ -326,7 +326,7 @@ public static class GregShop
         if (picker == null) return false;
         try
         {
-            var _ = picker.gameObject; // liveness
+            _ = picker.gameObject; // liveness
             picker.SetColor(color);
             return true;
         }

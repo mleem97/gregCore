@@ -72,7 +72,12 @@ public class GregAPI : IGregAPI
         });
     }
 
-    public void RegisterMod(string modId, string name, string version, object? apiObject = null)
+    public void RegisterMod(string modId, string name, string version)
+    {
+        RegisterMod(modId, name, version, null);
+    }
+
+    public void RegisterMod(string modId, string name, string version, object? apiObject)
     {
         _plugins.RegisterMod(new ModMetadata
         {

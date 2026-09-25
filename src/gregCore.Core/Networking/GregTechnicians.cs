@@ -20,13 +20,13 @@ public static class GregTechnicians
 
     public sealed class TechnicianInfo
     {
-        public int TechnicianID = -1;
-        public string Name = "";
-        public int Salary;
-        public string State = "";
-        public bool IsBusy;
-        public bool HasDeviceInHand;
-        public string CurrentServerID = "";
+        public int TechnicianID { get; set; } = -1;
+        public string Name { get; set; } = "";
+        public int Salary { get; set; }
+        public string State { get; set; } = "";
+        public bool IsBusy { get; set; }
+        public bool HasDeviceInHand { get; set; }
+        public string CurrentServerID { get; set; } = "";
     }
 
     // ── Find / read ──────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ public static class GregTechnicians
         if (tech == null) return false;
         try
         {
-            var _ = tech.gameObject; // liveness
+            _ = tech.gameObject; // liveness
             tech.RepairDevice();
             return true;
         }
@@ -119,7 +119,7 @@ public static class GregTechnicians
         if (tech == null) return false;
         try
         {
-            var _ = tech.gameObject; // liveness
+            _ = tech.gameObject; // liveness
             var job = new global::Il2Cpp.TechnicianManager.RepairJob();
             try { job.networkSwitch = networkSwitch; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             try { job.server = server; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
@@ -138,7 +138,7 @@ public static class GregTechnicians
         if (tech == null) return false;
         try
         {
-            var _ = tech.gameObject; // liveness
+            _ = tech.gameObject; // liveness
             var routine = tech.RequestJobDelayed();
             return GregRackAndSfp.StartIl2CppRoutine(routine);
         }
@@ -163,7 +163,7 @@ public static class GregTechnicians
         if (mgr == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.SendTechnician(networkSwitch, server);
             return true;
         }
@@ -180,7 +180,7 @@ public static class GregTechnicians
         if (mgr == null || tech == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.RequestNextJob(tech);
             return true;
         }
@@ -197,7 +197,7 @@ public static class GregTechnicians
         if (mgr == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.FireTechnician(technicianID);
             return true;
         }
@@ -229,7 +229,7 @@ public static class GregTechnicians
         catch { return false; }
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.RestoreJobQueue(list);
             return true;
         }
@@ -273,7 +273,7 @@ public static class GregTechnicians
         if (hr == null) return false;
         try
         {
-            var _ = hr.gameObject; // liveness
+            _ = hr.gameObject; // liveness
             hr.ButtonHireEmployee(index);
             return true;
         }
@@ -290,7 +290,7 @@ public static class GregTechnicians
         if (hr == null) return false;
         try
         {
-            var _ = hr.gameObject; // liveness
+            _ = hr.gameObject; // liveness
             hr.ButtonConfirmHire();
             return true;
         }
@@ -307,7 +307,7 @@ public static class GregTechnicians
         if (hr == null) return false;
         try
         {
-            var _ = hr.gameObject; // liveness
+            _ = hr.gameObject; // liveness
             hr.ButtonFireEmployee(index);
             return true;
         }
@@ -324,7 +324,7 @@ public static class GregTechnicians
         if (hr == null) return false;
         try
         {
-            var _ = hr.gameObject; // liveness
+            _ = hr.gameObject; // liveness
             hr.ButtonConfirmFireEmployee();
             return true;
         }

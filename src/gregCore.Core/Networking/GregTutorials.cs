@@ -25,7 +25,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ShowTutorial(index);
             return true;
         }
@@ -42,7 +42,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.StopTutorial();
             return true;
         }
@@ -59,7 +59,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.SkipTutorials();
             return true;
         }
@@ -76,7 +76,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.PlayVideo(tutorialIndex, inPauseMenu);
             return true;
         }
@@ -93,7 +93,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ButtonShowTutorialInPauseMenu(index);
             return true;
         }
@@ -110,7 +110,7 @@ public static class GregTutorials
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.StopVideoInPauseMenu();
             return true;
         }

@@ -37,7 +37,8 @@ public sealed class GregPerformanceModule
     public void SetTargetFPS(int fps) => Configure(GetProfile() with { TargetFps = fps });
     public void SetUnfocusedFPS(int fps) => Configure(GetProfile() with { UnfocusedFps = fps });
     public void SetVSync(bool enabled) => Configure(GetProfile() with { EnableVSync = enabled });
-    public void ThrottleWhenUnfocused(bool enabled, int unfocusedFps = 15) => Configure(GetProfile() with { ThrottleWhenUnfocused = enabled, UnfocusedFps = unfocusedFps });
+    public void ThrottleWhenUnfocused(bool enabled) => ThrottleWhenUnfocused(enabled, 15);
+    public void ThrottleWhenUnfocused(bool enabled, int unfocusedFps) => Configure(GetProfile() with { ThrottleWhenUnfocused = enabled, UnfocusedFps = unfocusedFps });
 
     // ── Memory ───────────────────────────────────────────────────────────────
     public void SetGCInterval(int seconds) => Configure(GetProfile() with { GcIntervalSeconds = seconds });

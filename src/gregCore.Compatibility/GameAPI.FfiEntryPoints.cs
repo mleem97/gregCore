@@ -15,6 +15,7 @@ public partial class GameAPIManager
     // in .codacy/codacy.yaml. Orchestrator bodies delegate to small
     // helpers in GameAPI.World.cs / GameAPI.Sync.cs / GameAPI.Place.cs.
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S107:Methods should not have too many parameters", Justification = "Native FFI ABI fixes this signature; see GameAPI.Bind.cs delegate wiring.")]
     int WorldSpawnObjectImpl(byte objectType, int prefabId, float x, float y, float z, float rotX, float rotY, float rotZ, float rotW, IntPtr outId, uint outMax)
     {
         try
@@ -73,12 +74,14 @@ public partial class GameAPIManager
             return 0;
         }
     }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S107:Methods should not have too many parameters", Justification = "Native FFI ABI fixes this signature; see GameAPI.Bind.cs delegate wiring.")]
     int WorldConnectCableImpl(int cableId, byte startType, float sx, float sy, float sz, IntPtr startDevice, uint startDeviceLen, byte endType, float ex, float ey, float ez, IntPtr endDevice, uint endDeviceLen)
     {
         // Phase 3 stub
         CrashLog.Log($"[WorldSync] ConnectCable stub: cableId={cableId}");
         return 0;
     }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S107:Methods should not have too many parameters", Justification = "Native FFI ABI fixes this signature; see GameAPI.Bind.cs delegate wiring.")]
     int WorldDropObjectImpl(IntPtr id, uint idLen, float x, float y, float z, float rotX, float rotY, float rotZ, float rotW)
     {
         try

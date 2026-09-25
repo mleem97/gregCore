@@ -124,15 +124,15 @@ public static class GregShopItems
     /// <summary>Parameter object for <see cref="AddButton(ShopButtonSpec)"/>.</summary>
     public sealed class ShopButtonSpec
     {
-        public global::Il2Cpp.ShopItem Template;
-        public GameObject Parent;
-        public int ItemId;
-        public string Label;
-        public int Price;
-        public int XpToUnlock;
-        public string Guid;
-        public bool IsCustomColor;
-        public Sprite Sprite;
+        public global::Il2Cpp.ShopItem Template { get; set; }
+        public GameObject Parent { get; set; }
+        public int ItemId { get; set; }
+        public string Label { get; set; }
+        public int Price { get; set; }
+        public int XpToUnlock { get; set; }
+        public string Guid { get; set; }
+        public bool IsCustomColor { get; set; }
+        public Sprite Sprite { get; set; }
     }
 
     public static bool ButtonExists(GameObject parent, string guid)

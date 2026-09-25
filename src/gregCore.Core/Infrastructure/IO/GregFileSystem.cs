@@ -10,8 +10,20 @@ namespace gregCore.Infrastructure.IO;
 public static class GregFileSystem
 {
     public static IEnumerable<string> EnumerateFilesByExtension(
-        string directory, string extension, SearchOption option = SearchOption.TopDirectoryOnly,
-        bool includeDeactivated = false)
+        string directory, string extension)
+    {
+        return EnumerateFilesByExtension(directory, extension, SearchOption.TopDirectoryOnly);
+    }
+
+    public static IEnumerable<string> EnumerateFilesByExtension(
+        string directory, string extension, SearchOption option)
+    {
+        return EnumerateFilesByExtension(directory, extension, option, false);
+    }
+
+    public static IEnumerable<string> EnumerateFilesByExtension(
+        string directory, string extension, SearchOption option,
+        bool includeDeactivated)
     {
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
             return Enumerable.Empty<string>();

@@ -20,7 +20,12 @@ public static class GregModSaveStrings
 
     // ── Pure managed codec (unit-tested) ─────────────────────────────────────
 
-    public static int[] Encode(string? text, int maxChars = DefaultMaxChars)
+    public static int[] Encode(string? text)
+    {
+        return Encode(text, DefaultMaxChars);
+    }
+
+    public static int[] Encode(string? text, int maxChars)
     {
         try
         {

@@ -113,7 +113,7 @@ public sealed class GregCSharpScriptBridge
             }
             catch { ProcessPending(); }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void ProcessPending()
@@ -137,7 +137,7 @@ public sealed class GregCSharpScriptBridge
             }
             ReloadAll();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void ReloadAll()
@@ -146,11 +146,11 @@ public sealed class GregCSharpScriptBridge
         lock (_mods) { snapshot = _mods.ToList(); _mods.Clear(); }
         foreach (var ctx in snapshot)
         {
-            try { ctx.SafeCall(() => ctx.Instance.OnShutdown(), "OnShutdown"); } catch { }
+            try { ctx.SafeCall(() => ctx.Instance.OnShutdown(), "OnShutdown"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         if (!string.IsNullOrEmpty(_csharpDir))
         {
-            try { LoadMods(_csharpDir); } catch { }
+            try { LoadMods(_csharpDir); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         MelonLogger.Msg("[CSharpScriptBridge] Scripts reloaded (main menu).");
     }
@@ -174,12 +174,12 @@ public sealed class GregCSharpScriptBridge
             }
             if (old != null)
             {
-                try { old.SafeCall(() => old.Instance.OnShutdown(), "OnShutdown"); } catch { }
+                try { old.SafeCall(() => old.Instance.OnShutdown(), "OnShutdown"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
             if (Directory.Exists(modDir)) LoadOne(modDir);
             MelonLogger.Msg($"[CSharpScriptBridge] Reloaded '{Path.GetFileName(modDir)}'.");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
     private static void LoadOne(string modDir)
     {
@@ -291,7 +291,7 @@ public sealed class GregCSharpScriptBridge
     public static void OnSceneLoaded(string sceneName)
     {
         if (!_initialized) return;
-        try { _currentScene = sceneName ?? ""; } catch { }
+        try { _currentScene = sceneName ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         List<GregCSharpModContext> snapshot;
         lock (_mods) { snapshot = _mods.ToList(); }
         foreach (var mod in snapshot)
@@ -300,7 +300,7 @@ public sealed class GregCSharpScriptBridge
             mod.SafeCall(() => mod.Instance.OnSceneLoaded(sceneName), "OnSceneLoaded");
         }
         // Queued script changes apply on main-menu entry (never mid-game).
-        try { if (IsMainMenu()) TryReloadNow(); } catch { }
+        try { if (IsMainMenu()) TryReloadNow(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void Shutdown()

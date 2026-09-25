@@ -42,19 +42,19 @@ namespace greg.CommonShop
 
     public class CustomShopItem
     {
-        public string Name = string.Empty;
-        public int Price;
-        public Sprite? Icon;
-        public Action? OnBuy;
-        public PlayerManager.ObjectInHand TemplateType;
-        public int TemplateID;
-        public Color? BackgroundColor;
-        public GameObject? CustomPrefab;
-        public Action<GameObject>? OnUIReady;
-        public int? ResultItemID;
-        public Action<int>? OnCheckout;
-        public string Category = "Mods";
-        public string SubCategory = "";
+        public string Name { get; set; } = string.Empty;
+        public int Price { get; set; }
+        public Sprite? Icon { get; set; }
+        public Action? OnBuy { get; set; }
+        public PlayerManager.ObjectInHand TemplateType { get; set; }
+        public int TemplateID { get; set; }
+        public Color? BackgroundColor { get; set; }
+        public GameObject? CustomPrefab { get; set; }
+        public Action<GameObject>? OnUIReady { get; set; }
+        public int? ResultItemID { get; set; }
+        public Action<int>? OnCheckout { get; set; }
+        public string Category { get; set; } = "Mods";
+        public string SubCategory { get; set; } = "";
         /// <summary>
         /// Optional purchase color passed to the game cart (custom-color
         /// presets). Null = default/plain item color.

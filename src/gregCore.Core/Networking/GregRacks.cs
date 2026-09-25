@@ -102,7 +102,7 @@ public static class GregRacks
         if (rack == null) return false;
         try
         {
-            var _ = rack.gameObject; // liveness
+            _ = rack.gameObject; // liveness
             return rack.IsPositionAvailable(index, sizeInU);
         }
         catch { return false; }
@@ -113,7 +113,7 @@ public static class GregRacks
         if (rack == null) return false;
         try
         {
-            var _ = rack.gameObject; // liveness
+            _ = rack.gameObject; // liveness
             if (used) rack.MarkPositionAsUsed(index, sizeInU);
             else rack.MarkPositionAsUnused(index, sizeInU);
             return true;
@@ -130,7 +130,7 @@ public static class GregRacks
         if (rack == null) return false;
         try
         {
-            var _ = rack.gameObject; // liveness
+            _ = rack.gameObject; // liveness
             rack.UnmountRack();
             return true;
         }
@@ -148,7 +148,7 @@ public static class GregRacks
         if (arr == null) return false;
         try
         {
-            var _ = rack.gameObject; // liveness
+            _ = rack.gameObject; // liveness
             rack.InitializeLoadedRack(arr);
             return true;
         }
@@ -172,7 +172,7 @@ public static class GregRacks
         if (pos == null) return false;
         try
         {
-            var _ = pos.gameObject; // liveness
+            _ = pos.gameObject; // liveness
             pos.SetUsed(used);
             return true;
         }
@@ -188,7 +188,7 @@ public static class GregRacks
         if (pos == null) return false;
         try
         {
-            var _ = pos.gameObject; // liveness
+            _ = pos.gameObject; // liveness
             return pos.IsAllowedItem(checkAvailability);
         }
         catch { return false; }
@@ -199,7 +199,7 @@ public static class GregRacks
         if (pos == null) return false;
         try
         {
-            var _ = pos.gameObject; // liveness
+            _ = pos.gameObject; // liveness
             var routine = pos.InsertItemInRack();
             return GregRackAndSfp.StartIl2CppRoutine(routine);
         }
@@ -217,7 +217,7 @@ public static class GregRacks
         if (bay == null) return false;
         try
         {
-            var _ = bay.gameObject; // liveness
+            _ = bay.gameObject; // liveness
             bay.FreeTrolleySlot(startIdx, sizeInU);
             return true;
         }
@@ -233,7 +233,7 @@ public static class GregRacks
         if (bay == null) return false;
         try
         {
-            var _ = bay.gameObject; // liveness
+            _ = bay.gameObject; // liveness
             bay.ResetAllSlots();
             return true;
         }
@@ -249,7 +249,7 @@ public static class GregRacks
         if (handle == null) return false;
         try
         {
-            var _ = handle.gameObject; // liveness
+            _ = handle.gameObject; // liveness
             handle.InteractOnClick();
             return true;
         }
@@ -265,7 +265,7 @@ public static class GregRacks
         if (check == null) return false;
         try
         {
-            var _ = check.gameObject; // liveness
+            _ = check.gameObject; // liveness
             check.PerformOverlapCheck();
             return true;
         }
@@ -281,7 +281,7 @@ public static class GregRacks
         if (check == null) return false;
         try
         {
-            var _ = check.gameObject; // liveness
+            _ = check.gameObject; // liveness
             check.SetRenderersEnabled(enabled);
             return true;
         }

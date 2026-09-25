@@ -174,7 +174,7 @@ public static class GregSaveGuard
             }
             _hooksInstalled = true;
             MelonLogger.Msg($"[gregCore][Save] Save hooks installed ({installed}): backup, sidecars, vanilla fallback, inventory.");
-            try { MelonLogger.Msg("[gregCore][Save] BackupRoot: " + (BackupRoot ?? "?")); } catch { }
+            try { MelonLogger.Msg("[gregCore][Save] BackupRoot: " + (BackupRoot ?? "?")); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         catch (Exception ex)
         {
@@ -290,7 +290,7 @@ public static class GregSaveGuard
                     + "angelegt and no Mod-Seitendateien geschrieben (Opt-out).");
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // Prefix at the serialization entry point: ensure a backup exists BEFORE
@@ -327,7 +327,7 @@ public static class GregSaveGuard
             if (string.IsNullOrWhiteSpace(dir) || string.IsNullOrWhiteSpace(name)) return;
             BackupVanillaSave(dir, name);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // Postfix after LoadGame: sanitizes the returned save — the

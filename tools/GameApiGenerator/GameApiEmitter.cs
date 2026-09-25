@@ -11,7 +11,7 @@ static partial class GameApiEmitter
         {
             return SanitizeCore(name, kw);
         }
-        catch { return "_"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "_"; }
     }
 
     // Core sanitizing without outer guard.
@@ -33,14 +33,14 @@ static partial class GameApiEmitter
             if (kw.Contains(s)) s = "@" + s;
             return s;
         }
-        catch { return "_"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "_"; }
     }
 
     // Checks whether a type derives from Unity component bases.
     public static bool IsComponent(TypeDefinition t)
     {
         try { return WalkBases(t.BaseType); }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Walks base types up to a fixed depth.
@@ -58,7 +58,7 @@ static partial class GameApiEmitter
                 if (!TryAdvanceBase(ref b)) return false;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return false;
     }
 
@@ -71,7 +71,7 @@ static partial class GameApiEmitter
             if (n == "UnityEngine.Component") return true;
             return IsBehaviourKind(n);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Matches behaviour and scriptable object bases.
@@ -82,7 +82,7 @@ static partial class GameApiEmitter
             if (n == "UnityEngine.Behaviour") return true;
             return n == "UnityEngine.ScriptableObject";
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Matches hierarchy roots that stop the walk.
@@ -94,7 +94,7 @@ static partial class GameApiEmitter
             if (n == "System.ValueType") return true;
             return n == "System.Enum";
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Advances to the resolved base type.
@@ -107,7 +107,7 @@ static partial class GameApiEmitter
             b = cur.Resolve()?.BaseType;
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Holds per-type naming info.
@@ -123,7 +123,7 @@ static partial class GameApiEmitter
             var isGeneric = t.Name.Contains('`') || t.HasGenericParameters;
             return new TypeNames(ns, shortName, isGeneric, GetArity(t.Name));
         }
-        catch { return new TypeNames("Global", t.Name, false, ""); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return new TypeNames("Global", t.Name, false, ""); }
     }
 
     // Extracts the `N generic arity suffix.
@@ -136,7 +136,7 @@ static partial class GameApiEmitter
             if (a.All(char.IsDigit)) return "_" + a;
             return "";
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     // Classifies the Cecil type kind.
@@ -148,7 +148,7 @@ static partial class GameApiEmitter
             if (t.IsInterface) return "Interface";
             return GetKindCore(t);
         }
-        catch { return "Class"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "Class"; }
     }
 
     // Classifies non-enum, non-interface kinds.
@@ -161,14 +161,14 @@ static partial class GameApiEmitter
             if (IsComponent(t)) return "Component";
             return "Class";
         }
-        catch { return "Class"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "Class"; }
     }
 
     // Checks for a static class shape.
     public static bool IsStaticClass(TypeDefinition t)
     {
         try { return IsStaticShape(t.IsAbstract, t.IsSealed, t.IsEnum, t.IsValueType, t.IsInterface); }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Evaluates static-class flags.
@@ -180,7 +180,7 @@ static partial class GameApiEmitter
             if (!sealed_) return false;
             return IsNonStaticExclusion(isEnum, isValue, isIface);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Excludes enum, struct and interface shapes.
@@ -192,6 +192,6 @@ static partial class GameApiEmitter
             if (isValue) return false;
             return !isIface;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

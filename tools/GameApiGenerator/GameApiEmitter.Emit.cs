@@ -13,7 +13,7 @@ static partial class GameApiEmitter
             registry.Add(line);
             generated++;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds source, writes the file and returns the registry line.
@@ -28,7 +28,7 @@ static partial class GameApiEmitter
             File.WriteAllText(file, sb.ToString());
             return BuildRegistryLine(data, keywords);
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     // Decides whether the type can be referenced directly.
@@ -38,7 +38,7 @@ static partial class GameApiEmitter
         {
             return IsRefableCore(data.Names.IsGeneric, data.Kind, data.Def.Name, data.Def.FullName, ambiguousTypeRefs);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Core referenceability rules.
@@ -51,14 +51,14 @@ static partial class GameApiEmitter
             if (name.StartsWith("_", StringComparison.Ordinal)) return false;
             return !ambiguous.Contains(fullName);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Builds the global:: type reference.
     private static string GetTypeRef(TypeDefinition t)
     {
         try { return "global::" + t.FullName.Replace('/', '.'); }
-        catch { return "global::System.Object"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "global::System.Object"; }
     }
 
     // Resolves the output file path.
@@ -71,7 +71,7 @@ static partial class GameApiEmitter
             Directory.CreateDirectory(dir);
             return Path.Combine(dir, Sanitize(data.Names.ShortName, keywords) + data.Names.Arity + ".g.cs");
         }
-        catch { return Path.Combine(genDir, "Unknown.g.cs"); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Path.Combine(genDir, "Unknown.g.cs"); }
     }
 
     // Builds the full module source.
@@ -90,7 +90,7 @@ static partial class GameApiEmitter
             AppendEnum(sb, data, keywords);
             sb.AppendLine("}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return sb;
     }
 
@@ -112,7 +112,7 @@ static partial class GameApiEmitter
             sb.AppendLine("{");
             AppendHeaderConsts(sb, data);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends GameTypeName constants.
@@ -126,7 +126,7 @@ static partial class GameApiEmitter
             sb.AppendLine($"    public const bool IsSingleton = {(data.SingletonMember != null ? "true" : "false")};");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends the TryGetSingleton helper.
@@ -144,11 +144,11 @@ static partial class GameApiEmitter
             sb.AppendLine("            if (inst == null || inst.Pointer == System.IntPtr.Zero) return null;");
             sb.AppendLine("            return inst;");
             sb.AppendLine("        }");
-            sb.AppendLine("        catch { return null; }");
+            sb.AppendLine("        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }");
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends the TryFindFirst helper for components.
@@ -162,7 +162,7 @@ static partial class GameApiEmitter
             sb.AppendLine($"        GregGameModuleHost.FindFirst<{typeRef}>();");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends Methods and Events constant groups.
@@ -173,9 +173,9 @@ static partial class GameApiEmitter
             if (data.Methods.Count == 0) return;
             AppendMethodNames(sb, data, keywords);
             AppendEventNames(sb, data, keywords);
-            AppendHookHelper(sb, data, canRef, typeRef);
+            AppendHookHelper(sb, canRef, typeRef);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends the Methods constants.
@@ -190,7 +190,7 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends the Events constants.
@@ -205,11 +205,11 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends the Hook helper.
-    private static void AppendHookHelper(System.Text.StringBuilder sb, TypeData data, bool canRef, string typeRef)
+    private static void AppendHookHelper(System.Text.StringBuilder sb, bool canRef, string typeRef)
     {
         try
         {
@@ -218,7 +218,7 @@ static partial class GameApiEmitter
             sb.AppendLine($"        GregGameModuleHost.HookMethod(harmony, typeof({typeRef}), methodName, eventBus, logger);");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends Properties constants.
@@ -239,7 +239,7 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends Fields constants.
@@ -260,7 +260,7 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Appends NestedTypes constants.
@@ -280,7 +280,7 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds a unique nested type identifier.
@@ -295,7 +295,7 @@ static partial class GameApiEmitter
             while (!seen.Add(id)) id = $"{baseId}_{n++}";
             return id;
         }
-        catch { return $"Nested{index}"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return $"Nested{index}"; }
     }
 
     // Appends enum Values constants.
@@ -316,7 +316,7 @@ static partial class GameApiEmitter
             sb.AppendLine("    }");
             sb.AppendLine();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds the registry descriptor line.
@@ -326,7 +326,7 @@ static partial class GameApiEmitter
         {
             return $"        new GameApiModuleDescriptor {{ GameTypeName = \"{data.Def.FullName}\", ModuleTypeName = \"gregCore.GameApi.{data.Names.Ns}.{Sanitize(data.Names.ShortName, keywords) + data.Names.Arity + "Module"}\", Kind = \"{data.Kind}\", IsSingleton = {(data.SingletonMember != null ? "true" : "false")}, IsGeneric = {(data.Names.IsGeneric ? "true" : "false")}, MethodCount = {data.Methods.Count} }},";
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     // NOTE: header/module naming uses caller-provided keywords for short names;
@@ -334,6 +334,6 @@ static partial class GameApiEmitter
     public static string ModuleName(TypeNames names, HashSet<string> keywords)
     {
         try { return Sanitize(names.ShortName, keywords) + names.Arity + "Module"; }
-        catch { return "UnknownModule"; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "UnknownModule"; }
     }
 }

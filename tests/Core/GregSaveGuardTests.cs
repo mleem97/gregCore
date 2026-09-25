@@ -16,8 +16,7 @@ namespace gregCore.Tests.Core;
 
 public class GregSaveGuardTests
 {
-    private static bool ExistsNone(string _) => false;
-
+    
     [Fact]
     public void ResolveBackupRoot_WindowsDocuments_UsesIt()
     {
@@ -33,7 +32,7 @@ public class GregSaveGuardTests
     public void ResolveBackupRoot_LinuxHomeItself_FallsBackToHome()
     {
         // .NET on Linux maps MyDocuments to $HOME (basename != Documents).
-        string root = GregSaveGuard.ResolveBackupRoot("/home/greg", "/home/greg", ExistsNone);
+        string root = GregSaveGuard.ResolveBackupRoot("/home/greg", "/home/greg", static _ => false);
 
         root.Should().Be(Path.Combine("/home/greg", "DatacenterBackups"));
     }
@@ -50,7 +49,7 @@ public class GregSaveGuardTests
     [Fact]
     public void ResolveBackupRoot_EmptyInputs_FallsBackToDot()
     {
-        string root = GregSaveGuard.ResolveBackupRoot(null, null, ExistsNone);
+        string root = GregSaveGuard.ResolveBackupRoot(null, null, static _ => false);
 
         root.Should().Be(Path.Combine(".", "DatacenterBackups"));
     }

@@ -12,7 +12,7 @@ static partial class GameApiEmitter
             if (p != null) return p;
             return FindSingletonField(t);
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     // Searches static properties for a singleton.
@@ -26,10 +26,10 @@ static partial class GameApiEmitter
                 {
                     if (IsSingletonProperty(p, t.FullName)) return p.Name;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return null;
     }
 
@@ -42,7 +42,7 @@ static partial class GameApiEmitter
             if (!(p.Name == "instance" || p.Name == "Instance")) return false;
             return p.PropertyType.FullName == fullName;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Searches static fields for a singleton.
@@ -56,10 +56,10 @@ static partial class GameApiEmitter
                 {
                     if (IsSingletonField(f, t.FullName)) return f.Name;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return null;
     }
 
@@ -72,7 +72,7 @@ static partial class GameApiEmitter
             if (!(f.Name == "instance" || f.Name == "Instance")) return false;
             return f.FieldType.FullName == fullName;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Collects public method names with static flags.
@@ -85,7 +85,7 @@ static partial class GameApiEmitter
             CollectMethodsCore(t, methods);
             methods.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return methods;
     }
 
@@ -102,10 +102,10 @@ static partial class GameApiEmitter
                     if (IsSkippedMethod(m)) continue;
                     if (seen.Add(m.Name)) methods.Add((m.Name, m.IsStatic));
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Filters constructors, special and compiler-generated methods.
@@ -118,7 +118,7 @@ static partial class GameApiEmitter
             if (m.IsSpecialName) return true;
             return m.Name.StartsWith("<", StringComparison.Ordinal);
         }
-        catch { return true; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return true; }
     }
 
     // Collects public property names.
@@ -134,10 +134,10 @@ static partial class GameApiEmitter
                     if (p.Name.StartsWith("<", StringComparison.Ordinal)) continue;
                     if (p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true) props.Add(p.Name);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return props;
     }
 
@@ -156,10 +156,10 @@ static partial class GameApiEmitter
                     if (f.Name.StartsWith("<", StringComparison.Ordinal)) continue;
                     fields.Add(f.Name);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return fields;
     }
 
@@ -172,7 +172,7 @@ static partial class GameApiEmitter
             CollectNestedCore(t, nested);
             nested.Sort(StringComparer.OrdinalIgnoreCase);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return nested;
     }
 
@@ -191,7 +191,7 @@ static partial class GameApiEmitter
                 foreach (var child in def.NestedTypes) stack.Push((child, full));
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Collects enum value names.
@@ -210,10 +210,10 @@ static partial class GameApiEmitter
                     if (f.Name == "value__") continue;
                     vals.Add((f.Name, f.Constant?.ToString() ?? "?"));
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return vals;
     }
 

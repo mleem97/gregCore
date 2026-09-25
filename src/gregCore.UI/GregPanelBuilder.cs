@@ -44,7 +44,12 @@ namespace gregCore.UI
         /// <summary>
         /// Build the panel structure. Call once before adding content.
         /// </summary>
-        public GregPanelBuilder Build(GregUILayerType layer = GregUILayerType.Panel)
+        public GregPanelBuilder Build()
+        {
+            return Build(GregUILayerType.Panel);
+        }
+
+        public GregPanelBuilder Build(GregUILayerType layer)
         {
             if (_isBuilt) return this;
             _isBuilt = true;

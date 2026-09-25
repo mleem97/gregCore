@@ -14,6 +14,7 @@ using gregCore.Infrastructure.Scripting.Lua.Modules;
 
 namespace gregCore.Tests.PublicApi;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S1313:Hardcoded IP addresses should not be used", Justification = "Test fixtures only: RFC1918 documentation address (10.0.0.1) and netmask literal (255.255.255.0) as Lua assert inputs; never bound or connected.")]
 public partial class LuaSdkTests
 {
     private static Script NewScript() => new Script();
@@ -34,7 +35,7 @@ public partial class LuaSdkTests
 
     private static void DeleteTempDir(string dir)
     {
-        try { if (Directory.Exists(dir)) Directory.Delete(dir, true); } catch { }
+        try { if (Directory.Exists(dir)) Directory.Delete(dir, true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static DynValue Call(Table table, string func, params object[] args)

@@ -53,7 +53,7 @@ public class GregModpackManifestTests
             v.Warnings.Should().HaveCountGreaterThanOrEqualTo(3);
             v.LibraryFolders.Should().ContainSingle(d => d.EndsWith("lib"));
         }
-        finally { try { Directory.Delete(Path.GetDirectoryName(mods), true); } catch { } }
+        finally { try { Directory.Delete(Path.GetDirectoryName(mods), true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } }
     }
 
     [Fact]

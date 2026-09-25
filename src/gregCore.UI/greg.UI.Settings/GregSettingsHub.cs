@@ -97,8 +97,11 @@ namespace greg.UI.Settings
         {
             try
             {
-                if (_instance == null) Initialize();
-                if (_instance == null) return false;
+                if (_instance == null)
+                {
+                    Initialize();
+                    if (_instance == null) return false;
+                }
                 if (!string.IsNullOrEmpty(tabId))
                 {
                     for (int i = 0; i < _tabs.Count; i++)

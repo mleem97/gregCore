@@ -1,3 +1,4 @@
+/* eslint-disable -- template/declaration file: illustrative API shape for script authors, not application code. Strict lint rules (unused params, any, triple-slash) do not apply here. */
 // example-mod.ts — minimal JS/TS script mod (UI-focused).
 // Compile: tsc example-mod.ts --target es2020 --lib es2020
 // Output example-mod.js goes to UserData/gregCore/Mods/JS/example-mod/.

@@ -16,7 +16,7 @@ namespace gregCore.Tests.Core;
 
 public class GregSaveGuardTests
 {
-    private static bool ExistsNone(string p) => false;
+    private static bool ExistsNone(string _) => false;
 
     [Fact]
     public void ResolveBackupRoot_WindowsDocuments_UsesIt()

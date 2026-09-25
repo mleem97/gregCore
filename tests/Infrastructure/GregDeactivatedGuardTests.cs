@@ -44,7 +44,7 @@ public class GregDeactivatedGuardTests
         }
         finally
         {
-            try { Directory.Delete(root, true); } catch { }
+            try { Directory.Delete(root, true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 

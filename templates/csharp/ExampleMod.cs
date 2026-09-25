@@ -15,6 +15,7 @@ public sealed class Example : GregMod
         _subscription = On("gregMod.lifecycle.sceneLoaded", OnScene);
     }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Event-callback signature is fixed by the On() subscription API; the template shows the canonical handler shape.")]
     private void OnScene(EventPayload _)
     {
         MainThread.Enqueue(() => Logger.Info("Scene callback handled on the main thread."));

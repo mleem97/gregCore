@@ -120,30 +120,22 @@ public static class GregModDeps
 
     // ── Validation ─────────────────────────────────────────────────────────────
 
-    public static bool EnsureLoaded(Dependency dep, out string detail)
+    public static (bool ok, string detail) EnsureLoaded(Dependency dep)
     {
-        detail = "";
         if (dep == null || string.IsNullOrWhiteSpace(dep.ModId))
-        {
-            detail = "empty dependency";
-            return false;
-        }
+            return (false, "empty dependency");
         if (!IsMelonLoaded(dep.ModId))
         {
-            detail = dep.Required ? "not loaded (required)" : "not loaded (optional)";
-            return !dep.Required;
+            string detail = dep.Required ? "not loaded (required)" : "not loaded (optional)";
+            return (!dep.Required, detail);
         }
         if (!string.IsNullOrWhiteSpace(dep.MinVersion))
         {
             string have = GetMelonVersion(dep.ModId);
             if (!IsVersionAtLeast(have, dep.MinVersion))
-            {
-                detail = $"Version too old (have: '{have}', need: >={dep.MinVersion})";
-                return !dep.Required;
-            }
+                return (!dep.Required, $"Version too old (have: '{have}', need: >={dep.MinVersion})");
         }
-        detail = "ok";
-        return true;
+        return (true, "ok");
     }
 
     public static List<Problem> CheckOwner(string ownerModId)
@@ -161,7 +153,8 @@ public static class GregModDeps
         {
             try
             {
-                if (!EnsureLoaded(dep, out string detail) && dep.Required)
+                var (depOk, detail) = EnsureLoaded(dep);
+                if (!depOk && dep.Required)
                 {
                     problems.Add(new Problem
                     {

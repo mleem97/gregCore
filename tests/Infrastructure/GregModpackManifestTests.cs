@@ -28,7 +28,7 @@ public class GregModpackManifestTests
             var v = GregModpackManifest.TryLoad(mods);
             v.Found.Should().BeFalse();
         }
-        finally { try { Directory.Delete(Path.GetDirectoryName(mods), true); } catch { } }
+        finally { try { Directory.Delete(Path.GetDirectoryName(mods), true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } }
     }
 
     [Fact]

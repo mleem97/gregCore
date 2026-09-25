@@ -146,8 +146,7 @@ public static class LuaModsModule
                     MinVersion = minVer ?? "",
                     Required = required,
                 };
-                string detail;
-                bool ok = gregCore.Core.Mods.GregModDeps.EnsureLoaded(dep, out detail);
+                var (ok, detail) = gregCore.Core.Mods.GregModDeps.EnsureLoaded(dep);
                 return DynValue.NewTuple(
                     DynValue.NewBoolean(ok),
                     DynValue.NewString(detail ?? ""));

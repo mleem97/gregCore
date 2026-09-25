@@ -181,11 +181,11 @@ public partial class LuaSdkTests
 
     private static void RegisterAllBridgeModules(Table greg, Script script, string dir)
     {
-        RegisterBridgeBatchA(greg, script, dir);
+        RegisterBridgeBatchA(greg, script);
         RegisterBridgeBatchB(greg, script, dir);
     }
 
-    private static void RegisterBridgeBatchA(Table greg, Script script, string dir)
+    private static void RegisterBridgeBatchA(Table greg, Script script)
     {
         LuaPlayerModule.Register(greg, script, "test");
         LuaWorldModule.Register(greg, script, "test");

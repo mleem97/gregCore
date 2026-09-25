@@ -43,35 +43,13 @@ public static class GregPatches
         string tag = string.IsNullOrEmpty(logPrefix) ? "GregPatches" : logPrefix;
         try
         {
-            if (harmony == null || targetType == null || patchHolder == null || string.IsNullOrEmpty(methodName))
-            {
-                try { MelonLogger.Warning($"[{tag}] TryPatch: bad arguments for '{methodName}'."); } catch { }
+            if (!ValidPatchArgs(harmony, targetType, patchHolder, methodName, tag))
                 return false;
-            }
 
-            var target = targetType.GetMethod(methodName, AnyInstance | BindingFlags.Static);
-            if (target == null)
-            {
-                try { MelonLogger.Warning($"[{tag}] Could not find {targetType.Name}.{methodName} — skipped."); } catch { }
-                return false;
-            }
+            var target = ResolveTarget(targetType, methodName, tag);
+            if (target == null) return false;
 
-            HarmonyMethod prefix = null;
-            HarmonyMethod postfix = null;
-            try
-            {
-                if (!string.IsNullOrEmpty(prefixName))
-                {
-                    var pm = patchHolder.GetMethod(prefixName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (pm != null) prefix = new HarmonyMethod(pm);
-                }
-                if (!string.IsNullOrEmpty(postfixName))
-                {
-                    var pm = patchHolder.GetMethod(postfixName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (pm != null) postfix = new HarmonyMethod(pm);
-                }
-            }
-            catch { }
+            var (prefix, postfix) = ResolvePatchMethods(patchHolder, prefixName, postfixName);
             if (prefix == null && postfix == null)
             {
                 try { MelonLogger.Warning($"[{tag}] No patch method found in {patchHolder.Name} — skipped."); } catch { }
@@ -87,5 +65,47 @@ public static class GregPatches
             try { MelonLogger.Warning($"[{tag}] Patch failed ({methodName}): {ex.GetBaseException().Message}"); } catch { }
             return false;
         }
+    }
+
+    private static bool ValidPatchArgs(HarmonyLib.Harmony harmony, Type targetType,
+        Type patchHolder, string methodName, string tag)
+    {
+        if (harmony == null || targetType == null || patchHolder == null || string.IsNullOrEmpty(methodName))
+        {
+            try { MelonLogger.Warning($"[{tag}] TryPatch: bad arguments for '{methodName}'."); } catch { }
+            return false;
+        }
+        return true;
+    }
+
+    private static System.Reflection.MethodInfo ResolveTarget(Type targetType, string methodName, string tag)
+    {
+        var target = targetType.GetMethod(methodName, AnyInstance | BindingFlags.Static);
+        if (target == null)
+        {
+            try { MelonLogger.Warning($"[{tag}] Could not find {targetType.Name}.{methodName} — skipped."); } catch { }
+        }
+        return target;
+    }
+
+    private static (HarmonyMethod prefix, HarmonyMethod postfix) ResolvePatchMethods(
+        Type patchHolder, string prefixName, string postfixName)
+    {
+        HarmonyMethod prefix = null;
+        HarmonyMethod postfix = null;
+        try
+        {
+            prefix = FindPatchMethod(patchHolder, prefixName);
+            postfix = FindPatchMethod(patchHolder, postfixName);
+        }
+        catch { }
+        return (prefix, postfix);
+    }
+
+    private static HarmonyMethod FindPatchMethod(Type patchHolder, string name)
+    {
+        if (string.IsNullOrEmpty(name)) return null;
+        var pm = patchHolder.GetMethod(name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        return pm != null ? new HarmonyMethod(pm) : null;
     }
 }

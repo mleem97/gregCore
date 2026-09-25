@@ -40,62 +40,79 @@ public static class IncompatibleModGuard
             {
                 try
                 {
-                    if (melon == null) continue;
-                    string modName = "";
-                    try { modName = melon.Info?.Name ?? ""; } catch { continue; }
-                    string asmName = "";
-                    try { asmName = melon.GetType()?.Assembly?.GetName()?.Name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    if (string.IsNullOrEmpty(modName) && string.IsNullOrEmpty(asmName)) continue;
-
-                    // Never touch own assembly (self-protection).
-                    if (string.Equals(asmName, "gregCore", StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    string hay = (modName + " " + asmName).ToLowerInvariant();
-                    bool hit = false;
-                    foreach (var m in Markers)
-                    {
-                        if (hay.Contains(m)) { hit = true; break; }
-                    }
-                    if (!hit) continue;
-
-                    string key = string.IsNullOrEmpty(asmName) ? modName : asmName;
-                    if (!_handled.Add(key)) continue; // already handled
-
-                    string version = "";
-                    try { version = melon.Info?.Version ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    try
-                    {
-                        var harmony = melon.HarmonyInstance;
-                        if (harmony != null)
-                        {
-                            harmony.UnpatchSelf();
-                            anyDisabled = true;
-                            MelonLogger.Warning($"[gregCore][HwId] Disabled incompatible ID mod " +
-                                $"'{modName}' v{version} (gregID only).");
-                            try
-                            {
-                                gregCore.UI.GregNotificationManager.Show(
-                                    $"'{modName}' disabled — gregID active.",
-                                    gregCore.UI.GregNotificationManager.GregToastType.Warning, 6f);
-                            }
-                            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                        }
-                        else
-                        {
-                            MelonLogger.Msg($"[gregCore][HwId] '{modName}': no Harmony instance, skipped.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MelonLogger.Warning($"[gregCore][HwId] Unpatch failed '{modName}': " +
-                            $"{ex.GetBaseException().Message}");
-                    }
+                    if (TryDisableOne(melon)) anyDisabled = true;
                 }
                 catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return anyDisabled;
+    }
+
+    private static bool TryDisableOne(MelonBase melon)
+    {
+        if (melon == null) return false;
+        string modName = "";
+        try { modName = melon.Info?.Name ?? ""; } catch { return false; }
+        string asmName = "";
+        try { asmName = melon.GetType()?.Assembly?.GetName()?.Name ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        if (string.IsNullOrEmpty(modName) && string.IsNullOrEmpty(asmName)) return false;
+
+        // Never touch own assembly (self-protection).
+        if (string.Equals(asmName, "gregCore", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        string hay = (modName + " " + asmName).ToLowerInvariant();
+        if (!MatchesMarker(hay)) return false;
+
+        string key = string.IsNullOrEmpty(asmName) ? modName : asmName;
+        if (!_handled.Add(key)) return false; // already handled
+        return UnpatchOne(melon, modName);
+    }
+
+    private static bool MatchesMarker(string hay)
+    {
+        foreach (var m in Markers)
+        {
+            if (hay.Contains(m)) return true;
+        }
+        return false;
+    }
+
+    private static bool UnpatchOne(MelonBase melon, string modName)
+    {
+        string version = "";
+        try { version = melon.Info?.Version ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try
+        {
+            var harmony = melon.HarmonyInstance;
+            if (harmony == null)
+            {
+                MelonLogger.Msg($"[gregCore][HwId] '{modName}': no Harmony instance, skipped.");
+                return false;
+            }
+            harmony.UnpatchSelf();
+            MelonLogger.Warning($"[gregCore][HwId] Disabled incompatible ID mod " +
+                $"'{modName}' v{version} (gregID only).");
+            NotifyDisabled(modName);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Warning($"[gregCore][HwId] Unpatch failed '{modName}': " +
+                $"{ex.GetBaseException().Message}");
+            return false;
+        }
+    }
+
+    private static void NotifyDisabled(string modName)
+    {
+        try
+        {
+            gregCore.UI.GregNotificationManager.Show(
+                $"'{modName}' disabled — gregID active.",
+                gregCore.UI.GregNotificationManager.GregToastType.Warning, 6f);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

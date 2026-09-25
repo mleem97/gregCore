@@ -95,17 +95,20 @@ public sealed class GregJsHost : IGregLanguageHost
         List<ModRuntime> snapshot;
         lock (_mods) { snapshot = _mods.ToList(); }
         foreach (var mod in snapshot)
-        {
-            if (mod?.Engine == null || !mod.SceneValid) continue;
-            try
-            {
-                var fn = mod.SceneFn;
-                if (fn == null || fn.IsNull() || fn.IsUndefined()) continue;
-                fn.Call(JsValue.Undefined, new[] { JsValue.FromObject(mod.Engine, sceneName ?? "") });
-            }
-            catch { mod.SceneValid = false; }
-        }
+            DispatchScene(mod, sceneName);
         try { if (IsMainMenu()) TryReloadNow(); } catch { }
+    }
+
+    private static void DispatchScene(ModRuntime mod, string sceneName)
+    {
+        if (mod?.Engine == null || !mod.SceneValid) return;
+        try
+        {
+            var fn = mod.SceneFn;
+            if (fn == null || fn.IsNull() || fn.IsUndefined()) return;
+            fn.Call(JsValue.Undefined, new[] { JsValue.FromObject(mod.Engine, sceneName ?? "") });
+        }
+        catch { mod.SceneValid = false; }
     }
 
     public void Shutdown()
@@ -298,10 +301,23 @@ public sealed class GregJsHost : IGregLanguageHost
     private static void RegisterApi(Engine engine, string modId)
     {
         var api = new Dictionary<string, object>();
+        RegisterLogApi(api, modId);
+        RegisterNotifyApi(api, engine, modId);
+        RegisterMenuApi(api, engine, modId);
+        RegisterSettingsApi(api, engine, modId);
+        RegisterHookApi(api, engine);
+        engine.SetValue("greg", api);
+    }
+
+    private static void RegisterLogApi(Dictionary<string, object> api, string modId)
+    {
         api["log"] = (Action<string>)(msg => SafeLog($"[{modId}] {msg}"));
         api["warn"] = (Action<string>)(msg => SafeWarn($"[{modId}] {msg}"));
         api["error"] = (Action<string>)(msg => SafeError($"[{modId}] {msg}"));
+    }
 
+    private static void RegisterNotifyApi(Dictionary<string, object> api, Engine engine, string modId)
+    {
         api["toast"] = (Action<string, double>)((msg, dur) =>
         {
             try { gregCore.UI.GregNotificationManager.Show(msg ?? "", (float)dur); } catch { }
@@ -319,7 +335,10 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             catch { }
         });
+    }
 
+    private static void RegisterMenuApi(Dictionary<string, object> api, Engine engine, string modId)
+    {
         api["createPanel"] = (Func<string, object>)(title =>
         {
             try { return gregCore.UI.GregPanelBuilder.Create(title ?? modId).Build(); }
@@ -339,7 +358,10 @@ public sealed class GregJsHost : IGregLanguageHost
         {
             try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { }
         });
+    }
 
+    private static void RegisterSettingsApi(Dictionary<string, object> api, Engine engine, string modId)
+    {
         api["registerToggle"] = (Action<string, string, bool>)((settingId, label, def) =>
         {
             try { gregCore.Core.GregCoreMod.PublicAPI?.RegisterToggle(modId, settingId, label, def); } catch { }
@@ -357,7 +379,10 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             catch { }
         });
+    }
 
+    private static void RegisterHookApi(Dictionary<string, object> api, Engine engine)
+    {
         api["on"] = (Action<string, JsValue>)((hookName, fn) =>
         {
             try
@@ -372,7 +397,6 @@ public sealed class GregJsHost : IGregLanguageHost
             }
             catch { }
         });
-        engine.SetValue("greg", api);
     }
 
     private static Action ToAction(Engine engine, JsValue fn)

@@ -403,25 +403,38 @@ public static class GregSaveGuard
             + " SFP modules, vanillaCount=" + vanillaCount + " (cached=" + _lastKnownVanillaCount
             + "), mod maps=" + _vanillaMaps.Count + ".");
 
+        int sanitized = SanitizeModules(modules, vanillaCount, phase);
+        if (sanitized > 0)
+            MelonLogger.Warning($"[gregCore][Save] {phase}: {sanitized} modded SFP modules downgraded to vanilla modules.");
+    }
+
+    private static int SanitizeModules(Il2CppSystem.Collections.Generic.List<global::Il2Cpp.SFPSaveData> modules,
+        int vanillaCount, string phase)
+    {
         int sanitized = 0;
         for (int i = 0; i < modules.Count; i++)
         {
-            global::Il2Cpp.SFPSaveData sfd = null;
-            try { sfd = modules[i]; } catch { continue; }
-            if (sfd == null) continue;
-            int id;
-            try { id = sfd.prefabID; } catch { continue; }
-            if (id < 0) continue;
-            if (vanillaCount > 0 && id < vanillaCount) continue; // valid vanilla ID
-
-            int target = ResolveVanillaTarget(id, vanillaCount);
-            if (target < 0 || target == id) continue;
-            try { sfd.prefabID = target; } catch { continue; }
-            sanitized++;
-            MelonLogger.Warning($"[gregCore][Save] SFP module #{i}: prefabID {id} -> {target} ({phase}, vanilla fallback).");
+            if (TrySanitizeModule(modules, i, vanillaCount, phase)) sanitized++;
         }
-        if (sanitized > 0)
-            MelonLogger.Warning($"[gregCore][Save] {phase}: {sanitized} modded SFP modules downgraded to vanilla modules.");
+        return sanitized;
+    }
+
+    private static bool TrySanitizeModule(Il2CppSystem.Collections.Generic.List<global::Il2Cpp.SFPSaveData> modules,
+        int index, int vanillaCount, string phase)
+    {
+        global::Il2Cpp.SFPSaveData sfd = null;
+        try { sfd = modules[index]; } catch { return false; }
+        if (sfd == null) return false;
+        int id;
+        try { id = sfd.prefabID; } catch { return false; }
+        if (id < 0) return false;
+        if (vanillaCount > 0 && id < vanillaCount) return false; // valid vanilla ID
+
+        int target = ResolveVanillaTarget(id, vanillaCount);
+        if (target < 0 || target == id) return false;
+        try { sfd.prefabID = target; } catch { return false; }
+        MelonLogger.Warning($"[gregCore][Save] SFP module #{index}: prefabID {id} -> {target} ({phase}, vanilla fallback).");
+        return true;
     }
 
     private static int CurrentVanillaModuleCount()

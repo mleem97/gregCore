@@ -339,109 +339,126 @@ public static class GregNetworkIdHealing
             // Heals every ID without gregID prefix (empty excluded — the
             // Start patch assigns those). Endpoints follow. Per-entry
             // null-guards: one bad entry never aborts the whole healing.
-            if (data.switches != null)
-            {
-                foreach (var swData in data.switches)
-                {
-                    try
-                    {
-                        if (swData == null) continue;
-                        string oldId = swData.switchID;
-                        if (string.IsNullOrEmpty(oldId)
-                            || HardwareIdPersistencePatch.HasPrefix(SwitchPrefix, oldId))
-                            continue;
-                        // Stable derivation (not random): matches the live-side
-                        // ID for the same legacy device, so save endpoints and
-                        // live objects correlate regardless of how vanilla
-                        // binds save entries to live objects.
-                        string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(SwitchPrefix, oldId);
-                        swData.switchID = newGuid;
-                        int healedCables = 0;
-                        if (data.cables != null)
-                        {
-                            foreach (var cable in data.cables)
-                            {
-                                if (cable == null) continue;
-                                if (cable.startPoint != null && cable.startPoint.switchID == oldId) { cable.startPoint.switchID = newGuid; healedCables++; }
-                                if (cable.endPoint != null && cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
-                            }
-                        }
-                        MelonLogger.Msg($"[gregCore][HwId] Remap Switch {oldId} -> {newGuid} ({healedCables} cables)");
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-            }
+            HealSwitches(data);
 
-            if (data.patchPanels != null)
-            {
-                foreach (var ppData in data.patchPanels)
-                {
-                    try
-                    {
-                        if (ppData == null) continue;
-                        string oldId = ppData.patchPanelID;
-                        if (string.IsNullOrEmpty(oldId)
-                            || HardwareIdPersistencePatch.HasPrefix(PatchPanelPrefix, oldId))
-                            continue;
-                        string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(PatchPanelPrefix, oldId);
-                        ppData.patchPanelID = newGuid;
-                        int healedCables = 0;
-                        if (data.cables != null)
-                        {
-                            foreach (var cable in data.cables)
-                            {
-                                if (cable == null) continue;
-                                if (cable.startPoint != null && cable.startPoint.switchID != null && cable.startPoint.switchID.StartsWith(oldId))
-                                {
-                                    cable.startPoint.switchID = cable.startPoint.switchID.Replace(oldId, newGuid);
-                                    healedCables++;
-                                }
-                                if (cable.endPoint != null && cable.endPoint.switchID != null && cable.endPoint.switchID.StartsWith(oldId))
-                                {
-                                    cable.endPoint.switchID = cable.endPoint.switchID.Replace(oldId, newGuid);
-                                    healedCables++;
-                                }
-                            }
-                        }
-                        MelonLogger.Msg($"[gregCore][HwId] Remap PatchPanel {oldId} -> {newGuid} ({healedCables} cables)");
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-            }
+            HealPatchPanels(data);
 
-            if (data.servers != null)
-            {
-                foreach (var serverData in data.servers)
-                {
-                    try
-                    {
-                        if (serverData == null) continue;
-                        string oldId = serverData.serverID;
-                        if (string.IsNullOrEmpty(oldId)
-                            || HardwareIdPersistencePatch.HasPrefix(ServerPrefix, oldId))
-                            continue;
-                        string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(ServerPrefix, oldId);
-                        serverData.serverID = newGuid;
-                        int healedCables = 0;
-                        if (data.cables != null)
-                        {
-                            foreach (var cable in data.cables)
-                            {
-                                if (cable == null) continue;
-                                if (cable.startPoint != null && cable.startPoint.serverID == oldId) { cable.startPoint.serverID = newGuid; healedCables++; }
-                                if (cable.endPoint != null && cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
-                            }
-                        }
-                        MelonLogger.Msg($"[gregCore][HwId] Remap Server {oldId} -> {newGuid} ({healedCables} cables)");
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-            }
+            HealServers(data);
         }
         catch (Exception ex)
         {
             HookIntegration.LogPatchError(nameof(GregNetworkIdHealing), ex);
         }
+    }
+
+    private static void HealSwitches(global::Il2Cpp.NetworkSaveData data)
+    {
+        if (data.switches == null) return;
+        foreach (var swData in data.switches)
+        {
+            try
+            {
+                if (swData == null) continue;
+                string oldId = swData.switchID;
+                if (string.IsNullOrEmpty(oldId)
+                    || HardwareIdPersistencePatch.HasPrefix(SwitchPrefix, oldId))
+                    continue;
+                string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(SwitchPrefix, oldId);
+                swData.switchID = newGuid;
+                int healed = HealSwitchEndpoints(data, oldId, newGuid);
+                MelonLogger.Msg($"[gregCore][HwId] Remap Switch {oldId} -> {newGuid} ({healed} cables)");
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+    }
+
+    private static int HealSwitchEndpoints(global::Il2Cpp.NetworkSaveData data, string oldId, string newGuid)
+    {
+        int healedCables = 0;
+        if (data.cables == null) return healedCables;
+        foreach (var cable in data.cables)
+        {
+            if (cable == null) continue;
+            if (cable.startPoint != null && cable.startPoint.switchID == oldId) { cable.startPoint.switchID = newGuid; healedCables++; }
+            if (cable.endPoint != null && cable.endPoint.switchID == oldId) { cable.endPoint.switchID = newGuid; healedCables++; }
+        }
+        return healedCables;
+    }
+
+    private static void HealPatchPanels(global::Il2Cpp.NetworkSaveData data)
+    {
+        if (data.patchPanels == null) return;
+        foreach (var ppData in data.patchPanels)
+        {
+            try
+            {
+                if (ppData == null) continue;
+                string oldId = ppData.patchPanelID;
+                if (string.IsNullOrEmpty(oldId)
+                    || HardwareIdPersistencePatch.HasPrefix(PatchPanelPrefix, oldId))
+                    continue;
+                string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(PatchPanelPrefix, oldId);
+                ppData.patchPanelID = newGuid;
+                int healed = HealPatchPanelEndpoints(data, oldId, newGuid);
+                MelonLogger.Msg($"[gregCore][HwId] Remap PatchPanel {oldId} -> {newGuid} ({healed} cables)");
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+    }
+
+    private static int HealPatchPanelEndpoints(global::Il2Cpp.NetworkSaveData data, string oldId, string newGuid)
+    {
+        int healedCables = 0;
+        if (data.cables == null) return healedCables;
+        foreach (var cable in data.cables)
+        {
+            if (cable == null) continue;
+            if (cable.startPoint != null && cable.startPoint.switchID != null && cable.startPoint.switchID.StartsWith(oldId))
+            {
+                cable.startPoint.switchID = cable.startPoint.switchID.Replace(oldId, newGuid);
+                healedCables++;
+            }
+            if (cable.endPoint != null && cable.endPoint.switchID != null && cable.endPoint.switchID.StartsWith(oldId))
+            {
+                cable.endPoint.switchID = cable.endPoint.switchID.Replace(oldId, newGuid);
+                healedCables++;
+            }
+        }
+        return healedCables;
+    }
+
+    private static void HealServers(global::Il2Cpp.NetworkSaveData data)
+    {
+        if (data.servers == null) return;
+        foreach (var serverData in data.servers)
+        {
+            try
+            {
+                if (serverData == null) continue;
+                string oldId = serverData.serverID;
+                if (string.IsNullOrEmpty(oldId)
+                    || HardwareIdPersistencePatch.HasPrefix(ServerPrefix, oldId))
+                    continue;
+                string newGuid = HardwareIdPersistencePatch.GenerateStableGregId(ServerPrefix, oldId);
+                serverData.serverID = newGuid;
+                int healed = HealServerEndpoints(data, oldId, newGuid);
+                MelonLogger.Msg($"[gregCore][HwId] Remap Server {oldId} -> {newGuid} ({healed} cables)");
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+    }
+
+    private static int HealServerEndpoints(global::Il2Cpp.NetworkSaveData data, string oldId, string newGuid)
+    {
+        int healedCables = 0;
+        if (data.cables == null) return healedCables;
+        foreach (var cable in data.cables)
+        {
+            if (cable == null) continue;
+            if (cable.startPoint != null && cable.startPoint.serverID == oldId) { cable.startPoint.serverID = newGuid; healedCables++; }
+            if (cable.endPoint != null && cable.endPoint.serverID == oldId) { cable.endPoint.serverID = newGuid; healedCables++; }
+        }
+        return healedCables;
     }
 
     [HarmonyPostfix]

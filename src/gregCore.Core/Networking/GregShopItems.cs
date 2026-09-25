@@ -121,6 +121,20 @@ public static class GregShopItems
 
     // ── Button dedup + creation ──────────────────────────────────────────────
 
+    /// <summary>Parameter object for <see cref="AddButton(ShopButtonSpec)"/>.</summary>
+    public sealed class ShopButtonSpec
+    {
+        public global::Il2Cpp.ShopItem Template;
+        public GameObject Parent;
+        public int ItemId;
+        public string Label;
+        public int Price;
+        public int XpToUnlock;
+        public string Guid;
+        public bool IsCustomColor;
+        public Sprite Sprite;
+    }
+
     public static bool ButtonExists(GameObject parent, string guid)
     {
         try
@@ -130,67 +144,101 @@ public static class GregShopItems
             if (tr == null) return false;
             for (int i = 0; i < tr.childCount; i++)
             {
-                GameObject child = null;
-                try { child = tr.GetChild(i)?.gameObject; } catch { continue; }
-                if (child == null) continue;
-                global::Il2Cpp.ShopItem si = null;
-                try { si = child.GetComponent<global::Il2Cpp.ShopItem>(); } catch { continue; }
-                if (si == null) continue;
-                string g = null;
-                try { g = si.guid; } catch { continue; }
-                if (string.Equals(g, guid, StringComparison.Ordinal)) return true;
+                if (ChildHasGuid(tr, i, guid)) return true;
             }
         }
         catch { }
         return false;
     }
 
+    private static bool ChildHasGuid(Transform tr, int index, string guid)
+    {
+        GameObject child = null;
+        try { child = tr.GetChild(index)?.gameObject; } catch { return false; }
+        if (child == null) return false;
+        global::Il2Cpp.ShopItem si = null;
+        try { si = child.GetComponent<global::Il2Cpp.ShopItem>(); } catch { return false; }
+        if (si == null) return false;
+        string g = null;
+        try { g = si.guid; } catch { return false; }
+        return string.Equals(g, guid, StringComparison.Ordinal);
+    }
+
     public static global::Il2Cpp.ShopItem AddButton(global::Il2Cpp.ShopItem template, GameObject parent,
         int itemId, string label, int price, int xpToUnlock, string guid, bool isCustomColor, Sprite sprite)
     {
+        return AddButton(new ShopButtonSpec
+        {
+            Template = template, Parent = parent, ItemId = itemId, Label = label,
+            Price = price, XpToUnlock = xpToUnlock, Guid = guid,
+            IsCustomColor = isCustomColor, Sprite = sprite
+        });
+    }
+
+    public static global::Il2Cpp.ShopItem AddButton(ShopButtonSpec spec)
+    {
         try
         {
-            if (template == null || parent == null || template.shopItemSO == null) return null;
-            if (string.IsNullOrEmpty(label) || string.IsNullOrEmpty(guid)) return null;
-            if (ButtonExists(parent, guid)) return null;
+            if (spec == null || spec.Template == null || spec.Parent == null
+                || spec.Template.shopItemSO == null) return null;
+            if (string.IsNullOrEmpty(spec.Label) || string.IsNullOrEmpty(spec.Guid)) return null;
+            if (ButtonExists(spec.Parent, spec.Guid)) return null;
 
-            var src = template.shopItemSO;
-            var so = ScriptableObject.CreateInstance<global::Il2Cpp.ShopItemSO>();
+            var so = BuildButtonSO(spec);
             if (so == null) return null;
-            Try(() => so.itemName = label);
-            Try(() => so.price = price);
-            Try(() => so.xpToUnlock = xpToUnlock);
-            Try(() => so.itemType = src.itemType);
-            Try(() => so.itemID = itemId);
-            Try(() => so.eol = src.eol);
-            Try(() => so.sprite = sprite != null ? sprite : src.sprite);
-            Try(() => so.isCustomColor = isCustomColor);
-
-            GameObject cloned = null;
-            try { cloned = UnityEngine.Object.Instantiate(template.gameObject, parent.transform, false); }
-            catch { return null; }
+            var cloned = CloneButton(spec);
             if (cloned == null) return null;
-            Try(() => cloned.name = "ShopItem_" + label.Replace(" ", "_").Replace("(", "").Replace(")", ""));
-            Try(() => cloned.transform.localPosition = Vector3.zero);
-            Try(() => cloned.transform.localScale = Vector3.one);
-
-            global::Il2Cpp.ShopItem item = null;
-            try { item = cloned.GetComponent<global::Il2Cpp.ShopItem>(); } catch { }
-            if (item == null)
-            {
-                try { UnityEngine.Object.Destroy(cloned); } catch { }
-                return null;
-            }
-            Try(() => item.shopItemSO = so);
-            Try(() => item.guid = guid);
-            Try(() => cloned.SetActive(true));
-            return item;
+            return AttachButtonSO(cloned, so, spec);
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning($"[gregCore][Shop] AddButton failed ('{label}'): {ex.Message}");
+            MelonLogger.Warning($"[gregCore][Shop] AddButton failed ('{spec?.Label}'): {ex.Message}");
             return null;
         }
+    }
+
+    private static global::Il2Cpp.ShopItemSO BuildButtonSO(ShopButtonSpec spec)
+    {
+        var src = spec.Template.shopItemSO;
+        var so = ScriptableObject.CreateInstance<global::Il2Cpp.ShopItemSO>();
+        if (so == null) return null;
+        Try(() => so.itemName = spec.Label);
+        Try(() => so.price = spec.Price);
+        Try(() => so.xpToUnlock = spec.XpToUnlock);
+        Try(() => so.itemType = src.itemType);
+        Try(() => so.itemID = spec.ItemId);
+        Try(() => so.eol = src.eol);
+        Try(() => so.sprite = spec.Sprite != null ? spec.Sprite : src.sprite);
+        Try(() => so.isCustomColor = spec.IsCustomColor);
+        return so;
+    }
+
+    private static GameObject CloneButton(ShopButtonSpec spec)
+    {
+        GameObject cloned = null;
+        try { cloned = UnityEngine.Object.Instantiate(spec.Template.gameObject, spec.Parent.transform, false); }
+        catch { return null; }
+        if (cloned == null) return null;
+        Try(() => cloned.name = "ShopItem_" + spec.Label.Replace(" ", "_").Replace("(", "").Replace(")", ""));
+        Try(() => cloned.transform.localPosition = Vector3.zero);
+        Try(() => cloned.transform.localScale = Vector3.one);
+        return cloned;
+    }
+
+    private static global::Il2Cpp.ShopItem AttachButtonSO(GameObject cloned,
+        global::Il2Cpp.ShopItemSO so, ShopButtonSpec spec)
+    {
+        global::Il2Cpp.ShopItem item = null;
+        try { item = cloned.GetComponent<global::Il2Cpp.ShopItem>(); } catch { }
+        if (item == null)
+        {
+            try { UnityEngine.Object.Destroy(cloned); } catch { }
+            return null;
+        }
+        Try(() => item.shopItemSO = so);
+        Try(() => item.guid = spec.Guid);
+        Try(() => cloned.SetActive(true));
+        return item;
     }
 
     private static void Try(Action action)

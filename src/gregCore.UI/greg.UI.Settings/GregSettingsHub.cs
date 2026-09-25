@@ -59,26 +59,36 @@ namespace greg.UI.Settings
             try
             {
                 if (_tabs == null || _tabs.Count == 0) return null;
-                foreach (var tab in _tabs)
-                {
-                    if (tab == null || string.IsNullOrEmpty(tab.Id)) continue;
-                    if (!string.IsNullOrEmpty(menuId)
-                        && (string.Equals(tab.Id, menuId, StringComparison.OrdinalIgnoreCase)
-                            || tab.Id.StartsWith(menuId + ".", StringComparison.OrdinalIgnoreCase)))
-                        return tab.Id;
-                }
-
-                if (!string.IsNullOrEmpty(modName))
-                {
-                    foreach (var tab in _tabs)
-                    {
-                        if (tab == null) continue;
-                        if (string.Equals(tab.Label, modName, StringComparison.OrdinalIgnoreCase))
-                            return tab.Id;
-                    }
-                }
+                var byMenu = FindTabByMenuId(menuId);
+                if (byMenu != null) return byMenu;
+                return FindTabByLabel(modName);
             }
             catch { }
+            return null;
+        }
+
+        private static string FindTabByMenuId(string menuId)
+        {
+            if (string.IsNullOrEmpty(menuId)) return null;
+            foreach (var tab in _tabs)
+            {
+                if (tab == null || string.IsNullOrEmpty(tab.Id)) continue;
+                if (string.Equals(tab.Id, menuId, StringComparison.OrdinalIgnoreCase)
+                    || tab.Id.StartsWith(menuId + ".", StringComparison.OrdinalIgnoreCase))
+                    return tab.Id;
+            }
+            return null;
+        }
+
+        private static string FindTabByLabel(string modName)
+        {
+            if (string.IsNullOrEmpty(modName)) return null;
+            foreach (var tab in _tabs)
+            {
+                if (tab == null) continue;
+                if (string.Equals(tab.Label, modName, StringComparison.OrdinalIgnoreCase))
+                    return tab.Id;
+            }
             return null;
         }
 

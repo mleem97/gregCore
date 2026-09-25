@@ -194,53 +194,79 @@ public sealed class GregCSharpScriptBridge
             string[] csFiles = global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateFilesByExtension(modDir, ".cs", SearchOption.TopDirectoryOnly).ToArray();
             if (csFiles.Length == 0) return;
 
-            Assembly assembly = GregCSharpCompiler.Compile(modId, csFiles);
+            Assembly assembly = CompileMod(modDir, modId, csFiles);
             if (assembly == null) return;
 
-            var modType = assembly.GetTypes()
-                .FirstOrDefault(t => typeof(IGregCSharpMod).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-            if (modType == null)
-            {
-                MelonLogger.Warning("[CSharpScriptBridge] Mod has no class implementing IGregCSharpMod: " + modId);
-                return;
-            }
+            Type modType = ResolveModType(assembly, modId);
+            if (modType == null) return;
 
-            var instance = (IGregCSharpMod)Activator.CreateInstance(modType);
-            if (instance == null)
-            {
-                MelonLogger.Warning("[CSharpScriptBridge] Failed to instantiate mod: " + modId);
-                return;
-            }
+            var instance = InstantiateMod(modType, modId);
+            if (instance == null) return;
 
-            var context = new GregCSharpModContext
-            {
-                Id = instance.ModId,
-                Directory = modDir,
-                Assembly = assembly,
-                Instance = instance
-            };
-
-            context.SafeCall(() => context.Instance.OnInit(), "OnInit");
-            context.Initialized = true;
-            lock (_mods) { _mods.Add(context); }
-
-            MelonLogger.Msg("[CSharpScriptBridge] Loaded mod: " + instance.ModName + " v" + instance.Version);
+            RegisterMod(modDir, assembly, instance);
         }
         catch (ReflectionTypeLoadException ex)
         {
-            MelonLogger.Error("[CSharpScriptBridge] Type load error in mod '" + modId + "': " + ex.Message);
-            if (ex.LoaderExceptions != null)
-            {
-                foreach (var le in ex.LoaderExceptions.Take(3))
-                {
-                    if (le != null)
-                        MelonLogger.Error("    -> " + le.Message);
-                }
-            }
+            LogLoaderExceptions(modId, ex);
         }
         catch (Exception ex)
         {
             MelonLogger.Error("[CSharpScriptBridge] Failed to load mod '" + modId + "': " + ex.Message);
+        }
+    }
+
+    private static Assembly CompileMod(string modDir, string modId, string[] csFiles)
+    {
+        try { return GregCSharpCompiler.Compile(modId, csFiles); }
+        catch
+        {
+            MelonLogger.Error("[CSharpScriptBridge] Compile failed for mod '" + modId + "' in " + modDir);
+            return null;
+        }
+    }
+
+    private static Type ResolveModType(Assembly assembly, string modId)
+    {
+        var modType = assembly.GetTypes()
+            .FirstOrDefault(t => typeof(IGregCSharpMod).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+        if (modType == null)
+            MelonLogger.Warning("[CSharpScriptBridge] Mod has no class implementing IGregCSharpMod: " + modId);
+        return modType;
+    }
+
+    private static IGregCSharpMod InstantiateMod(Type modType, string modId)
+    {
+        var instance = (IGregCSharpMod)Activator.CreateInstance(modType);
+        if (instance == null)
+            MelonLogger.Warning("[CSharpScriptBridge] Failed to instantiate mod: " + modId);
+        return instance;
+    }
+
+    private static void RegisterMod(string modDir, Assembly assembly, IGregCSharpMod instance)
+    {
+        var context = new GregCSharpModContext
+        {
+            Id = instance.ModId,
+            Directory = modDir,
+            Assembly = assembly,
+            Instance = instance
+        };
+
+        context.SafeCall(() => context.Instance.OnInit(), "OnInit");
+        context.Initialized = true;
+        lock (_mods) { _mods.Add(context); }
+
+        MelonLogger.Msg("[CSharpScriptBridge] Loaded mod: " + instance.ModName + " v" + instance.Version);
+    }
+
+    private static void LogLoaderExceptions(string modId, ReflectionTypeLoadException ex)
+    {
+        MelonLogger.Error("[CSharpScriptBridge] Type load error in mod '" + modId + "': " + ex.Message);
+        if (ex.LoaderExceptions == null) return;
+        foreach (var le in ex.LoaderExceptions.Take(3))
+        {
+            if (le != null)
+                MelonLogger.Error("    -> " + le.Message);
         }
     }
 

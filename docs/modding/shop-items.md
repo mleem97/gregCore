@@ -162,6 +162,8 @@ var template = gregCore.Core.Networking.GregShopItems.FindTemplate(shop, itemTyp
 var parent = gregCore.Core.Networking.GregShopItems.FindSection(shop, "HL Mods");
 gregCore.Core.Networking.GregShopItems.AddButton(template, parent,
     itemId, label, price, xp, guid, isCustomColor, sprite); // skips existing guid
+// 9 params too many? Use the ShopButtonSpec overload instead:
+// AddButton(new ShopButtonSpec { Template = template, Parent = parent, ... })
 ```
 
 Rules: prefab results must be inactive holder children (never live scene

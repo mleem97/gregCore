@@ -178,7 +178,7 @@ public class LuaCoroutineScheduler
             if (tuple[1].Type != DataType.Number) return;
             co.WaitRemaining = (float)tuple[1].Number;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void RegisterTimer(double seconds, Closure callback, bool repeating)

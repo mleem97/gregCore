@@ -86,7 +86,7 @@ public static class LuaNetModule
                         var t = new Table(script);
                         string cluster = "";
                         int rules = 0;
-                        try { cluster = f.clusterIP ?? ""; } catch { }
+                        try { cluster = f.clusterIP ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         try { rules = f.filterRules != null ? f.filterRules.Count : 0; } catch { }
                         t["cluster_ip"] = cluster;
                         t["rules"] = rules;
@@ -125,7 +125,7 @@ public static class LuaNetModule
                         int prefab = -1;
                         bool inserted = false;
                         try { prefab = s.prefabID; } catch { }
-                        try { inserted = s.isInserted; } catch { }
+                        try { inserted = s.isInserted; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["prefab"] = prefab;
                         t["inserted"] = inserted;
                         try

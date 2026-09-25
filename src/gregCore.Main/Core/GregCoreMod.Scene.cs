@@ -8,6 +8,7 @@ using gregCore.Infrastructure.Plugins;
 
 namespace gregCore.Core;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1118:Utility classes should not have public constructors", Justification = "Partial declaration holding only scene helpers; the class extends MelonMod and is instantiated by MelonLoader (instance members live in GregCoreMod.cs).")]
 public sealed partial class GregCoreMod
 {
     // Runs best-effort guards once the scene is stable.

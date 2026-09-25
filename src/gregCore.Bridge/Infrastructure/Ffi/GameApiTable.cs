@@ -13,6 +13,7 @@ namespace gregCore.Infrastructure.Ffi;
 // RULE 3: Removed fields are ONLY marked as [Obsolete], never deleted!
 
 [StructLayout(LayoutKind.Sequential)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1104:Make this field private and encapsulate it in a public property", Justification = "ABI-CRITICAL FFI struct: fields must stay sequential public fields for native interop. See RULE 1-3 above.")]
 public struct GameApiTable
 {
     // [GREG_SYNC_REVIEW_REQUIRED]

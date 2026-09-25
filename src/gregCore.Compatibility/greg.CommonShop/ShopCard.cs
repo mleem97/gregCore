@@ -40,7 +40,7 @@ namespace greg.CommonShop
                 ApplyCardImages(card, template, data);
                 RewireBuyButton(shop, card, data, cart);
                 InvokeUIReady(card, data);
-                try { card.SetActive(true); } catch { }
+                try { card.SetActive(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return card;
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace greg.CommonShop
                 foreach (var img in card.GetComponentsInChildren<Image>(true))
                 {
                     if (img == null) continue;
-                    try { img.color = new Color(img.color.r * 0.4f, img.color.g * 0.4f, img.color.b * 0.4f, img.color.a); } catch { }
+                    try { img.color = new Color(img.color.r * 0.4f, img.color.g * 0.4f, img.color.b * 0.4f, img.color.a); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
             catch { }
@@ -83,7 +83,7 @@ namespace greg.CommonShop
                 foreach (var txt in card.GetComponentsInChildren<Il2CppTMPro.TextMeshProUGUI>(true))
                 {
                     if (txt == null) continue;
-                    try { txt.color = new Color(0.5f, 0.5f, 0.5f, 1f); } catch { }
+                    try { txt.color = new Color(0.5f, 0.5f, 0.5f, 1f); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
             catch { }

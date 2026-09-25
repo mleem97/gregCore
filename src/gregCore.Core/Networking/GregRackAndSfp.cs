@@ -127,7 +127,7 @@ public static class GregRackAndSfp
         if (module == null || link == null) return false;
         try
         {
-            var _ = module.gameObject; // liveness
+            _ = module.gameObject; // liveness
             module.InsertDirectlyIntoPort(link);
             return true;
         }
@@ -143,7 +143,7 @@ public static class GregRackAndSfp
         if (module == null) return false;
         try
         {
-            var _ = module.gameObject; // liveness
+            _ = module.gameObject; // liveness
             module.RemoveFromPort();
             return true;
         }
@@ -167,7 +167,7 @@ public static class GregRackAndSfp
         if (box == null) return -1;
         try
         {
-            var _ = box.gameObject; // liveness
+            _ = box.gameObject; // liveness
             return box.GetFreeSpaceInTheBox();
         }
         catch { return -1; }
@@ -178,7 +178,7 @@ public static class GregRackAndSfp
         if (box == null) return false;
         try
         {
-            var _ = box.gameObject; // liveness
+            _ = box.gameObject; // liveness
             return box.CanAcceptSFP(sfpType);
         }
         catch { return false; }
@@ -189,7 +189,7 @@ public static class GregRackAndSfp
         if (box == null) return null;
         try
         {
-            var _ = box.gameObject; // liveness
+            _ = box.gameObject; // liveness
             return box.TakeSFPFromBox();
         }
         catch (Exception ex)
@@ -204,7 +204,7 @@ public static class GregRackAndSfp
         if (box == null) return false;
         try
         {
-            var _ = box.gameObject; // liveness
+            _ = box.gameObject; // liveness
             box.InsertSFPBackIntoBox();
             return true;
         }
@@ -228,7 +228,7 @@ public static class GregRackAndSfp
         if (door == null) return false;
         try
         {
-            var _ = door.gameObject; // liveness
+            _ = door.gameObject; // liveness
             door.InteractOnClick();
             return true;
         }
@@ -250,7 +250,7 @@ public static class GregRackAndSfp
         if (mount == null) return false;
         try
         {
-            var _ = mount.gameObject; // liveness
+            _ = mount.gameObject; // liveness
             var routine = mount.InstallRack(cheat, type, false);
             return StartIl2CppRoutine(routine);
         }
@@ -387,7 +387,7 @@ public static class GregRackAndSfp
         }
         try
         {
-            var _ = rack.gameObject; // liveness
+            _ = rack.gameObject; // liveness
             var routine = global::Il2Cpp.RackTemplateApplier.Apply(rack, template);
             return StartIl2CppRoutine(routine);
         }

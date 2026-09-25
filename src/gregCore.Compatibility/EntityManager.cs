@@ -35,7 +35,7 @@ public static partial class EntityManager
         public GameObject GO = null!;
         public Animator? Animator;
         public NavMeshAgent? NavAgent;
-        public bool WaitingForUMA;
+        public bool WaitingForUMA = false;
         public float UMAWaitStart;
         public int SpeedParamHash;
         public int WalkingParamHash;

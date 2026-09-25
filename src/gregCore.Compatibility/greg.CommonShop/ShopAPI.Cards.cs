@@ -21,7 +21,7 @@ namespace greg.CommonShop
                 if (clone == null) return;
                 var si = clone.GetComponent<ShopItem>();
                 if (si == null) return;
-                FillLegacyShopItem(si, template, data);
+                FillLegacyShopItem(si, data);
                 try { si.Start(); } catch { }
                 ApplyCardVisuals(clone, template, data);
                 try { data.OnUIReady?.Invoke(clone); } catch { }
@@ -44,7 +44,7 @@ namespace greg.CommonShop
             catch { return null!; }
         }
 
-        private static void FillLegacyShopItem(ShopItem si, ShopItem template, CustomShopItem data)
+        private static void FillLegacyShopItem(ShopItem si, CustomShopItem data)
         {
             try
             {

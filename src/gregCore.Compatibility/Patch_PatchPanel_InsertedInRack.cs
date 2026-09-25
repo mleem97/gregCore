@@ -55,7 +55,7 @@ internal static class Patch_PatchPanel_InsertedInRack
             if (!installed.HasValue) return;
             ApplyRestoredId(instance, rackPosUid, currentId, installed.Value.objectId, "restored clone ID (dict fallback)");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplyRestoredId(PatchPanel? instance, int rackPosUid, string currentId, string stableId, string label)

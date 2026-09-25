@@ -34,8 +34,7 @@ namespace greg.CommonShop
         {
             try
             {
-                var le = gridContainer.GetComponent<LayoutElement>();
-                if (le == null) le = gridContainer.gameObject.AddComponent<LayoutElement>();
+                if (gridContainer.GetComponent<LayoutElement>() == null) gridContainer.gameObject.AddComponent<LayoutElement>();
             }
             catch { }
         }

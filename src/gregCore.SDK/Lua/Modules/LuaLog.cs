@@ -13,11 +13,11 @@ internal static class LuaLog
 {
     internal static void Error(string message)
     {
-        try { MelonLogger.Error(message); } catch { }
+        try { MelonLogger.Error(message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     internal static void Warning(string message)
     {
-        try { MelonLogger.Warning(message); } catch { }
+        try { MelonLogger.Warning(message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

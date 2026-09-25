@@ -27,10 +27,10 @@ public static class GregModDeps
 
     public sealed class Problem
     {
-        public string OwnerModId = "";
-        public string ModId = "";
-        public string Detail = "";
-        public bool Required = true;
+        public string OwnerModId { get; set; } = "";
+        public string ModId { get; set; } = "";
+        public string Detail { get; set; } = "";
+        public bool Required { get; set; } = true;
 
         public override string ToString()
         {

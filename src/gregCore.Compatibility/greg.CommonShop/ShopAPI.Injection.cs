@@ -215,7 +215,7 @@ namespace greg.CommonShop
                 ShopItem cap = template;
                 btn.onClick.AddListener((Action)(() =>
                 {
-                    try { cap.ButtonBuyItem(); } catch { }
+                    try { cap.ButtonBuyItem(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }));
             }
             catch { /* best-effort: vanilla card keeps previous wiring */ }

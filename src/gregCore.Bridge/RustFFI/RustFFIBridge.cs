@@ -270,7 +270,7 @@ public static class RustFFIBridge
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct GregModInfo
+    struct GregModInfo : IEquatable<GregModInfo>
     {
         public IntPtr id;
         public IntPtr name;
@@ -278,6 +278,23 @@ public static class RustFFIBridge
         public IntPtr author;
         public IntPtr description;
         public uint api_version;
+
+        public bool Equals(GregModInfo other)
+        {
+            return id == other.id && name == other.name && version == other.version
+                && author == other.author && description == other.description
+                && api_version == other.api_version;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GregModInfo other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(id, name, version, author, description, api_version);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

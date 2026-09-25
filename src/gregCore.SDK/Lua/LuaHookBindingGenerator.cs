@@ -299,7 +299,7 @@ public sealed partial class LuaHookBindingGenerator
         try
         {
             if (current == null) return;
-            current.IsVoid = value?.Trim().ToLower() == "true";
+            current.IsVoid = value?.Trim().ToLowerInvariant() == "true";
             if (current.Group != null && current.MethodName != null)
             {
                 hooks.Add(current);

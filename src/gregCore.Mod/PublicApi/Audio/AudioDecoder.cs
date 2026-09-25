@@ -93,7 +93,7 @@ public static partial class AudioDecoder
             rate = ReadInt32LE(data, pos + 12);
             bits = ReadInt16LE(data, pos + 22);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool IsSupportedFormat(int channels, int rate, int audio, int bits)

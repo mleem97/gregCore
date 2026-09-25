@@ -87,7 +87,7 @@ public static partial class CustomEmployeeManager
                 rawImage.color = Color.white;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplyPortraitFallback(Transform portraitTransform)

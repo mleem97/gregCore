@@ -43,7 +43,7 @@ namespace gregCore.GameLayer.Bootstrap;
             RegisterUi(container, logger, settings, core);
             var apiContext = CreateApiContext(container, logger, core, settings);
             settings.PluginRegistry.Configure(apiContext);
-            RegisterRuntime(container, logger, core, settings, apiContext);
+            RegisterRuntime(container, logger, core, apiContext);
             ValidateStartup(container);
             logger.Info("All services registered");
             return container;
@@ -98,7 +98,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 {
                     try { melonLogger.Msg($"[gregCore][Manifest] '{validation.Manifest.Name}': " +
                         $"{validation.ValidMods.Count} mods, {validation.ValidLibrary.Count} libs, " +
-                        $"{validation.ValidPlugins.Count} plugins."); } catch { }
+                        $"{validation.ValidPlugins.Count} plugins."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
             catch { /* manifest is optional */ }
@@ -230,7 +230,7 @@ namespace gregCore.GameLayer.Bootstrap;
             };
         }
 
-        private static void RegisterRuntime(GregServiceContainer container, ConsoleLogger logger, CoreBundle core, SettingsBundle s, global::gregCore.PublicApi.GregApiContext apiContext)
+        private static void RegisterRuntime(GregServiceContainer container, ConsoleLogger logger, CoreBundle core, global::gregCore.PublicApi.GregApiContext apiContext)
         {
             try
             {

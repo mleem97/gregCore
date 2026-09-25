@@ -177,7 +177,7 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
                 _rwLock.EnterReadLock();
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private bool InvokeAll(string hookName, EventPayload payload, Action<EventPayload>[] handlers)

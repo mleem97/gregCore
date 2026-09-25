@@ -91,7 +91,7 @@ public sealed class GregJsHost : IGregLanguageHost
     public void OnSceneLoaded(string sceneName)
     {
         if (!IsActive) return;
-        try { _currentScene = sceneName ?? ""; } catch { }
+        try { _currentScene = sceneName ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         List<ModRuntime> snapshot;
         lock (_mods) { snapshot = _mods.ToList(); }
         foreach (var mod in snapshot)
@@ -114,7 +114,7 @@ public sealed class GregJsHost : IGregLanguageHost
     public void Shutdown()
     {
         try { if (_watcher != null) { _watcher.EnableRaisingEvents = false; _watcher.Dispose(); _watcher = null; } } catch { }
-        try { if (_debounce != null) { _debounce.Stop(); _debounce.Dispose(); _debounce = null; } } catch { }
+        try { if (_debounce != null) { _debounce.Stop(); _debounce.Dispose(); _debounce = null; } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         lock (_mods) { _mods.Clear(); }
         IsActive = false;
     }
@@ -320,7 +320,7 @@ public sealed class GregJsHost : IGregLanguageHost
     {
         api["toast"] = (Action<string, double>)((msg, dur) =>
         {
-            try { gregCore.UI.GregNotificationManager.Show(msg ?? "", (float)dur); } catch { }
+            try { gregCore.UI.GregNotificationManager.Show(msg ?? "", (float)dur); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
         api["toastRich"] = (Action<string, string, string, double>)((top, title, sub, dur) =>
         {
@@ -349,7 +349,7 @@ public sealed class GregJsHost : IGregLanguageHost
             try
             {
                 gregCore.UI.GregMenuBinding.BindToggle(menuId,
-                    ToAction(engine, toggleFn),
+                    ToAction(toggleFn),
                     ToFuncBool(engine, isOpenFn));
             }
             catch { }
@@ -375,7 +375,7 @@ public sealed class GregJsHost : IGregLanguageHost
             try
             {
                 gregCore.Core.GregCoreMod.PublicAPI?.RegisterKeybind(modId, actionId, label,
-                    UnityEngine.KeyCode.None, ToAction(engine, fn));
+                    UnityEngine.KeyCode.None, ToAction(fn));
             }
             catch { }
         });
@@ -392,14 +392,14 @@ public sealed class GregJsHost : IGregLanguageHost
                 var cb = fn;
                 bus.On(hookName, payload =>
                 {
-                    try { cb.Call(JsValue.Undefined, new[] { JsValue.FromObject(engine, payload?.Data) }); } catch { }
+                    try { cb.Call(JsValue.Undefined, new[] { JsValue.FromObject(engine, payload?.Data) }); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 });
             }
             catch { }
         });
     }
 
-    private static Action ToAction(Engine engine, JsValue fn)
+    private static Action ToAction(JsValue fn)
     {
         return () =>
         {
@@ -428,7 +428,7 @@ public sealed class GregJsHost : IGregLanguageHost
 
     private static void SafeLog(string msg)
     {
-        try { MelonLoader.MelonLogger.Msg("[gregCore][JS] " + msg); } catch { }
+        try { MelonLoader.MelonLogger.Msg("[gregCore][JS] " + msg); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SafeWarn(string msg)

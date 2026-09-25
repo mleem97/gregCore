@@ -14,13 +14,13 @@ namespace gregCore.API;
 
 public class CustomEmployeeEntry
 {
-    public string EmployeeId = null!;
-    public string Name = null!;
-    public string Description = null!;
-    public float SalaryPerHour;
-    public float RequiredReputation;
-    public bool IsHired;
-    public bool RequiresConfirmation;
+    public string EmployeeId { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public float SalaryPerHour { get; set; }
+    public float RequiredReputation { get; set; }
+    public bool IsHired { get; set; }
+    public bool RequiresConfirmation { get; set; }
 }
 
 public static partial class CustomEmployeeManager
@@ -45,7 +45,12 @@ public static partial class CustomEmployeeManager
     public static IReadOnlyList<CustomEmployeeEntry> Employees => _employees;
     public static bool HasPendingAction => _pendingEmployeeId != null;
 
-    public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation = false)
+    public static int Register(string id, string name, string description, float salary, float reputation)
+    {
+        return Register(id, name, description, salary, reputation, false);
+    }
+
+    public static int Register(string id, string name, string description, float salary, float reputation, bool requiresConfirmation)
     {
         if (!IsValidRegistration(id, name, description)) return 0;
         if (_employeeIndex.ContainsKey(id))

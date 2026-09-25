@@ -29,7 +29,7 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
     private static int ResolveRackUid(NetworkSwitch? instance, SwitchSaveData? save)
     {
         int rackPosUid = -1;
-        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
+        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { }
         if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { }
         return rackPosUid;

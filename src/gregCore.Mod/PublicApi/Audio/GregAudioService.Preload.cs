@@ -210,7 +210,7 @@ public static partial class GregAudioService
         {
             if (!IsValidPreload(samples, channels, frequency)) return;
             var clip = AudioClip.Create(title, samples.Length / channels, channels, frequency, false);
-            if (!TryStorePreload(path, title, clip, samples)) return;
+            if (!TryStorePreload(clip, samples)) return;
             GregAudioClipCache.Put(path, clip);
             MelonLogger.Msg("[gregCore][Audio] Preloaded: '" + title + "'.");
         }
@@ -230,7 +230,7 @@ public static partial class GregAudioService
         catch { return false; }
     }
 
-    private static bool TryStorePreload(string path, string title, AudioClip clip, float[] samples)
+    private static bool TryStorePreload(AudioClip clip, float[] samples)
     {
         try
         {

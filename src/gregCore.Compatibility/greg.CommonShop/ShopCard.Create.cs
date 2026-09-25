@@ -45,7 +45,7 @@ namespace greg.CommonShop
                     try { ApplySingleText(txt, data, n); } catch { }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplySingleText(Il2CppTMPro.TextMeshProUGUI txt, CustomShopItem data, string lowerName)

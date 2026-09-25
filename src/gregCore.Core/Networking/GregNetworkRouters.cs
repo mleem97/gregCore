@@ -110,7 +110,7 @@ public static class GregNetworkRouters
         if (router == null || string.IsNullOrWhiteSpace(subnetCidr)) return false;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             return router.AddSubnet(vlanId, subnetCidr);
         }
         catch (Exception ex)
@@ -125,7 +125,7 @@ public static class GregNetworkRouters
         if (router == null) return false;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             router.RemoveSubnet(vlanId);
             return true;
         }
@@ -143,7 +143,7 @@ public static class GregNetworkRouters
         if (router == null) return -1;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             return router.AddRoute(sourceVlanId, sourceIp ?? "", targetVlanId, targetIp ?? "");
         }
         catch (Exception ex)
@@ -158,7 +158,7 @@ public static class GregNetworkRouters
         if (router == null) return false;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             router.RemoveRoute(routeId);
             return true;
         }
@@ -174,7 +174,7 @@ public static class GregNetworkRouters
         if (router == null) return false;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             router.ReapplyAllRoutes();
             return true;
         }
@@ -190,7 +190,7 @@ public static class GregNetworkRouters
         if (router == null) return false;
         try
         {
-            var _ = router.gameObject; // liveness
+            _ = router.gameObject; // liveness
             router.SyncRoutesWithSameAsn();
             return true;
         }
@@ -217,7 +217,7 @@ public static class GregNetworkRouters
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             firewall.AddRule(portIndex, sourceIpCidr ?? "", destIpCidr ?? "",
                 networkPort, proto, bidirectional, allow);
             return true;
@@ -235,7 +235,7 @@ public static class GregNetworkRouters
         if (firewall == null) return false;
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             firewall.RemoveRule(portIndex, vlanId, sourceIpCidr ?? "", destIpCidr ?? "", networkPort);
             return true;
         }
@@ -260,7 +260,7 @@ public static class GregNetworkRouters
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             return firewall.IsTrafficAllowed(portIndex, vlanId, sourceIp ?? "", destIp ?? "", networkPort, proto);
         }
         catch (Exception ex)
@@ -275,7 +275,7 @@ public static class GregNetworkRouters
         if (firewall == null) return false;
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             firewall.SyncRulesFromCluster();
             return true;
         }
@@ -291,7 +291,7 @@ public static class GregNetworkRouters
         if (firewall == null) return false;
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             firewall.BroadcastRulesToCluster();
             return true;
         }
@@ -307,7 +307,7 @@ public static class GregNetworkRouters
         if (firewall == null) return "";
         try
         {
-            var _ = firewall.gameObject; // liveness
+            _ = firewall.gameObject; // liveness
             return firewall.clusterIP ?? "";
         }
         catch { return ""; }

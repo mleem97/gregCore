@@ -29,7 +29,7 @@ internal static class Patch_CustomerBase_AreAllAppRequirementsMet
             if (_satisfiedCustomers.Add(id))
                 EventDispatcher.FireCustomerSatisfied(id);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void FireUnsatisfied(int id)

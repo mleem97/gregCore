@@ -18,7 +18,7 @@ public partial class GameAPIManager
             CrashLog.Log($"[WorldSync] PlaceInRack: id={objId}, uid={rackUid}");
 
             if (!TryResolvePlaceTarget(objId, out ulong handle, out var comp)) return 0;
-            if (!TryResolvePlaceRack(objId, rackUid, out var rackPos, out var rack)) return 0;
+            if (!TryResolvePlaceRack(rackUid, out var rackPos, out var rack)) return 0;
 
             if (!comp.gameObject.activeSelf)
                 comp.gameObject.SetActive(true);
@@ -55,7 +55,7 @@ public partial class GameAPIManager
         return true;
     }
 
-    private bool TryResolvePlaceRack(string objId, int rackUid, out Il2Cpp.RackPosition rackPos, out Il2Cpp.Rack rack)
+    private bool TryResolvePlaceRack(int rackUid, out Il2Cpp.RackPosition rackPos, out Il2Cpp.Rack rack)
     {
         rackPos = FindRackPosition(rackUid);
         rack = null;

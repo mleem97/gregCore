@@ -177,9 +177,9 @@ public static class GoFFIBridge
         catch { }
         finally
         {
-            try { if (hPtr != IntPtr.Zero) Marshal.FreeHGlobal(hPtr); } catch { }
+            try { if (hPtr != IntPtr.Zero) Marshal.FreeHGlobal(hPtr); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             try { if (tPtr != IntPtr.Zero) Marshal.FreeHGlobal(tPtr); } catch { }
-            try { if (jPtr != IntPtr.Zero) Marshal.FreeHGlobal(jPtr); } catch { }
+            try { if (jPtr != IntPtr.Zero) Marshal.FreeHGlobal(jPtr); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 

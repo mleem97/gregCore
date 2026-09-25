@@ -31,10 +31,10 @@ public static class GregCustomers
 
     public sealed class ItemInfo
     {
-        public int CustomerID = -1;
-        public string CustomerName = "";
-        public int Difficulty;
-        public int Reputation;
+        public int CustomerID { get; set; } = -1;
+        public string CustomerName { get; set; } = "";
+        public int Difficulty { get; set; }
+        public int Reputation { get; set; }
         public int[] AppTypes = Array.Empty<int>();
     }
 

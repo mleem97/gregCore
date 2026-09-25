@@ -167,7 +167,7 @@ public struct GameAPITable
 
 public partial class GameAPIManager : IDisposable
 {
-    public const uint API_VERSION = 19;
+    public static uint API_VERSION { get; } = 19;
 
     private IntPtr _tablePtr;
     private GameAPITable _table;

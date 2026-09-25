@@ -56,7 +56,7 @@ namespace greg.CommonShop
             {
                 Transform existing = parent.Find(gridName);
                 if (existing == null) return null!;
-                try { existing.gameObject.SetActive(true); } catch { }
+                try { existing.gameObject.SetActive(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return existing;
             }
             catch { return null!; }

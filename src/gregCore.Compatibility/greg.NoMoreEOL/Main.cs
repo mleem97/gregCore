@@ -19,7 +19,7 @@ namespace greg.NoMoreEOL
         private bool _autoRepairBrokenServers = true;
         private bool _disableSwitchesEOL = true;
         private bool _disableServersEOL = true;
-        internal static bool WarningsVisible = true;
+        internal static bool WarningsVisible { get; set; } = true;
 
         // Internal State
         internal static readonly HashSet<PositionIndicator> Indicators = new();

@@ -48,6 +48,7 @@ internal sealed class GregMemoryPressureHandler
         Task.Run(() => { GC.Collect(1, GCCollectionMode.Optimized, false); });
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Event-handler signature is fixed by the event bus subscription (see constructor). Payload intentionally unused.")]
     private void OnRamCritical(EventPayload p)
     {
         // UNITY MAIN THREAD REQUIRED

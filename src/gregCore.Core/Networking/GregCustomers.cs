@@ -35,7 +35,7 @@ public static class GregCustomers
         public string CustomerName { get; set; } = "";
         public int Difficulty { get; set; }
         public int Reputation { get; set; }
-        public int[] AppTypes = Array.Empty<int>();
+        public int[] AppTypes { get; set; } = Array.Empty<int>();
     }
 
     // ── Find ─────────────────────────────────────────────────────────────────

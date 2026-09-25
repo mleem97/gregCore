@@ -13,7 +13,12 @@ public sealed class MelonLoggerAdapter : IGregLogger
     private readonly MelonLogger.Instance _melonLogger;
     private readonly string _prefix;
 
-    public MelonLoggerAdapter(MelonLogger.Instance melonLogger, string prefix = "")
+    public MelonLoggerAdapter(MelonLogger.Instance melonLogger)
+        : this(melonLogger, "")
+    {
+    }
+
+    public MelonLoggerAdapter(MelonLogger.Instance melonLogger, string prefix)
     {
         ArgumentNullException.ThrowIfNull(melonLogger);
         _melonLogger = melonLogger;

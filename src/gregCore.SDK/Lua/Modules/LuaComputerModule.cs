@@ -37,14 +37,14 @@ public static class LuaComputerModule
     public static void Register(Table greg, Script script, string modId)
     {
         var t = new Table(script);
-        RegisterShortcuts(t, script, modId);
+        RegisterShortcuts(t, modId);
         RegisterApps(t, modId);
         RegisterAppState(t, script, modId);
         RegisterListings(t, script);
         greg["computer"] = t;
     }
 
-    private static void RegisterShortcuts(Table t, Script script, string modId)
+    private static void RegisterShortcuts(Table t, string modId)
     {
         // greg.computer.register_shortcut(id, label, fn_or_appid)
         // fn (Closure) runs on click; string opens the app with that id.

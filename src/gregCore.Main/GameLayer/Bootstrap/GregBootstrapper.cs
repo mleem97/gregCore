@@ -41,7 +41,7 @@ namespace gregCore.GameLayer.Bootstrap;
             RegisterSettings(container, settings);
             RegisterNative(container, logger, core.Bus);
             RegisterUi(container, logger, settings, core);
-            var apiContext = CreateApiContext(container, logger, core, settings);
+            var apiContext = CreateApiContext(container, logger, core);
             settings.PluginRegistry.Configure(apiContext);
             RegisterRuntime(container, logger, core, apiContext);
             ValidateStartup(container);
@@ -213,7 +213,7 @@ namespace gregCore.GameLayer.Bootstrap;
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
-        private static global::gregCore.PublicApi.GregApiContext CreateApiContext(GregServiceContainer container, ConsoleLogger logger, CoreBundle core, SettingsBundle s)
+        private static global::gregCore.PublicApi.GregApiContext CreateApiContext(GregServiceContainer container, ConsoleLogger logger, CoreBundle core)
         {
             var lifetime = new CancellationTokenSource();
             return new global::gregCore.PublicApi.GregApiContext {

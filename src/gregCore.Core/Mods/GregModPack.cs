@@ -56,7 +56,7 @@ public static class GregModPack
 
     public sealed class Snapshot
     {
-        public string ModName = "";
+        public string ModName { get; set; } = "";
         public List<ShopItem> ShopItems { get; set; } = new List<ShopItem>();
         public List<StaticItem> StaticItems { get; set; } = new List<StaticItem>();
         public List<DllRef> Dlls { get; set; } = new List<DllRef>();

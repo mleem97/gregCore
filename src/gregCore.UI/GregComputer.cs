@@ -79,7 +79,25 @@ public static partial class GregComputer
     private static string Key(string modId, string id) => modId + "\u0000" + id;
 
     public static bool RegisterShortcut(string modId, string id, string label,
-        Action? onClick, string? appId = null, int order = 100)
+        Action? onClick)
+    {
+        return RegisterShortcut(modId, id, label, onClick, null, 100);
+    }
+
+    public static bool RegisterShortcut(string modId, string id, string label,
+        Action? onClick, string? appId)
+    {
+        return RegisterShortcut(modId, id, label, onClick, appId, 100);
+    }
+
+    public static bool RegisterShortcut(string modId, string id, string label,
+        Action? onClick, int order)
+    {
+        return RegisterShortcut(modId, id, label, onClick, null, order);
+    }
+
+    public static bool RegisterShortcut(string modId, string id, string label,
+        Action? onClick, string? appId, int order)
     {
         try
         {

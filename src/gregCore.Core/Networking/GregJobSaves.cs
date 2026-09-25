@@ -30,7 +30,7 @@ public static class GregJobSaves
     public sealed class RepairJob
     {
         public string ServerID { get; set; } = "";
-        public string SwitchID = "";
+        public string SwitchID { get; set; } = "";
     }
 
     public sealed class InteractObject

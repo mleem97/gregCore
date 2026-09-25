@@ -72,7 +72,7 @@ public static class GregSaveGuard
         MelonLogger.Msg($"[gregCore][Save] Vanilla-Modul-Map registriert: {modId}.");
     }
 
-    public static bool BackupEnabled = true;
+    public static bool BackupEnabled { get; set; } = true;
     public static int MaxBackupsPerSave = 3;
     private static bool _optOutWarned;
 

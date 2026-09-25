@@ -16,7 +16,7 @@ namespace gregCore.UI
         public sealed class Clickable
         {
             public VisualElement Element { get; set; }
-            public Action Action;
+            public Action Action { get; set; }
         }
 
         // One click pass. Returns true if an action fired.

@@ -54,23 +54,43 @@ namespace gregCore.UI
             }
         }
 
-        public static void Show(string message, float duration = 3f)
+        public static void Show(string message)
+        {
+            Show(message, 3f);
+        }
+
+        public static void Show(string message, float duration)
         {
             Show(message, GregToastType.Info, null, duration);
         }
 
-        public static void Show(string message, GregToastType type, float duration = 3f)
+        public static void Show(string message, GregToastType type)
+        {
+            Show(message, type, 3f);
+        }
+
+        public static void Show(string message, GregToastType type, float duration)
         {
             Show(message, type, null, duration);
         }
 
         // Custom icon by name from the IconToolkit (e.g. mod-owned icons).
-        public static void Show(string message, string customIcon, float duration = 3f)
+        public static void Show(string message, string customIcon)
+        {
+            Show(message, customIcon, 3f);
+        }
+
+        public static void Show(string message, string customIcon, float duration)
         {
             Show(message, GregToastType.Custom, customIcon, duration);
         }
 
-        public static void Show(string message, GregToastType type, string customIcon, float duration = 3f)
+        public static void Show(string message, GregToastType type, string customIcon)
+        {
+            Show(message, type, customIcon, 3f);
+        }
+
+        public static void Show(string message, GregToastType type, string customIcon, float duration)
         {
             if (!_initialized) Initialize();
 

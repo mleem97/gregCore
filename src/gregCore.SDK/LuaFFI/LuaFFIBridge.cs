@@ -17,7 +17,7 @@ using gregCore.Infrastructure.Scripting.Lua.Dev;
 
 namespace gregCore.Bridge.LuaFFI;
 
-public sealed class LuaFFIBridge
+public static class LuaFFIBridge
 {
     private static readonly List<LuaPlugin> _plugins = new();
     private static LuaHotReload? _hotReload;

@@ -103,7 +103,15 @@ public static class GregIoLuaModule
         {
             try
             {
-                var files = Directory.GetFiles(dataDir, pattern ?? "*.*", SearchOption.AllDirectories)
+                string searchPattern = pattern ?? "*.*";
+                // [Security] Prevent path traversal through wildcard pattern in GetFiles
+                if (searchPattern.Contains("..") || searchPattern.Contains(Path.DirectorySeparatorChar.ToString()) || searchPattern.Contains(Path.AltDirectorySeparatorChar.ToString()))
+                {
+                    MelonLogger.Error($"[LuaMod:{modId}] io.list_files failed: Invalid characters in pattern");
+                    return new Table(script);
+                }
+
+                var files = Directory.GetFiles(dataDir, searchPattern, SearchOption.AllDirectories)
                     .Select(f => Path.GetRelativePath(dataDir, f).Replace('\\', '/'))
                     .ToArray();
 

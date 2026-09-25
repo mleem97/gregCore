@@ -23,7 +23,7 @@ GregPanelBuilder.Create("Title")
 
 Three mandatory companions (IL2CPP realities, see `docs/modding/ui-panels.md`):
 
-1. **Clicks** — register `Button.RegisterCallback<ClickEvent>` **and** the per-frame `worldBound` fallback (`GregClickRouter.RouteClicks`, 500 ms dedup, `Screen.height - y` flip). There is no `EventSystem`.
+1. **Clicks** — register `Button.RegisterCallback<ClickEvent>` **and** the per-frame `worldBound` fallback (`GregClickRouter.RouteClicks(clickables, lastClickUtc)` returns `bool`, no `ref`; `MarkRealClick()` returns the new timestamp — assign it: `_lastClick = GregClickRouter.MarkRealClick()`), 500 ms dedup, `Screen.height - y` flip. There is no `EventSystem`.
 2. **Fonts** — apply `GregFontLoader.DefaultUGUIFont` (null-tolerant; Toolkit default renders invisible otherwise).
 3. **Input lock** — `GregMenuOptions{LockCamera, LockMovement, LockInteract, ShowCursor, Draggable, SlideFromRight, PanelWidth}` + `GregMenuRegistry.SetOpen(menuId, open)`; ignore toggles while Pause/Escape/Options canvases are open.
 

@@ -42,7 +42,7 @@ GregShopItems.UnregisterPrefab(itemId);
 GregShopItems.TryGetBaseId(itemId, out var baseId);
 GregShopItems.TryResolvePrefab(itemId, out var prefab);
 var section = GregShopItems.FindSection(shop, "HL Mods");   // created if missing
-GregShopItems.AddButton(template, section, itemId, label, price, xp, guid, isCustomColor, sprite);
+GregShopItems.AddButton(new GregShopItems.ShopButtonSpec { Template = template, Parent = section, ItemId = itemId, Label = label, Price = price, XpToUnlock = xp, Guid = guid, IsCustomColor = isCustomColor, Sprite = sprite });
 GregShop.CartAddOne(...); GregShop.CartRemoveOne(...);      // stay on vanilla cart behavior
 // persist via GregModPack DTOs (ShopItem/StaticItem/DllRef/Snapshot) + GregModSave
 ```

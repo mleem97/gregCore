@@ -38,7 +38,7 @@ GregPanelBuilder.Create("ShiftHelper")
 
 Three mandatory companions (see `docs/modding/ui-panels.md`):
 
-1. **Clicks**: `Button.RegisterCallback<ClickEvent>` **and** the per-frame `worldBound` fallback (`GregClickRouter.RouteClicks`, 500 ms dedup, `Screen.height - y` flip) — there is no `EventSystem`.
+1. **Clicks**: `Button.RegisterCallback<ClickEvent>` **and** the per-frame `worldBound` fallback (`GregClickRouter.RouteClicks(clickables, lastClickUtc)` returns `bool`, no `ref`; `MarkRealClick()` returns the new timestamp — assign it), 500 ms dedup, `Screen.height - y` flip — there is no `EventSystem`.
 2. **Fonts**: `GregFontLoader.DefaultUGUIFont` (null-tolerant; Toolkit default renders invisible otherwise).
 3. **Input lock**: `GregMenuRegistry.SetOpen(menuId, open)` drives `GregInputLock` (cursor, `PlayerManager` movement/look flags, `PlayerInput.actions`); ignore toggles while Pause/Escape/Options canvases are open.
 

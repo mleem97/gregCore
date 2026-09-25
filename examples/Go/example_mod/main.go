@@ -95,11 +95,12 @@ func greg_mod_init() {
 	logMsg(fmt.Sprintf("[%s v%s] Initializing...", ModName, ModVersion))
 
 	// Subscribe to events
-	subscribe(EventCoinsChanged, unsafe.Pointer(C.on_coins_changed))
-	subscribe(EventXpChanged, unsafe.Pointer(C.on_xp_changed))
-	subscribe(EventGameSaved, unsafe.Pointer(C.on_game_saved))
-	subscribe(EventRackPosition, unsafe.Pointer(C.on_rack_position))
-	subscribe(EventCableCreated, unsafe.Pointer(C.on_cable_created))
+	// nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block -- cgo requires unsafe.Pointer to pass C callbacks; no Go alternative exists.
+	subscribe(EventCoinsChanged, unsafe.Pointer(C.on_coins_changed)) // nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block
+	subscribe(EventXpChanged, unsafe.Pointer(C.on_xp_changed)) // nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block
+	subscribe(EventGameSaved, unsafe.Pointer(C.on_game_saved)) // nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block
+	subscribe(EventRackPosition, unsafe.Pointer(C.on_rack_position)) // nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block
+	subscribe(EventCableCreated, unsafe.Pointer(C.on_cable_created)) // nosemgrep: go_unsafe_rule-unsafe, go.lang.security.audit.unsafe.use-of-unsafe-block
 
 	logMsg(fmt.Sprintf("[%s] Mod initialized successfully!", ModName))
 }

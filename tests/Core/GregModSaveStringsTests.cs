@@ -54,7 +54,7 @@ public class GregModSaveStringsTests
     public void CombineSplitTitleBody_RoundTrips()
     {
         var combined = GregModSaveStrings.CombineTitleBody("NOTES", "line1\nline2");
-        GregModSaveStrings.SplitTitleBody(combined, out var title, out var body);
+        var (title, body) = GregModSaveStrings.SplitTitleBody(combined);
         title.Should().Be("NOTES");
         body.Should().Be("line1\nline2");
     }
@@ -62,7 +62,7 @@ public class GregModSaveStringsTests
     [Fact]
     public void SplitTitleBody_NoNewline_YieldsTitleOnly()
     {
-        GregModSaveStrings.SplitTitleBody("just-a-title", out var title, out var body);
+        var (title, body) = GregModSaveStrings.SplitTitleBody("just-a-title");
         title.Should().Be("just-a-title");
         body.Should().Be("");
     }
@@ -70,7 +70,7 @@ public class GregModSaveStringsTests
     [Fact]
     public void SplitTitleBody_Null_YieldsEmpty()
     {
-        GregModSaveStrings.SplitTitleBody(null, out var title, out var body);
+        var (title, body) = GregModSaveStrings.SplitTitleBody(null);
         title.Should().Be("");
         body.Should().Be("");
     }

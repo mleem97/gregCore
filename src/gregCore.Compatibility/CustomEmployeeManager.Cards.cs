@@ -76,7 +76,7 @@ public static partial class CustomEmployeeManager
             if (!repSet && (n.Contains("rep") || n.Contains("reputation") || n.Contains("prestige")))
                 repSet = TrySetTextOnTransform(t, wantRep);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void AssignByPosition(System.Collections.Generic.List<Transform> texts, string wantName, string wantSalary, string wantRep, ref bool nameSet, ref bool salarySet, ref bool repSet)

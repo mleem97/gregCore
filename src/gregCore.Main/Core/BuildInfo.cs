@@ -13,8 +13,10 @@ public static class BuildInfo
     public const string Flavor = "DEV";
     public const string Version = "1.2.3-dev.0";
 #else
+#pragma warning disable // Justification: Flavor/Version must stay const (assembly-level MelonInfo attribute requires compile-time constants; see GregCoreMod.cs).
     public const string Flavor = "RELEASE";
     public const string Version = "1.2.3";
+#pragma warning restore
 #endif
 
     public const string Name = "gregCore";

@@ -251,7 +251,7 @@ public static class GregServers
         if (server == null || entry == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.ServerInsertedInRack(entry);
             return true;
         }
@@ -276,7 +276,7 @@ public static class GregServers
         if (server == null || string.IsNullOrWhiteSpace(ip)) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.SetIP(ip);
             return true;
         }
@@ -292,7 +292,7 @@ public static class GregServers
         if (server == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.PowerButton(forceState);
             return true;
         }
@@ -308,7 +308,7 @@ public static class GregServers
         if (server == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.UpdateCustomer(customerID);
             return true;
         }
@@ -324,7 +324,7 @@ public static class GregServers
         if (server == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.UpdateAppID(appID);
             return true;
         }
@@ -340,7 +340,7 @@ public static class GregServers
         if (server == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.RepairDevice();
             return true;
         }
@@ -356,7 +356,7 @@ public static class GregServers
         if (server == null) return false;
         try
         {
-            var _ = server.gameObject; // liveness
+            _ = server.gameObject; // liveness
             server.ClearWarningSign(preserved);
             return true;
         }

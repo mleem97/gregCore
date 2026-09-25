@@ -58,7 +58,7 @@ public static class GregModPack
     {
         public string ModName = "";
         public List<ShopItem> ShopItems = new List<ShopItem>();
-        public List<StaticItem> StaticItems = new List<StaticItem>();
+        public List<StaticItem> StaticItems { get; set; } = new List<StaticItem>();
         public List<DllRef> Dlls = new List<DllRef>();
     }
 

@@ -171,15 +171,15 @@ public static class GregLang
         try
         {
             var cat = global::MelonLoader.MelonPreferences.CreateCategory("gregCore", "gregCore");
-            var entry = cat.GetEntry<string>("Language");
-            if (entry == null)
+            var existingLang = cat.GetEntry<string>("Language");
+            if (existingLang == null)
             {
-                entry = cat.CreateEntry("Language", LangCodes.Auto, "Language",
+                cat.CreateEntry("Language", LangCodes.Auto, "Language",
                     "UI language for Greg mods (two-letter code, or 'auto' = system language). Translations: Mods/Data/<modId>/<lang>.json.");
                 try { cat.SaveToFile(false); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 return LangCodes.Auto;
             }
-            return string.IsNullOrWhiteSpace(entry.Value) ? LangCodes.Auto : entry.Value;
+            return string.IsNullOrWhiteSpace(existingLang.Value) ? LangCodes.Auto : existingLang.Value;
         }
         catch { return LangCodes.Auto; }
     }

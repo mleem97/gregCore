@@ -67,7 +67,13 @@ public static class DemandPlanner
     // Deficit scales with demand: multiplier 0 = no feed,
     // 1 = exact deficit, 2 = double deficit (oversupply for growth).
     public static List<(int AppId, float Amount)> ComputeFeed(
-        float[] required, float[] current, float multiplier, float epsilon = DefaultEpsilon)
+        float[] required, float[] current, float multiplier)
+    {
+        return ComputeFeed(required, current, multiplier, DefaultEpsilon);
+    }
+
+    public static List<(int AppId, float Amount)> ComputeFeed(
+        float[] required, float[] current, float multiplier, float epsilon)
     {
         var feed = new List<(int, float)>();
         if (multiplier <= 0f) return feed;

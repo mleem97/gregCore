@@ -14,7 +14,7 @@ public sealed partial class LuaRepl
             gregTable["log_warning"] = (Action<string>)(msg => AddOutput($"[WARN] {msg}"));
             gregTable["log_error"] = (Action<string>)(msg => AddOutput($"[ERROR] {msg}"));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Registers economy accessors in the REPL greg table.

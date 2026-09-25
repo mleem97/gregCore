@@ -67,7 +67,7 @@ public static class GregNumpad
         if (inst == null || string.IsNullOrEmpty(number)) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ClickNumber(number);
             return true;
         }
@@ -109,7 +109,7 @@ public static class GregNumpad
         if (inst == null || action == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             action(inst);
             return true;
         }

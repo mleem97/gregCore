@@ -59,7 +59,7 @@ namespace greg.CommonShop
         /// Optional purchase color passed to the game cart (custom-color
         /// presets). Null = default/plain item color.
         /// </summary>
-        public Color? PurchaseColor;
+        public Color? PurchaseColor { get; set; }
 
         /// <summary>Assigns a vanilla base-game category to this item.</summary>
         public void SetCategory(VanillaCategory category) => Category = category.ToShopString();

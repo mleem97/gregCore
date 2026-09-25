@@ -15,6 +15,7 @@ namespace DataCenterModLoader;
 [HarmonyPatch(typeof(UsableObject), nameof(UsableObject.InteractOnClick))]
 internal static class Patch_UsableObject_InteractOnClick
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S2386:Mutable fields should not be declared public", Justification = "Harmony cross-patch coordination flag: written and read by cooperating patch classes in the same assembly (see usages). Must stay mutable.")]
     internal static bool SuppressEvents = false;
 
     [ThreadStatic] private static int _prevNumObjects;
@@ -134,7 +135,7 @@ internal static class Patch_UsableObject_InteractOnClick
             {
                 CrashLog.Log($"[WorldSync] Pickup: resolved clone ID '{objectId}' → stable '{stableEntry.Value.objectId}' (rackUid={pickupRackUid})");
                 objectId = stableEntry.Value.objectId;
-                try { ApplyStableIdentity(__instance, objectType, objectId); } catch { }
+                try { ApplyStableIdentity(__instance, objectType, objectId); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             Patch_Rack_MarkPositionAsUsed.RemoveInstalledObject(pickupRackUid);
         }

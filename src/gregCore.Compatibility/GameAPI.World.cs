@@ -87,6 +87,7 @@ public partial class GameAPIManager
         return 0;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     uint WorldGetObjectHashesImpl(IntPtr buf, uint maxCount)
     {
         // Phase 4 stub

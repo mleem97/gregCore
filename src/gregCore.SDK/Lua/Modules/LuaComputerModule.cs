@@ -38,7 +38,7 @@ public static class LuaComputerModule
     {
         var t = new Table(script);
         RegisterShortcuts(t, script, modId);
-        RegisterApps(t, script, modId);
+        RegisterApps(t, modId);
         RegisterAppState(t, script, modId);
         RegisterListings(t, script);
         greg["computer"] = t;
@@ -94,7 +94,7 @@ public static class LuaComputerModule
         }
     }
 
-    private static void RegisterApps(Table t, Script script, string modId)
+    private static void RegisterApps(Table t, string modId)
     {
         // greg.computer.register_app(appId, title, on_open_fn[, on_close_fn]) -> bool
         // on_open_fn(handleId): build content with panel_add_* calls.

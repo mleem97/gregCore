@@ -249,6 +249,7 @@ public partial class GameAPIManager
     // lobby and co-op lifecycle now; gregCore must not open a second session.
     private ulong SteamGetMyIdImpl() => 0;
     private IntPtr SteamGetFriendNameImpl(ulong steamId) => IntPtr.Zero;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamCreateLobbyImpl(uint lobbyType, uint maxPlayers) { return 0; }
     private int SteamJoinLobbyImpl(ulong lobbyId) { return 0; }
     private void SteamLeaveLobbyImpl() { }
@@ -261,8 +262,10 @@ public partial class GameAPIManager
 
     private int SteamSendP2PImpl(ulong target, IntPtr data, uint len, uint reliable) => 0;
     private uint SteamIsP2PAvailableImpl(IntPtr outSize) => 0;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private uint SteamReadP2PImpl(IntPtr buf, uint bufLen, IntPtr outSender) => 0;
     private void SteamAcceptP2PImpl(ulong remote) { /* intentionally inert: native Data Center owns lobby callbacks */ }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private uint SteamPollEventImpl(IntPtr outType, IntPtr outData)
     {
         // Intentionally inert: native Data Center owns lobby callbacks.

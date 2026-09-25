@@ -227,7 +227,7 @@ public static partial class GregAudioService
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             _fading = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Call per frame (crossfade). Fires TrackEnded at end of track.

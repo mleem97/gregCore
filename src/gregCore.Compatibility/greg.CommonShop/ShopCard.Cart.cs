@@ -52,7 +52,7 @@ namespace greg.CommonShop
             {
                 int cid = -1; int cprice = -1; string cname = null!;
                 try { cid = cartItem.itemID; } catch { return false; }
-                try { cprice = cartItem.price; } catch { }
+                try { cprice = cartItem.price; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 try { cname = cartItem.itemName; } catch { }
                 return cid == targetID && cprice == data.Price && cname == data.Name;
             }

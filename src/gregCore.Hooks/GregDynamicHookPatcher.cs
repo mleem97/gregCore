@@ -86,7 +86,7 @@ namespace gregCore.GameLayer.Hooks
                 _report.Skipped.Add(new HookInstallEntry { HookId = "legacy-inventory", Status = "skipped", ErrorClass = "ManifestNotBoundToBuild", TargetMember = hooksFilePath });
                 _logger.Warning("Rejected legacy unbound hook inventory; use framework/greg_hooks.json.");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         public void InstallFromManifest(GregHooksManifest? manifest, string manifestDirectory)

@@ -9,6 +9,7 @@ namespace DataCenterModLoader;
 
 internal static class SpawnedObjectTracker
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S2386:Mutable fields should not be declared public", Justification = "Harmony cross-patch coordination flag: written and read by cooperating patch classes in the same assembly (see usages). Must stay mutable.")]
     internal static bool SuppressEvents = false;
 
     private static readonly HashSet<int> _knownInstances = new();

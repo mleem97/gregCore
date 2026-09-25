@@ -34,7 +34,7 @@ public static class GregServiceRequests
     public sealed class SaveSnapshot
     {
         public int CurrentSRNumber { get; set; }
-        public List<RequestInfo> Requests = new List<RequestInfo>();
+        public List<RequestInfo> Requests { get; set; } = new List<RequestInfo>();
     }
 
     // ── Instance ─────────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ public static class GregServiceRequests
         if (inst == null) return result;
         Try(() =>
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             var list = inst.requests;
             if (list == null) return;
             foreach (var sr in list)
@@ -85,7 +85,7 @@ public static class GregServiceRequests
         if (inst == null) return -1;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             return inst.currentSRNumber;
         }
         catch { return -1; }
@@ -115,7 +115,7 @@ public static class GregServiceRequests
         global::Il2Cpp.ServiceRequestsSaveData data = null;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             data = inst.GetSaveData();
         }
         catch { data = null; }
@@ -130,7 +130,7 @@ public static class GregServiceRequests
         if (inst == null || sr == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.AddRequest(sr);
             return true;
         }
@@ -147,7 +147,7 @@ public static class GregServiceRequests
         if (inst == null || data == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.LoadFromSave(data);
             return true;
         }
@@ -164,7 +164,7 @@ public static class GregServiceRequests
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.RebuildUI();
             return true;
         }
@@ -205,7 +205,7 @@ public static class GregServiceRequests
         if (row == null || inst == null || sr == null) return false;
         try
         {
-            var _ = row.gameObject; // liveness
+            _ = row.gameObject; // liveness
             row.Bind(inst, sr);
             return true;
         }
@@ -221,7 +221,7 @@ public static class GregServiceRequests
         if (row == null) return false;
         try
         {
-            var _ = row.gameObject; // liveness
+            _ = row.gameObject; // liveness
             row.SetAsSeparator(label ?? "");
             return true;
         }
@@ -237,7 +237,7 @@ public static class GregServiceRequests
         if (row == null) return false;
         try
         {
-            var _ = row.gameObject; // liveness
+            _ = row.gameObject; // liveness
             row.OnClickServiceRequestRow();
             return true;
         }
@@ -254,7 +254,7 @@ public static class GregServiceRequests
         global::Il2Cpp.ServiceRequest sr = null;
         try
         {
-            var _ = row.gameObject; // liveness
+            _ = row.gameObject; // liveness
             sr = row.boundSR;
         }
         catch { sr = null; }

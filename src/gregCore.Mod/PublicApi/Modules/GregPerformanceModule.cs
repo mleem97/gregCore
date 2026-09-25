@@ -42,7 +42,8 @@ public sealed class GregPerformanceModule
 
     // ── Memory ───────────────────────────────────────────────────────────────
     public void SetGCInterval(int seconds) => Configure(GetProfile() with { GcIntervalSeconds = seconds });
-    public void SetStreamingMipmaps(bool enabled, float budgetMb = 512f) => Configure(GetProfile() with { EnableStreamingMipmaps = enabled, StreamingMipmapBudgetMb = budgetMb });
+    public void SetStreamingMipmaps(bool enabled) => SetStreamingMipmaps(enabled, 512f);
+    public void SetStreamingMipmaps(bool enabled, float budgetMb) => Configure(GetProfile() with { EnableStreamingMipmaps = enabled, StreamingMipmapBudgetMb = budgetMb });
     public void SetTextureResolution(int level) => Configure(GetProfile() with { TextureResolution = level });
 
     // ── Graphics / Quality ───────────────────────────────────────────────────
@@ -63,7 +64,8 @@ public sealed class GregPerformanceModule
     public void SetDecals(bool enabled) => Configure(GetProfile() with { DisableDecals = !enabled });
 
     // ── Upscaling ────────────────────────────────────────────────────────────
-    public void SetUpscaling(bool enabled, int dlssMode = 0, int fsrMode = 0) => Configure(GetProfile() with { ForceUpscaling = enabled, DLSSQualityMode = dlssMode, FSRQualityMode = fsrMode });
+    public void SetUpscaling(bool enabled) => SetUpscaling(enabled, 0, 0);
+    public void SetUpscaling(bool enabled, int dlssMode, int fsrMode) => Configure(GetProfile() with { ForceUpscaling = enabled, DLSSQualityMode = dlssMode, FSRQualityMode = fsrMode });
     public void SetDLSSMode(int mode) => Configure(GetProfile() with { DLSSQualityMode = mode });
     public void SetFSRMode(int mode) => Configure(GetProfile() with { FSRQualityMode = mode });
 

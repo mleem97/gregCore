@@ -300,7 +300,7 @@ public static class GregSaveGuard
     {
         try
         {
-            EnsureBackedUpForCurrentSlot("SerializeToBytes");
+            EnsureBackedUpForCurrentSlot();
             SanitizeSaveData(__0, "Speichern");
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (SerializeToBytes): " + ex.Message); }
@@ -310,13 +310,13 @@ public static class GregSaveGuard
     {
         try
         {
-            EnsureBackedUpForCurrentSlot("SaveGameData");
+            EnsureBackedUpForCurrentSlot();
             SanitizeSaveData(global::Il2Cpp.SaveData.instance, "Speichern");
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (SaveGameData): " + ex.Message); }
     }
 
-    private static void EnsureBackedUpForCurrentSlot(string phase)
+    private static void EnsureBackedUpForCurrentSlot()
     {
         try
         {

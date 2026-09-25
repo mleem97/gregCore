@@ -44,8 +44,13 @@ public static class GregFileSystem
         }
     }
 
+    public static IEnumerable<string> EnumerateDirectories(string directory)
+    {
+        return EnumerateDirectories(directory, false);
+    }
+
     public static IEnumerable<string> EnumerateDirectories(
-        string directory, bool includeDeactivated = false)
+        string directory, bool includeDeactivated)
     {
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
             return Enumerable.Empty<string>();

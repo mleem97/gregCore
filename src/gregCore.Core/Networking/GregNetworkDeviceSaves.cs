@@ -71,25 +71,25 @@ public static partial class GregNetworkDeviceSaves
 
     public sealed class SfpSave
     {
-        public int PrefabID;
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public bool IsInserted;
-        public Vector3 PortPosition;
+        public int PrefabID { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public bool IsInserted { get; set; }
+        public Vector3 PortPosition { get; set; }
     }
 
     public sealed class LacpSave
     {
-        public int GroupId;
-        public string DeviceA = "";
-        public string DeviceB = "";
-        public List<int> CableIds = new List<int>();
+        public int GroupId { get; set; }
+        public string DeviceA { get; set; } = "";
+        public string DeviceB { get; set; } = "";
+        public List<int> CableIds { get; set; } = new List<int>();
     }
 
     public sealed class CableEndpoint
     {
         public string Type = "";
-        public Vector3 Position;
+        public Vector3 Position { get; set; }
         public int CustomerID;
         public string SwitchID { get; set; } = "";
         public string ServerID { get; set; } = "";
@@ -108,14 +108,14 @@ public static partial class GregNetworkDeviceSaves
 
     public sealed class CableLinkLabel
     {
-        public Vector3 Position;
+        public Vector3 Position { get; set; }
         public string LabelText { get; set; } = "";
     }
 
     public sealed class PortVlanFilter
     {
-        public int PortIndex;
-        public List<int> DisallowedVlanIds = new List<int>();
+        public int PortIndex { get; set; }
+        public List<int> DisallowedVlanIds { get; set; } = new List<int>();
     }
 
     // ── Router ───────────────────────────────────────────────────────────────

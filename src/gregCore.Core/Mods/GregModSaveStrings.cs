@@ -65,19 +65,16 @@ public static class GregModSaveStrings
     }
 
     /// <summary>Splits a <see cref="CombineTitleBody"/> pair. Never throws.</summary>
-    public static void SplitTitleBody(string? text, out string title, out string body)
+    public static (string title, string body) SplitTitleBody(string? text)
     {
-        title = "";
-        body = "";
         try
         {
-            if (string.IsNullOrEmpty(text)) return;
-            int nl = text.IndexOf('\n');
-            if (nl < 0) { title = text; return; }
-            title = text.Substring(0, nl);
-            body = text.Substring(nl + 1);
+            if (string.IsNullOrEmpty(text)) return ("", "");
+            int idx = text.IndexOf('\n');
+            if (idx < 0) return (text, "");
+            return (text.Substring(0, idx), text.Substring(idx + 1));
         }
-        catch { title = ""; body = ""; }
+        catch { return ("", ""); }
     }
 
     // ── Il2Cpp list glue (needs the game; excluded from coverage) ───────────

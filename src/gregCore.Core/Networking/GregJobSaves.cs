@@ -29,7 +29,7 @@ public static class GregJobSaves
 
     public sealed class RepairJob
     {
-        public string ServerID = "";
+        public string ServerID { get; set; } = "";
         public string SwitchID = "";
     }
 

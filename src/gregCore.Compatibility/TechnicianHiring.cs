@@ -108,7 +108,7 @@ public static class TechnicianHiring
 
             CrashLog.Log($"TechnicianHiring.OnEmployeeHired: handling '{employeeId}'");
 
-            var ctx = ResolveHireContext(employeeId);
+            var ctx = ResolveHireContext();
             if (ctx == null) return;
             var tech = CloneSourceTechnician(ctx.Value.source, employeeId);
             if (tech == null) return;
@@ -120,7 +120,7 @@ public static class TechnicianHiring
         }
     }
 
-    private static (TechnicianManager manager, Technician source)? ResolveHireContext(string employeeId)
+    private static (TechnicianManager manager, Technician source)? ResolveHireContext()
     {
         var tm = TechnicianManager.instance;
         if (tm == null)

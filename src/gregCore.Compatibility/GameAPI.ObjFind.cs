@@ -426,6 +426,8 @@ public partial class GameAPIManager
                         savedSizeInU = pp.sizeInU > 0 ? pp.sizeInU : 1;
                     }
                     break;
+                default:
+                    break;
             }
         }
         catch (Exception ex) { CrashLog.Log($"[WorldSync] RackGameUninstall: failed to save rack pos: {ex.Message}"); }

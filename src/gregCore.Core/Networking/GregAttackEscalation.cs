@@ -99,7 +99,7 @@ public static class GregAttackEscalation
         if (mgr == null) return;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
         }
         catch { return; }
 

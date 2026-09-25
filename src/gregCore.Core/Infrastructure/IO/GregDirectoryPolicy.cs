@@ -54,8 +54,8 @@ public static class GregDirectoryPolicy
         var result = new List<Violation>();
         if (string.IsNullOrWhiteSpace(gameRoot) || !Directory.Exists(gameRoot)) return result;
         try { AuditModsDir(Path.Combine(gameRoot, "Mods"), result); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-        try { AuditFlatDir(Path.Combine(gameRoot, "Plugins"), "plugin"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-        try { AuditFlatDir(Path.Combine(gameRoot, "UserLibs"), "userlib"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { AuditFlatDir(Path.Combine(gameRoot, "Plugins")); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { AuditFlatDir(Path.Combine(gameRoot, "UserLibs")); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return result;
     }
 
@@ -103,7 +103,7 @@ public static class GregDirectoryPolicy
 
     // Plugins/UserLibs: no statement about content, only existence check for the report.
     // Strict validation (foreign mod DLLs) belongs to the companion plugin (Cecil there).
-    private static void AuditFlatDir(string dir, string kind)
+    private static void AuditFlatDir(string dir)
     {
         if (!Directory.Exists(dir))
             throw new DirectoryNotFoundException(dir);

@@ -86,7 +86,7 @@ internal static class Patch_Server_ServerInsertedInRack
             string prefix = StripCloneSuffix(srv.gameObject?.name ?? "");
             for (int i = 0; i < mgr.serverPrefabs.Count; i++)
             {
-                try { if (mgr.serverPrefabs[i]?.name == prefix) return i; } catch { }
+                try { if (mgr.serverPrefabs[i]?.name == prefix) return i; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
         catch { }

@@ -42,7 +42,7 @@ namespace greg.CommonShop
                     }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
 
@@ -51,12 +51,12 @@ namespace greg.CommonShop
             try
             {
                 int cid = -1; int cprice = -1; string cname = null!;
-                try { cid = cartItem.itemID; } catch { return false; }
+                try { cid = cartItem.itemID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
                 try { cprice = cartItem.price; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
-                try { cname = cartItem.itemName; } catch { }
+                try { cname = cartItem.itemName; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return cid == targetID && cprice == data.Price && cname == data.Name;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static void TryInvokeCartMethod(ComputerShop shop, CustomShopItem data, MethodInfo cart)
@@ -83,9 +83,9 @@ namespace greg.CommonShop
                 if (!data.PurchaseColor.HasValue)
                     return Activator.CreateInstance(ps[4].ParameterType);
                 try { return Activator.CreateInstance(ps[4].ParameterType, new object[] { data.PurchaseColor.Value }); }
-                catch { return Activator.CreateInstance(ps[4].ParameterType); }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Activator.CreateInstance(ps[4].ParameterType); }
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
         private static MethodInfo ResolveCartMethod()
@@ -101,7 +101,7 @@ namespace greg.CommonShop
                     return _cartMethod;
                 }
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
         private static MethodInfo FindCartMethod()
@@ -114,7 +114,7 @@ namespace greg.CommonShop
                     if (found != null) return found;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
@@ -128,7 +128,7 @@ namespace greg.CommonShop
                     if (MatchesCartSignature(m)) return m;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
@@ -143,7 +143,7 @@ namespace greg.CommonShop
                 if (ps[3].ParameterType != typeof(string)) return false;
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
     }
 }

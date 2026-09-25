@@ -4,8 +4,13 @@ namespace gregCore.Core.Diagnostics;
 
 public static class GregDoctor
 {
+    public static GregDoctorReport Create(string gameRoot, string manifestPath, string logPath)
+    {
+        return Create(gameRoot, manifestPath, logPath, null, null);
+    }
+
     public static GregDoctorReport Create(string gameRoot, string manifestPath, string logPath,
-        IEnumerable<string>? loadedMods = null, IEnumerable<string>? activeHosts = null)
+        IEnumerable<string>? loadedMods, IEnumerable<string>? activeHosts)
     {
         var fingerprint = GameFingerprint.Capture(gameRoot);
         var manifestVersion = "UNKNOWN";

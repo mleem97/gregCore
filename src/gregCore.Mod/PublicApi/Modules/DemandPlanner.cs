@@ -54,7 +54,7 @@ public sealed class DemandScanResult
 
 public static class DemandPlanner
 {
-    public const float DefaultEpsilon = 0.001f;
+    public static float DefaultEpsilon { get; } = 0.001f;
 
     public static (bool DoRoute, bool DoFeed, bool DoProducts) ResolveActions(DemandOptions options)
     {
@@ -259,7 +259,13 @@ public static class DemandPlanner
     // The player must overprovision accordingly - exactly the
     // "high-end" feel. Never drain below 0, never more than available.
     public static List<(int AppId, float Amount)> ComputeHighEndDrain(
-        float[] required, float[] current, float multiplier, float epsilon = DefaultEpsilon)
+        float[] required, float[] current, float multiplier)
+    {
+        return ComputeHighEndDrain(required, current, multiplier, DefaultEpsilon);
+    }
+
+    public static List<(int AppId, float Amount)> ComputeHighEndDrain(
+        float[] required, float[] current, float multiplier, float epsilon)
     {
         var drain = new List<(int, float)>();
         if (required == null || current == null) return drain;

@@ -94,7 +94,7 @@ public static class GregCoop
         if (sync == null) return result;
         Try(() =>
         {
-            var _ = sync.gameObject; // liveness
+            _ = sync.gameObject; // liveness
             var dict = sync.avatars;
             if (dict == null) return;
             foreach (var kv in dict)
@@ -124,7 +124,7 @@ public static class GregCoop
         if (sync == null) return false;
         try
         {
-            var _ = sync.gameObject; // liveness
+            _ = sync.gameObject; // liveness
             sync.RemoveAvatar(peerId);
             return true;
         }
@@ -141,7 +141,7 @@ public static class GregCoop
         if (sync == null) return false;
         try
         {
-            var _ = sync.gameObject; // liveness
+            _ = sync.gameObject; // liveness
             sync.ForceResend();
             return true;
         }
@@ -314,7 +314,7 @@ public static class GregCoop
         if (sync == null) return result;
         Try(() =>
         {
-            var _ = sync.gameObject; // liveness
+            _ = sync.gameObject; // liveness
             var dict = sync.ghosts;
             if (dict == null) return;
             foreach (var kv in dict)
@@ -331,7 +331,7 @@ public static class GregCoop
         if (sync == null) return false;
         try
         {
-            var _ = sync.gameObject; // liveness
+            _ = sync.gameObject; // liveness
             sync.RemoveGhost(peerId);
             return true;
         }
@@ -376,7 +376,7 @@ public static class GregCoop
         if (chat == null) return false;
         try
         {
-            var _ = chat.gameObject; // liveness
+            _ = chat.gameObject; // liveness
             chat.AddToChatOutput(text);
             return true;
         }

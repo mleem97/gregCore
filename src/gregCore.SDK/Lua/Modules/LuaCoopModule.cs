@@ -38,7 +38,7 @@ public static class LuaCoopModule
         coop["shutdown"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregCoop.ShutdownSession(); }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -51,7 +51,7 @@ public static class LuaCoopModule
         coop["remove_avatar"] = (Func<double, bool>)((peerId) =>
         {
             try { return gregCore.Core.Networking.GregCoop.RemoveAvatar((ulong)peerId); }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -90,7 +90,7 @@ public static class LuaCoopModule
             t["z"] = (double)p.Position.z;
             t["yaw"] = (double)p.Yaw;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return t;
     }
 
@@ -100,14 +100,14 @@ public static class LuaCoopModule
         coop["resend"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregCoop.ForceResend(); }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.coop.peer_timeout() -> number
         coop["peer_timeout"] = (Func<double>)(() =>
         {
             try { return (double)gregCore.Core.Networking.GregCoop.GetPeerTimeout(); }
-            catch { return 0.0; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0.0; }
         });
     }
 }

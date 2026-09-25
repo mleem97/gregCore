@@ -39,6 +39,6 @@ internal static class Patch_CustomerBase_AreAllAppRequirementsMet
             if (_satisfiedCustomers.Remove(id))
                 EventDispatcher.FireCustomerUnsatisfied(id);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

@@ -24,12 +24,12 @@ public static class GregMenuBinding
         if (string.IsNullOrEmpty(menuId) || toggle == null) return;
         GregMenuRegistry.RegisterOpener(menuId, () =>
         {
-            try { toggle(); } catch { }
+            try { toggle(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             Report(menuId, SafeIsOpen(isOpen));
         });
         GregMenuRegistry.RegisterCloser(menuId, () =>
         {
-            try { if (isOpen == null || SafeIsOpen(isOpen)) toggle(); } catch { }
+            try { if (isOpen == null || SafeIsOpen(isOpen)) toggle(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             Report(menuId, false);
         });
     }
@@ -40,11 +40,11 @@ public static class GregMenuBinding
     /// </summary>
     public static void Report(string menuId, bool open)
     {
-        try { GregMenuRegistry.SetOpen(menuId, open); } catch { }
+        try { GregMenuRegistry.SetOpen(menuId, open); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool SafeIsOpen(Func<bool> isOpen)
     {
-        try { return isOpen != null && isOpen(); } catch { return false; }
+        try { return isOpen != null && isOpen(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

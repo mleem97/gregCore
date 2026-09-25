@@ -101,7 +101,7 @@ public sealed partial class LuaRepl
             }
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private bool TryHistoryDown(Keyboard keyboard)
@@ -114,7 +114,7 @@ public sealed partial class LuaRepl
             _inputField.value = _input;
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private void TrySubmitEnter(Keyboard keyboard)
@@ -124,7 +124,7 @@ public sealed partial class LuaRepl
             if (!keyboard.enterKey.wasPressedThisFrame) return;
             SubmitCurrentInput();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private void SubmitCurrentInput()
@@ -325,11 +325,11 @@ public sealed partial class LuaRepl
                 AddOutput($"<color=#00BFA5>= {result.ToPrintString()}</color>");
             }
         }
-        catch (SyntaxErrorException sex)
+        catch (SyntaxErrorException sex) /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             AddOutput($"<color=#FF5252>Syntax Error: {sex.Message}</color>");
         }
-        catch (ScriptRuntimeException rex)
+        catch (ScriptRuntimeException rex) /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             AddOutput($"<color=#FF5252>Runtime Error: {rex.Message}</color>");
         }

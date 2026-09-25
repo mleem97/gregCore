@@ -122,7 +122,7 @@ public class LuaCoroutineScheduler
                 catch (Exception ex)
                 {
                     MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine tick error: {ex.Message}");
-                    try { _coroutines.RemoveAt(i); } catch { }
+                    try { _coroutines.RemoveAt(i); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
         }
@@ -137,7 +137,7 @@ public class LuaCoroutineScheduler
         var co = _coroutines[index];
         if (co.Coroutine.State == CoroutineState.Dead)
         {
-            try { _coroutines.RemoveAt(index); } catch { }
+            try { _coroutines.RemoveAt(index); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return;
         }
         try
@@ -149,7 +149,7 @@ public class LuaCoroutineScheduler
         catch (Exception ex)
         {
             MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine error: {ex.Message}");
-            try { _coroutines.RemoveAt(index); } catch { }
+            try { _coroutines.RemoveAt(index); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 
@@ -163,7 +163,7 @@ public class LuaCoroutineScheduler
             co.WaitRemaining = null;
             return false;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void TryApplyWaitResult(LuaCoroutine co, DynValue result)

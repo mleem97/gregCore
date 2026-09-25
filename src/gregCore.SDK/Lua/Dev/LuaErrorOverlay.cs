@@ -24,7 +24,12 @@ public sealed class LuaErrorOverlay
     /// <summary>
     /// Adds a new error.
     /// </summary>
-    public void ReportError(string modId, string message, string? stackTrace = null)
+    public void ReportError(string modId, string message)
+    {
+        ReportError(modId, message, null);
+    }
+
+    public void ReportError(string modId, string message, string? stackTrace)
     {
         _errors.Add(new ErrorEntry
         {

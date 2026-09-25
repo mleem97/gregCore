@@ -34,7 +34,7 @@ public static class GregObjectives
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.CreateNewObjective(localisationUID, objectiveUID, position, xpReward, reputationReward, isSub);
             return true;
         }
@@ -51,7 +51,7 @@ public static class GregObjectives
         if (inst == null) return -1;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             return inst.CreateAppObjective(customerID, appID, time, requiredIOPS);
         }
         catch (Exception ex)
@@ -67,7 +67,7 @@ public static class GregObjectives
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.StartObjective(objectiveUID, position, false);
             return true;
         }
@@ -84,7 +84,7 @@ public static class GregObjectives
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ClearObjectives();
             return true;
         }
@@ -101,7 +101,7 @@ public static class GregObjectives
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             return inst.IsTutorialInProgress();
         }
         catch { return false; }
@@ -114,7 +114,7 @@ public static class GregObjectives
         if (inst == null) return result;
         Try(() =>
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             var set = inst.activeObjectives;
             if (set == null) return;
             foreach (var uid in set)
@@ -133,7 +133,7 @@ public static class GregObjectives
         if (timed == null) return false;
         try
         {
-            var _ = timed.gameObject; // liveness
+            _ = timed.gameObject; // liveness
             timed.SetupObjectiveTimed(maxTime, text ?? "", customerID, appID, requiredIOPS);
             return true;
         }
@@ -149,7 +149,7 @@ public static class GregObjectives
         if (objective == null) return false;
         try
         {
-            var _ = objective.gameObject; // liveness
+            _ = objective.gameObject; // liveness
             objective.GetReward();
             return true;
         }
@@ -192,7 +192,7 @@ public static class GregObjectives
         if (mgr == null || device == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.Register(device);
             return true;
         }
@@ -209,7 +209,7 @@ public static class GregObjectives
         if (mgr == null || device == null) return false;
         try
         {
-            var _ = mgr.gameObject; // liveness
+            _ = mgr.gameObject; // liveness
             mgr.Unregister(device);
             return true;
         }

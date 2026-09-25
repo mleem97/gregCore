@@ -40,15 +40,15 @@ public static class GregModDeps
 
     public sealed class ModEntry
     {
-        public string Id = "";
+        public string Id { get; set; } = "";
         public string Version { get; set; } = "";
     }
 
     public sealed class ManifestDiff
     {
         public List<ModEntry> MissingOnRemote { get; set; } = new List<ModEntry>();
-        public List<ModEntry> MissingLocally = new List<ModEntry>();
-        public List<string> VersionMismatches = new List<string>();
+        public List<ModEntry> MissingLocally { get; set; } = new List<ModEntry>();
+        public List<string> VersionMismatches { get; set; } = new List<string>();
         public bool Compatible => MissingOnRemote.Count == 0 && MissingLocally.Count == 0 && VersionMismatches.Count == 0;
     }
 

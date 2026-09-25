@@ -76,7 +76,7 @@ namespace gregCore.GameLayer.Bootstrap;
                         if (File.Exists(candidate))
                             return Assembly.LoadFrom(candidate);
                     }
-                    catch { /* per-folder best-effort */ }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* per-folder best-effort */ }
                 }
             }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
@@ -92,7 +92,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 _manifestLibraryFolders = validation.LibraryFolders.ToArray();
                 foreach (var warn in validation.Warnings.Take(10))
                 {
-                    try { melonLogger.Warning($"[gregCore][Manifest] {warn}"); } catch { }
+                    try { melonLogger.Warning($"[gregCore][Manifest] {warn}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
                 if (validation.Found)
                 {
@@ -101,7 +101,7 @@ namespace gregCore.GameLayer.Bootstrap;
                         $"{validation.ValidPlugins.Count} plugins."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { /* manifest is optional */ }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* manifest is optional */ }
         }
 
         private sealed class CoreBundle
@@ -137,7 +137,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 container.Register<IGregPersistenceService>(new GregPersistenceService(logger));
                 container.Register<IGregHookRegistry>(new GregHookRegistry(logger));
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private sealed class SettingsBundle
@@ -175,7 +175,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 container.Register<GregInputBindingService>(s.InputBinding);
                 container.Register<IGregPluginRegistry>(s.PluginRegistry);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void RegisterNative(GregServiceContainer container, ConsoleLogger logger, GregEventBus bus)
@@ -190,7 +190,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 container.Register<Core.Abstractions.IGregNativeModService>(nativeModService);
                 container.Register<gregCore.Infrastructure.Plugins.Native.GregNativeModService>(nativeModService);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void RegisterUi(GregServiceContainer container, ConsoleLogger logger, SettingsBundle s, CoreBundle core)
@@ -210,7 +210,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 gregCore.API.GregAPI._keybindReg = s.Keybinds;
                 gregCore.API.GregAPI._modSettingsService = s.ModSettings;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static global::gregCore.PublicApi.GregApiContext CreateApiContext(GregServiceContainer container, ConsoleLogger logger, CoreBundle core, SettingsBundle s)
@@ -245,7 +245,7 @@ namespace gregCore.GameLayer.Bootstrap;
                 global::gregCore.PublicApi.greg._context = apiContext;
                 global::gregCore.PublicApi.greg._governor = governor;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
     private static void ValidateStartup(GregServiceContainer container)

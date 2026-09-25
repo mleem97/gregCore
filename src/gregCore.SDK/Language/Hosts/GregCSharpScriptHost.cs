@@ -11,15 +11,11 @@ public sealed class GregCSharpScriptHost : IGregLanguageHost
     public bool IsActive { get; private set; }
     public string[] FileExtensions => new[] { ".cs" };
 
-    public bool IsDependencyAvailable(out string detail)
+    public (bool available, string detail) IsDependencyAvailable()
     {
         if (!GregCSharpCompiler.IsAvailable)
-        {
-            detail = "Roslyn (Microsoft.CodeAnalysis.CSharp) not found in runtime";
-            return false;
-        }
-        detail = "Roslyn / C# script runtime";
-        return true;
+            return (false, "Roslyn (Microsoft.CodeAnalysis.CSharp) not found in runtime");
+        return (true, "Roslyn / C# script runtime");
     }
 
     public void Activate(string modsScriptsDir)

@@ -11,10 +11,9 @@ public sealed class GregLuaHost : IGregLanguageHost
     public bool IsActive { get; private set; }
     public string[] FileExtensions => new[] { ".lua" };
 
-    public bool IsDependencyAvailable(out string detail)
+    public (bool available, string detail) IsDependencyAvailable()
     {
-        detail = "MoonSharp 2.0.0";
-        return typeof(Script) != null;
+        return (typeof(Script) != null, "MoonSharp 2.0.0");
     }
 
     public void Activate(string modsScriptsDir)

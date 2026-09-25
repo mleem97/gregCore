@@ -81,7 +81,8 @@ public static class GregLanguageRegistry
                 continue;
             }
 
-            if (!host.IsDependencyAvailable(out var detail))
+            var (available, detail) = host.IsDependencyAvailable();
+            if (!available)
             {
                 MelonLogger.Warning($"[gregCore] {host.HostName} dependency missing: {detail}");
                 MelonLogger.Msg($"[gregCore]   [{host.HostId}] {("SKIPPED").PadRight(10)} — dependency missing");

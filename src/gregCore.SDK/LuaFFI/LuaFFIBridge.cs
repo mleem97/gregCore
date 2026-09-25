@@ -83,8 +83,8 @@ public sealed class LuaFFIBridge
     {
         try
         {
-            if (!TryResolveSource(source, out string dir, out string mainFile, out bool isLegacyFile)) return;
-            LoadSinglePlugin(source, dir, mainFile, luaDir, isLegacyFile);
+            if (!TryResolveSource(source, out string dir, out _, out bool isLegacyFile)) return;
+            LoadSinglePlugin(source, dir, luaDir, isLegacyFile);
         }
         catch (Exception ex)
         {
@@ -121,7 +121,7 @@ public sealed class LuaFFIBridge
         catch { return true; }
     }
 
-    private static void LoadSinglePlugin(string source, string dir, string mainFile, string luaDir, bool isLegacyFile)
+    private static void LoadSinglePlugin(string source, string dir, string luaDir, bool isLegacyFile)
     {
         try
         {
@@ -131,16 +131,15 @@ public sealed class LuaFFIBridge
                 : ReadManifest(manifestFile, Path.GetFileName(dir));
             string id = manifest.Id;
             string resolvedMain = Path.Combine(dir, string.IsNullOrWhiteSpace(manifest.Entrypoint) ? "main.lua" : manifest.Entrypoint);
-            mainFile = resolvedMain;
             var script = new Script(CoreModules.Preset_SoftSandbox);
             var gregTable = SetupScript(script, dir, luaDir, id);
             var scheduler = SetupScheduler(script, gregTable);
-            RunMainFile(script, mainFile);
-            var plugin = BuildPlugin(id, manifest, script, mainFile, scheduler);
+            RunMainFile(script, resolvedMain);
+            var plugin = BuildPlugin(id, manifest, script, resolvedMain, scheduler);
             SafeCall(plugin, plugin.OnInit);
             _plugins.Add(plugin);
             RegisterInModRegistry(id, manifest);
-            _hotReload?.RegisterPlugin(id, script, mainFile);
+            _hotReload?.RegisterPlugin(id, script, resolvedMain);
             MelonLogger.Msg($"[LuaFFI] Mod loaded: {id} ({_hookGenerator?.TotalHookCount} hooks available)");
         }
         catch (Exception ex)

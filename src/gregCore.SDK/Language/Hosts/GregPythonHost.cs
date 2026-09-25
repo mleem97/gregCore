@@ -10,17 +10,12 @@ public sealed class GregPythonHost : IGregLanguageHost
     public bool IsActive { get; private set; }
     public string[] FileExtensions => new[] { ".py" };
 
-    public bool IsDependencyAvailable(out string detail)
+    public (bool available, string detail) IsDependencyAvailable()
     {
         var pythonType = Type.GetType("Python.Runtime.PythonEngine, Python.Runtime");
         if (pythonType == null)
-        {
-            detail = "Python.Runtime.dll missing";
-            return false;
-        }
-
-        detail = "Python-Host-Bindings";
-        return true;
+            return (false, "Python.Runtime.dll missing");
+        return (true, "Python-Host-Bindings");
     }
 
     public void Activate(string modsScriptsDir)

@@ -100,7 +100,7 @@ public sealed class GregDemandModule
             foreach (var kv in subnets)
             {
                 result.Apps++;
-                result.Routed += TryAutoRoute(cb, customerId, kv.Key, kv.Value, options.DryRun, doRoute, options.Quiet);
+                result.Routed += TryAutoRoute(cb, customerId, kv.Key, kv.Value, doRoute, options.Quiet);
             }
         }
         catch (Exception ex) { LogMemberFailure(ex); }
@@ -220,7 +220,7 @@ public sealed class GregDemandModule
         catch (Exception ex) { LogMemberFailure(ex); return false; }
     }
 
-    private int TryAutoRoute(global::Il2Cpp.CustomerBase cb, int customerId, int appId, string subnet, bool dryRun, bool write, bool quiet)
+    private int TryAutoRoute(global::Il2Cpp.CustomerBase cb, int customerId, int appId, string subnet, bool write, bool quiet)
     {
         try
         {

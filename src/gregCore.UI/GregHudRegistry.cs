@@ -15,9 +15,9 @@ public static class GregHudRegistry
 {
     public sealed class Entry
     {
-        public string ModId;
-        public string Key;
-        public string Label;
+        public string ModId { get; set; }
+        public string Key { get; set; }
+        public string Label { get; set; }
     }
 
     private static readonly Dictionary<string, Entry> _entries =

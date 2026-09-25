@@ -21,7 +21,12 @@ public sealed class ConsoleLogger : IGregLogger
 
     public void Info(string message) => greg.Logging.GregLogger.Msg(message, _context);
     public void Warning(string message) => greg.Logging.GregLogger.Warn(message, _context);
-    public void Error(string message, Exception? ex = null) 
+    public void Error(string message)
+    {
+        Error(message, null);
+    }
+
+    public void Error(string message, Exception? ex)
     {
         greg.Logging.GregLogger.Error(message, ex, _context);
     }

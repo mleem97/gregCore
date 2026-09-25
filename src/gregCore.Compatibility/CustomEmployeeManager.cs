@@ -98,7 +98,7 @@ public static partial class CustomEmployeeManager
             CrashLog.Log($"CustomEmployee registered: id={id}, name={name}, salary={salary}/h, requiredRep={reputation}");
             MelonLogger.Msg($"[CustomEmployee] Registered: {name} (id={id}, salary={salary}/h, rep={reputation})");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public static bool IsHired(string id)
@@ -123,7 +123,7 @@ public static partial class CustomEmployeeManager
     private static bool HasRequiredReputation(CustomEmployeeEntry entry)
     {
         float playerRep = 0f;
-        try { playerRep = PlayerManager.instance?.playerClass?.reputation ?? 0f; } catch { }
+        try { playerRep = PlayerManager.instance?.playerClass?.reputation ?? 0f; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         if (playerRep >= entry.RequiredReputation) return true;
         CrashLog.Log($"CustomEmployee hire rejected: {entry.EmployeeId} requires rep {entry.RequiredReputation}, player has {playerRep}");
         MelonLogger.Warning($"[CustomEmployee] Cannot hire {entry.Name}: need reputation {entry.RequiredReputation} (you have {playerRep:F0})");
@@ -137,11 +137,11 @@ public static partial class CustomEmployeeManager
             entry.IsHired = true;
             CrashLog.Log($"CustomEmployee hired: {id} ({entry.Name})");
             MelonLogger.Msg($"[CustomEmployee] Hired: {entry.Name}");
-            try { BalanceSheet.instance?.RegisterSalary((int)entry.SalaryPerHour); } catch { }
+            try { BalanceSheet.instance?.RegisterSalary((int)entry.SalaryPerHour); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             EventDispatcher.FireCustomEmployeeHired(id);
             SaveState();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Returns: 1 = fired, 0 = not found or not currently hired
@@ -268,7 +268,7 @@ public static partial class CustomEmployeeManager
                 CrashLog.Log($"LoadState: restored IsHired for '{e.EmployeeId}' ({e.Name}), salary={e.SalaryPerHour}");
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return anyRestored;
     }
 
@@ -305,7 +305,7 @@ public static partial class CustomEmployeeManager
                 CrashLog.Log($"ReregisterSalariesIfNeeded: registered salary {e.SalaryPerHour} for '{e.EmployeeId}' ({e.Name})");
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return count;
     }
 }

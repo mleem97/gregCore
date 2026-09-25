@@ -46,11 +46,10 @@ public sealed class GregJsHost : IGregLanguageHost
     private readonly HashSet<string> _pendingReloads = new(StringComparer.OrdinalIgnoreCase);
     private bool _pendingLogged;
 
-    public bool IsDependencyAvailable(out string detail)
+    public (bool available, string detail) IsDependencyAvailable()
     {
-        detail = "JS runtime binding (Jint)";
-        try { return typeof(Engine) != null; }
-        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
+        try { return (typeof(Engine) != null, "JS runtime binding (Jint)"); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return (false, "JS runtime binding (Jint)"); }
     }
 
     public void Activate(string modsScriptsDir)

@@ -12,6 +12,7 @@ public interface IGregLogger
     void Info(string message);
     void Success(string message);
     void Warning(string message);
-    void Error(string message, Exception? ex = null);
+    void Error(string message);
+    void Error(string message, Exception? ex);
     IGregLogger ForContext(string context);
 }

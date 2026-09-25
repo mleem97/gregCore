@@ -10,10 +10,9 @@ public sealed class GregRustHost : IGregLanguageHost
     public bool IsActive { get; private set; }
     public string[] FileExtensions => new[] { ".rs", ".rmod" };
 
-    public bool IsDependencyAvailable(out string detail)
+    public (bool available, string detail) IsDependencyAvailable()
     {
-        detail = "Rust-Bridge (FFI/ABI-Layer)";
-        return typeof(RustFFIBridge) != null;
+        return (typeof(RustFFIBridge) != null, "Rust-Bridge (FFI/ABI-Layer)");
     }
 
     public void Activate(string modsScriptsDir)

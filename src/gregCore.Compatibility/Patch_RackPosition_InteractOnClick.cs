@@ -24,7 +24,7 @@ internal static class Patch_RackPosition_InteractOnClick
             _prevNumObjects = pm.numberOfObjectsInHand;
             _prevObjectInHand = (int)pm.objectInHand;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     internal static void Postfix(RackPosition __instance)

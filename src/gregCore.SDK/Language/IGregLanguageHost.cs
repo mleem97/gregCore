@@ -33,7 +33,7 @@ public interface IGregLanguageHost
     /// <summary>
     /// Checks whether the runtime dependencies for this host are available.
     /// </summary>
-    bool IsDependencyAvailable(out string detail);
+    (bool available, string detail) IsDependencyAvailable();
 
     /// <summary>
     /// Activates the host and loads scripts from the given directory.

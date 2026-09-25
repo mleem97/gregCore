@@ -14,7 +14,7 @@ public static class GregAudioClipCache
         public long LastUsed { get; set; }
     }
 
-    public const int Capacity = 3;
+    public static int Capacity { get; } = 3;
 
     private static readonly Dictionary<string, Entry> _cache =
         new Dictionary<string, Entry>(System.StringComparer.OrdinalIgnoreCase);

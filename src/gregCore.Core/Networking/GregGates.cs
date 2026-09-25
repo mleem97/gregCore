@@ -58,7 +58,7 @@ public static class GregGates
         if (gate == null) return false;
         try
         {
-            var _ = gate.gameObject; // liveness
+            _ = gate.gameObject; // liveness
             gate.OpenGate();
             return true;
         }
@@ -74,7 +74,7 @@ public static class GregGates
         if (gate == null) return false;
         try
         {
-            var _ = gate.gameObject; // liveness
+            _ = gate.gameObject; // liveness
             if (networked) gate.CloseGateNetworked();
             else gate.CloseGate();
             return true;
@@ -91,7 +91,7 @@ public static class GregGates
         if (gate == null) return false;
         try
         {
-            var _ = gate.gameObject; // liveness
+            _ = gate.gameObject; // liveness
             gate.ApplyRemoteToggle(open);
             return true;
         }
@@ -107,7 +107,7 @@ public static class GregGates
         if (gate == null) return false;
         try
         {
-            var _ = gate.gameObject; // liveness
+            _ = gate.gameObject; // liveness
             gate.TruckComing();
             return true;
         }
@@ -137,7 +137,7 @@ public static class GregGates
         if (wall == null) return false;
         try
         {
-            var _ = wall.gameObject; // liveness
+            _ = wall.gameObject; // liveness
             wall.OpenWall();
             return true;
         }

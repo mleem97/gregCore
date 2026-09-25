@@ -23,15 +23,15 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
 
     private static string ReadSwitchId(NetworkSwitch? instance)
     {
-        try { return instance?.switchId ?? ""; } catch { return ""; }
+        try { return instance?.switchId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static int ResolveRackUid(NetworkSwitch? instance, SwitchSaveData? save)
     {
         int rackPosUid = -1;
         try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
-        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { }
-        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { }
+        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return rackPosUid;
     }
 
@@ -44,7 +44,7 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
             ApplyRestoredId(instance, rackPosUid, currentId, pending.Value.objectId, "restored clone ID");
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void TryRestoreInstalled(NetworkSwitch? instance, int rackPosUid, string currentId)
@@ -55,7 +55,7 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
             if (!installed.HasValue) return;
             ApplyRestoredId(instance, rackPosUid, currentId, installed.Value.objectId, "restored clone ID (dict fallback)");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplyRestoredId(NetworkSwitch? instance, int rackPosUid, string currentId, string stableId, string label)
@@ -63,10 +63,10 @@ internal static class Patch_NetworkSwitch_SwitchInsertedInRack
         try
         {
             if (string.IsNullOrEmpty(stableId) || currentId == stableId) return;
-            try { if (instance != null) instance.switchId = stableId; } catch { }
-            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { }
+            try { if (instance != null) instance.switchId = stableId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             CrashLog.Log($"[WorldSync] SwitchInsertedInRack: {label} '{currentId}' → '{stableId}' rackUid={rackPosUid}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

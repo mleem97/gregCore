@@ -16,12 +16,12 @@ namespace greg.CommonShop
                     ? Object.Instantiate(data.CustomPrefab, parent)
                     : Object.Instantiate(template.gameObject, parent);
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
         private static void NameCard(GameObject card, CustomShopItem data)
         {
-            try { card.name = $"ModCard_{data.Name.Replace(" ", "_")}"; } catch { }
+            try { card.name = $"ModCard_{data.Name.Replace(" ", "_")}"; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void RemoveVanillaComponent(GameObject card)
@@ -31,7 +31,7 @@ namespace greg.CommonShop
                 var si = card.GetComponent<ShopItem>();
                 if (si != null) Object.DestroyImmediate(si);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplyCardTexts(GameObject card, CustomShopItem data)
@@ -42,7 +42,7 @@ namespace greg.CommonShop
                 {
                     if (txt == null) continue;
                     if (!TryLowerName(txt.name, out string n)) continue;
-                    try { ApplySingleText(txt, data, n); } catch { }
+                    try { ApplySingleText(txt, data, n); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
@@ -55,7 +55,7 @@ namespace greg.CommonShop
                 if (lowerName == "textprice") txt.text = $"{data.Price} $";
                 else if (lowerName == "text") txt.text = data.Name;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplyCardImages(GameObject card, ShopItem template, CustomShopItem data)
@@ -66,10 +66,10 @@ namespace greg.CommonShop
                 {
                     if (img == null) continue;
                     if (!TryLowerName(img.name, out string n)) continue;
-                    try { ApplySingleImage(img, template, data, n); } catch { }
+                    try { ApplySingleImage(img, template, data, n); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplySingleImage(Image img, ShopItem template, CustomShopItem data, string lowerName)
@@ -84,20 +84,20 @@ namespace greg.CommonShop
                     img.color = Color.white;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static bool TryLowerName(string name, out string lower)
         {
             lower = "";
             try { lower = name.ToLower(); return true; }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static void RewireBuyButton(ComputerShop shop, GameObject card, CustomShopItem data, System.Reflection.MethodInfo cart)
         {
             ButtonExtended btnExt = null!;
-            try { btnExt = card.GetComponentInChildren<ButtonExtended>(true); } catch { }
+            try { btnExt = card.GetComponentInChildren<ButtonExtended>(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             if (btnExt == null) return;
             try
             {
@@ -105,7 +105,7 @@ namespace greg.CommonShop
                 btnExt.interactable = true;
                 Action buy = () =>
                 {
-                    try { AddCustomItemToCart(shop, data, cart); } catch { }
+                    try { AddCustomItemToCart(shop, data, cart); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                     try { data.OnBuy?.Invoke(); } catch (Exception ex) { _log.Warn($"OnBuy failed '{data.Name}': {ex.GetBaseException().Message}"); }
                 };
                 btnExt.onClick.AddListener((Action)buy);

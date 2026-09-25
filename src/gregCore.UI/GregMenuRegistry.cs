@@ -21,7 +21,7 @@ public static class GregMenuRegistry
     private sealed class Entry
     {
         public GregMenuOptions Options = new GregMenuOptions();
-        public bool Open;
+        public bool Open { get; set; }
         public Action Opener;
         public Action Closer;
     }
@@ -136,10 +136,10 @@ public static class GregMenuRegistry
 
     public sealed class MenuInfo
     {
-        public string MenuId;
-        public bool Open;
-        public bool HasOpener;
-        public bool HasCloser;
+        public string MenuId { get; set; }
+        public bool Open { get; set; }
+        public bool HasOpener { get; set; }
+        public bool HasCloser { get; set; }
     }
 
     public static void SetOpen(string menuId, bool open)

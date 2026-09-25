@@ -81,7 +81,7 @@ public static class LuaShopModule
                 var si = ItemAt(idx);
                 return si != null && gregCore.Core.Networking.GregShop.UnlockItem(si);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.shop.buy(idx) → bool (adds to cart / buys)
@@ -128,7 +128,7 @@ public static class LuaShopModule
                 }
                 return result;
             }
-            catch { return new Table(script); }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return new Table(script); }
         });
     }
 
@@ -144,7 +144,7 @@ public static class LuaShopModule
                 if (r < 1 || r > rows.Count) return false;
                 return gregCore.Core.Networking.GregShop.CartAddOne(rows[r - 1]);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
         t["cart_remove"] = (Func<int, bool>)((r) =>
         {
@@ -154,7 +154,7 @@ public static class LuaShopModule
                 if (r < 1 || r > rows.Count) return false;
                 return gregCore.Core.Networking.GregShop.CartRemoveOne(rows[r - 1]);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -181,7 +181,7 @@ public static class LuaShopModule
                         t["name"] = dto != null ? dto.ItemName ?? "" : "";
                         t["price"] = dto != null ? dto.Price : 0;
                         int modId = 0;
-                        try { modId = gregCore.Core.Networking.GregShop.GetModId(mi); } catch { }
+                        try { modId = gregCore.Core.Networking.GregShop.GetModId(mi); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         t["mod_id"] = modId;
                         result[i++] = t;
                     }
@@ -210,7 +210,7 @@ public static class LuaShopModule
                 var mi = found[r - 1];
                 return mi != null && gregCore.Core.Networking.GregShop.BuyModItem(mi);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.shop.picker_is_open() / picker_open() / picker_cancel() → bool
@@ -221,7 +221,7 @@ public static class LuaShopModule
                 var shop = GetShop();
                 return shop != null && gregCore.Core.Networking.GregShop.IsPickerOpen(shop);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -234,7 +234,7 @@ public static class LuaShopModule
                 var shop = GetShop();
                 return shop != null && gregCore.Core.Networking.GregShop.OpenPicker(shop);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
         t["picker_cancel"] = (Func<bool>)(() =>
         {
@@ -243,7 +243,7 @@ public static class LuaShopModule
                 var shop = GetShop();
                 return shop != null && gregCore.Core.Networking.GregShop.CancelPicker(shop);
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -265,7 +265,7 @@ public static class LuaShopModule
                 t["a"] = (double)c.a;
                 return DynValue.FromObject(script, t);
             }
-            catch { return DynValue.Nil; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return DynValue.Nil; }
         });
         t["picker_set_color"] = (Func<double, double, double, double, bool>)((r, g, b, a) =>
         {
@@ -276,7 +276,7 @@ public static class LuaShopModule
                 return gregCore.Core.Networking.GregShop.SetPickerColor(shop,
                     new UnityEngine.Color((float)r, (float)g, (float)b, (float)a));
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -290,7 +290,7 @@ public static class LuaShopModule
             if (shop == null || shop.Pointer == IntPtr.Zero) return null;
             return shop;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     internal static global::Il2Cpp.ShopItem ItemAt(int idx)
@@ -307,7 +307,7 @@ public static class LuaShopModule
             }
             return null;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     internal static System.Collections.Generic.List<global::Il2Cpp.ShopCartItem> CartRows()

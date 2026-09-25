@@ -25,20 +25,20 @@ internal static class Patch_Server_ServerInsertedInRack
 
     private static string ReadInstanceId(Server? instance)
     {
-        try { return instance?.ServerID ?? ""; } catch { return ""; }
+        try { return instance?.ServerID ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static byte ReadObjectType(Server? instance)
     {
-        try { return (byte)(instance?.serverType ?? 0); } catch { return 0; }
+        try { return (byte)(instance?.serverType ?? 0); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0; }
     }
 
     private static int ResolveRackUid(Server? instance, ServerSaveData? save)
     {
         int rackPosUid = -1;
-        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
-        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { }
-        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { }
+        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return rackPosUid;
     }
 
@@ -51,7 +51,7 @@ internal static class Patch_Server_ServerInsertedInRack
             ApplyRestoredId(instance, rackPosUid, instanceId, pending.Value.objectId, "restored clone ID");
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void TryRestoreInstalled(Server? instance, int rackPosUid, string instanceId)
@@ -62,7 +62,7 @@ internal static class Patch_Server_ServerInsertedInRack
             if (!installed.HasValue) return;
             ApplyRestoredId(instance, rackPosUid, instanceId, installed.Value.objectId, "restored clone ID (dict fallback)");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void ApplyRestoredId(Server? instance, int rackPosUid, string instanceId, string stableId, string label)
@@ -70,11 +70,11 @@ internal static class Patch_Server_ServerInsertedInRack
         try
         {
             if (string.IsNullOrEmpty(stableId) || instanceId == stableId) return;
-            try { if (instance != null) instance.ServerID = stableId; } catch { }
-            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { }
+            try { if (instance != null) instance.ServerID = stableId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             CrashLog.Log($"[WorldSync] ServerInsertedInRack: {label} '{instanceId}' → '{stableId}' rackUid={rackPosUid}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     internal static int FindServerPrefabIndex(Server srv)
@@ -89,7 +89,7 @@ internal static class Patch_Server_ServerInsertedInRack
                 try { if (mgr.serverPrefabs[i]?.name == prefix) return i; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return 0;
     }
 
@@ -101,6 +101,6 @@ internal static class Patch_Server_ServerInsertedInRack
             int idx = srvName.LastIndexOf('_');
             return idx > 0 ? srvName.Substring(0, idx) : srvName;
         }
-        catch { return srvName; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return srvName; }
     }
 }

@@ -83,8 +83,16 @@ public static class GregModSaveStrings
     public static global::Il2Cpp.ModItemSaveData? UpsertText(
         Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ModItemSaveData>? list,
         string folder,
+        string? text)
+    {
+        return UpsertText(list, folder, text, DefaultMaxChars);
+    }
+
+    public static global::Il2Cpp.ModItemSaveData? UpsertText(
+        Il2CppSystem.Collections.Generic.List<global::Il2Cpp.ModItemSaveData>? list,
+        string folder,
         string? text,
-        int maxChars = DefaultMaxChars)
+        int maxChars)
     {
         if (list == null || string.IsNullOrEmpty(folder)) return null;
         try

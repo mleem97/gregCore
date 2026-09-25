@@ -24,7 +24,12 @@ namespace gregCore.UI
         public static readonly Color Danger = new Color(1.00f, 0.32f, 0.32f);
         public static readonly Color Success = new Color(0.30f, 0.70f, 0.35f);
 
-        public static GUIStyle Box(Texture2D bg = null)
+        public static GUIStyle Box()
+        {
+            return Box(null);
+        }
+
+        public static GUIStyle Box(Texture2D bg)
         {
             var s = new GUIStyle();
             s.normal.background = bg;
@@ -34,7 +39,22 @@ namespace gregCore.UI
             return s;
         }
 
-        public static GUIStyle Label(int size = 13, bool bold = false, Color? color = null)
+        public static GUIStyle Label()
+        {
+            return Label(13);
+        }
+
+        public static GUIStyle Label(int size)
+        {
+            return Label(size, false);
+        }
+
+        public static GUIStyle Label(int size, bool bold)
+        {
+            return Label(size, bold, null);
+        }
+
+        public static GUIStyle Label(int size, bool bold, Color? color)
         {
             var s = new GUIStyle();
             s.fontSize = size;
@@ -43,7 +63,12 @@ namespace gregCore.UI
             return s;
         }
 
-        public static GUIStyle Button(bool primary = false)
+        public static GUIStyle Button()
+        {
+            return Button(false);
+        }
+
+        public static GUIStyle Button(bool primary)
         {
             var s = new GUIStyle();
             s.fontSize = 13;

@@ -50,8 +50,8 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
-                return File.ReadAllText(fullPath);
+                string fullPath = ResolveSafe(dataDir, path);
+                return GregIoFileStore.ReadAllText(fullPath);
             }
             catch (Exception ex)
             {
@@ -69,10 +69,8 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
-                string dir = Path.GetDirectoryName(fullPath)!;
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(fullPath, content);
+                string fullPath = ResolveSafe(dataDir, path);
+                GregIoFileStore.WriteAllText(fullPath, content);
             }
             catch (Exception ex)
             {
@@ -88,7 +86,7 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
+                string fullPath = ResolveSafe(dataDir, path);
                 File.AppendAllText(fullPath, content);
             }
             catch (Exception ex)
@@ -102,7 +100,7 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
+                string fullPath = ResolveSafe(dataDir, path);
                 if (File.Exists(fullPath)) File.Delete(fullPath);
             }
             catch (Exception ex)
@@ -120,7 +118,7 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
+                string fullPath = ResolveSafe(dataDir, path);
                 return File.Exists(fullPath);
             }
             catch
@@ -134,7 +132,7 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
+                string fullPath = ResolveSafe(dataDir, path);
                 if (File.Exists(fullPath)) File.Delete(fullPath);
             }
             catch (Exception ex)
@@ -182,9 +180,9 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
+                string fullPath = ResolveSafe(dataDir, path);
                 if (!File.Exists(fullPath)) return DynValue.Nil;
-                string text = File.ReadAllText(fullPath);
+                string text = GregIoFileStore.ReadAllText(fullPath);
                 if (string.IsNullOrWhiteSpace(text)) return DynValue.Nil;
                 using (var doc = System.Text.Json.JsonDocument.Parse(text))
                 {
@@ -207,11 +205,9 @@ public static class GregIoLuaModule
         {
             try
             {
-                string fullPath = ResolveSafe(dataDir, path); // nosemgrep: csharp.lang.security.filesystem.unsafe-path-combine.unsafe-path-combine -- all file access routes through ResolveSafe (GetFullPath + sandbox prefix containment); dataDir is framework-resolved, never raw Lua input.
-                string dir = Path.GetDirectoryName(fullPath)!;
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                string fullPath = ResolveSafe(dataDir, path);
                 object plain = LuaJsonModule.ToPlainObject(value);
-                File.WriteAllText(fullPath, System.Text.Json.JsonSerializer.Serialize(plain,
+                GregIoFileStore.WriteAllText(fullPath, System.Text.Json.JsonSerializer.Serialize(plain,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 return true;
             }

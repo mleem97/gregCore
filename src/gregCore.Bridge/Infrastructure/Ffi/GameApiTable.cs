@@ -14,12 +14,29 @@ namespace gregCore.Infrastructure.Ffi;
 
 [StructLayout(LayoutKind.Sequential)]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1104:Make this field private and encapsulate it in a public property", Justification = "ABI-CRITICAL FFI struct: fields must stay sequential public fields for native interop. See RULE 1-3 above.")]
-public struct GameApiTable
+public struct GameApiTable : IEquatable<GameApiTable>
 {
     // [GREG_SYNC_REVIEW_REQUIRED]
     public IntPtr GetVersion;
     public IntPtr RegisterEventHandler;
     public IntPtr SendNetworkMessage;
+
+    public bool Equals(GameApiTable other)
+    {
+        return GetVersion == other.GetVersion
+            && RegisterEventHandler == other.RegisterEventHandler
+            && SendNetworkMessage == other.SendNetworkMessage;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is GameApiTable other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(GetVersion, RegisterEventHandler, SendNetworkMessage);
+    }
 }
 
 public static class ApiTableGuard

@@ -13,7 +13,7 @@ namespace greg.CommonShop
             if (IsVanillaTemplateType(item)) return;
             int customId = (int)item.TemplateType;
             string modName = CallingModName();
-            if (TryValidateExistingClaim(customId, modName, item)) return;
+            if (TryValidateExistingClaim(customId, modName)) return;
             RegisterNewClaim(customId, modName, item);
         }
 
@@ -23,7 +23,7 @@ namespace greg.CommonShop
             catch { return true; }
         }
 
-        private static bool TryValidateExistingClaim(int customId, string modName, CustomShopItem item)
+        private static bool TryValidateExistingClaim(int customId, string modName)
         {
             try
             {

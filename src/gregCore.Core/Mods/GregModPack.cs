@@ -59,7 +59,7 @@ public static class GregModPack
         public string ModName = "";
         public List<ShopItem> ShopItems = new List<ShopItem>();
         public List<StaticItem> StaticItems { get; set; } = new List<StaticItem>();
-        public List<DllRef> Dlls = new List<DllRef>();
+        public List<DllRef> Dlls { get; set; } = new List<DllRef>();
     }
 
     // ── Factory: empty, immediately usable ModPackConfig ─────────────────────

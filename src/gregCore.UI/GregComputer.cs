@@ -96,7 +96,7 @@ public static partial class GregComputer
             RaiseChanged();
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static bool UnregisterShortcut(string modId, string id)
@@ -108,11 +108,29 @@ public static partial class GregComputer
             if (removed) RaiseChanged();
             return removed;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static bool RegisterApp(string modId, string appId, string title,
-        Action<GregPanelBuilder>? build, Action? onClosed = null, bool framePage = true)
+        Action<GregPanelBuilder>? build, Action? onClosed, bool framePage)
+    {
+        return RegisterAppImpl(modId, appId, title, build, onClosed, framePage);
+    }
+
+    public static bool RegisterApp(string modId, string appId, string title,
+        Action<GregPanelBuilder>? build)
+    {
+        return RegisterAppImpl(modId, appId, title, build, null, true);
+    }
+
+    public static bool RegisterApp(string modId, string appId, string title,
+        Action<GregPanelBuilder>? build, bool framePage)
+    {
+        return RegisterAppImpl(modId, appId, title, build, null, framePage);
+    }
+
+    private static bool RegisterAppImpl(string modId, string appId, string title,
+        Action<GregPanelBuilder>? build, Action? onClosed, bool framePage)
     {
         try
         {
@@ -129,7 +147,7 @@ public static partial class GregComputer
             RaiseChanged();
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static bool UnregisterApp(string modId, string appId)
@@ -145,7 +163,7 @@ public static partial class GregComputer
             }
             return removed;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static int UnregisterAll(string modId)
@@ -159,7 +177,7 @@ public static partial class GregComputer
             if (n > 0) RaiseChanged();
             return n;
         }
-        catch { return 0; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0; }
     }
 
     private static int RemoveOwned(string modId)
@@ -170,7 +188,7 @@ public static partial class GregComputer
             n += RemoveOwnedApps(modId);
             return n;
         }
-        catch { return 0; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0; }
     }
 
     private static int RemoveOwnedShortcuts(string modId)
@@ -189,10 +207,10 @@ public static partial class GregComputer
                         if (_shortcuts.TryGetValue(k, out var s) && s != null && s.ModId == modId && _shortcuts.Remove(k)) n++;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return n;
     }
 
@@ -212,10 +230,10 @@ public static partial class GregComputer
                         if (_apps.TryGetValue(k, out var a) && a != null && a.ModId == modId && _apps.Remove(k)) n++;
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return n;
     }
 
@@ -231,7 +249,7 @@ public static partial class GregComputer
                 return null;
             }
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     public static IReadOnlyList<ComputerShortcut> Shortcuts()
@@ -247,7 +265,7 @@ public static partial class GregComputer
                     .ToArray();
             }
         }
-        catch { return Array.Empty<ComputerShortcut>(); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Array.Empty<ComputerShortcut>(); }
     }
 
     public static IReadOnlyList<ComputerApp> Apps()
@@ -262,7 +280,7 @@ public static partial class GregComputer
                     .ToArray();
             }
         }
-        catch { return Array.Empty<ComputerApp>(); }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Array.Empty<ComputerApp>(); }
     }
 
     public static bool TryGetApp(string appId, out ComputerApp? app)
@@ -277,7 +295,7 @@ public static partial class GregComputer
             }
             return app != null;
         }
-        catch { app = null; return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  app = null; return false; }
     }
 
     public static bool TryOpenApp(string appId)
@@ -286,7 +304,7 @@ public static partial class GregComputer
         {
             if (!TryGetApp(appId, out var app) || app == null) return false;
             lock (_gate) { _currentAppId = app.AppId; }
-            try { AppOpened?.Invoke(app.AppId); } catch { }
+            try { AppOpened?.Invoke(app.AppId); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             SafeEmit(HookAppOpened, new Dictionary<string, object>
             {
                 { "AppId", app.AppId }, { "ModId", app.ModId }, { "Title", app.Title },
@@ -294,7 +312,7 @@ public static partial class GregComputer
             if (app.FramePage) ShowAppPage(app);
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static void CloseApp()
@@ -305,7 +323,7 @@ public static partial class GregComputer
             HideAppPage(state.Closing);
             NotifyClosed(state.Closing, state.OnClosed);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public static bool InvokeShortcut(string modId, string id)
@@ -326,12 +344,12 @@ public static partial class GregComputer
             }
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void RaiseChanged()
     {
-        try { Changed?.Invoke(); } catch { }
+        try { Changed?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SafeEmit(string hook, Dictionary<string, object> data)
@@ -345,7 +363,7 @@ public static partial class GregComputer
                 Data = data,
             });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
 }

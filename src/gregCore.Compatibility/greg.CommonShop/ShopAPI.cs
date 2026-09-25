@@ -44,7 +44,7 @@ namespace greg.CommonShop
         internal static void EnsureInitialized()
         {
             if (_initialized) return;
-            try { LoadIDRegistry(); } catch { }
+            try { LoadIDRegistry(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             _initialized = true;
         }
 
@@ -74,7 +74,7 @@ namespace greg.CommonShop
                     return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
 
@@ -89,7 +89,7 @@ namespace greg.CommonShop
                     return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
 
@@ -100,7 +100,7 @@ namespace greg.CommonShop
                 if (string.IsNullOrEmpty(item.Category))
                     item.Category = "Mods";
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void TryLiveInject()
@@ -114,7 +114,7 @@ namespace greg.CommonShop
                     InjectAll(shop);
                 }
             }
-            catch { /* best-effort */ }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* best-effort */ }
         }
 
         /// <summary>Attributes the calling mod for the persistent ID registry.</summary>
@@ -135,10 +135,10 @@ namespace greg.CommonShop
                         }
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return string.IsNullOrWhiteSpace(modName) ? "unknown" : modName;
             }
-            catch { return "unknown"; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "unknown"; }
         }
     }
 }

@@ -36,7 +36,7 @@ namespace greg.CommonShop
             {
                 if (gridContainer.GetComponent<LayoutElement>() == null) gridContainer.gameObject.AddComponent<LayoutElement>();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void NormalizeGrid(GridLayoutGroup grid)
@@ -49,7 +49,7 @@ namespace greg.CommonShop
                 grid.padding = new RectOffset { left = leftPad, right = rightPad, top = 10, bottom = 20 };
                 if (grid.spacing.y > 50f) grid.spacing = new Vector2(grid.spacing.x, 15f);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static int CountActiveCards(Transform gridContainer)
@@ -59,10 +59,10 @@ namespace greg.CommonShop
             {
                 for (int i = 0; i < gridContainer.childCount; i++)
                 {
-                    try { if (gridContainer.GetChild(i).gameObject.activeSelf) activeCards++; } catch { }
+                    try { if (gridContainer.GetChild(i).gameObject.activeSelf) activeCards++; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return activeCards;
         }
 
@@ -77,7 +77,7 @@ namespace greg.CommonShop
                 le.preferredHeight = 0;
                 le.flexibleHeight = 0;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ApplyGridHeight(Transform gridContainer, GridLayoutGroup grid, RectTransform rt, int activeCards)
@@ -94,7 +94,7 @@ namespace greg.CommonShop
                 le.preferredHeight = height;
                 le.flexibleHeight = 0;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static int ComputeColumnCount(GridLayoutGroup grid, RectTransform rt)
@@ -110,7 +110,7 @@ namespace greg.CommonShop
                     return cell > 0f ? Math.Max(1, Mathf.FloorToInt((usableWidth + grid.spacing.x) / cell)) : 4;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return 4;
         }
 
@@ -122,7 +122,7 @@ namespace greg.CommonShop
                 float spacingY = grid != null ? grid.spacing.y : 15f;
                 return 10f + 20f + (rows * cellH) + (Math.Max(0, rows - 1) * spacingY);
             }
-            catch { return 0f; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0f; }
         }
 
         internal static void UpdateLayoutHeight(ComputerShop shop)
@@ -163,7 +163,7 @@ namespace greg.CommonShop
                     if (activeChildren > 1) totalHeight += (activeChildren - 1) * layout.spacing;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return totalHeight;
         }
 
@@ -179,7 +179,7 @@ namespace greg.CommonShop
                 if (le != null && le.preferredHeight > 0) childHeight = le.preferredHeight;
                 return childHeight;
             }
-            catch { return 0f; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0f; }
         }
     }
 }

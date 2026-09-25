@@ -205,7 +205,7 @@ namespace gregCore.UI
                         CaptureFontFromText(txt);
                         if (_defaultTMPFontAsset != null && _defaultTMPMaterial != null) break;
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
             catch (Exception ex)
@@ -223,7 +223,7 @@ namespace gregCore.UI
                 _tmpTemplate = txt;
                 MelonLogger.Msg($"[FontLoader]   Captured TMP template from: '{txt.gameObject.name}' (Layer: {txt.gameObject.layer})");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void CaptureFontFromText(TextMeshProUGUI txt)
@@ -242,7 +242,7 @@ namespace gregCore.UI
                 if (_defaultUGUIFont == null && fontAsset.sourceFontFile != null)
                     _defaultUGUIFont = fontAsset.sourceFontFile;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void CaptureMaterial(TextMeshProUGUI txt)
@@ -254,7 +254,7 @@ namespace gregCore.UI
                 _defaultTMPMaterial = txt.fontSharedMaterial;
                 MelonLogger.Msg($"[FontLoader]   TMP material captured from scene: '{_defaultTMPMaterial.name}'");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void FindTMPFontAssets()
@@ -374,7 +374,7 @@ namespace gregCore.UI
                     ? $"[FontLoader] UGUI font: '{_defaultUGUIFont.name}' (gameFont={_hasFoundGameFont})"
                     : "[FontLoader] No UGUI font found - text may be invisible");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void EnsureTextCoreAsset()
@@ -403,7 +403,7 @@ namespace gregCore.UI
                 TrySdfDefinition();
                 TryLegacyDefinition();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void TrySdfDefinition()

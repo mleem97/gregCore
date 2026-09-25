@@ -13,7 +13,7 @@ namespace DataCenterModLoader;
 public class BillboardNameTag : MonoBehaviour
 {
     public Transform followTarget = null!;
-    public float offsetY = 1.85f;
+    public float offsetY { get; set; } = 1.85f;
 
     void Update()
     {
@@ -37,17 +37,17 @@ public static partial class EntityManager
         public NavMeshAgent? NavAgent;
         public bool WaitingForUMA = false;
         public float UMAWaitStart;
-        public int SpeedParamHash;
+        public int SpeedParamHash = 0;
         public int WalkingParamHash;
         public bool HasSpeedParam;
-        public bool HasWalkingParam;
+        public bool HasWalkingParam = false;
         public bool AnimParamsDiscovered;
         public int CrouchParamHash;
         public int SittingParamHash;
         public int CarryingParamHash;
-        public bool HasCrouchParam;
+        public bool HasCrouchParam = false;
         public bool HasSittingParam;
-        public bool HasCarryingParam;
+        public bool HasCarryingParam = false;
         public GameObject? NameTagGO;
         public Vector3 LastPos;
         public GameObject? CarryProxyGO;

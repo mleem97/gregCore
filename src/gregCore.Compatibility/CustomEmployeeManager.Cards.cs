@@ -93,7 +93,7 @@ public static partial class CustomEmployeeManager
                 if (nameSet && salarySet && repSet) break;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool TrySetByPath(Transform card, string path, string text)
@@ -118,14 +118,14 @@ public static partial class CustomEmployeeManager
 
     private static bool IsButtonSubtree(Transform child)
     {
-        try { if (child.GetComponent<UnityEngine.UI.Button>() != null) return true; } catch { }
-        try { if (child.GetComponent<ButtonExtended>() != null) return true; } catch { }
+        try { if (child.GetComponent<UnityEngine.UI.Button>() != null) return true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        try { if (child.GetComponent<ButtonExtended>() != null) return true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return false;
     }
 
     private static bool HasTextComponent(Transform child)
     {
-        try { if (child.GetComponent<TextMeshProUGUI>() != null) return true; } catch { }
+        try { if (child.GetComponent<TextMeshProUGUI>() != null) return true; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return false;
     }
 
@@ -246,7 +246,7 @@ public static partial class CustomEmployeeManager
             hireT.gameObject.SetActive(!entry.IsHired);
             fireT.gameObject.SetActive(entry.IsHired);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetButtonLabels(Transform hireT, Transform fireT)
@@ -258,7 +258,7 @@ public static partial class CustomEmployeeManager
             bool fireTextSet = TrySetTextOnTransform(fireT.Find("TextHire"), "Fire");
             if (!fireTextSet) TrySetTextOnTransform(fireT, "Fire");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void WireHireFireButtons(Transform hireT, Transform fireT, CustomEmployeeEntry entry)

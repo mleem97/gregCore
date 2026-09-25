@@ -10,7 +10,7 @@ namespace DataCenterModLoader;
 
 // function pointer table for rust mods, append-only
 [StructLayout(LayoutKind.Sequential)]
-public struct GameAPITable
+public struct GameAPITable : IEquatable<GameAPITable>
 {
     // v1
     public uint ApiVersion;
@@ -163,6 +163,269 @@ public struct GameAPITable
     public IntPtr RackGameInstall;
     public IntPtr RackGameUninstall;
     public IntPtr ObjSetStringField;
+    public bool Equals(GameAPITable other)
+    {
+        return (ApiVersion == other.ApiVersion &&
+                LogInfo == other.LogInfo &&
+                LogWarning == other.LogWarning &&
+                LogError == other.LogError &&
+                GetPlayerMoney == other.GetPlayerMoney &&
+                SetPlayerMoney == other.SetPlayerMoney &&
+                GetTimeScale == other.GetTimeScale &&
+                SetTimeScale == other.SetTimeScale &&
+                GetServerCount == other.GetServerCount &&
+                GetRackCount == other.GetRackCount &&
+                GetCurrentScene == other.GetCurrentScene &&
+                GetPlayerXP == other.GetPlayerXP &&
+                SetPlayerXP == other.SetPlayerXP &&
+                GetPlayerReputation == other.GetPlayerReputation &&
+                SetPlayerReputation == other.SetPlayerReputation &&
+                GetTimeOfDay == other.GetTimeOfDay &&
+                GetDay == other.GetDay &&
+                GetSecondsInFullDay == other.GetSecondsInFullDay &&
+                SetSecondsInFullDay == other.SetSecondsInFullDay &&
+                GetSwitchCount == other.GetSwitchCount &&
+                GetSatisfiedCustomerCount == other.GetSatisfiedCustomerCount &&
+                SetNetWatchEnabled == other.SetNetWatchEnabled &&
+                IsNetWatchEnabled == other.IsNetWatchEnabled &&
+                GetNetWatchStats == other.GetNetWatchStats &&
+                GetBrokenServerCount == other.GetBrokenServerCount &&
+                GetBrokenSwitchCount == other.GetBrokenSwitchCount &&
+                GetEolServerCount == other.GetEolServerCount &&
+                GetEolSwitchCount == other.GetEolSwitchCount &&
+                GetFreeTechnicianCount == other.GetFreeTechnicianCount &&
+                GetTotalTechnicianCount == other.GetTotalTechnicianCount &&
+                DispatchRepairServer == other.DispatchRepairServer &&
+                DispatchRepairSwitch == other.DispatchRepairSwitch &&
+                DispatchReplaceServer == other.DispatchReplaceServer &&
+                DispatchReplaceSwitch == other.DispatchReplaceSwitch &&
+                RegisterCustomEmployee == other.RegisterCustomEmployee &&
+                IsCustomEmployeeHired == other.IsCustomEmployeeHired &&
+                FireCustomEmployee == other.FireCustomEmployee &&
+                RegisterSalary == other.RegisterSalary &&
+                ShowNotification == other.ShowNotification &&
+                GetMoneyPerSecond == other.GetMoneyPerSecond &&
+                GetExpensesPerSecond == other.GetExpensesPerSecond &&
+                GetXpPerSecond == other.GetXpPerSecond &&
+                IsGamePaused == other.IsGamePaused &&
+                SetGamePaused == other.SetGamePaused &&
+                GetDifficulty == other.GetDifficulty &&
+                TriggerSave == other.TriggerSave &&
+                SteamGetMyId == other.SteamGetMyId &&
+                SteamGetFriendName == other.SteamGetFriendName &&
+                SteamCreateLobby == other.SteamCreateLobby &&
+                SteamJoinLobby == other.SteamJoinLobby &&
+                SteamLeaveLobby == other.SteamLeaveLobby &&
+                SteamGetLobbyId == other.SteamGetLobbyId &&
+                SteamGetLobbyOwner == other.SteamGetLobbyOwner &&
+                SteamGetLobbyMemberCount == other.SteamGetLobbyMemberCount &&
+                SteamGetLobbyMemberByIndex == other.SteamGetLobbyMemberByIndex &&
+                SteamSetLobbyData == other.SteamSetLobbyData &&
+                SteamGetLobbyData == other.SteamGetLobbyData &&
+                SteamSendP2P == other.SteamSendP2P &&
+                SteamIsP2PAvailable == other.SteamIsP2PAvailable &&
+                SteamReadP2P == other.SteamReadP2P &&
+                SteamAcceptP2P == other.SteamAcceptP2P &&
+                SteamPollEvent == other.SteamPollEvent &&
+                GetPlayerPosition == other.GetPlayerPosition &&
+                ConfigRegisterBool == other.ConfigRegisterBool &&
+                ConfigRegisterInt == other.ConfigRegisterInt &&
+                ConfigRegisterFloat == other.ConfigRegisterFloat &&
+                ConfigGetBool == other.ConfigGetBool &&
+                ConfigGetInt == other.ConfigGetInt &&
+                ConfigGetFloat == other.ConfigGetFloat &&
+                SpawnCharacter == other.SpawnCharacter &&
+                DestroyEntity == other.DestroyEntity &&
+                SetEntityPosition == other.SetEntityPosition &&
+                IsEntityReady == other.IsEntityReady &&
+                SetEntityAnimation == other.SetEntityAnimation &&
+                GetPrefabCount == other.GetPrefabCount &&
+                SetEntityName == other.SetEntityName &&
+                GetPlayerCarryState == other.GetPlayerCarryState &&
+                GetPlayerCrouching == other.GetPlayerCrouching &&
+                GetPlayerSitting == other.GetPlayerSitting &&
+                SetEntityCrouching == other.SetEntityCrouching &&
+                SetEntitySitting == other.SetEntitySitting &&
+                SetEntityCarryAnim == other.SetEntityCarryAnim &&
+                CreateEntityCarryVisual == other.CreateEntityCarryVisual &&
+                DestroyEntityCarryVisual == other.DestroyEntityCarryVisual &&
+                GetDefaultSpawnPosition == other.GetDefaultSpawnPosition &&
+                WarpLocalPlayer == other.WarpLocalPlayer &&
+                GetEntityPosition == other.GetEntityPosition &&
+                AddEntityCollider == other.AddEntityCollider &&
+                SetEntityCarryTransform == other.SetEntityCarryTransform &&
+                WorldGetObjectCount == other.WorldGetObjectCount &&
+                WorldGetObjectHashes == other.WorldGetObjectHashes &&
+                WorldGetObjectState == other.WorldGetObjectState &&
+                WorldSpawnObject == other.WorldSpawnObject &&
+                WorldDestroyObject == other.WorldDestroyObject &&
+                WorldPlaceInRack == other.WorldPlaceInRack &&
+                WorldRemoveFromRack == other.WorldRemoveFromRack &&
+                WorldSetPower == other.WorldSetPower &&
+                WorldSetProperty == other.WorldSetProperty &&
+                WorldConnectCable == other.WorldConnectCable &&
+                WorldDisconnectCable == other.WorldDisconnectCable &&
+                WorldPickupObject == other.WorldPickupObject &&
+                WorldDropObject == other.WorldDropObject &&
+                WorldEnsureRackUIDs == other.WorldEnsureRackUIDs &&
+                ObjFindByType == other.ObjFindByType &&
+                ObjGetStringField == other.ObjGetStringField &&
+                ObjIsActive == other.ObjIsActive &&
+                ObjSetActive == other.ObjSetActive &&
+                ObjGetPosition == other.ObjGetPosition &&
+                ObjSetPosition == other.ObjSetPosition &&
+                ObjSetRotation == other.ObjSetRotation &&
+                ObjSetParentToWorld == other.ObjSetParentToWorld &&
+                RbSetKinematic == other.RbSetKinematic &&
+                RbSetGravity == other.RbSetGravity &&
+                RbWakeUp == other.RbWakeUp &&
+                ObjFindById == other.ObjFindById &&
+                GetHeldObject == other.GetHeldObject &&
+                ObjGetRotation == other.ObjGetRotation &&
+                ObjSetParent == other.ObjSetParent &&
+                ObjSetLocalPosition == other.ObjSetLocalPosition &&
+                ObjSetLocalRotation == other.ObjSetLocalRotation &&
+                RackFindPosition == other.RackFindPosition &&
+                RackGameInstall == other.RackGameInstall &&
+                RackGameUninstall == other.RackGameUninstall &&
+                ObjSetStringField == other.ObjSetStringField);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is GameAPITable other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        var h = new HashCode();
+        h.Add(ApiVersion);
+            h.Add(LogInfo);
+            h.Add(LogWarning);
+            h.Add(LogError);
+            h.Add(GetPlayerMoney);
+            h.Add(SetPlayerMoney);
+            h.Add(GetTimeScale);
+            h.Add(SetTimeScale);
+            h.Add(GetServerCount);
+            h.Add(GetRackCount);
+            h.Add(GetCurrentScene);
+            h.Add(GetPlayerXP);
+            h.Add(SetPlayerXP);
+            h.Add(GetPlayerReputation);
+            h.Add(SetPlayerReputation);
+            h.Add(GetTimeOfDay);
+            h.Add(GetDay);
+            h.Add(GetSecondsInFullDay);
+            h.Add(SetSecondsInFullDay);
+            h.Add(GetSwitchCount);
+            h.Add(GetSatisfiedCustomerCount);
+            h.Add(SetNetWatchEnabled);
+            h.Add(IsNetWatchEnabled);
+            h.Add(GetNetWatchStats);
+            h.Add(GetBrokenServerCount);
+            h.Add(GetBrokenSwitchCount);
+            h.Add(GetEolServerCount);
+            h.Add(GetEolSwitchCount);
+            h.Add(GetFreeTechnicianCount);
+            h.Add(GetTotalTechnicianCount);
+            h.Add(DispatchRepairServer);
+            h.Add(DispatchRepairSwitch);
+            h.Add(DispatchReplaceServer);
+            h.Add(DispatchReplaceSwitch);
+            h.Add(RegisterCustomEmployee);
+            h.Add(IsCustomEmployeeHired);
+            h.Add(FireCustomEmployee);
+            h.Add(RegisterSalary);
+            h.Add(ShowNotification);
+            h.Add(GetMoneyPerSecond);
+            h.Add(GetExpensesPerSecond);
+            h.Add(GetXpPerSecond);
+            h.Add(IsGamePaused);
+            h.Add(SetGamePaused);
+            h.Add(GetDifficulty);
+            h.Add(TriggerSave);
+            h.Add(SteamGetMyId);
+            h.Add(SteamGetFriendName);
+            h.Add(SteamCreateLobby);
+            h.Add(SteamJoinLobby);
+            h.Add(SteamLeaveLobby);
+            h.Add(SteamGetLobbyId);
+            h.Add(SteamGetLobbyOwner);
+            h.Add(SteamGetLobbyMemberCount);
+            h.Add(SteamGetLobbyMemberByIndex);
+            h.Add(SteamSetLobbyData);
+            h.Add(SteamGetLobbyData);
+            h.Add(SteamSendP2P);
+            h.Add(SteamIsP2PAvailable);
+            h.Add(SteamReadP2P);
+            h.Add(SteamAcceptP2P);
+            h.Add(SteamPollEvent);
+            h.Add(GetPlayerPosition);
+            h.Add(ConfigRegisterBool);
+            h.Add(ConfigRegisterInt);
+            h.Add(ConfigRegisterFloat);
+            h.Add(ConfigGetBool);
+            h.Add(ConfigGetInt);
+            h.Add(ConfigGetFloat);
+            h.Add(SpawnCharacter);
+            h.Add(DestroyEntity);
+            h.Add(SetEntityPosition);
+            h.Add(IsEntityReady);
+            h.Add(SetEntityAnimation);
+            h.Add(GetPrefabCount);
+            h.Add(SetEntityName);
+            h.Add(GetPlayerCarryState);
+            h.Add(GetPlayerCrouching);
+            h.Add(GetPlayerSitting);
+            h.Add(SetEntityCrouching);
+            h.Add(SetEntitySitting);
+            h.Add(SetEntityCarryAnim);
+            h.Add(CreateEntityCarryVisual);
+            h.Add(DestroyEntityCarryVisual);
+            h.Add(GetDefaultSpawnPosition);
+            h.Add(WarpLocalPlayer);
+            h.Add(GetEntityPosition);
+            h.Add(AddEntityCollider);
+            h.Add(SetEntityCarryTransform);
+            h.Add(WorldGetObjectCount);
+            h.Add(WorldGetObjectHashes);
+            h.Add(WorldGetObjectState);
+            h.Add(WorldSpawnObject);
+            h.Add(WorldDestroyObject);
+            h.Add(WorldPlaceInRack);
+            h.Add(WorldRemoveFromRack);
+            h.Add(WorldSetPower);
+            h.Add(WorldSetProperty);
+            h.Add(WorldConnectCable);
+            h.Add(WorldDisconnectCable);
+            h.Add(WorldPickupObject);
+            h.Add(WorldDropObject);
+            h.Add(WorldEnsureRackUIDs);
+            h.Add(ObjFindByType);
+            h.Add(ObjGetStringField);
+            h.Add(ObjIsActive);
+            h.Add(ObjSetActive);
+            h.Add(ObjGetPosition);
+            h.Add(ObjSetPosition);
+            h.Add(ObjSetRotation);
+            h.Add(ObjSetParentToWorld);
+            h.Add(RbSetKinematic);
+            h.Add(RbSetGravity);
+            h.Add(RbWakeUp);
+            h.Add(ObjFindById);
+            h.Add(GetHeldObject);
+            h.Add(ObjGetRotation);
+            h.Add(ObjSetParent);
+            h.Add(ObjSetLocalPosition);
+            h.Add(ObjSetLocalRotation);
+            h.Add(RackFindPosition);
+            h.Add(RackGameInstall);
+            h.Add(RackGameUninstall);
+            h.Add(ObjSetStringField);
+        return h.ToHashCode();
+    }
+
 }
 
 public partial class GameAPIManager : IDisposable

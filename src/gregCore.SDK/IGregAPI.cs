@@ -20,12 +20,16 @@ public interface IGregAPI
     void RegisterMod(string modId, string name, string version, object? apiObject);
 
     // --- Settings & Input ---
-    void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "");
-    void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged = null, string category = "General", string description = "");
-    void RegisterKeybind(string modId, string actionId, string displayName, UnityEngine.KeyCode defaultKey, Action onPress, string category = "Controls", string description = "");
+    void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue);
+    void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged, string category, string description);
+    void RegisterSlider(string modId, string settingId, string displayName, float defaultValue);
+    void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged, string category, string description);
+    void RegisterKeybind(string modId, string actionId, string displayName, UnityEngine.KeyCode defaultKey, Action onPress);
+    void RegisterKeybind(string modId, string actionId, string displayName, UnityEngine.KeyCode defaultKey, Action onPress, string category, string description);
 
     // --- Notifications ---
-    void ShowNotification(string title, string message, float duration = 5f);
+    void ShowNotification(string title, string message);
+    void ShowNotification(string title, string message, float duration);
 
     // --- Logging (short) ---
     void Log(string message);
@@ -33,8 +37,10 @@ public interface IGregAPI
     void Error(string message);
 
     // --- Toasts & F1 menus (UI) ---
-    void Toast(string message, float duration = 3f);
-    void ToastRich(string top, string title, string sub, float duration = 5f);
+    void Toast(string message);
+    void Toast(string message, float duration);
+    void ToastRich(string top, string title, string sub);
+    void ToastRich(string top, string title, string sub, float duration);
     void BindMenuToggle(string menuId, Action toggle, Func<bool> isOpen);
     void ReportMenu(string menuId, bool open);
 

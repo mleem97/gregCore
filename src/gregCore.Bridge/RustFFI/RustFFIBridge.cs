@@ -298,7 +298,7 @@ public static class RustFFIBridge
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct GregCoreAPI
+    struct GregCoreAPI : IEquatable<GregCoreAPI>
     {
         public uint api_version;
         public IntPtr log_info, log_warning, log_error;
@@ -311,6 +311,66 @@ public static class RustFFIBridge
         public IntPtr subscribe_event, unsubscribe_event, fire_event;
         public IntPtr on_hook, fire_hook;
         public IntPtr config_set_bool, config_get_bool, config_set_int, config_get_int, config_set_float, config_get_float, config_set_string, config_get_string;
+
+        public bool Equals(GregCoreAPI other)
+        {
+            return api_version == other.api_version
+                && log_info == other.log_info && log_warning == other.log_warning && log_error == other.log_error
+                && get_player_money == other.get_player_money && set_player_money == other.set_player_money
+                && get_player_xp == other.get_player_xp && set_player_xp == other.set_player_xp
+                && get_player_reputation == other.get_player_reputation && set_player_reputation == other.set_player_reputation
+                && get_server_count == other.get_server_count && get_rack_count == other.get_rack_count
+                && get_switch_count == other.get_switch_count && get_broken_server_count == other.get_broken_server_count
+                && get_broken_switch_count == other.get_broken_switch_count
+                && get_free_technician_count == other.get_free_technician_count
+                && get_total_technician_count == other.get_total_technician_count
+                && dispatch_repair_server == other.dispatch_repair_server && dispatch_repair_switch == other.dispatch_repair_switch
+                && get_time_of_day == other.get_time_of_day && get_day == other.get_day
+                && get_seconds_in_full_day == other.get_seconds_in_full_day && set_seconds_in_full_day == other.set_seconds_in_full_day
+                && get_current_scene == other.get_current_scene && is_game_paused == other.is_game_paused
+                && set_game_paused == other.set_game_paused && get_time_scale == other.get_time_scale
+                && set_time_scale == other.set_time_scale && trigger_save == other.trigger_save
+                && get_difficulty == other.get_difficulty
+                && get_player_position == other.get_player_position && show_notification == other.show_notification
+                && subscribe_event == other.subscribe_event && unsubscribe_event == other.unsubscribe_event
+                && fire_event == other.fire_event
+                && on_hook == other.on_hook && fire_hook == other.fire_hook
+                && config_set_bool == other.config_set_bool && config_get_bool == other.config_get_bool
+                && config_set_int == other.config_set_int && config_get_int == other.config_get_int
+                && config_set_float == other.config_set_float && config_get_float == other.config_get_float
+                && config_set_string == other.config_set_string && config_get_string == other.config_get_string;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GregCoreAPI other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            var h = new HashCode();
+            h.Add(api_version);
+            h.Add(log_info); h.Add(log_warning); h.Add(log_error);
+            h.Add(get_player_money); h.Add(set_player_money);
+            h.Add(get_player_xp); h.Add(set_player_xp);
+            h.Add(get_player_reputation); h.Add(set_player_reputation);
+            h.Add(get_server_count); h.Add(get_rack_count); h.Add(get_switch_count);
+            h.Add(get_broken_server_count); h.Add(get_broken_switch_count);
+            h.Add(get_free_technician_count); h.Add(get_total_technician_count);
+            h.Add(dispatch_repair_server); h.Add(dispatch_repair_switch);
+            h.Add(get_time_of_day); h.Add(get_day);
+            h.Add(get_seconds_in_full_day); h.Add(set_seconds_in_full_day);
+            h.Add(get_current_scene); h.Add(is_game_paused); h.Add(set_game_paused);
+            h.Add(get_time_scale); h.Add(set_time_scale); h.Add(trigger_save); h.Add(get_difficulty);
+            h.Add(get_player_position); h.Add(show_notification);
+            h.Add(subscribe_event); h.Add(unsubscribe_event); h.Add(fire_event);
+            h.Add(on_hook); h.Add(fire_hook);
+            h.Add(config_set_bool); h.Add(config_get_bool);
+            h.Add(config_set_int); h.Add(config_get_int);
+            h.Add(config_set_float); h.Add(config_get_float);
+            h.Add(config_set_string); h.Add(config_get_string);
+            return h.ToHashCode();
+        }
     }
 
     class RustPlugin

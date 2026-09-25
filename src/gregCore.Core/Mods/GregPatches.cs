@@ -52,17 +52,17 @@ public static class GregPatches
             var (prefix, postfix) = ResolvePatchMethods(patchHolder, prefixName, postfixName);
             if (prefix == null && postfix == null)
             {
-                try { MelonLogger.Warning($"[{tag}] No patch method found in {patchHolder.Name} — skipped."); } catch { }
+                try { MelonLogger.Warning($"[{tag}] No patch method found in {patchHolder.Name} — skipped."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return false;
             }
 
             harmony.Patch(target, prefix, postfix);
-            try { MelonLogger.Msg($"[{tag}] Patched {targetType.Name}.{methodName}."); } catch { }
+            try { MelonLogger.Msg($"[{tag}] Patched {targetType.Name}.{methodName}."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return true;
         }
         catch (Exception ex)
         {
-            try { MelonLogger.Warning($"[{tag}] Patch failed ({methodName}): {ex.GetBaseException().Message}"); } catch { }
+            try { MelonLogger.Warning($"[{tag}] Patch failed ({methodName}): {ex.GetBaseException().Message}"); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
     }
@@ -72,7 +72,7 @@ public static class GregPatches
     {
         if (harmony == null || targetType == null || patchHolder == null || string.IsNullOrEmpty(methodName))
         {
-            try { MelonLogger.Warning($"[{tag}] TryPatch: bad arguments for '{methodName}'."); } catch { }
+            try { MelonLogger.Warning($"[{tag}] TryPatch: bad arguments for '{methodName}'."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
         return true;
@@ -83,7 +83,7 @@ public static class GregPatches
         var target = targetType.GetMethod(methodName, AnyInstance | BindingFlags.Static);
         if (target == null)
         {
-            try { MelonLogger.Warning($"[{tag}] Could not find {targetType.Name}.{methodName} — skipped."); } catch { }
+            try { MelonLogger.Warning($"[{tag}] Could not find {targetType.Name}.{methodName} — skipped."); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
         return target;
     }
@@ -98,7 +98,7 @@ public static class GregPatches
             prefix = FindPatchMethod(patchHolder, prefixName);
             postfix = FindPatchMethod(patchHolder, postfixName);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return (prefix, postfix);
     }
 

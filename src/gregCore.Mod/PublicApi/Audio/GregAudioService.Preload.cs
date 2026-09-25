@@ -36,7 +36,7 @@ public static partial class GregAudioService
         if (!TryStartPreloadRequest(path, out string url))
             yield break;
         UnityWebRequest req = null;
-        try { req = UnityWebRequest.Get(url); } catch { req = null; }
+        try { req = UnityWebRequest.Get(url); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  req = null; }
         if (req == null) { ClearPreloadIfCurrent(path); yield break; }
         req.timeout = 30;
         yield return req.SendWebRequest();
@@ -60,7 +60,7 @@ public static partial class GregAudioService
             url = ToFileUrl(path);
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool TryReadPreloadBytes(UnityWebRequest req, string path, out byte[] data)
@@ -70,24 +70,24 @@ public static partial class GregAudioService
         {
             if (_preloadingPath != path) return false;
             bool ok = false;
-            try { ok = req.result == UnityWebRequest.Result.Success; } catch { ok = false; }
+            try { ok = req.result == UnityWebRequest.Result.Success; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  ok = false; }
             if (!ok) { ClearPreloadIfCurrent(path); return false; }
             try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (data == null || data.Length == 0) { ClearPreloadIfCurrent(path); return false; }
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static string GetExtension(string path)
     {
         try { return Path.GetExtension(path).ToLowerInvariant(); }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static void ClearPreloadIfCurrent(string path)
     {
-        try { if (_preloadingPath == path) _preloadingPath = null; } catch { }
+        try { if (_preloadingPath == path) _preloadingPath = null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static IEnumerable<object> PreloadMp3Steps(string path, string title, byte[] data)
@@ -123,7 +123,7 @@ public static partial class GregAudioService
             samples = all.ToArray();
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         finally
         {
             try { if (mpeg != null) mpeg.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
@@ -146,7 +146,7 @@ public static partial class GregAudioService
             if (ch <= 0 || rate <= 0) return false;
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static List<float> DrainMpeg(string path, NLayer.MpegFile mpeg)
@@ -160,13 +160,13 @@ public static partial class GregAudioService
             {
                 if (_preloadingPath != path) break;
                 int read = 0;
-                try { read = mpeg.ReadSamples(buf, 0, buf.Length); } catch { break; }
+                try { read = mpeg.ReadSamples(buf, 0, buf.Length); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  break; }
                 if (read <= 0) break;
                 for (int i = 0; i < read; i++) all.Add(buf[i]);
                 if (read < buf.Length) break;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return all;
     }
 
@@ -179,7 +179,7 @@ public static partial class GregAudioService
             if (_preloadingPath != path) return;
             FinishPreload(path, title, samples, channels, frequency);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool TryDecodePreload(string path, byte[] data, out float[] samples, out int channels, out int frequency)
@@ -196,7 +196,7 @@ public static partial class GregAudioService
             }
             return true;
         }
-        catch
+        catch /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             ClearPreloadIfCurrent(path);
             return false;
@@ -227,7 +227,7 @@ public static partial class GregAudioService
         {
             return samples != null && samples.Length > 0 && channels > 0 && frequency > 0;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static bool TryStorePreload(AudioClip clip, float[] samples)
@@ -242,6 +242,6 @@ public static partial class GregAudioService
             }
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

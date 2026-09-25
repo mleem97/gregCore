@@ -65,7 +65,7 @@ public static class LuaComputerModule
         t["unregister_shortcut"] = (Func<string, bool>)((id) =>
         {
             try { return GregComputer.UnregisterShortcut(modId, id ?? ""); }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -119,7 +119,7 @@ public static class LuaComputerModule
                 lock (_gate) { _luaApps.Remove(modId + "\u0000" + (appId ?? "")); }
                 return GregComputer.UnregisterApp(modId, appId ?? "");
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
     }
 
@@ -148,7 +148,7 @@ public static class LuaComputerModule
         t["open_app"] = (Func<string, bool>)((appId) =>
         {
             try { return GregComputer.TryOpenApp(appId ?? ""); }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.computer.close_app() -> bool (true when an app was open)
@@ -160,14 +160,14 @@ public static class LuaComputerModule
                 GregComputer.CloseApp();
                 return was;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         });
 
         // greg.computer.current_app() -> string ("" when none)
         t["current_app"] = (Func<string>)(() =>
         {
             try { return GregComputer.CurrentAppId ?? ""; }
-            catch { return ""; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
         });
     }
 
@@ -195,7 +195,7 @@ public static class LuaComputerModule
                 out_[i++] = row;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return out_;
     }
 
@@ -213,7 +213,7 @@ public static class LuaComputerModule
                 out_[i++] = row;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return out_;
     }
 
@@ -229,7 +229,7 @@ public static class LuaComputerModule
             }
             GregComputer.UnregisterAll(modId);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void CloseOwnedHandles(string modId)
@@ -243,14 +243,14 @@ public static class LuaComputerModule
                     if (_luaApps.TryGetValue(k, out var entry) && entry != null
                         && entry.ModId == modId && !string.IsNullOrEmpty(entry.Handle))
                     {
-                        try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
+                        try { LuaTabletModule.CloseTablet(entry.Handle); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                         entry.Handle = "";
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void RemoveOwnedEntries(string modId)
@@ -264,10 +264,10 @@ public static class LuaComputerModule
                     if (k.StartsWith(modId + "\u0000", StringComparison.Ordinal))
                         _luaApps.Remove(k);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void DetachHandlers(string modId)
@@ -276,20 +276,20 @@ public static class LuaComputerModule
         {
             if (_openedHandlers.TryGetValue(modId, out var opened) && opened != null)
             {
-                try { GregComputer.AppOpened -= opened; } catch { }
+                try { GregComputer.AppOpened -= opened; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 _openedHandlers.Remove(modId);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         try
         {
             if (_closedHandlers.TryGetValue(modId, out var closed) && closed != null)
             {
-                try { GregComputer.AppClosed -= closed; } catch { }
+                try { GregComputer.AppClosed -= closed; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 _closedHandlers.Remove(modId);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void EnsureHandlers(string modId)
@@ -301,8 +301,8 @@ public static class LuaComputerModule
             Action<string> closed = (appId) => OnAppClosed(modId, appId);
             _openedHandlers[modId] = opened;
             _closedHandlers[modId] = closed;
-            try { GregComputer.AppOpened += opened; } catch { }
-            try { GregComputer.AppClosed += closed; } catch { }
+            try { GregComputer.AppOpened += opened; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { GregComputer.AppClosed += closed; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 
@@ -331,11 +331,11 @@ public static class LuaComputerModule
         {
             if (!string.IsNullOrEmpty(entry.Handle))
             {
-                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
+                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 entry.Handle = "";
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static string OpenHandleForApp(string appId)
@@ -345,7 +345,7 @@ public static class LuaComputerModule
             string title = ResolveAppTitle(appId);
             return LuaTabletModule.OpenTabletForApp(title);
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static string ResolveAppTitle(string appId)
@@ -355,7 +355,7 @@ public static class LuaComputerModule
             if (GregComputer.TryGetApp(appId, out var app) && app != null
                 && !string.IsNullOrWhiteSpace(app.Title)) return app.Title;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return appId;
     }
 
@@ -367,7 +367,7 @@ public static class LuaComputerModule
             lock (_gate) { _luaApps.TryGetValue(modId + "\u0000" + appId, out entry); }
             if (entry != null && !string.IsNullOrEmpty(entry.Handle))
             {
-                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
+                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 entry.Handle = "";
             }
             if (entry?.OnClose != null) SafeCall(modId, entry.OnClose, appId);

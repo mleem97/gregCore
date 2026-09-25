@@ -20,10 +20,10 @@ public sealed partial class GregCoreMod
             NotifyNetSession();
             LoadSaveSidecars();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
-    // Compatibility guard (second run: catches late-loading incompatible ID mods).
+    // Compatibility guard (second run: catches late-loading incompatible ID mods). /* ignored: defensive best-effort (CONVENTIONS.md) */
     private static void DisableIncompatibleIds()
     {
         try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
@@ -67,7 +67,7 @@ public sealed partial class GregCoreMod
         {
             return string.Equals(sceneName, "MainMenu", StringComparison.Ordinal);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // Hides vanilla UI when entering gameplay scenes.
@@ -83,7 +83,7 @@ public sealed partial class GregCoreMod
         {
             (GregServiceContainer.Get<IGregPluginRegistry>() as GregPluginRegistry)?.SceneLoaded(sceneName);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Publishes the sceneLoaded payload on both buses plus the legacy bridge.
@@ -94,7 +94,7 @@ public sealed partial class GregCoreMod
             var scenePayload = BuildScenePayload(buildIndex, sceneName);
             DispatchScenePayload(scenePayload);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Builds the event payload for a scene change.
@@ -113,7 +113,7 @@ public sealed partial class GregCoreMod
                 }
             };
         }
-        catch
+        catch /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             return new gregCore.Core.Models.EventPayload
             {
@@ -133,7 +133,7 @@ public sealed partial class GregCoreMod
             EventBus?.Publish("gregMod.lifecycle.sceneLoaded", scenePayload);
             DispatchLegacyScenePayload(scenePayload);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     // Dispatches the deprecated compatibility bridge payload.
@@ -144,6 +144,6 @@ public sealed partial class GregCoreMod
             HookBus?.Dispatch("greg.lifecycle.SceneLoaded", scenePayload);
             EventBus?.Publish("greg.lifecycle.SceneLoaded", scenePayload);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

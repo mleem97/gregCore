@@ -21,7 +21,7 @@ namespace greg.CommonShop
                 if (existing != null) return existing;
                 var template = ResolveGridTemplate(parent);
                 if (template == null) return parent;
-                int insertIdx = ResolveInsertIndex(parent, template);
+                int insertIdx = ResolveInsertIndex(template);
                 var textTemplate = FindHeaderTextTemplate(parent, out float fontSize);
                 EnsureMainLabel(parent, mainCat, textTemplate, fontSize, ref insertIdx);
                 EnsureSubLabel(parent, mainCat, subCat, textTemplate, fontSize, ref insertIdx);
@@ -30,7 +30,7 @@ namespace greg.CommonShop
             catch (Exception ex)
             {
                 _log.Warn($"EnsureCategoryContainer failed: {ex.GetBaseException().Message}");
-                try { return shop.shopItemParent.transform; } catch { return null!; }
+                try { return shop.shopItemParent.transform; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
             }
         }
 
@@ -41,13 +41,13 @@ namespace greg.CommonShop
                 var vlg = parent.GetComponent<VerticalLayoutGroup>();
                 if (vlg != null) vlg.childForceExpandHeight = false;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static string BuildGridName(string mainCat, string subCat)
         {
             try { return string.IsNullOrEmpty(subCat) ? $"Grid_{mainCat}" : $"Grid_{mainCat}_{subCat}"; }
-            catch { return $"Grid_{mainCat}"; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return $"Grid_{mainCat}"; }
         }
 
         private static Transform FindExistingGrid(Transform parent, string gridName)
@@ -59,7 +59,7 @@ namespace greg.CommonShop
                 try { existing.gameObject.SetActive(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return existing;
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
         private static Transform ResolveGridTemplate(Transform parent)
@@ -68,13 +68,13 @@ namespace greg.CommonShop
             {
                 Transform hlTemplate = parent.Find("HL Mods");
                 if (hlTemplate != null) return hlTemplate;
-                try { return parent.GetComponentsInChildren<GridLayoutGroup>(true).FirstOrDefault()?.transform!; } catch { }
+                try { return parent.GetComponentsInChildren<GridLayoutGroup>(true).FirstOrDefault()?.transform!; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
-        private static int ResolveInsertIndex(Transform parent, Transform hlTemplate)
+        private static int ResolveInsertIndex(Transform hlTemplate)
         {
             try
             {
@@ -85,9 +85,9 @@ namespace greg.CommonShop
                     int hlIdx = hlTemplate.GetSiblingIndex();
                     return hlIdx > 0 ? hlIdx - 1 : 0;
                 }
-                catch { return -1; }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return -1; }
             }
-            catch { return -1; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return -1; }
         }
 
         private static Il2CppTMPro.TextMeshProUGUI FindHeaderTextTemplate(Transform parent, out float fontSize)
@@ -104,7 +104,7 @@ namespace greg.CommonShop
                     }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
@@ -123,9 +123,9 @@ namespace greg.CommonShop
                     tmp.fontSize = fontSize;
                     tmp.margin = new Vector4(0, 0, 0, 0);
                 }
-                PlaceLabel(parent, mainLabel, ref insertIdx);
+                PlaceLabel(mainLabel, ref insertIdx);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void EnsureSubLabel(Transform parent, string mainCat, string subCat, Il2CppTMPro.TextMeshProUGUI textTemplate, float fontSize, ref int insertIdx)
@@ -144,9 +144,9 @@ namespace greg.CommonShop
                     tmp.fontSize = fontSize * 0.75f;
                     tmp.margin = new Vector4(0, 0, 0, 0);
                 }
-                PlaceLabel(parent, subLabel, ref insertIdx);
+                PlaceLabel(subLabel, ref insertIdx);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static GameObject CloneLabel(Transform parent, GameObject template, string labelName)
@@ -162,24 +162,24 @@ namespace greg.CommonShop
                 if (le != null) Object.DestroyImmediate(le);
                 return label;
             }
-            catch { return null!; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
         }
 
-        private static void PlaceLabel(Transform parent, GameObject label, ref int insertIdx)
+        private static void PlaceLabel(GameObject label, ref int insertIdx)
         {
             try
             {
                 if (insertIdx != -1) label.transform.SetSiblingIndex(insertIdx++);
                 else label.transform.SetAsLastSibling();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static Transform CreateGrid(Transform parent, Transform template, string gridName, int insertIdx)
         {
             GameObject newGrid;
             try { newGrid = Object.Instantiate(template.gameObject, parent); }
-            catch { return parent; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return parent; }
             try
             {
                 newGrid.name = gridName;
@@ -189,7 +189,7 @@ namespace greg.CommonShop
                 ClearGridChildren(newGrid);
                 return newGrid.transform;
             }
-            catch { return parent; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return parent; }
         }
 
         private static void EnsureGridLayout(GameObject newGrid)
@@ -200,7 +200,7 @@ namespace greg.CommonShop
                 if (gridLe == null) gridLe = newGrid.AddComponent<LayoutElement>();
                 gridLe.flexibleHeight = 0;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void PlaceGrid(GameObject newGrid, int insertIdx)
@@ -210,7 +210,7 @@ namespace greg.CommonShop
                 if (insertIdx != -1) newGrid.transform.SetSiblingIndex(insertIdx);
                 else newGrid.transform.SetAsLastSibling();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ClearGridChildren(GameObject newGrid)
@@ -219,10 +219,10 @@ namespace greg.CommonShop
             {
                 for (int i = newGrid.transform.childCount - 1; i >= 0; i--)
                 {
-                    try { Object.DestroyImmediate(newGrid.transform.GetChild(i).gameObject); } catch { }
+                    try { Object.DestroyImmediate(newGrid.transform.GetChild(i).gameObject); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 }

@@ -90,7 +90,7 @@ public static partial class GregNetworkDeviceSaves
     {
         public string Type = "";
         public Vector3 Position { get; set; }
-        public int CustomerID;
+        public int CustomerID { get; set; }
         public string SwitchID { get; set; } = "";
         public string ServerID { get; set; } = "";
     }

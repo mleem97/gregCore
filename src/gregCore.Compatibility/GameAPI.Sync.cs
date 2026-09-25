@@ -18,6 +18,7 @@ public partial class GameAPIManager
         return 0;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     int WorldSetPropertyImpl(IntPtr id, uint idLen, IntPtr key, uint keyLen, IntPtr val, uint valLen)
     {
         // Phase 3 stub

@@ -87,7 +87,12 @@ public class GregAPI : IGregAPI
         });
     }
 
-    public void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged = null, string category = "General", string description = "")
+    public void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue)
+    {
+        RegisterToggle(modId, settingId, displayName, defaultValue, null, "General", "");
+    }
+
+    public void RegisterToggle(string modId, string settingId, string displayName, bool defaultValue, Action<bool>? onChanged, string category, string description)
     {
         _settings.Register(new SettingEntry<bool>
         {
@@ -102,7 +107,12 @@ public class GregAPI : IGregAPI
         });
     }
 
-    public void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged = null, string category = "General", string description = "")
+    public void RegisterSlider(string modId, string settingId, string displayName, float defaultValue)
+    {
+        RegisterSlider(modId, settingId, displayName, defaultValue, null, "General", "");
+    }
+
+    public void RegisterSlider(string modId, string settingId, string displayName, float defaultValue, Action<float>? onChanged, string category, string description)
     {
         _settings.Register(new SettingEntry<float>
         {
@@ -117,7 +127,12 @@ public class GregAPI : IGregAPI
         });
     }
 
-    public void RegisterKeybind(string modId, string actionId, string displayName, KeyCode defaultKey, Action onPress, string category = "Controls", string description = "")
+    public void RegisterKeybind(string modId, string actionId, string displayName, KeyCode defaultKey, Action onPress)
+    {
+        RegisterKeybind(modId, actionId, displayName, defaultKey, onPress, "Controls", "");
+    }
+
+    public void RegisterKeybind(string modId, string actionId, string displayName, KeyCode defaultKey, Action onPress, string category, string description)
     {
         _keybinds.Register(new KeybindEntry
         {
@@ -131,64 +146,79 @@ public class GregAPI : IGregAPI
         });
     }
 
-    public void ShowNotification(string title, string message, float duration = 5f)
+    public void ShowNotification(string title, string message)
+    {
+        ShowNotification(title, message, 5f);
+    }
+
+    public void ShowNotification(string title, string message, float duration)
     {
         _notifications.Show(title, message, duration);
     }
 
     public void Log(string message)
     {
-        try { _logger.Info(message); } catch { }
+        try { _logger.Info(message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public void Warn(string message)
     {
-        try { _logger.Warning(message); } catch { }
+        try { _logger.Warning(message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public void Error(string message)
     {
-        try { _logger.Error(message); } catch { }
+        try { _logger.Error(message); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
-    public void Toast(string message, float duration = 3f)
+    public void Toast(string message)
     {
-        try { gregCore.UI.GregNotificationManager.Show(message, duration); } catch { }
+        Toast(message, 3f);
     }
 
-    public void ToastRich(string top, string title, string sub, float duration = 5f)
+    public void Toast(string message, float duration)
     {
-        try { gregCore.UI.GregNotificationManager.ShowRich(top, title, sub, null, null, duration); } catch { }
+        try { gregCore.UI.GregNotificationManager.Show(message, duration); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+    }
+
+    public void ToastRich(string top, string title, string sub)
+    {
+        ToastRich(top, title, sub, 5f);
+    }
+
+    public void ToastRich(string top, string title, string sub, float duration)
+    {
+        try { gregCore.UI.GregNotificationManager.ShowRich(top, title, sub, null, null, duration); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public void BindMenuToggle(string menuId, Action toggle, Func<bool> isOpen)
     {
-        try { gregCore.UI.GregMenuBinding.BindToggle(menuId, toggle, isOpen); } catch { }
+        try { gregCore.UI.GregMenuBinding.BindToggle(menuId, toggle, isOpen); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public void ReportMenu(string menuId, bool open)
     {
-        try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { }
+        try { gregCore.UI.GregMenuBinding.Report(menuId, open); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public void RegisterShopPrefab(int itemId, int baseItemId, Func<UnityEngine.GameObject> resolver)
     {
-        try { gregCore.Core.Networking.GregShopItems.RegisterPrefab(itemId, baseItemId, resolver); } catch { }
+        try { gregCore.Core.Networking.GregShopItems.RegisterPrefab(itemId, baseItemId, resolver); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public bool TryResolveShopPrefab(int itemId, out UnityEngine.GameObject prefab)
     {
         prefab = null;
-        try { return gregCore.Core.Networking.GregShopItems.TryResolvePrefab(itemId, out prefab); } catch { return false; }
+        try { return gregCore.Core.Networking.GregShopItems.TryResolvePrefab(itemId, out prefab); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public void RegisterSaveSidecar(string modId, Func<string> save, Action<string> load)
     {
-        try { gregCore.Infrastructure.Persistence.GregSaveGuard.RegisterSidecar(modId, save, load); } catch { }
+        try { gregCore.Infrastructure.Persistence.GregSaveGuard.RegisterSidecar(modId, save, load); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public bool TryReloadScriptsNow()
     {
-        try { return gregCore.Bridge.CSharpScript.GregCSharpScriptBridge.TryReloadNow(); } catch { return false; }
+        try { return gregCore.Bridge.CSharpScript.GregCSharpScriptBridge.TryReloadNow(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 }

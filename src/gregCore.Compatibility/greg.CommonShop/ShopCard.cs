@@ -60,7 +60,7 @@ namespace greg.CommonShop
                 DimTexts(card);
                 DisableButton(card);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void DimImages(GameObject card)
@@ -73,7 +73,7 @@ namespace greg.CommonShop
                     try { img.color = new Color(img.color.r * 0.4f, img.color.g * 0.4f, img.color.b * 0.4f, img.color.a); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void DimTexts(GameObject card)
@@ -86,16 +86,16 @@ namespace greg.CommonShop
                     try { txt.color = new Color(0.5f, 0.5f, 0.5f, 1f); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void DisableButton(GameObject card)
         {
             ButtonExtended btn = null!;
-            try { btn = card.GetComponentInChildren<ButtonExtended>(true); } catch { }
+            try { btn = card.GetComponentInChildren<ButtonExtended>(true); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             if (btn == null) return;
-            try { btn.onClick.RemoveAllListeners(); } catch { }
-            try { btn.interactable = false; } catch { }
+            try { btn.onClick.RemoveAllListeners(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { btn.interactable = false; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
 }

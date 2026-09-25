@@ -33,9 +33,9 @@ public static class GregAttackEscalation
 
     public sealed class TierStats
     {
-        public float AttackInterval;
-        public float SpawnRate;
-        public float MoveSpeed;
+        public float AttackInterval { get; set; }
+        public float SpawnRate { get; set; }
+        public float MoveSpeed { get; set; }
     }
 
     private static EscalationConfig _config = new EscalationConfig();

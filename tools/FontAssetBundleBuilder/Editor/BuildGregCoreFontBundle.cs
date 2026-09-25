@@ -209,7 +209,7 @@ public static class BuildGregCoreFontBundle
             foreach (var p in assetPaths)
                 Debug.Log($"[FontBundle]   - {p}");
         }
-        catch { }
+        catch { /* ignored: best-effort editor bundling; failures surface via Debug.Log below */ }
     }
 
     private static bool TryBuild(string[] assetPaths)

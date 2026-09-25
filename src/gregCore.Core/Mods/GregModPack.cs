@@ -3,7 +3,7 @@
 /// Purpose:     ModPackConfig extension: builds game-compatible ModPacks
 ///               (ModPackConfig + ShopItemConfig + StaticItemConfig + DllEntry)
 ///               and reads arbitrary packs into managed snapshots.
-///               All accesses best-effort (try/catch per field), so an
+///               All accesses best-effort (try/catch per field), so an /* ignored: defensive best-effort (CONVENTIONS.md) */
 ///               unknown/incomplete type never breaks the caller.
 /// </file-summary>
 
@@ -57,7 +57,7 @@ public static class GregModPack
     public sealed class Snapshot
     {
         public string ModName = "";
-        public List<ShopItem> ShopItems = new List<ShopItem>();
+        public List<ShopItem> ShopItems { get; set; } = new List<ShopItem>();
         public List<StaticItem> StaticItems { get; set; } = new List<StaticItem>();
         public List<DllRef> Dlls { get; set; } = new List<DllRef>();
     }
@@ -67,7 +67,7 @@ public static class GregModPack
     public static global::Il2Cpp.ModPackConfig Create(string modName)
     {
         global::Il2Cpp.ModPackConfig cfg = null;
-        try { cfg = new global::Il2Cpp.ModPackConfig(); } catch { return null; }
+        try { cfg = new global::Il2Cpp.ModPackConfig(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         try { cfg.modName = modName ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         EnsureLists(cfg);
         return cfg;
@@ -89,7 +89,7 @@ public static class GregModPack
         if (cfg == null || dto == null) return null;
         EnsureLists(cfg);
         global::Il2Cpp.ShopItemConfig item = null;
-        try { item = new global::Il2Cpp.ShopItemConfig(); } catch { return null; }
+        try { item = new global::Il2Cpp.ShopItemConfig(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         Try(() => item.itemName = dto.ItemName ?? "");
         Try(() => item.price = dto.Price);
         Try(() => item.xpToUnlock = dto.XpToUnlock);
@@ -115,7 +115,7 @@ public static class GregModPack
         if (cfg == null || dto == null) return null;
         EnsureLists(cfg);
         global::Il2Cpp.StaticItemConfig item = null;
-        try { item = new global::Il2Cpp.StaticItemConfig(); } catch { return null; }
+        try { item = new global::Il2Cpp.StaticItemConfig(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         Try(() => item.itemName = dto.ItemName ?? "");
         Try(() => item.modelScale = dto.ModelScale);
         Try(() => item.colliderSize = ToFloatArray(dto.ColliderSize));
@@ -134,7 +134,7 @@ public static class GregModPack
         if (cfg == null || dto == null) return null;
         EnsureLists(cfg);
         global::Il2Cpp.DllEntry entry = null;
-        try { entry = new global::Il2Cpp.DllEntry(); } catch { return null; }
+        try { entry = new global::Il2Cpp.DllEntry(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         Try(() => entry.fileName = dto.FileName ?? "");
         Try(() => entry.entryClass = dto.EntryClass ?? "");
         Try(() => cfg.dlls.Add(entry));
@@ -251,11 +251,11 @@ public static class GregModPack
     {
         if (src == null) return Array.Empty<float>();
         int n = 0;
-        try { n = src.Length; } catch { return Array.Empty<float>(); }
+        try { n = src.Length; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Array.Empty<float>(); }
         var dst = new float[Math.Max(0, n)];
         for (int i = 0; i < dst.Length; i++)
         {
-            try { dst[i] = src[i]; } catch { dst[i] = 0f; }
+            try { dst[i] = src[i]; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  dst[i] = 0f; }
         }
         return dst;
     }
@@ -264,11 +264,11 @@ public static class GregModPack
     {
         if (src == null) return Array.Empty<int>();
         int n = 0;
-        try { n = src.Length; } catch { return Array.Empty<int>(); }
+        try { n = src.Length; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Array.Empty<int>(); }
         var dst = new int[Math.Max(0, n)];
         for (int i = 0; i < dst.Length; i++)
         {
-            try { dst[i] = src[i]; } catch { dst[i] = 0; }
+            try { dst[i] = src[i]; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  dst[i] = 0; }
         }
         return dst;
     }
@@ -277,11 +277,11 @@ public static class GregModPack
     {
         if (src == null) return Array.Empty<bool>();
         int n = 0;
-        try { n = src.Length; } catch { return Array.Empty<bool>(); }
+        try { n = src.Length; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Array.Empty<bool>(); }
         var dst = new bool[Math.Max(0, n)];
         for (int i = 0; i < dst.Length; i++)
         {
-            try { dst[i] = src[i]; } catch { dst[i] = false; }
+            try { dst[i] = src[i]; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  dst[i] = false; }
         }
         return dst;
     }

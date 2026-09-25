@@ -25,7 +25,12 @@ public sealed class LuaProfiler
     /// Creates a profiler with the given frame budget.
     /// </summary>
     /// <param name="frameBudgetMs">Max milliseconds per frame for all Lua mods combined (default: 2.0ms)</param>
-    public LuaProfiler(float frameBudgetMs = 2.0f)
+    public LuaProfiler()
+        : this(2.0f)
+    {
+    }
+
+    public LuaProfiler(float frameBudgetMs)
     {
         _frameBudgetMs = frameBudgetMs;
     }
@@ -119,7 +124,7 @@ public sealed class LuaProfiler
         public int FrameCount;
     }
 
-    public readonly struct ProfileScope : IDisposable
+    public readonly struct ProfileScope : IDisposable, IEquatable<ProfileScope>
     {
         private readonly float[] _targetMs;
         private readonly long _startTicks;
@@ -135,6 +140,21 @@ public sealed class LuaProfiler
             long elapsed = Stopwatch.GetTimestamp() - _startTicks;
             float ms = (elapsed * 1000f) / Stopwatch.Frequency;
             _targetMs[0] += ms;
+        }
+
+        public bool Equals(ProfileScope other)
+        {
+            return _targetMs == other._targetMs && _startTicks == other._startTicks;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ProfileScope other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_targetMs, _startTicks);
         }
     }
 }

@@ -377,7 +377,7 @@ public static partial class GregAudioService
         {
             req.timeout = 30;
             yield return req.SendWebRequest();
-            fail = ReadDownload(req, title, out data);
+            fail = ReadDownload(req, out data);
         }
         if (fail != null)
         {
@@ -392,7 +392,7 @@ public static partial class GregAudioService
         StartClip(filePath, title, clip, volume);
     }
 
-    private static string ReadDownload(UnityWebRequest req, string title, out byte[] data)
+    private static string ReadDownload(UnityWebRequest req, out byte[] data)
     {
         data = null;
         try

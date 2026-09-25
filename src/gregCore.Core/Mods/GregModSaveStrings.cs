@@ -16,7 +16,7 @@ namespace gregCore.Core.Mods;
 public static class GregModSaveStrings
 {
     /// <summary>Default cap so one text entry never bloats the save.</summary>
-    public const int DefaultMaxChars = 1800;
+    public static int DefaultMaxChars { get; } = 1800;
 
     // ── Pure managed codec (unit-tested) ─────────────────────────────────────
 
@@ -39,7 +39,12 @@ public static class GregModSaveStrings
         catch { return Array.Empty<int>(); }
     }
 
-    public static string Decode(int[]? units, int maxChars = DefaultMaxChars)
+    public static string Decode(int[]? units)
+    {
+        return Decode(units, DefaultMaxChars);
+    }
+
+    public static string Decode(int[]? units, int maxChars)
     {
         try
         {

@@ -40,8 +40,8 @@ namespace gregCore.Core
         public static new HarmonyLib.Harmony? HarmonyInstance { get; private set; }
         public static GregEventBus? EventBus { get; private set; }
         public static GregHookBus? HookBus { get; private set; }
-        private static bool _lateInitCompleted;
-        private static bool _shutdownRequested;
+        private bool _lateInitCompleted;
+        private bool _shutdownRequested;
 
         public override void OnInitializeMelon()
         {

@@ -36,7 +36,7 @@ public static class GregInputLock
                 if (_applied) Restore();
                 return;
             }
-            GregMenuRegistry.GetLockState(out bool cam, out bool move, out bool interact, out bool cursor);
+            var (cam, move, interact, cursor) = GregMenuRegistry.GetLockState();
             if (!_applied)
             {
                 Apply(cam, move, interact, cursor);

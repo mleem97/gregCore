@@ -53,7 +53,7 @@ public static class GregJobSaves
         // Vanilla ctor needs a live technician object; null is
         // best-effort (returns null when vanilla dereferences).
         global::Il2Cpp.TechnicianSaveData entry = null;
-        try { entry = new global::Il2Cpp.TechnicianSaveData(null); } catch { return null; }
+        try { entry = new global::Il2Cpp.TechnicianSaveData(null); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         FillTechnician(entry, dto);
         return entry;
     }
@@ -93,7 +93,7 @@ public static class GregJobSaves
     public static global::Il2Cpp.RepairJobSaveData CreateRepairJob(RepairJob dto)
     {
         global::Il2Cpp.RepairJobSaveData entry = null;
-        try { entry = new global::Il2Cpp.RepairJobSaveData(); } catch { return null; }
+        try { entry = new global::Il2Cpp.RepairJobSaveData(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         FillRepairJob(entry, dto);
         return entry;
     }
@@ -135,7 +135,7 @@ public static class GregJobSaves
         // Vanilla ctor needs a live interact object; null is
         // best-effort (returns null when vanilla dereferences).
         global::Il2Cpp.InteractObjectData entry = null;
-        try { entry = new global::Il2Cpp.InteractObjectData(null); } catch { return null; }
+        try { entry = new global::Il2Cpp.InteractObjectData(null); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         FillInteractObject(entry, dto);
         return entry;
     }
@@ -195,7 +195,7 @@ public static class GregJobSaves
             {
                 if (entry == null) continue;
                 int uid = -1;
-                try { uid = entry.uid; } catch { continue; }
+                try { uid = entry.uid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                 if (uid == dto.Uid) { found = entry; break; }
             }
         });
@@ -203,7 +203,7 @@ public static class GregJobSaves
         var created = CreateInteractObject(dto);
         if (created != null)
         {
-            try { list.Add(created); } catch { return null; }
+            try { list.Add(created); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         }
         return created;
     }

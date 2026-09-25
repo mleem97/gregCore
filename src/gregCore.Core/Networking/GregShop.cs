@@ -203,7 +203,7 @@ public static class GregShop
     public static int GetModId(global::Il2Cpp.ModShopItem mi)
     {
         if (mi == null) return -1;
-        try { return mi.modID; } catch { return -1; }
+        try { return mi.modID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return -1; }
     }
 
     public static GregModPack.ShopItem ReadModConfig(global::Il2Cpp.ModShopItem mi)
@@ -215,7 +215,7 @@ public static class GregShop
             _ = mi.gameObject; // liveness
             config = mi.config;
         }
-        catch { config = null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  config = null; }
         return GregModPack.ReadShopItem(config);
     }
 
@@ -278,7 +278,7 @@ public static class GregShop
     {
         var picker = FindPicker(shop);
         if (picker == null) return false;
-        try { return picker.gameObject.activeInHierarchy; } catch { return false; }
+        try { return picker.gameObject.activeInHierarchy; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static bool OpenPicker(global::Il2Cpp.ComputerShop shop)
@@ -317,7 +317,7 @@ public static class GregShop
     {
         var picker = FindPicker(shop);
         if (picker == null) return Color.white;
-        try { return picker.GetColor(); } catch { return Color.white; }
+        try { return picker.GetColor(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return Color.white; }
     }
 
     public static bool SetPickerColor(global::Il2Cpp.ComputerShop shop, Color color)
@@ -339,7 +339,7 @@ public static class GregShop
 
     private static string Base(Exception ex)
     {
-        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { return "?"; }
+        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "?"; }
     }
 
     private static void Warn(string message)

@@ -52,7 +52,7 @@ public static class GregModHub
             try { GregInputLock.Refresh(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             Rebuild();
         }
-        catch (System.Exception ex)
+        catch (System.Exception ex) /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             MelonLogger.Warning($"[gregCore][UI] Hub open failed: {ex.Message}");
         }
@@ -113,7 +113,7 @@ public static class GregModHub
         hint.style.fontSize = 11;
         hint.style.marginBottom = 8;
         hint.style.whiteSpace = WhiteSpace.Normal;
-        if (font != null) { try { hint.style.unityFont = font; } catch { } }
+        if (font != null) { try { hint.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } }
         card.Add(hint);
 
         var scroll = new ScrollView(ScrollViewMode.Vertical);
@@ -157,7 +157,7 @@ public static class GregModHub
             AddOrphanMenus(font, orphan);
             AddEmptyNotice(font);
         }
-        catch (System.Exception ex)
+        catch (System.Exception ex) /* ignored: defensive best-effort (CONVENTIONS.md) */
         {
             MelonLogger.Warning($"[gregCore][UI] Hub rebuild failed: {ex.Message}");
         }
@@ -248,16 +248,16 @@ public static class GregModHub
     {
         string captured = m.MenuId;
         string settingsTab = null;
-        try { settingsTab = greg.UI.Settings.GregSettingsHub.FindTabForMenu(captured, ownerModName); } catch { }
+        try { settingsTab = greg.UI.Settings.GregSettingsHub.FindTabForMenu(captured, ownerModName); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         System.Action settingsAction = null;
         if (!string.IsNullOrEmpty(settingsTab))
         {
             string capturedTab = settingsTab;
             settingsAction = () =>
             {
-                try { Close(); } catch { }
-                try { greg.UI.Settings.GregSettingsHub.ShowTab(capturedTab); } catch { }
-                try { Rebuild(); } catch { }
+                try { Close(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                try { greg.UI.Settings.GregSettingsHub.ShowTab(capturedTab); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+                try { Rebuild(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             };
         }
 
@@ -314,15 +314,15 @@ public static class GregModHub
         btn.style.backgroundColor = new Color(0.04f, 0.51f, 0.63f, 1f);
         btn.style.color = Color.white;
         btn.style.fontSize = 12;
-        if (font != null) { try { btn.style.unityFont = font; } catch { } }
+        if (font != null) { try { btn.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  } }
         btn.RegisterCallback<ClickEvent>(new System.Action<ClickEvent>(_ =>
         {
             try
             {
-                GregClickRouter.MarkRealClick(ref _lastRealClickUtc);
+                _lastRealClickUtc = GregClickRouter.MarkRealClick();
                 onClick();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }));
         _clickables.Add(new GregClickRouter.Clickable { Element = btn, Action = onClick });
         return btn;

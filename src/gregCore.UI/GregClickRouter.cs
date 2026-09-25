@@ -59,9 +59,9 @@ namespace gregCore.UI
             return false;
         }
 
-        public static void MarkRealClick(ref DateTime lastRealClickUtc)
+        public static DateTime MarkRealClick()
         {
-            try { lastRealClickUtc = DateTime.UtcNow; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { return DateTime.UtcNow; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ return DateTime.UtcNow; }
         }
     }
 }

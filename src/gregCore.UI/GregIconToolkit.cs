@@ -165,7 +165,12 @@ public static class GregIconToolkit
     // Set icon as background image (for buttons/bars). size<=0 =
     // size unchanged. Aspect ratio is preserved (Contain).
     // Return: icon found?
-    public static bool ApplyBackground(VisualElement el, string name, float size = 0f)
+    public static bool ApplyBackground(VisualElement el, string name)
+    {
+        return ApplyBackground(el, name, 0f);
+    }
+
+    public static bool ApplyBackground(VisualElement el, string name, float size)
     {
         try
         {
@@ -185,7 +190,12 @@ public static class GregIconToolkit
     }
 
     // Finished icon element (image, square). Null on failure.
-    public static VisualElement Icon(string name, float size = 24f)
+    public static VisualElement Icon(string name)
+    {
+        return Icon(name, 24f);
+    }
+
+    public static VisualElement Icon(string name, float size)
     {
         try
         {

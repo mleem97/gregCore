@@ -51,10 +51,10 @@ public sealed class ComputerApp
 
 public static partial class GregComputer
 {
-    public const string ButtonPrefix = "greg-computer-";
-    public const string HookShortcutClicked = "greg.COMPUTER.ShortcutClicked";
-    public const string HookAppOpened = "greg.COMPUTER.AppOpened";
-    public const string HookAppClosed = "greg.COMPUTER.AppClosed";
+    public static string ButtonPrefix { get; } = "greg-computer-";
+    public static string HookShortcutClicked { get; } = "greg.COMPUTER.ShortcutClicked";
+    public static string HookAppOpened { get; } = "greg.COMPUTER.AppOpened";
+    public static string HookAppClosed { get; } = "greg.COMPUTER.AppClosed";
 
     private static readonly Dictionary<string, ComputerShortcut> _shortcuts =
         new Dictionary<string, ComputerShortcut>(StringComparer.Ordinal);

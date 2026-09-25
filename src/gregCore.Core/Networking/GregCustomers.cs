@@ -70,7 +70,7 @@ public static class GregCustomers
             foreach (var cb in FindAllBases())
             {
                 int id = -1;
-                try { id = cb.customerID; } catch { continue; }
+                try { id = cb.customerID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                 if (id == customerID) { found = cb; break; }
             }
         });
@@ -85,7 +85,7 @@ public static class GregCustomers
             foreach (var cb in FindAllBases())
             {
                 int id = -1;
-                try { id = cb.customerBaseID; } catch { continue; }
+                try { id = cb.customerBaseID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                 if (id == customerBaseID) { found = cb; break; }
             }
         });
@@ -133,11 +133,11 @@ public static class GregCustomers
             var arr = item.appTypes;
             if (arr == null) return;
             int n = 0;
-            try { n = arr.Length; } catch { return; }
+            try { n = arr.Length; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return; }
             var dst = new int[Math.Max(0, n)];
             for (int i = 0; i < dst.Length; i++)
             {
-                try { dst[i] = arr[i]; } catch { dst[i] = 0; }
+                try { dst[i] = arr[i]; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  dst[i] = 0; }
             }
             dto.AppTypes = dst;
         });
@@ -154,7 +154,7 @@ public static class GregCustomers
             _ = cb.gameObject; // liveness
             return cb.IsIPPresent(ip);
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     public static int GetAppIDForIP(global::Il2Cpp.CustomerBase cb, string ip)
@@ -165,7 +165,7 @@ public static class GregCustomers
             _ = cb.gameObject; // liveness
             return cb.GetAppIDForIP(ip);
         }
-        catch { return -1; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return -1; }
     }
 
     // ── Routed Subnets ───────────────────────────────────────────────────────
@@ -184,7 +184,7 @@ public static class GregCustomers
                 try { arr[i] = src[i] ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { arr = null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  arr = null; }
         try
         {
             _ = cb.gameObject; // liveness
@@ -219,7 +219,7 @@ public static class GregCustomers
     {
         if (cb == null || dto == null) return false;
         global::Il2Cpp.CustomerBaseSaveData data = null;
-        try { data = GregCustomerSaves.CreateBase(dto); } catch { data = null; }
+        try { data = GregCustomerSaves.CreateBase(dto); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  data = null; }
         if (data == null) return false;
         try
         {
@@ -254,7 +254,7 @@ public static class GregCustomers
 
     private static string Base(Exception ex)
     {
-        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { return "?"; }
+        try { return ex != null ? ex.GetBaseException().Message : "?"; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return "?"; }
     }
 
     private static void Warn(string message)

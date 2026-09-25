@@ -301,14 +301,14 @@ public static class GregModDeps
         string s = raw.Trim().TrimStart('v', 'V');
         foreach (var chunk in s.Split('.', '-', '+'))
         {
-            string digits = "";
+            var digits = new System.Text.StringBuilder();
             foreach (char c in chunk)
             {
                 if (c < '0' || c > '9') break;
-                digits += c;
+                digits.Append(c);
             }
             if (digits.Length == 0) break;
-            if (int.TryParse(digits, out int v)) parts.Add(v);
+            if (int.TryParse(digits.ToString(), out int v)) parts.Add(v);
             else break;
         }
         return parts.ToArray();

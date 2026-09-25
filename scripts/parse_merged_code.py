@@ -345,7 +345,7 @@ def build_hooks_for_class_region(
             entry = _build_hook_entry(class_name, dom, name, ret, params)
             if entry:
                 hooks.append(entry)
-        except Exception:
+        except Exception:  # nosec: B112 - best-effort codegen: skip unparseable block
             continue
     return hooks
 
@@ -418,7 +418,7 @@ def _collect_all_hooks(text: str, include_hot: bool, include_prop: bool) -> tupl
             all_hooks.extend(
                 build_hooks_for_file(stem, code, include_hot_loops=include_hot, include_properties=include_prop)
             )
-    except Exception:
+    except Exception:  # nosec: B110 - best-effort codegen: nothing to report
         pass
     return all_hooks, files
 
@@ -475,7 +475,7 @@ def _write_doc(args, doc: dict) -> None:
     try:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(doc, indent=2), encoding="utf-8")
-    except Exception:
+    except Exception:  # nosec: B110 - best-effort codegen: nothing to report
         pass
 
 

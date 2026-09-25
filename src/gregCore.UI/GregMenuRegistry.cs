@@ -173,9 +173,9 @@ public static class GregMenuRegistry
     }
 
     // Aggregated lock state across all open menus (OR combination).
-    public static void GetLockState(out bool cam, out bool move, out bool interact, out bool cursor)
+    public static (bool cam, bool move, bool interact, bool cursor) GetLockState()
     {
-        cam = false; move = false; interact = false; cursor = false;
+        bool cam = false, move = false, interact = false, cursor = false;
         lock (_menus)
         {
             foreach (var kv in _menus)
@@ -188,13 +188,14 @@ public static class GregMenuRegistry
                 cursor |= e.Options.ShowCursor;
             }
         }
+        return (cam, move, interact, cursor);
     }
 
     public static bool IsLockActive
     {
         get
         {
-            GetLockState(out bool cam, out bool move, out bool interact, out bool cursor);
+            var (cam, move, interact, cursor) = GetLockState();
             return cam || move || interact || cursor;
         }
     }

@@ -42,12 +42,12 @@ public static partial class CustomEmployeeManager
         bool salarySet = TrySetByPath(card, "VL/text_employeeSalary", wantSalary);
         bool repSet = TrySetByPath(card, "VL/text_requiredReputation", wantRep);
         if (nameSet && salarySet && repSet) return;
-        try { ScanTextsByHint(card, entry, wantName, wantSalary, wantRep, ref nameSet, ref salarySet, ref repSet); }
+        try { ScanTextsByHint(card, wantName, wantSalary, wantRep, ref nameSet, ref salarySet, ref repSet); }
         catch (Exception ex) { CrashLog.LogException("AssignCardTexts fallback scan", ex); }
         CrashLog.Log($"AssignCardTexts: name={nameSet}, salary={salarySet}, rep={repSet} for '{entry.EmployeeId}'");
     }
 
-    private static void ScanTextsByHint(Transform card, CustomEmployeeEntry entry, string wantName, string wantSalary, string wantRep, ref bool nameSet, ref bool salarySet, ref bool repSet)
+    private static void ScanTextsByHint(Transform card, string wantName, string wantSalary, string wantRep, ref bool nameSet, ref bool salarySet, ref bool repSet)
     {
         var textTransforms = new System.Collections.Generic.List<Transform>();
         CollectTextTransforms(card, textTransforms);

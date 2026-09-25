@@ -349,7 +349,7 @@ public sealed class GregJsHost : IGregLanguageHost
             {
                 gregCore.UI.GregMenuBinding.BindToggle(menuId,
                     ToAction(toggleFn),
-                    ToFuncBool(engine, isOpenFn));
+                    ToFuncBool(isOpenFn));
             }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         });
@@ -411,7 +411,7 @@ public sealed class GregJsHost : IGregLanguageHost
         };
     }
 
-    private static Func<bool> ToFuncBool(Engine engine, JsValue fn)
+    private static Func<bool> ToFuncBool(JsValue fn)
     {
         return () =>
         {

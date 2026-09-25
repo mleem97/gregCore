@@ -164,17 +164,6 @@ public static class GregShopItems
         return string.Equals(g, guid, StringComparison.Ordinal);
     }
 
-    public static global::Il2Cpp.ShopItem AddButton(global::Il2Cpp.ShopItem template, GameObject parent,
-        int itemId, string label, int price, int xpToUnlock, string guid, bool isCustomColor, Sprite sprite)
-    {
-        return AddButton(new ShopButtonSpec
-        {
-            Template = template, Parent = parent, ItemId = itemId, Label = label,
-            Price = price, XpToUnlock = xpToUnlock, Guid = guid,
-            IsCustomColor = isCustomColor, Sprite = sprite
-        });
-    }
-
     public static global::Il2Cpp.ShopItem AddButton(ShopButtonSpec spec)
     {
         try

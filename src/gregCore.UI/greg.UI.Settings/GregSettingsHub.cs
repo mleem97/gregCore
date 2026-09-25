@@ -258,47 +258,8 @@ namespace greg.UI.Settings
                 body.style.flexDirection = FlexDirection.Row;
                 root.Add(body);
 
-                _sidebar = new VisualElement();
-                _sidebar.name = "SettingsSidebar";
-                _sidebar.style.width = 220;
-                _sidebar.style.flexShrink = 0;
-                _sidebar.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f);
-                _sidebar.style.borderRightWidth = 1;
-                _sidebar.style.borderRightColor = GregUITheme.NeutralBorder;
-                _sidebar.style.paddingTop = 10;
-                _sidebar.style.paddingBottom = 10;
-                body.Add(_sidebar);
-
-                // Scrollable tab list (many tabs must not push content out).
-                var sidebarScroll = new ScrollView(ScrollViewMode.Vertical);
-                sidebarScroll.name = "SettingsSidebarScroll";
-                sidebarScroll.style.flexGrow = 1;
-                sidebarScroll.style.flexShrink = 1;
-                sidebarScroll.style.minHeight = 0;
-                sidebarScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
-                sidebarScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
-                _sidebar.Add(sidebarScroll);
-                _sidebarContent = sidebarScroll.contentContainer;
-
-                // Scrollable tab content (long settings pages scroll
-                // instead of overflowing past the panel edge).
-                var contentScroll = new ScrollView(ScrollViewMode.Vertical);
-                contentScroll.name = "SettingsContentScroll";
-                contentScroll.style.flexGrow = 1;
-                contentScroll.style.flexShrink = 1;
-                contentScroll.style.minHeight = 0;
-                contentScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
-                contentScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
-                body.Add(contentScroll);
-
-                _contentArea = contentScroll.contentContainer;
-                _contentArea.name = "SettingsContent";
-                _contentArea.style.paddingLeft = GregUITheme.Padding;
-                _contentArea.style.paddingRight = GregUITheme.Padding;
-                _contentArea.style.paddingTop = GregUITheme.Padding;
-                _contentArea.style.paddingBottom = GregUITheme.Padding;
-                // NOTE: no flexGrow here — the ScrollView owns the sizing;
-                // the content container must size to its children.
+                BuildSidebarContainer(body);
+                BuildContentArea(body);
 
                 BuildSidebar();
             }
@@ -306,6 +267,54 @@ namespace greg.UI.Settings
             {
                 MelonLogger.Error($"[GregSettingsHub] BuildUI failed: {ex.Message}");
             }
+        }
+
+        private void BuildSidebarContainer(VisualElement body)
+        {
+            _sidebar = new VisualElement();
+            _sidebar.name = "SettingsSidebar";
+            _sidebar.style.width = 220;
+            _sidebar.style.flexShrink = 0;
+            _sidebar.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f);
+            _sidebar.style.borderRightWidth = 1;
+            _sidebar.style.borderRightColor = GregUITheme.NeutralBorder;
+            _sidebar.style.paddingTop = 10;
+            _sidebar.style.paddingBottom = 10;
+            body.Add(_sidebar);
+
+            // Scrollable tab list (many tabs must not push content out).
+            var sidebarScroll = new ScrollView(ScrollViewMode.Vertical);
+            sidebarScroll.name = "SettingsSidebarScroll";
+            sidebarScroll.style.flexGrow = 1;
+            sidebarScroll.style.flexShrink = 1;
+            sidebarScroll.style.minHeight = 0;
+            sidebarScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
+            sidebarScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            _sidebar.Add(sidebarScroll);
+            _sidebarContent = sidebarScroll.contentContainer;
+        }
+
+        private void BuildContentArea(VisualElement body)
+        {
+            // Scrollable tab content (long settings pages scroll
+            // instead of overflowing past the panel edge).
+            var contentScroll = new ScrollView(ScrollViewMode.Vertical);
+            contentScroll.name = "SettingsContentScroll";
+            contentScroll.style.flexGrow = 1;
+            contentScroll.style.flexShrink = 1;
+            contentScroll.style.minHeight = 0;
+            contentScroll.verticalScrollerVisibility = ScrollerVisibility.Auto;
+            contentScroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            body.Add(contentScroll);
+
+            _contentArea = contentScroll.contentContainer;
+            _contentArea.name = "SettingsContent";
+            _contentArea.style.paddingLeft = GregUITheme.Padding;
+            _contentArea.style.paddingRight = GregUITheme.Padding;
+            _contentArea.style.paddingTop = GregUITheme.Padding;
+            _contentArea.style.paddingBottom = GregUITheme.Padding;
+            // NOTE: no flexGrow here — the ScrollView owns the sizing;
+            // the content container must size to its children.
         }
 
         private void BuildSidebar()

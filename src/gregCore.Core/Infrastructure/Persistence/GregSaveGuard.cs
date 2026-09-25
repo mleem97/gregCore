@@ -164,62 +164,9 @@ public static class GregSaveGuard
     public static void Install(HarmonyLib.Harmony harmony)
     {
         if (_hooksInstalled || harmony == null) return;
-        var installed = 0;
         try
         {
-            // Backup + sidecars before the game save
-            var saveGame = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SaveGame",
-                new Type[] { typeof(string), typeof(string) });
-            if (saveGame != null)
-            {
-                harmony.Patch(saveGame, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveGamePrefix)));
-                installed++;
-            }
-
-            // Vanilla fallback (saving): exactly at the serialization entry point
-            var serialize = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SerializeToBytes",
-                new Type[] { typeof(global::Il2Cpp.SaveData) });
-            if (serialize != null)
-            {
-                harmony.Patch(serialize, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveSerializePrefix)));
-                installed++;
-            }
-            var saveGameData = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SaveGameData");
-            if (saveGameData != null)
-            {
-                harmony.Patch(saveGameData, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveGameDataPrefix)));
-                installed++;
-            }
-
-            // Vanilla fallback (loading): directly after deserialization.
-            // LoadGame returns the save (the singleton stays untouched in
-            // the main menu — SaveData.instance is not yet constructible
-            // there and throws NRE). The void entry points only run in
-            // gameplay scenes (the menu only loads preview data, no mod content).
-            var loadGame = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "LoadGame",
-                new Type[] { typeof(string) });
-            if (loadGame != null)
-            {
-                harmony.Patch(loadGame, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGamePostfix)));
-                installed++;
-            }
-            foreach (string name in new[] { "LoadFromBytes", "LoadGameData" })
-            {
-                var target = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), name);
-                if (target == null) continue;
-                harmony.Patch(target, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGuardedPostfix)));
-                installed++;
-            }
-
-            // Save inventory: after healing (prefix) all device IDs are
-            // final - here everything in the save is inventoried + given stable
-            // UIDs (invisible, sidecar + memory). Extracted
-            // (codeline limit): only hook registration stays here.
-            var loadNetworkState = AccessTools.Method(typeof(global::Il2Cpp.WaypointInitializationSystem),
-                "LoadNetworkState");
-            if (loadNetworkState != null && PatchLoadNetworkState(harmony, loadNetworkState))
-                installed++;
-
+            int installed = PatchSaveEntryPoints(harmony) + PatchLoadEntryPoints(harmony);
             if (installed == 0)
             {
                 MelonLogger.Warning("[gregCore][Save] No SaveSystem method found (API drift?).");
@@ -233,6 +180,69 @@ public static class GregSaveGuard
         {
             MelonLogger.Error("[gregCore][Save] Hook installation failed: " + ex.GetBaseException().Message);
         }
+    }
+
+    private static int PatchSaveEntryPoints(HarmonyLib.Harmony harmony)
+    {
+        var installed = 0;
+        // Backup + sidecars before the game save
+        var saveGame = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SaveGame",
+            new Type[] { typeof(string), typeof(string) });
+        if (saveGame != null)
+        {
+            harmony.Patch(saveGame, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveGamePrefix)));
+            installed++;
+        }
+
+        // Vanilla fallback (saving): exactly at the serialization entry point
+        var serialize = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SerializeToBytes",
+            new Type[] { typeof(global::Il2Cpp.SaveData) });
+        if (serialize != null)
+        {
+            harmony.Patch(serialize, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveSerializePrefix)));
+            installed++;
+        }
+        var saveGameData = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "SaveGameData");
+        if (saveGameData != null)
+        {
+            harmony.Patch(saveGameData, prefix: new HarmonyMethod(typeof(GregSaveGuard), nameof(SaveGameDataPrefix)));
+            installed++;
+        }
+        return installed;
+    }
+
+    private static int PatchLoadEntryPoints(HarmonyLib.Harmony harmony)
+    {
+        var installed = 0;
+        // Vanilla fallback (loading): directly after deserialization.
+        // LoadGame returns the save (the singleton stays untouched in
+        // the main menu — SaveData.instance is not yet constructible
+        // there and throws NRE). The void entry points only run in
+        // gameplay scenes (the menu only loads preview data, no mod content).
+        var loadGame = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), "LoadGame",
+            new Type[] { typeof(string) });
+        if (loadGame != null)
+        {
+            harmony.Patch(loadGame, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGamePostfix)));
+            installed++;
+        }
+        foreach (string name in new[] { "LoadFromBytes", "LoadGameData" })
+        {
+            var target = AccessTools.Method(typeof(global::Il2Cpp.SaveSystem), name);
+            if (target == null) continue;
+            harmony.Patch(target, postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadGuardedPostfix)));
+            installed++;
+        }
+
+        // Save inventory: after healing (prefix) all device IDs are
+        // final - here everything in the save is inventoried + given stable
+        // UIDs (invisible, sidecar + memory). Extracted
+        // (codeline limit): only hook registration stays here.
+        var loadNetworkState = AccessTools.Method(typeof(global::Il2Cpp.WaypointInitializationSystem),
+            "LoadNetworkState");
+        if (loadNetworkState != null && PatchLoadNetworkState(harmony, loadNetworkState))
+            installed++;
+        return installed;
     }
 
     // Prefix BEFORE the game save: FIRST vanilla backup, THEN sidecars —

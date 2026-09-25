@@ -16,7 +16,7 @@ using gregCore.UI;
 
 namespace gregCore.Infrastructure.Scripting.Lua.Dev;
 
-public sealed class LuaRepl
+public sealed partial class LuaRepl
 {
     private bool _visible;
     private string _input = "";
@@ -38,58 +38,14 @@ public sealed class LuaRepl
         try
         {
             var replScript = new Script(CoreModules.Preset_SoftSandbox);
-
-            // Register greg API in REPL context
             var gregTable = new Table(replScript);
-
-            // Basic logging
-            gregTable["log_info"] = (Action<string>)(msg => AddOutput($"[INFO] {msg}"));
-            gregTable["log_warning"] = (Action<string>)(msg => AddOutput($"[WARN] {msg}"));
-            gregTable["log_error"] = (Action<string>)(msg => AddOutput($"[ERROR] {msg}"));
-
-            // Economy
-            gregTable["get_money"] = (Func<double>)(() => API.GregAPI.GetPlayerMoney());
-            gregTable["set_money"] = (Action<double>)(v => API.GregAPI.SetPlayerMoney(v));
-            gregTable["get_xp"] = (Func<double>)(() => API.GregAPI.GetPlayerXp());
-            gregTable["get_reputation"] = (Func<double>)(() => API.GregAPI.GetPlayerReputation());
-
-            // World
-            gregTable["server_count"] = (Func<int>)(() => (int)API.GregAPI.GetServerCount());
-            gregTable["rack_count"] = (Func<int>)(() => (int)API.GregAPI.GetRackCount());
-            gregTable["time_of_day"] = (Func<double>)(() => API.GregAPI.GetTimeOfDay());
-            gregTable["day"] = (Func<int>)(() => (int)API.GregAPI.GetDay());
-            gregTable["scene"] = (Func<string>)(() => API.GregAPI.GetCurrentScene());
-            gregTable["is_paused"] = (Func<bool>)(() => API.GregAPI.IsGamePaused());
-            gregTable["pause"] = (Action)(() => API.GregAPI.SetGamePaused(true));
-            gregTable["resume"] = (Action)(() => API.GregAPI.SetGamePaused(false));
-
+            RegisterLoggingApi(gregTable);
+            RegisterEconomyApi(gregTable);
+            RegisterWorldApi(gregTable);
             replScript.Globals["greg"] = gregTable;
-
-            // Helper: print redirects to output
-            replScript.Globals["print"] = (Action<DynValue[]>)(args =>
-            {
-                string line = string.Join("\t", Array.ConvertAll(args, a => a.ToPrintString()));
-                AddOutput(line);
-            });
-
-            AddOutput("─── gregCore Lua REPL v1.1.0 ───");
-            AddOutput("Type Lua expressions. Press Enter to evaluate.");
-            AddOutput("Use greg.* for API access. Type 'help()' for commands.");
-
-            replScript.Globals["help"] = (Action)(() =>
-            {
-                AddOutput("── Available commands ──");
-                AddOutput("  greg.get_money()       → Player money");
-                AddOutput("  greg.set_money(1000)   → Set money");
-                AddOutput("  greg.server_count()    → Active servers");
-                AddOutput("  greg.rack_count()      → Active racks");
-                AddOutput("  greg.time_of_day()     → Current time");
-                AddOutput("  greg.day()             → Current day");
-                AddOutput("  greg.scene()           → Active scene");
-                AddOutput("  greg.pause() / resume()");
-                AddOutput("  clear()                → Clear output");
-            });
-
+            RegisterPrintHelper(replScript);
+            PrintWelcome();
+            RegisterHelpCommand(replScript);
             replScript.Globals["clear"] = (Action)(() => _output.Clear());
 
             // Build UI
@@ -118,42 +74,97 @@ public sealed class LuaRepl
     {
         if (_root == null || _root.style.display == DisplayStyle.None) return;
         if (_inputField == null) return;
-
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
-
-        if (keyboard.upArrowKey.wasPressedThisFrame && _history.Count > 0)
+        try
         {
+            if (TryHistoryUp(keyboard)) return;
+            if (TryHistoryDown(keyboard)) return;
+            TrySubmitEnter(keyboard);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaREPL] Update failed: {ex.Message}");
+        }
+    }
+
+    private bool TryHistoryUp(Keyboard keyboard)
+    {
+        try
+        {
+            if (!keyboard.upArrowKey.wasPressedThisFrame || _history.Count == 0) return false;
             _historyIndex = Math.Max(0, _historyIndex - 1);
             if (_historyIndex < _history.Count)
             {
                 _input = _history[_historyIndex];
                 _inputField.value = _input;
             }
+            return true;
         }
-        else if (keyboard.downArrowKey.wasPressedThisFrame && _history.Count > 0)
+        catch { return false; }
+    }
+
+    private bool TryHistoryDown(Keyboard keyboard)
+    {
+        try
         {
+            if (!keyboard.downArrowKey.wasPressedThisFrame || _history.Count == 0) return false;
             _historyIndex = Math.Min(_history.Count, _historyIndex + 1);
             _input = _historyIndex < _history.Count ? _history[_historyIndex] : "";
             _inputField.value = _input;
+            return true;
         }
-        else if (keyboard.enterKey.wasPressedThisFrame)
+        catch { return false; }
+    }
+
+    private void TrySubmitEnter(Keyboard keyboard)
+    {
+        try
         {
-            if (!string.IsNullOrWhiteSpace(_input) && _replScript != null)
-            {
-                Evaluate(_input, _replScript);
-                _history.Add(_input);
-                _historyIndex = _history.Count;
-                _input = "";
-                _inputField.value = "";
-            }
+            if (!keyboard.enterKey.wasPressedThisFrame) return;
+            SubmitCurrentInput();
+        }
+        catch { }
+    }
+
+    private void SubmitCurrentInput()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_input) || _replScript == null) return;
+            Evaluate(_input, _replScript);
+            _history.Add(_input);
+            _historyIndex = _history.Count;
+            _input = "";
+            _inputField.value = "";
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaREPL] Submit failed: {ex.Message}");
         }
     }
 
     private void BuildUI(Script replScript)
     {
-        _replScript = replScript;
-        _root = new VisualElement
+        try
+        {
+            _replScript = replScript;
+            _root = CreateRoot();
+            _root.Add(CreateHeader());
+            _outputScroll = CreateOutputScroll();
+            _root.Add(_outputScroll);
+            _root.Add(CreateInputRow(replScript));
+            GregUIManager.RegisterPanel("LuaREPL", _root);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaREPL] BuildUI failed: {ex.Message}");
+        }
+    }
+
+    private static VisualElement CreateRoot()
+    {
+        return new VisualElement
         {
             name = "LuaREPL",
             style =
@@ -184,9 +195,11 @@ public sealed class LuaRepl
                 display = DisplayStyle.None
             }
         };
+    }
 
-        // Header
-        var header = new Label("gregCore Lua REPL")
+    private static Label CreateHeader()
+    {
+        return new Label("gregCore Lua REPL")
         {
             style =
             {
@@ -200,10 +213,11 @@ public sealed class LuaRepl
                 paddingBottom = 6
             }
         };
-        _root.Add(header);
+    }
 
-        // Output scroll view
-        _outputScroll = new ScrollView(ScrollViewMode.Vertical)
+    private static ScrollView CreateOutputScroll()
+    {
+        return new ScrollView(ScrollViewMode.Vertical)
         {
             style =
             {
@@ -229,9 +243,10 @@ public sealed class LuaRepl
                 paddingRight = 6
             }
         };
-        _root.Add(_outputScroll);
+    }
 
-        // Input row
+    private VisualElement CreateInputRow(Script replScript)
+    {
         var inputRow = new VisualElement
         {
             style =
@@ -240,8 +255,16 @@ public sealed class LuaRepl
                 alignItems = Align.Center
             }
         };
+        inputRow.Add(CreatePrompt());
+        _inputField = CreateInputField();
+        inputRow.Add(_inputField);
+        inputRow.Add(CreateRunButton(replScript));
+        return inputRow;
+    }
 
-        var prompt = new Label("›")
+    private static Label CreatePrompt()
+    {
+        return new Label("›")
         {
             style =
             {
@@ -251,9 +274,11 @@ public sealed class LuaRepl
                 width = 15
             }
         };
-        inputRow.Add(prompt);
+    }
 
-        _inputField = new TextField
+    private TextField CreateInputField()
+    {
+        var field = new TextField
         {
             value = _input,
             style =
@@ -265,9 +290,12 @@ public sealed class LuaRepl
                 height = 24
             }
         };
-        _inputField.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => _input = evt.newValue));
-        inputRow.Add(_inputField);
+        field.RegisterCallback<ChangeEvent<string>>(new Action<ChangeEvent<string>>(evt => _input = evt.newValue));
+        return field;
+    }
 
+    private Button CreateRunButton(Script replScript)
+    {
         var runButton = new Button
         {
             text = "Run",
@@ -281,23 +309,8 @@ public sealed class LuaRepl
                 marginLeft = 4
             }
         };
-        runButton.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt =>
-        {
-            if (!string.IsNullOrWhiteSpace(_input))
-            {
-                Evaluate(_input, replScript);
-                _history.Add(_input);
-                _historyIndex = _history.Count;
-                _input = "";
-                _inputField.value = "";
-            }
-        }));
-        inputRow.Add(runButton);
-
-        _root.Add(inputRow);
-
-        // Register in UI manager
-        GregUIManager.RegisterPanel("LuaREPL", _root);
+        runButton.RegisterCallback<ClickEvent>(new Action<ClickEvent>(evt => SubmitCurrentInput()));
+        return runButton;
     }
 
     private void Evaluate(string code, Script replScript)

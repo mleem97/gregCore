@@ -21,7 +21,7 @@ using UnityEngine.Networking;
 namespace gregCore.PublicApi.Audio;
 
 [ExcludeFromCodeCoverage(Justification = "Runtime audio over live game objects; needs running game.")]
-public static class GregAudioService
+public static partial class GregAudioService
 {
     public const float CrossfadeDuration = 2.5f;
     public const int CacheCapacity = 3;
@@ -141,57 +141,17 @@ public static class GregAudioService
         {
             EnsureFadeSource();
             var active = ActiveSource();
-            bool audible = false;
-            try
-            {
-                var f = _fading ? _fadeTo : active;
-                audible = f != null && f.clip != null && (f.isPlaying || _fading);
-                if (!audible && active != null)
-                    audible = active.clip != null && active.isPlaying;
-            }
-            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            bool audible = IsAudible(active);
             _currentTitle = title;
             _currentPath = filePath;
             try { TrackStarted?.Invoke(filePath, title); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             if (!audible || _fadeSource == null || active == null)
             {
-                _fading = false;
-                if (active != null)
-                {
-                    try { active.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    active.clip = clip;
-                    active.volume = volume;
-                    active.loop = false;
-                    active.Play();
-                }
+                PlayDirect(active, clip, volume);
             }
             else
             {
-                AudioSource to = _activeIsA ? _fadeSource : FindAudioManager()?.musicAudioSource;
-                if (to == null || to == active)
-                {
-                    try { active.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    active.clip = clip;
-                    active.volume = volume;
-                    active.loop = false;
-                    active.Play();
-                }
-                else
-                {
-                    _fadeFrom = active;
-                    _fadeTo = to;
-                    _fadeT = 0f;
-                    _fadeVol = volume;
-                    try
-                    {
-                        to.clip = clip;
-                        to.volume = 0f;
-                        to.loop = false;
-                        to.Play();
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    _fading = true;
-                }
+                PlayWithCrossfade(active, clip, volume);
             }
         }
         catch (Exception ex)
@@ -200,28 +160,125 @@ public static class GregAudioService
         }
     }
 
+    private static bool IsAudible(AudioSource active)
+    {
+        try
+        {
+            var f = _fading ? _fadeTo : active;
+            bool audible = f != null && f.clip != null && (f.isPlaying || _fading);
+            if (!audible && active != null)
+                audible = active.clip != null && active.isPlaying;
+            return audible;
+        }
+        catch { return false; }
+    }
+
+    private static void PlayDirect(AudioSource active, AudioClip clip, float volume)
+    {
+        try
+        {
+            _fading = false;
+            if (active == null) return;
+            try { active.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            active.clip = clip;
+            active.volume = volume;
+            active.loop = false;
+            active.Play();
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error("[gregCore][Audio] PlayDirect: " + ex.GetBaseException().Message);
+        }
+    }
+
+    private static void PlayWithCrossfade(AudioSource active, AudioClip clip, float volume)
+    {
+        try
+        {
+            AudioSource to = _activeIsA ? _fadeSource : FindAudioManager()?.musicAudioSource;
+            if (to == null || to == active)
+            {
+                PlayDirect(active, clip, volume);
+                return;
+            }
+            StartCrossfade(active, to, clip, volume);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error("[gregCore][Audio] Crossfade: " + ex.GetBaseException().Message);
+        }
+    }
+
+    private static void StartCrossfade(AudioSource active, AudioSource to, AudioClip clip, float volume)
+    {
+        try
+        {
+            _fadeFrom = active;
+            _fadeTo = to;
+            _fadeT = 0f;
+            _fadeVol = volume;
+            try
+            {
+                to.clip = clip;
+                to.volume = 0f;
+                to.loop = false;
+                to.Play();
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            _fading = true;
+        }
+        catch { }
+    }
+
     // Call per frame (crossfade). Fires TrackEnded at end of track.
     public static void Tick(float dt)
     {
         try
         {
-            if (_fading)
-            {
-                _fadeT += dt / CrossfadeDuration;
-                float k = _fadeT >= 1f ? 1f : _fadeT;
-                k = k * k * (3f - 2f * k);
-                if (_fadeFrom != null) { try { _fadeFrom.volume = _fadeVol * (1f - k); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
-                if (_fadeTo != null) { try { _fadeTo.volume = _fadeVol * k; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
-                if (_fadeT >= 1f)
-                {
-                    try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    _activeIsA = !_activeIsA;
-                    _fading = false;
-                }
-            }
-            if (PollEnded()) { try { TrackEnded?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+            TickFade(dt);
+            TickEnded();
         }
         catch { _fading = false; }
+    }
+
+    private static void TickFade(float dt)
+    {
+        try
+        {
+            if (!_fading) return;
+            _fadeT += dt / CrossfadeDuration;
+            float k = _fadeT >= 1f ? 1f : _fadeT;
+            k = k * k * (3f - 2f * k);
+            ApplyFadeVolumes(k);
+            if (_fadeT >= 1f) CompleteFade();
+        }
+        catch { _fading = false; }
+    }
+
+    private static void ApplyFadeVolumes(float k)
+    {
+        try
+        {
+            if (_fadeFrom != null) { try { _fadeFrom.volume = _fadeVol * (1f - k); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+            if (_fadeTo != null) { try { _fadeTo.volume = _fadeVol * k; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+        }
+        catch { }
+    }
+
+    private static void CompleteFade()
+    {
+        try { if (_fadeFrom != null) _fadeFrom.Stop(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        _activeIsA = !_activeIsA;
+        _fading = false;
+    }
+
+    private static void TickEnded()
+    {
+        try
+        {
+            if (PollEnded()) { try { TrackEnded?.Invoke(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+        }
+        catch { }
     }
 
     // True exactly on the trailing edge (track ended naturally).
@@ -309,96 +366,6 @@ public static class GregAudioService
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
-    public static string ProgressText()
-    {
-        try
-        {
-            var src = PlayedSource();
-            if (src == null || src.clip == null) return "";
-            float pos = src.time;
-            float len = src.clip.length;
-            if (len <= 0f) return "";
-            if (pos < 0f) pos = 0f;
-            if (pos > len) pos = len;
-            return FormatTime(pos) + " / " + FormatTime(len);
-        }
-        catch { return ""; }
-    }
-
-    private static string FormatTime(float s)
-    {
-        int m = (int)(s / 60f);
-        int sec = (int)(s % 60f);
-        return m + ":" + (sec < 10 ? "0" : "") + sec;
-    }
-
-    public static float ProgressFraction()
-    {
-        try
-        {
-            var src = PlayedSource();
-            if (src == null || src.clip == null) return -1f;
-            float len = src.clip.length;
-            if (len <= 0f) return -1f;
-            float pos = src.time;
-            if (pos < 0f) pos = 0f;
-            if (pos > len) pos = len;
-            return pos / len;
-        }
-        catch { return -1f; }
-    }
-
-    public static float RemainingSeconds()
-    {
-        try
-        {
-            var src = PlayedSource();
-            if (src == null || src.clip == null || !src.isPlaying) return -1f;
-            float len = src.clip.length;
-            if (len <= 0f) return -1f;
-            float rem = len - src.time;
-            return rem < 0f ? 0f : rem;
-        }
-        catch { return -1f; }
-    }
-
-    private static AudioSource PlayedSource()
-    {
-        try
-        {
-            if (_fading && _fadeTo != null) return _fadeTo;
-            return ActiveSource();
-        }
-        catch { return null; }
-    }
-
-    public static void Seek(float fraction)
-    {
-        try
-        {
-            if (fraction < 0f) fraction = 0f;
-            if (fraction > 1f) fraction = 1f;
-            var src = PlayedSource();
-            if (src == null || src.clip == null) return;
-            float len = src.clip.length;
-            if (len <= 0f) return;
-            src.time = fraction * len;
-            _wasPlaying = true;
-        }
-        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-    }
-
-    private static string ToFileUrl(string path)
-    {
-        if (string.IsNullOrEmpty(path)) return "";
-        try { return new Uri(path).AbsoluteUri; }
-        catch
-        {
-            string url = path.Replace("\\", "/");
-            return "file:///" + Uri.EscapeDataString(url.Replace(":", "|")).Replace("|", ":");
-        }
-    }
-
     private static IEnumerator LoadAndPlay(string filePath, string title, float volume)
     {
         string url = ToFileUrl(filePath);
@@ -410,17 +377,7 @@ public static class GregAudioService
         {
             req.timeout = 30;
             yield return req.SendWebRequest();
-            try
-            {
-                if (req.result != UnityWebRequest.Result.Success)
-                    fail = "Download: " + req.error;
-                else
-                {
-                    try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    if (data == null || data.Length == 0) fail = "Leer";
-                }
-            }
-            catch (Exception ex) { fail = "Download: " + ex.GetBaseException().Message; }
+            fail = ReadDownload(req, title, out data);
         }
         if (fail != null)
         {
@@ -435,19 +392,61 @@ public static class GregAudioService
         StartClip(filePath, title, clip, volume);
     }
 
+    private static string ReadDownload(UnityWebRequest req, string title, out byte[] data)
+    {
+        data = null;
+        try
+        {
+            if (req.result != UnityWebRequest.Result.Success)
+                return "Download: " + req.error;
+            try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            if (data == null || data.Length == 0) return "Leer";
+            return null;
+        }
+        catch (Exception ex) { return "Download: " + ex.GetBaseException().Message; }
+    }
+
     private static AudioClip DecodeToClip(string title, string filePath, byte[] data)
     {
         try
         {
-            float[] samples = null;
-            int channels = 0;
-            int frequency = 0;
+            if (!TryGetSamples(title, filePath, data, out float[] samples, out int channels, out int frequency))
+                return null;
+            return CreateClip(title, samples, channels, frequency);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error("[gregCore][Audio] Decode: " + ex.GetBaseException().Message);
+            return null;
+        }
+    }
+
+    private static bool TryGetSamples(string title, string filePath, byte[] data, out float[] samples, out int channels, out int frequency)
+    {
+        samples = null;
+        channels = 0;
+        frequency = 0;
+        try
+        {
             if (!AudioDecoder.TryDecode(filePath, data, out samples, out channels, out frequency)
                 || samples == null || samples.Length == 0 || channels <= 0 || frequency <= 0)
             {
                 MelonLogger.Warning("[gregCore][Audio] Decoding failed (" + title + ")");
-                return null;
+                return false;
             }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error("[gregCore][Audio] Decode: " + ex.GetBaseException().Message);
+            return false;
+        }
+    }
+
+    private static AudioClip CreateClip(string title, float[] samples, int channels, int frequency)
+    {
+        try
+        {
             int frames = samples.Length / channels;
             var clip = AudioClip.Create(title, frames, channels, frequency, false);
             if (clip == null || !clip.SetData(samples, 0))
@@ -460,7 +459,7 @@ public static class GregAudioService
         }
         catch (Exception ex)
         {
-            MelonLogger.Error("[gregCore][Audio] Decode: " + ex.GetBaseException().Message);
+            MelonLogger.Error("[gregCore][Audio] Clip: " + ex.GetBaseException().Message);
             return null;
         }
     }
@@ -471,140 +470,5 @@ public static class GregAudioService
     {
         try { return !string.IsNullOrEmpty(filePath) && _preloadingPath == filePath; }
         catch { return false; }
-    }
-
-    public static void PreloadFile(string filePath, string title)
-    {
-        if (string.IsNullOrEmpty(filePath)) return;
-        if (string.IsNullOrEmpty(title)) title = Path.GetFileNameWithoutExtension(filePath);
-        try
-        {
-            if (GregAudioClipCache.Has(filePath)) return;
-            if (_preloadingPath == filePath) return;
-            _preloadingPath = filePath;
-            MelonCoroutines.Start(PreloadSlices(filePath, title));
-        }
-        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-    }
-
-    public static void CancelPreload()
-    {
-        _preloadingPath = null;
-    }
-
-    private static IEnumerator PreloadSlices(string filePath, string title)
-    {
-        string path = filePath;
-        string url = ToFileUrl(path);
-        byte[] data = null;
-        UnityWebRequest req = null;
-        try { req = UnityWebRequest.Get(url); } catch { req = null; }
-        if (req == null) { if (_preloadingPath == path) _preloadingPath = null; yield break; }
-        req.timeout = 30;
-        yield return req.SendWebRequest();
-        if (_preloadingPath != path) yield break;
-        bool ok = false;
-        try { ok = req.result == UnityWebRequest.Result.Success; } catch { ok = false; }
-        if (!ok) { if (_preloadingPath == path) _preloadingPath = null; yield break; }
-        try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-        if (data == null || data.Length == 0) { if (_preloadingPath == path) _preloadingPath = null; yield break; }
-
-        string ext = Path.GetExtension(path).ToLowerInvariant();
-        if (ext == ".mp3")
-        {
-            NLayer.MpegFile mpeg = null;
-            MemoryStream ms = null;
-            var all = new List<float>();
-            int ch = 0;
-            int rate = 0;
-            bool failed = false;
-            try
-            {
-                ms = new MemoryStream(data, false);
-                mpeg = new NLayer.MpegFile(ms);
-                ch = mpeg.Channels;
-                rate = mpeg.SampleRate;
-                if (ch <= 0 || rate <= 0) failed = true;
-            }
-            catch { failed = true; }
-            if (!failed)
-            {
-                int slice = Math.Max(1024, (rate * ch) / 10);
-                var buf = new float[slice];
-                try
-                {
-                    while (true)
-                    {
-                        if (_preloadingPath != path) break;
-                        int read = 0;
-                        try { read = mpeg.ReadSamples(buf, 0, buf.Length); } catch { break; }
-                        if (read <= 0) break;
-                        for (int i = 0; i < read; i++) all.Add(buf[i]);
-                        if (read < buf.Length) break;
-                        yield return null;
-                    }
-                }
-                finally
-                {
-                    try { if (mpeg != null) mpeg.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                    try { if (ms != null) ms.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-            }
-            else
-            {
-                try { if (mpeg != null) mpeg.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { if (ms != null) ms.Dispose(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-            }
-            if (_preloadingPath != path || all.Count == 0 || ch <= 0 || rate <= 0)
-            {
-                if (_preloadingPath == path) _preloadingPath = null;
-                yield break;
-            }
-            FinishPreload(path, title, all.ToArray(), ch, rate);
-            yield break;
-        }
-
-        float[] samples = null;
-        int channels = 0;
-        int frequency = 0;
-        try
-        {
-            if (!AudioDecoder.TryDecode(path, data, out samples, out channels, out frequency))
-            {
-                if (_preloadingPath == path) _preloadingPath = null;
-                yield break;
-            }
-        }
-        catch
-        {
-            if (_preloadingPath == path) _preloadingPath = null;
-            yield break;
-        }
-        if (_preloadingPath != path) yield break;
-        FinishPreload(path, title, samples, channels, frequency);
-    }
-
-    private static void FinishPreload(string filePath, string title, float[] samples, int channels, int frequency)
-    {
-        string path = filePath;
-        try
-        {
-            if (samples == null || samples.Length == 0 || channels <= 0 || frequency <= 0) return;
-            int frames = samples.Length / channels;
-            var clip = AudioClip.Create(title, frames, channels, frequency, false);
-            if (clip == null) return;
-            if (!clip.SetData(samples, 0))
-            {
-                try { UnityEngine.Object.Destroy(clip); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                return;
-            }
-            GregAudioClipCache.Put(path, clip);
-            MelonLogger.Msg("[gregCore][Audio] Preloaded: '" + title + "'.");
-        }
-        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-        finally
-        {
-            if (_preloadingPath == path) _preloadingPath = null;
-        }
     }
 }

@@ -48,77 +48,137 @@ public class LuaCoroutineScheduler
     public void OnUpdate(float deltaTime)
     {
         _currentFrameTime = deltaTime;
+        UpdateTimers(deltaTime);
+        UpdateCoroutines(deltaTime);
+    }
 
-        // Update timers
-        for (int i = _timers.Count - 1; i >= 0; i--)
+    private void UpdateTimers(float deltaTime)
+    {
+        try
         {
-            var t = _timers[i];
-            t.Remaining -= deltaTime;
-
-            if (t.Remaining <= 0f)
+            for (int i = _timers.Count - 1; i >= 0; i--)
             {
                 try
                 {
-                    t.Callback.Call();
+                    TickTimer(i, deltaTime);
                 }
                 catch (Exception ex)
                 {
-                    MelonLogger.Error($"[LuaCoroutineScheduler] Timer callback error: {ex.Message}");
-                }
-
-                if (t.Repeating)
-                {
-                    t.Remaining = t.Interval;
-                }
-                else
-                {
-                    _timers.RemoveAt(i);
+                    MelonLogger.Error($"[LuaCoroutineScheduler] Timer tick error: {ex.Message}");
                 }
             }
         }
-
-        // Update coroutines
-        for (int i = _coroutines.Count - 1; i >= 0; i--)
+        catch (Exception ex)
         {
-            var co = _coroutines[i];
+            MelonLogger.Error($"[LuaCoroutineScheduler] Timer update error: {ex.Message}");
+        }
+    }
 
-            if (co.Coroutine.State != CoroutineState.Dead)
+    private void TickTimer(int index, float deltaTime)
+    {
+        try
+        {
+            var t = _timers[index];
+            t.Remaining -= deltaTime;
+            if (t.Remaining > 0f) return;
+            FireTimer(t);
+            if (t.Repeating)
             {
-                try
-                {
-                    // Resume if waiting for time
-                    if (co.WaitRemaining.HasValue)
-                    {
-                        co.WaitRemaining -= deltaTime;
-                        if (co.WaitRemaining.Value > 0f) continue;
-                        co.WaitRemaining = null;
-                    }
-
-                    var result = co.Coroutine.Resume();
-                    
-                    // Check if yielded with WAIT + time
-                    if (co.Coroutine.State != CoroutineState.Dead && result.Type == DataType.Tuple)
-                    {
-                        var tuple = result.Tuple;
-                        if (tuple.Length >= 2 
-                            && tuple[0].String == "__WAIT__"
-                            && tuple[1].Type == DataType.Number)
-                        {
-                            co.WaitRemaining = (float)tuple[1].Number;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine error: {ex.Message}");
-                    _coroutines.RemoveAt(i);
-                }
+                t.Remaining = t.Interval;
             }
             else
             {
-                _coroutines.RemoveAt(i);
+                _timers.RemoveAt(index);
             }
         }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaCoroutineScheduler] Timer tick error: {ex.Message}");
+        }
+    }
+
+    private static void FireTimer(ScheduledTimer t)
+    {
+        try
+        {
+            t.Callback.Call();
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaCoroutineScheduler] Timer callback error: {ex.Message}");
+        }
+    }
+
+    private void UpdateCoroutines(float deltaTime)
+    {
+        try
+        {
+            for (int i = _coroutines.Count - 1; i >= 0; i--)
+            {
+                try
+                {
+                    TickCoroutine(i, deltaTime);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine tick error: {ex.Message}");
+                    try { _coroutines.RemoveAt(i); } catch { }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine update error: {ex.Message}");
+        }
+    }
+
+    private void TickCoroutine(int index, float deltaTime)
+    {
+        var co = _coroutines[index];
+        if (co.Coroutine.State == CoroutineState.Dead)
+        {
+            try { _coroutines.RemoveAt(index); } catch { }
+            return;
+        }
+        try
+        {
+            if (TryConsumeWait(co, deltaTime)) return;
+            var result = co.Coroutine.Resume();
+            TryApplyWaitResult(co, result);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaCoroutineScheduler] Coroutine error: {ex.Message}");
+            try { _coroutines.RemoveAt(index); } catch { }
+        }
+    }
+
+    private static bool TryConsumeWait(LuaCoroutine co, float deltaTime)
+    {
+        try
+        {
+            if (!co.WaitRemaining.HasValue) return false;
+            co.WaitRemaining -= deltaTime;
+            if (co.WaitRemaining.Value > 0f) return true;
+            co.WaitRemaining = null;
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private static void TryApplyWaitResult(LuaCoroutine co, DynValue result)
+    {
+        try
+        {
+            if (co.Coroutine.State == CoroutineState.Dead) return;
+            if (result.Type != DataType.Tuple) return;
+            var tuple = result.Tuple;
+            if (tuple.Length < 2) return;
+            if (tuple[0].String != "__WAIT__") return;
+            if (tuple[1].Type != DataType.Number) return;
+            co.WaitRemaining = (float)tuple[1].Number;
+        }
+        catch { }
     }
 
     private void RegisterTimer(double seconds, Closure callback, bool repeating)

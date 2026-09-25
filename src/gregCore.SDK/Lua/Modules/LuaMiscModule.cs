@@ -13,9 +13,16 @@ public static class LuaMiscModule
 {
     public static void Register(Table greg, Script script, string modId)
     {
-        var steam = new Table(script);
+        greg["steam"] = BuildSteam(script);
+        greg["locale"] = BuildLocale(script);
+        greg["numpad"] = BuildNumpad(script);
+        greg["pause"] = BuildPause(script, modId);
+    }
 
-        // greg.steam.parse_lobby(connect) → number (0 when unparsable)
+    private static Table BuildSteam(Script script)
+    {
+        var steam = new Table(script);
+        // greg.steam.parse_lobby(connect) -> number (0 when unparsable)
         steam["parse_lobby"] = (Func<string, double>)((connect) =>
         {
             try
@@ -25,34 +32,36 @@ public static class LuaMiscModule
             }
             catch { return 0.0; }
         });
-        greg["steam"] = steam;
+        return steam;
+    }
 
+    private static Table BuildLocale(Script script)
+    {
         var locale = new Table(script);
-
-        // greg.locale.text(uid, fallback) → string
+        // greg.locale.text(uid, fallback) -> string
         locale["text"] = (Func<int, string, string>)((uid, fallback) =>
         {
             try { return gregCore.Core.Networking.GregLocalisation.GetTextByID(uid, fallback ?? ""); }
             catch { return fallback ?? ""; }
         });
-
-        // greg.locale.change(uid) → bool
+        // greg.locale.change(uid) -> bool
         locale["change"] = (Func<int, bool>)((uid) =>
         {
             try { return gregCore.Core.Networking.GregLocalisation.ChangeLanguage(uid); }
             catch { return false; }
         });
-
-        // greg.locale.current() → number
+        // greg.locale.current() -> number
         locale["current"] = (Func<int>)(() =>
         {
             try { return gregCore.Core.Networking.GregLocalisation.GetLoadLanguageUID(); }
             catch { return 0; }
         });
-        greg["locale"] = locale;
+        return locale;
+    }
 
+    private static Table BuildNumpad(Script script)
+    {
         var numpad = new Table(script);
-
         // greg.numpad.is_active() / written() / copied()
         numpad["is_active"] = (Func<bool>)(() =>
         {
@@ -69,8 +78,13 @@ public static class LuaMiscModule
             try { return gregCore.Core.Networking.GregNumpad.GetCopiedNumber() ?? ""; }
             catch { return ""; }
         });
+        RegisterNumpadPress(numpad);
+        return numpad;
+    }
 
-        // greg.numpad.press(digit) / press_ok() / press_delete() → bool
+    private static void RegisterNumpadPress(Table numpad)
+    {
+        // greg.numpad.press(digit) / press_ok() / press_delete() -> bool
         numpad["press"] = (Func<string, bool>)((digit) =>
         {
             try { return gregCore.Core.Networking.GregNumpad.PressNumber(digit ?? ""); }
@@ -86,51 +100,60 @@ public static class LuaMiscModule
             try { return gregCore.Core.Networking.GregNumpad.PressDelete(); }
             catch { return false; }
         });
-        greg["numpad"] = numpad;
+    }
 
+    private static Table BuildPause(Script script, string modId)
+    {
         var pause = new Table(script);
-
-        // greg.pause.is_paused() → bool
+        // greg.pause.is_paused() -> bool
         pause["is_paused"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregPauseMenu.IsPaused(); }
             catch { return false; }
         });
+        RegisterPauseCallbacks(pause, modId);
+        return pause;
+    }
 
-        // greg.pause.on_open(fn) / on_close(fn) → bool (subscribe; no unsubscribe
-        // handle by design — callbacks live as long as the mod)
-        pause["on_open"] = (Func<Closure, bool>)((fn) =>
+    private static void RegisterPauseCallbacks(Table pause, string modId)
+    {
+        // greg.pause.on_open(fn) / on_close(fn) -> bool (subscribe; no unsubscribe
+        // handle by design - callbacks live as long as the mod)
+        pause["on_open"] = (Func<Closure, bool>)((fn) => SubscribePauseOpen(fn, modId));
+        pause["on_close"] = (Func<Closure, bool>)((fn) => SubscribePauseClose(fn, modId));
+    }
+
+    private static bool SubscribePauseOpen(Closure fn, string modId)
+    {
+        try
         {
-            try
+            if (fn == null) return false;
+            return gregCore.Core.Networking.GregPauseMenu.SubscribeOpen(() =>
             {
-                if (fn == null) return false;
-                return gregCore.Core.Networking.GregPauseMenu.SubscribeOpen(() =>
+                try { fn.Call(); }
+                catch (Exception ex)
                 {
-                    try { fn.Call(); }
-                    catch (Exception ex)
-                    {
-                        LuaLog.Error($"[LuaMod:{modId}] pause.on_open callback failed: {ex.Message}");
-                    }
-                });
-            }
-            catch { return false; }
-        });
-        pause["on_close"] = (Func<Closure, bool>)((fn) =>
+                    LuaLog.Error($"[LuaMod:{modId}] pause.on_open callback failed: {ex.Message}");
+                }
+            });
+        }
+        catch { return false; }
+    }
+
+    private static bool SubscribePauseClose(Closure fn, string modId)
+    {
+        try
         {
-            try
+            if (fn == null) return false;
+            return gregCore.Core.Networking.GregPauseMenu.SubscribeClose(() =>
             {
-                if (fn == null) return false;
-                return gregCore.Core.Networking.GregPauseMenu.SubscribeClose(() =>
+                try { fn.Call(); }
+                catch (Exception ex)
                 {
-                    try { fn.Call(); }
-                    catch (Exception ex)
-                    {
-                        LuaLog.Error($"[LuaMod:{modId}] pause.on_close callback failed: {ex.Message}");
-                    }
-                });
-            }
-            catch { return false; }
-        });
-        greg["pause"] = pause;
+                    LuaLog.Error($"[LuaMod:{modId}] pause.on_close callback failed: {ex.Message}");
+                }
+            });
+        }
+        catch { return false; }
     }
 }

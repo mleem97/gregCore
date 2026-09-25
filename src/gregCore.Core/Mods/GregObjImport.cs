@@ -33,14 +33,14 @@ public static class GregObjImport
         }
         if (mesh == null)
         {
-            Warn($"Import lieferte null ('{Short(full)}').");
+            Warn($"Import returned null ('{Short(full)}').");
             return null;
         }
         int verts = -1;
         try { verts = mesh.vertexCount; } catch { verts = -1; }
         if (verts <= 0)
         {
-            Warn($"Import ohne Vertices ('{Short(full)}').");
+            Warn($"Import has no vertices ('{Short(full)}').");
             return null;
         }
         return mesh;
@@ -66,7 +66,7 @@ public static class GregObjImport
             if (!combined.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(combined, root, StringComparison.OrdinalIgnoreCase))
             {
-                Warn($"Pfad bricht aus dem Pack-Ordner aus ('{modelFile}').");
+                Warn($"Path escapes the pack folder ('{modelFile}').");
                 return null;
             }
         }
@@ -83,7 +83,7 @@ public static class GregObjImport
         full = null;
         if (string.IsNullOrWhiteSpace(filePath))
         {
-            Warn("Leerer Dateipfad.");
+            Warn("Empty file path.");
             return false;
         }
         string candidate = filePath;
@@ -104,7 +104,7 @@ public static class GregObjImport
         {
             if (info.Length > MaxObjBytes)
             {
-                Warn($"Datei zu gross ({info.Length} Bytes, Limit {MaxObjBytes}): '{Short(filePath)}'.");
+                Warn($"File too large ({info.Length} bytes, limit {MaxObjBytes}): '{Short(filePath)}'.");
                 return false;
             }
         }

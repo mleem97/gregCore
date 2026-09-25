@@ -15,72 +15,74 @@ public static class LuaObjectivesModule
     public static void Register(Table greg, Script script, string modId)
     {
         var objectives = new Table(script);
+        RegisterBasics(objectives);
+        RegisterQuery(objectives, script, modId);
+        RegisterLifecycle(objectives);
+        greg["objectives"] = objectives;
+    }
 
-        // greg.objectives.show(index) → bool
+    private static void RegisterBasics(Table objectives)
+    {
+        // greg.objectives.show(index) -> bool
         objectives["show"] = (Func<int, bool>)((index) =>
         {
             try { return gregCore.Core.Networking.GregTutorials.ShowTutorial(index); }
             catch { return false; }
         });
-
-        // greg.objectives.stop() → bool
+        // greg.objectives.stop() -> bool
         objectives["stop"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregTutorials.StopTutorial(); }
             catch { return false; }
         });
-
-        // greg.objectives.skip() → bool (alle Tutorials überspringen)
+        // greg.objectives.skip() -> bool (skip all tutorials)
         objectives["skip"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregTutorials.SkipTutorials(); }
             catch { return false; }
         });
-
-        // greg.objectives.active() → array of objective UIDs
-        objectives["active"] = (Func<Table>)(() =>
-        {
-            try
-            {
-                var result = new Table(script);
-                int i = 1;
-                foreach (int uid in gregCore.Core.Networking.GregObjectives.GetActiveObjectiveUIDs())
-                    result[i++] = uid;
-                return result;
-            }
-            catch (Exception ex)
-            {
-                LuaLog.Error($"[LuaMod:{modId}] objectives.active() failed: {ex.Message}");
-                return new Table(script);
-            }
-        });
-
-        // greg.objectives.tutorial_in_progress() → bool
+        // greg.objectives.tutorial_in_progress() -> bool
         objectives["tutorial_in_progress"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregObjectives.IsTutorialInProgress(); }
             catch { return false; }
         });
+    }
 
-        // greg.objectives.create({loc=, uid=, x=, y=, z=, xp=?, rep=?, sub=?}) → bool
-        objectives["create"] = (Func<DynValue, bool>)((spec) =>
+    private static void RegisterQuery(Table objectives, Script script, string modId)
+    {
+        // greg.objectives.active() -> array of objective UIDs
+        objectives["active"] = (Func<Table>)(() => ListActive(script, modId));
+        // greg.objectives.clear() -> bool
+        objectives["clear"] = (Func<bool>)(() =>
         {
-            try
-            {
-                if (spec == null || spec.Type != DataType.Table) return false;
-                var t = spec.Table;
-                int loc = Num(t, "loc");
-                int uid = Num(t, "uid");
-                float x = FNum(t, "x"), y = FNum(t, "y"), z = FNum(t, "z");
-                int xp = Num(t, "xp"), rep = Num(t, "rep");
-                bool sub = t.Get("sub").Type == DataType.Boolean && t.Get("sub").Boolean;
-                return gregCore.Core.Networking.GregObjectives.CreateObjective(
-                    loc, uid, new UnityEngine.Vector3(x, y, z), xp, rep, sub);
-            }
+            try { return gregCore.Core.Networking.GregObjectives.ClearObjectives(); }
             catch { return false; }
         });
+    }
 
-        // greg.objectives.start(uid, x, y, z) → bool
+    private static Table ListActive(Script script, string modId)
+    {
+        try
+        {
+            var result = new Table(script);
+            int i = 1;
+            foreach (int uid in gregCore.Core.Networking.GregObjectives.GetActiveObjectiveUIDs())
+                result[i++] = uid;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            LuaLog.Error($"[LuaMod:{modId}] objectives.active() failed: {ex.Message}");
+            return new Table(script);
+        }
+    }
+
+    private static void RegisterLifecycle(Table objectives)
+    {
+        // greg.objectives.create({loc=, uid=, x=, y=, z=, xp=?, rep=?, sub=?}) -> bool
+        objectives["create"] = (Func<DynValue, bool>)((spec) => TryCreate(spec));
+        // greg.objectives.start(uid, x, y, z) -> bool
         objectives["start"] = (Func<int, double, double, double, bool>)((uid, x, y, z) =>
         {
             try
@@ -90,22 +92,35 @@ public static class LuaObjectivesModule
             }
             catch { return false; }
         });
+        RegisterVideo(objectives);
+    }
 
-        // greg.objectives.clear() → bool
-        objectives["clear"] = (Func<bool>)(() =>
+    private static bool TryCreate(DynValue spec)
+    {
+        try
         {
-            try { return gregCore.Core.Networking.GregObjectives.ClearObjectives(); }
-            catch { return false; }
-        });
+            if (spec == null || spec.Type != DataType.Table) return false;
+            var t = spec.Table;
+            int loc = Num(t, "loc");
+            int uid = Num(t, "uid");
+            float x = FNum(t, "x"), y = FNum(t, "y"), z = FNum(t, "z");
+            int xp = Num(t, "xp"), rep = Num(t, "rep");
+            bool sub = t.Get("sub").Type == DataType.Boolean && t.Get("sub").Boolean;
+            return gregCore.Core.Networking.GregObjectives.CreateObjective(
+                loc, uid, new UnityEngine.Vector3(x, y, z), xp, rep, sub);
+        }
+        catch { return false; }
+    }
 
-        // greg.objectives.play_video(index, in_pause_menu) → bool
+    private static void RegisterVideo(Table objectives)
+    {
+        // greg.objectives.play_video(index, in_pause_menu) -> bool
         objectives["play_video"] = (Func<int, bool, bool>)((index, inPause) =>
         {
             try { return gregCore.Core.Networking.GregTutorials.PlayVideo(index, inPause); }
             catch { return false; }
         });
-
-        // greg.objectives.show_in_pause(index) / stop_video_in_pause() → bool
+        // greg.objectives.show_in_pause(index) / stop_video_in_pause() -> bool
         objectives["show_in_pause"] = (Func<int, bool>)((index) =>
         {
             try { return gregCore.Core.Networking.GregTutorials.ShowTutorialInPauseMenu(index); }
@@ -116,8 +131,6 @@ public static class LuaObjectivesModule
             try { return gregCore.Core.Networking.GregTutorials.StopVideoInPauseMenu(); }
             catch { return false; }
         });
-
-        greg["objectives"] = objectives;
     }
 
     internal static int Num(Table t, string key)

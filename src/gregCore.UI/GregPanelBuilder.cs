@@ -58,82 +58,10 @@ namespace gregCore.UI
                     return this;
                 }
 
-                _root = new VisualElement();
-                _root.name = $"Panel_{_title}";
-                _root.style.position = Position.Absolute;
-                _root.style.left = new Length(50, LengthUnit.Percent);
-                _root.style.top = new Length(50, LengthUnit.Percent);
-                _root.style.translate = new Translate(new Length(-50, LengthUnit.Percent), new Length(-50, LengthUnit.Percent));
-                _root.style.width = 500;
-                _root.style.height = 600;
-                _root.style.maxWidth = new Length(90, LengthUnit.Percent);
-                _root.style.maxHeight = new Length(90, LengthUnit.Percent);
-                _root.style.backgroundColor = GregUITheme.PanelBackground;
-                _root.style.borderTopLeftRadius = GregUITheme.CornerRadius;
-                _root.style.borderTopRightRadius = GregUITheme.CornerRadius;
-                _root.style.borderBottomLeftRadius = GregUITheme.CornerRadius;
-                _root.style.borderBottomRightRadius = GregUITheme.CornerRadius;
-                _root.style.borderLeftWidth = GregUITheme.BorderWidth;
-                _root.style.borderRightWidth = GregUITheme.BorderWidth;
-                _root.style.borderTopWidth = GregUITheme.BorderWidth;
-                _root.style.borderBottomWidth = GregUITheme.BorderWidth;
-                _root.style.borderLeftColor = GregUITheme.NeutralBorder;
-                _root.style.borderRightColor = GregUITheme.NeutralBorder;
-                _root.style.borderTopColor = GregUITheme.NeutralBorder;
-                _root.style.borderBottomColor = GregUITheme.NeutralBorder;
-                _root.pickingMode = PickingMode.Position;
-
-                // Header
-                _header = new VisualElement();
-                _header.name = "PanelHeader";
-                _header.style.height = GregUITheme.HeaderHeight;
-                _header.style.backgroundColor = new Color(0, 0, 0, 0.2f);
-                _header.style.borderBottomWidth = 3;
-                _header.style.borderBottomColor = GregUITheme.PrimaryAccent;
-                _header.style.flexDirection = FlexDirection.Row;
-                _header.style.alignItems = Align.Center;
-                _header.style.paddingLeft = GregUITheme.Padding;
-                _header.style.paddingRight = GregUITheme.Padding;
-
-                var titleLabel = new Label(_title.ToUpper());
-                titleLabel.style.color = GregUITheme.SecondaryColor;
-                titleLabel.style.fontSize = 20;
-                titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-                titleLabel.style.flexGrow = 1;
-                _header.Add(titleLabel);
-
-                // Close button
-                var closeBtn = new Button();
-                closeBtn.text = "X";
-                closeBtn.style.width = 30;
-                closeBtn.style.height = 30;
-                closeBtn.style.backgroundColor = Color.clear;
-                closeBtn.style.color = GregUITheme.SecondaryColor;
-                closeBtn.style.borderLeftWidth = 0;
-                closeBtn.style.borderRightWidth = 0;
-                closeBtn.style.borderTopWidth = 0;
-                closeBtn.style.borderBottomWidth = 0;
-                closeBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => Hide()));
-                _header.Add(closeBtn);
-
+                _root = BuildRoot();
+                _header = BuildHeader();
                 _root.Add(_header);
-
-                // Scrollable content
-                _scrollView = new ScrollView();
-                _scrollView.name = "PanelContent";
-                _scrollView.style.flexGrow = 1;
-                _scrollView.style.paddingLeft = GregUITheme.Padding;
-                _scrollView.style.paddingRight = GregUITheme.Padding;
-                _scrollView.style.paddingTop = GregUITheme.Padding;
-                _scrollView.style.paddingBottom = GregUITheme.Padding;
-                _scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
-                _scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
-
-                _contentContainer = _scrollView.contentContainer;
-                _root.Add(_scrollView);
-
-                layerRoot.Add(_root);
-                _root.style.display = DisplayStyle.None;
+                BuildContent(layerRoot);
 
                 // Apply game font
                 GregCanvasManager.Instance.ApplyGameFont(_root);
@@ -144,6 +72,91 @@ namespace gregCore.UI
             }
 
             return this;
+        }
+
+        private VisualElement BuildRoot()
+        {
+            var root = new VisualElement();
+            root.name = $"Panel_{_title}";
+            root.style.position = Position.Absolute;
+            root.style.left = new Length(50, LengthUnit.Percent);
+            root.style.top = new Length(50, LengthUnit.Percent);
+            root.style.translate = new Translate(new Length(-50, LengthUnit.Percent), new Length(-50, LengthUnit.Percent));
+            root.style.width = 500;
+            root.style.height = 600;
+            root.style.maxWidth = new Length(90, LengthUnit.Percent);
+            root.style.maxHeight = new Length(90, LengthUnit.Percent);
+            root.style.backgroundColor = GregUITheme.PanelBackground;
+            root.style.borderTopLeftRadius = GregUITheme.CornerRadius;
+            root.style.borderTopRightRadius = GregUITheme.CornerRadius;
+            root.style.borderBottomLeftRadius = GregUITheme.CornerRadius;
+            root.style.borderBottomRightRadius = GregUITheme.CornerRadius;
+            root.style.borderLeftWidth = GregUITheme.BorderWidth;
+            root.style.borderRightWidth = GregUITheme.BorderWidth;
+            root.style.borderTopWidth = GregUITheme.BorderWidth;
+            root.style.borderBottomWidth = GregUITheme.BorderWidth;
+            root.style.borderLeftColor = GregUITheme.NeutralBorder;
+            root.style.borderRightColor = GregUITheme.NeutralBorder;
+            root.style.borderTopColor = GregUITheme.NeutralBorder;
+            root.style.borderBottomColor = GregUITheme.NeutralBorder;
+            root.pickingMode = PickingMode.Position;
+            return root;
+        }
+
+        private VisualElement BuildHeader()
+        {
+            var header = new VisualElement();
+            header.name = "PanelHeader";
+            header.style.height = GregUITheme.HeaderHeight;
+            header.style.backgroundColor = new Color(0, 0, 0, 0.2f);
+            header.style.borderBottomWidth = 3;
+            header.style.borderBottomColor = GregUITheme.PrimaryAccent;
+            header.style.flexDirection = FlexDirection.Row;
+            header.style.alignItems = Align.Center;
+            header.style.paddingLeft = GregUITheme.Padding;
+            header.style.paddingRight = GregUITheme.Padding;
+
+            var titleLabel = new Label(_title.ToUpper());
+            titleLabel.style.color = GregUITheme.SecondaryColor;
+            titleLabel.style.fontSize = 20;
+            titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            titleLabel.style.flexGrow = 1;
+            header.Add(titleLabel);
+
+            // Close button
+            var closeBtn = new Button();
+            closeBtn.text = "X";
+            closeBtn.style.width = 30;
+            closeBtn.style.height = 30;
+            closeBtn.style.backgroundColor = Color.clear;
+            closeBtn.style.color = GregUITheme.SecondaryColor;
+            closeBtn.style.borderLeftWidth = 0;
+            closeBtn.style.borderRightWidth = 0;
+            closeBtn.style.borderTopWidth = 0;
+            closeBtn.style.borderBottomWidth = 0;
+            closeBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => Hide()));
+            header.Add(closeBtn);
+            return header;
+        }
+
+        private void BuildContent(VisualElement layerRoot)
+        {
+            // Scrollable content
+            _scrollView = new ScrollView();
+            _scrollView.name = "PanelContent";
+            _scrollView.style.flexGrow = 1;
+            _scrollView.style.paddingLeft = GregUITheme.Padding;
+            _scrollView.style.paddingRight = GregUITheme.Padding;
+            _scrollView.style.paddingTop = GregUITheme.Padding;
+            _scrollView.style.paddingBottom = GregUITheme.Padding;
+            _scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
+            _scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+
+            _contentContainer = _scrollView.contentContainer;
+            _root.Add(_scrollView);
+
+            layerRoot.Add(_root);
+            _root.style.display = DisplayStyle.None;
         }
 
         public GregPanelBuilder SetSize(float width, float height)

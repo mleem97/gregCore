@@ -32,7 +32,19 @@ namespace gregCore.Infrastructure.Settings.Services
 
         private void BuildUI()
         {
-            _hudPanel = new VisualElement
+            _hudPanel = NewHudPanel();
+            _hudPanel.Add(NewTitleLabel());
+
+            var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
+            foreach (var conflict in conflicts)
+                _hudPanel.Add(NewConflictLabel(conflict.DisplayName, conflict.CurrentKey));
+
+            GregUIManager.RegisterPanel("HUD", _hudPanel);
+        }
+
+        private static VisualElement NewHudPanel()
+        {
+            return new VisualElement
             {
                 name = "HUD",
                 style =
@@ -61,10 +73,11 @@ namespace gregCore.Infrastructure.Settings.Services
                     display = DisplayStyle.None
                 }
             };
+        }
 
-            var conflicts = _keybindRegistry.GetAll().Where(k => k.HasConflict).ToList();
-            
-            var titleLabel = new Label("gregCore: Keybind-Konflikte!")
+        private static Label NewTitleLabel()
+        {
+            return new Label("gregCore: keybind conflicts!")
             {
                 style =
                 {
@@ -74,23 +87,19 @@ namespace gregCore.Infrastructure.Settings.Services
                     marginBottom = 8
                 }
             };
-            _hudPanel.Add(titleLabel);
+        }
 
-            foreach (var conflict in conflicts)
+        private static Label NewConflictLabel(string displayName, UnityEngine.KeyCode currentKey)
+        {
+            return new Label($"{displayName} ({currentKey})")
             {
-                var conflictLabel = new Label($"{conflict.DisplayName} ({conflict.CurrentKey})")
+                style =
                 {
-                    style =
-                    {
-                        fontSize = 12,
-                        color = new Color(0.88f, 0.88f, 0.88f),
-                        marginBottom = 4
-                    }
-                };
-                _hudPanel.Add(conflictLabel);
-            }
-
-            GregUIManager.RegisterPanel("HUD", _hudPanel);
+                    fontSize = 12,
+                    color = new Color(0.88f, 0.88f, 0.88f),
+                    marginBottom = 4
+                }
+            };
         }
     }
 }

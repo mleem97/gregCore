@@ -49,87 +49,163 @@ public static class GoFFIBridge
     private static void SetupApiTable()
     {
         _apiTable = new GregCoreAPI { api_version = 1 };
+        SetupLogging();
+        SetupPlayer();
+        SetupWorld();
+        SetupTime();
+        SetupEvents();
+        SetupHooks();
+        SetupConfig();
+        _apiTablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GregCoreAPI>());
+        Marshal.StructureToPtr(_apiTable, _apiTablePtr, false);
+    }
 
-        _apiTable.log_info = AddDelegate<LogDelegate>(ptr => GregAPI.LogInfo(Marshal.PtrToStringAnsi(ptr) ?? ""));
-        _apiTable.log_warning = AddDelegate<LogDelegate>(ptr => GregAPI.LogWarning(Marshal.PtrToStringAnsi(ptr) ?? ""));
-        _apiTable.log_error = AddDelegate<LogDelegate>(ptr => GregAPI.LogError(Marshal.PtrToStringAnsi(ptr) ?? ""));
+    private static void SetupLogging()
+    {
+        try
+        {
+            _apiTable.log_info = AddDelegate<LogDelegate>(ptr => GregAPI.LogInfo(Marshal.PtrToStringAnsi(ptr) ?? ""));
+            _apiTable.log_warning = AddDelegate<LogDelegate>(ptr => GregAPI.LogWarning(Marshal.PtrToStringAnsi(ptr) ?? ""));
+            _apiTable.log_error = AddDelegate<LogDelegate>(ptr => GregAPI.LogError(Marshal.PtrToStringAnsi(ptr) ?? ""));
+            _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
+        }
+        catch { }
+    }
 
-        _apiTable.get_player_money = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerMoney());
-        _apiTable.set_player_money = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerMoney(val));
-        _apiTable.get_player_xp = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerXp());
-        _apiTable.set_player_xp = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerXp(val));
-        _apiTable.get_player_reputation = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerReputation());
-        _apiTable.set_player_reputation = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerReputation(val));
+    private static void SetupPlayer()
+    {
+        try
+        {
+            _apiTable.get_player_money = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerMoney());
+            _apiTable.set_player_money = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerMoney(val));
+            _apiTable.get_player_xp = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerXp());
+            _apiTable.set_player_xp = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerXp(val));
+            _apiTable.get_player_reputation = AddDelegate<GetDoubleDelegate>(() => GregAPI.GetPlayerReputation());
+            _apiTable.set_player_reputation = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetPlayerReputation(val));
+            _apiTable.get_player_position = AddDelegate<GetPlayerPosDelegate>((out float x, out float y, out float z, out float ry) => {
+                var pos = GregAPI.GetPlayerPosition();
+                x = pos.x; y = pos.y; z = pos.z; ry = pos.y;
+            });
+        }
+        catch { }
+    }
 
-        _apiTable.get_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetServerCount());
-        _apiTable.get_rack_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetRackCount());
-        _apiTable.get_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetSwitchCount());
-        _apiTable.get_broken_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenServerCount());
-        _apiTable.get_broken_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenSwitchCount());
+    private static void SetupWorld()
+    {
+        try
+        {
+            _apiTable.get_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetServerCount());
+            _apiTable.get_rack_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetRackCount());
+            _apiTable.get_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetSwitchCount());
+            _apiTable.get_broken_server_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenServerCount());
+            _apiTable.get_broken_switch_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetBrokenSwitchCount());
+            _apiTable.get_free_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetFreeTechnicianCount());
+            _apiTable.get_total_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetTotalTechnicianCount());
+            _apiTable.dispatch_repair_server = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairServer());
+            _apiTable.dispatch_repair_switch = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairSwitch());
+        }
+        catch { }
+    }
 
-        _apiTable.get_free_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetFreeTechnicianCount());
-        _apiTable.get_total_technician_count = AddDelegate<GetUintDelegate>(() => GregAPI.GetTotalTechnicianCount());
-        _apiTable.dispatch_repair_server = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairServer());
-        _apiTable.dispatch_repair_switch = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairSwitch());
+    private static void SetupTime()
+    {
+        try
+        {
+            _apiTable.get_time_of_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeOfDay());
+            _apiTable.get_day = AddDelegate<GetUintDelegate>(() => GregAPI.GetDay());
+            _apiTable.get_seconds_in_full_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetSecondsInFullDay());
+            _apiTable.set_seconds_in_full_day = AddDelegate<SetFloatDelegate>(val => GregAPI.SetSecondsInFullDay(val));
+            _apiTable.get_current_scene = AddDelegate<GetStringDelegate>(() => Marshal.StringToHGlobalAnsi(GregAPI.GetCurrentScene()));
+            _apiTable.is_game_paused = AddDelegate<GetUintDelegate>(() => GregAPI.IsGamePaused() ? 1u : 0u);
+            _apiTable.set_game_paused = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetGamePaused(val > 0));
+            _apiTable.get_time_scale = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeScale());
+            _apiTable.set_time_scale = AddDelegate<SetFloatDelegate>(val => GregAPI.SetTimeScale(val));
+            _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => { GregAPI.TriggerSave(); return 0; });
+            _apiTable.get_difficulty = AddDelegate<GetIntDelegate>(() => GregAPI.GetDifficulty());
+        }
+        catch { }
+    }
 
-        _apiTable.get_time_of_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeOfDay());
-        _apiTable.get_day = AddDelegate<GetUintDelegate>(() => GregAPI.GetDay());
-        _apiTable.get_seconds_in_full_day = AddDelegate<GetFloatDelegate>(() => GregAPI.GetSecondsInFullDay());
-        _apiTable.set_seconds_in_full_day = AddDelegate<SetFloatDelegate>(val => GregAPI.SetSecondsInFullDay(val));
+    private static void SetupEvents()
+    {
+        try
+        {
+            _apiTable.subscribe_event = AddDelegate<SubscribeDelegate>((eventId, cbPtr) => {
+                var callback = Marshal.GetDelegateForFunctionPointer<EventActionDelegate>(cbPtr);
+                GregAPI.Subscribe(((GregEventId)eventId).ToString(), data => callback(eventId, (ulong)data));
+            });
+            _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
+        }
+        catch { }
+    }
 
-        _apiTable.get_current_scene = AddDelegate<GetStringDelegate>(() => Marshal.StringToHGlobalAnsi(GregAPI.GetCurrentScene()));
-        _apiTable.is_game_paused = AddDelegate<GetUintDelegate>(() => GregAPI.IsGamePaused() ? 1u : 0u);
-        _apiTable.set_game_paused = AddDelegate<SetDoubleDelegate>(val => GregAPI.SetGamePaused(val > 0));
-        _apiTable.get_time_scale = AddDelegate<GetFloatDelegate>(() => GregAPI.GetTimeScale());
-        _apiTable.set_time_scale = AddDelegate<SetFloatDelegate>(val => GregAPI.SetTimeScale(val));
-        _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => { GregAPI.TriggerSave(); return 0; });
-        _apiTable.get_difficulty = AddDelegate<GetIntDelegate>(() => GregAPI.GetDifficulty());
+    private static void SetupHooks()
+    {
+        try
+        {
+            _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => OnHookCalled(hookPtr, cbPtr));
+            _apiTable.fire_hook = AddDelegate<FireHookDelegate>((hookPtr, jsonPtr) => FireHookCalled(hookPtr, jsonPtr));
+        }
+        catch { }
+    }
 
-        _apiTable.get_player_position = AddDelegate<GetPlayerPosDelegate>((out float x, out float y, out float z, out float ry) => {
-            var pos = GregAPI.GetPlayerPosition();
-            x = pos.x; y = pos.y; z = pos.z; ry = pos.y; // ry mapped to y
-        });
-
-        _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
-
-        _apiTable.subscribe_event = AddDelegate<SubscribeDelegate>((eventId, cbPtr) => {
-            var callback = Marshal.GetDelegateForFunctionPointer<EventActionDelegate>(cbPtr);
-            GregAPI.Subscribe(((GregEventId)eventId).ToString(), data => callback(eventId, (ulong)data));
-        });
-        _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
-
-        // Hook API (New)
-        _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => {
+    private static void OnHookCalled(IntPtr hookPtr, IntPtr cbPtr)
+    {
+        try
+        {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
             var callback = Marshal.GetDelegateForFunctionPointer<HookActionDelegate>(cbPtr);
-            GregAPI.Hooks.On(hookName, payloadObj => {
-                var payload = (gregCore.Sdk.Models.GregPayload)payloadObj;
-                string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload.Data);
-                IntPtr hPtr = Marshal.StringToHGlobalAnsi(payload.HookName);
-                IntPtr tPtr = Marshal.StringToHGlobalAnsi(payload.Trigger);
-                IntPtr jPtr = Marshal.StringToHGlobalAnsi(json);
-                callback(hPtr, tPtr, jPtr);
-                Marshal.FreeHGlobal(hPtr);
-                Marshal.FreeHGlobal(tPtr);
-                Marshal.FreeHGlobal(jPtr);
-            });
-        });
-        _apiTable.fire_hook = AddDelegate<FireHookDelegate>((hookPtr, jsonPtr) => {
+            GregAPI.Hooks.On(hookName, payloadObj => InvokeHookCallback(callback, payloadObj));
+        }
+        catch { }
+    }
+
+    private static void InvokeHookCallback(HookActionDelegate callback, object payloadObj)
+    {
+        IntPtr hPtr = IntPtr.Zero;
+        IntPtr tPtr = IntPtr.Zero;
+        IntPtr jPtr = IntPtr.Zero;
+        try
+        {
+            var payload = (gregCore.Sdk.Models.GregPayload)payloadObj;
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload.Data);
+            hPtr = Marshal.StringToHGlobalAnsi(payload.HookName);
+            tPtr = Marshal.StringToHGlobalAnsi(payload.Trigger);
+            jPtr = Marshal.StringToHGlobalAnsi(json);
+            callback(hPtr, tPtr, jPtr);
+        }
+        catch { }
+        finally
+        {
+            try { if (hPtr != IntPtr.Zero) Marshal.FreeHGlobal(hPtr); } catch { }
+            try { if (tPtr != IntPtr.Zero) Marshal.FreeHGlobal(tPtr); } catch { }
+            try { if (jPtr != IntPtr.Zero) Marshal.FreeHGlobal(jPtr); } catch { }
+        }
+    }
+
+    private static void FireHookCalled(IntPtr hookPtr, IntPtr jsonPtr)
+    {
+        try
+        {
             string hookName = Marshal.PtrToStringAnsi(hookPtr) ?? "";
             string json = Marshal.PtrToStringAnsi(jsonPtr) ?? "{}";
             var data = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json) ?? new();
             var payload = new gregCore.Sdk.Models.GregPayload(hookName, "GoMod") { Data = data };
             GregAPI.Hooks.Fire(hookName, payload);
-        });
+        }
+        catch { }
+    }
 
-        // Config
-        _apiTable.config_set_bool = AddDelegate<ConfigSetBoolDelegate>((modId, key, val) =>
-            GregAPI.ConfigSetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", val > 0));
-        _apiTable.config_get_bool = AddDelegate<ConfigGetBoolDelegate>((modId, key, def) =>
-            GregAPI.ConfigGetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", def > 0) ? 1u : 0u);
-
-        _apiTablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<GregCoreAPI>());
-        Marshal.StructureToPtr(_apiTable, _apiTablePtr, false);
+    private static void SetupConfig()
+    {
+        try
+        {
+            _apiTable.config_set_bool = AddDelegate<ConfigSetBoolDelegate>((modId, key, val) =>
+                GregAPI.ConfigSetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", val > 0));
+            _apiTable.config_get_bool = AddDelegate<ConfigGetBoolDelegate>((modId, key, def) =>
+                GregAPI.ConfigGetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", def > 0) ? 1u : 0u);
+        }
+        catch { }
     }
 
     private static IntPtr AddDelegate<T>(T del) where T : Delegate
@@ -143,49 +219,59 @@ public static class GoFFIBridge
         string gameRoot = global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
         string goDir = Path.Combine(gameRoot, "Plugins", "Go");
         if (!Directory.Exists(goDir)) Directory.CreateDirectory(goDir);
-
         foreach (string dir in global::gregCore.Infrastructure.IO.GregFileSystem.EnumerateDirectories(goDir))
         {
-            // Guard: niemals aus `.deactivated` laden.
-            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(dir)) continue;
+            try { TryLoadOne(dir); }
+            catch (Exception ex) { GregAPI.LogError($"Error loading Go plugin {dir}: {ex.Message}"); }
+        }
+    }
+
+    private static void TryLoadOne(string dir)
+    {
+        try
+        {
+            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(dir)) return;
             string dllPath = Path.Combine(dir, Path.GetFileName(dir) + ".dll");
-            if (!File.Exists(dllPath)) continue;
+            if (!File.Exists(dllPath)) return;
+            IntPtr lib = System.Runtime.InteropServices.NativeLibrary.Load(dllPath);
+            if (lib == IntPtr.Zero) return;
+            if (!TryInitLibrary(lib, dllPath)) return;
+        }
+        catch (Exception ex)
+        {
+            GregAPI.LogError($"Error loading Go Plugin {dir}: {ex.Message}");
+        }
+    }
 
-            try
+    private static bool TryInitLibrary(IntPtr lib, string dllPath)
+    {
+        try
+        {
+            _loadedLibraries.Add(lib);
+            IntPtr infoFunc = System.Runtime.InteropServices.NativeLibrary.GetExport(lib, "greg_mod_info");
+            IntPtr initFunc = System.Runtime.InteropServices.NativeLibrary.GetExport(lib, "greg_mod_init");
+            if (infoFunc == IntPtr.Zero || initFunc == IntPtr.Zero) return false;
+            var getInfo = Marshal.GetDelegateForFunctionPointer<Func<GregModInfo>>(infoFunc);
+            var info = getInfo();
+            var init = Marshal.GetDelegateForFunctionPointer<Func<IntPtr, bool>>(initFunc);
+            if (!init(_apiTablePtr)) return false;
+            var plugin = new GoPlugin
             {
-                IntPtr lib = System.Runtime.InteropServices.NativeLibrary.Load(dllPath);
-                if (lib == IntPtr.Zero) continue;
-
-                _loadedLibraries.Add(lib);
-
-                IntPtr infoFunc = System.Runtime.InteropServices.NativeLibrary.GetExport(lib, "greg_mod_info");
-                IntPtr initFunc = System.Runtime.InteropServices.NativeLibrary.GetExport(lib, "greg_mod_init");
-
-                if (infoFunc == IntPtr.Zero || initFunc == IntPtr.Zero) continue;
-
-                var getInfo = Marshal.GetDelegateForFunctionPointer<Func<GregModInfo>>(infoFunc);
-                var info = getInfo();
-
-                var init = Marshal.GetDelegateForFunctionPointer<Func<IntPtr, bool>>(initFunc);
-                if (init(_apiTablePtr))
-                {
-                    var plugin = new GoPlugin
-                    {
-                        Id = Marshal.PtrToStringAnsi(info.id) ?? "Unknown",
-                        Handle = lib,
-                        Update = GetOptionalExport<Action<float>>(lib, "greg_mod_update"),
-                        OnEvent = GetOptionalExport<Action<uint, ulong>>(lib, "greg_mod_event"),
-                        OnSceneLoaded = GetOptionalExport<Action<IntPtr>>(lib, "greg_mod_scene_loaded"),
-                        Shutdown = GetOptionalExport<Action>(lib, "greg_mod_shutdown")
-                    };
-                    _plugins.Add(plugin);
-                    GregAPI.LogInfo($"Go Plugin loaded: {plugin.Id}");
-                }
-            }
-            catch (Exception ex)
-            {
-                GregAPI.LogError($"Error loading Go Plugin {dllPath}: {ex.Message}");
-            }
+                Id = Marshal.PtrToStringAnsi(info.id) ?? "Unknown",
+                Handle = lib,
+                Update = GetOptionalExport<Action<float>>(lib, "greg_mod_update"),
+                OnEvent = GetOptionalExport<Action<uint, ulong>>(lib, "greg_mod_event"),
+                OnSceneLoaded = GetOptionalExport<Action<IntPtr>>(lib, "greg_mod_scene_loaded"),
+                Shutdown = GetOptionalExport<Action>(lib, "greg_mod_shutdown")
+            };
+            _plugins.Add(plugin);
+            GregAPI.LogInfo($"Go Plugin loaded: {plugin.Id}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            GregAPI.LogError($"Error loading Go Plugin {dllPath}: {ex.Message}");
+            return false;
         }
     }
 

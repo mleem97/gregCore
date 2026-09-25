@@ -152,71 +152,96 @@ public static class GregModHub
             var mods = Core.Mods.GregModRegistry.All().ToList();
             var menus = GregMenuRegistry.Snapshot();
 
-            var byMod = new Dictionary<string, List<GregMenuRegistry.MenuInfo>>();
-            var orphan = new List<GregMenuRegistry.MenuInfo>();
-            foreach (var m in menus)
-            {
-                if (m.MenuId == MenuId) continue;
-                // Framework-internal menus (e.g. greg.console) are operated via hotkey
-                // and do not belong in the hub list.
-                if (m.MenuId != null && m.MenuId.StartsWith("greg.",
-                    System.StringComparison.OrdinalIgnoreCase)) continue;
-                string owner = null;
-                foreach (var mod in mods)
-                {
-                    if (mod == null || mod.Menus == null) continue;
-                    if (System.Array.Exists(mod.Menus, id =>
-                        string.Equals(id, m.MenuId, System.StringComparison.OrdinalIgnoreCase)))
-                    { owner = mod.Name; break; }
-                }
-                if (owner == null) orphan.Add(m);
-                else
-                {
-                    if (!byMod.TryGetValue(owner, out var l)) { l = new List<GregMenuRegistry.MenuInfo>(); byMod[owner] = l; }
-                    l.Add(m);
-                }
-            }
-
-            foreach (var mod in mods.OrderBy(x => x != null ? x.Name : string.Empty))
-            {
-                if (mod == null) continue;
-                var row = Row(font, $"{mod.Name}  v{mod.Version}", null, null);
-                row.style.marginBottom = 2;
-                _body.Add(row);
-                if (byMod.TryGetValue(mod.Name, out var ml))
-                    foreach (var m in ml)
-                    {
-                        var r = MenuRow(font, m, mod.Name);
-                        r.style.marginBottom = 6;
-                        _body.Add(r);
-                    }
-                else
-                {
-                    var pad = new VisualElement();
-                    pad.style.height = 4;
-                    _body.Add(pad);
-                }
-            }
-            foreach (var m in orphan)
-            {
-                var r = MenuRow(font, m, null);
-                r.style.marginBottom = 6;
-                _body.Add(r);
-            }
-
-            if (_body.childCount == 0)
-            {
-                var empty = new Label("No mods registered.");
-                empty.style.color = new Color(0.7f, 0.7f, 0.7f, 1f);
-                empty.style.fontSize = 13;
-                if (font != null) { try { empty.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
-                _body.Add(empty);
-            }
+            var byMod = GroupMenusByMod(menus, mods, out var orphan);
+            AddModSections(font, mods, byMod);
+            AddOrphanMenus(font, orphan);
+            AddEmptyNotice(font);
         }
         catch (System.Exception ex)
         {
             MelonLogger.Warning($"[gregCore][UI] Hub rebuild failed: {ex.Message}");
         }
+    }
+
+    private static Dictionary<string, List<GregMenuRegistry.MenuInfo>> GroupMenusByMod(
+        System.Collections.Generic.IReadOnlyList<GregMenuRegistry.MenuInfo> menus, List<Core.Mods.GregModRegistry.Entry> mods,
+        out List<GregMenuRegistry.MenuInfo> orphan)
+    {
+        var byMod = new Dictionary<string, List<GregMenuRegistry.MenuInfo>>();
+        orphan = new List<GregMenuRegistry.MenuInfo>();
+        foreach (var m in menus)
+        {
+            if (m.MenuId == MenuId) continue;
+            // Framework-internal menus (e.g. greg.console) are operated via hotkey
+            // and do not belong in the hub list.
+            if (m.MenuId != null && m.MenuId.StartsWith("greg.",
+                System.StringComparison.OrdinalIgnoreCase)) continue;
+            string owner = FindMenuOwner(mods, m.MenuId);
+            if (owner == null) orphan.Add(m);
+            else
+            {
+                if (!byMod.TryGetValue(owner, out var l)) { l = new List<GregMenuRegistry.MenuInfo>(); byMod[owner] = l; }
+                l.Add(m);
+            }
+        }
+        return byMod;
+    }
+
+    private static string FindMenuOwner(List<Core.Mods.GregModRegistry.Entry> mods, string menuId)
+    {
+        foreach (var mod in mods)
+        {
+            if (mod == null || mod.Menus == null) continue;
+            if (System.Array.Exists(mod.Menus, id =>
+                string.Equals(id, menuId, System.StringComparison.OrdinalIgnoreCase)))
+                return mod.Name;
+        }
+        return null;
+    }
+
+    private static void AddModSections(Font font, List<Core.Mods.GregModRegistry.Entry> mods,
+        Dictionary<string, List<GregMenuRegistry.MenuInfo>> byMod)
+    {
+        foreach (var mod in mods.OrderBy(x => x != null ? x.Name : string.Empty))
+        {
+            if (mod == null) continue;
+            var row = Row(font, $"{mod.Name}  v{mod.Version}", null, null);
+            row.style.marginBottom = 2;
+            _body.Add(row);
+            if (byMod.TryGetValue(mod.Name, out var ml))
+                foreach (var m in ml)
+                {
+                    var r = MenuRow(font, m, mod.Name);
+                    r.style.marginBottom = 6;
+                    _body.Add(r);
+                }
+            else
+            {
+                var pad = new VisualElement();
+                pad.style.height = 4;
+                _body.Add(pad);
+            }
+        }
+    }
+
+    private static void AddOrphanMenus(Font font, List<GregMenuRegistry.MenuInfo> orphan)
+    {
+        foreach (var m in orphan)
+        {
+            var r = MenuRow(font, m, null);
+            r.style.marginBottom = 6;
+            _body.Add(r);
+        }
+    }
+
+    private static void AddEmptyNotice(Font font)
+    {
+        if (_body.childCount != 0) return;
+        var empty = new Label("No mods registered.");
+        empty.style.color = new Color(0.7f, 0.7f, 0.7f, 1f);
+        empty.style.fontSize = 13;
+        if (font != null) { try { empty.style.unityFont = font; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ } }
+        _body.Add(empty);
     }
 
     private static VisualElement MenuRow(Font font, GregMenuRegistry.MenuInfo m, string ownerModName)

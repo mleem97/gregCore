@@ -37,59 +37,65 @@ public static partial class GregNetworkDeviceSaves
         if (entry == null || dto == null) return;
         Try(() => entry.asn = dto.Asn);
         Try(() => entry.nextRouteId = dto.NextRouteId);
-        Try(() =>
+        Try(() => entry.routingTable = BuildSubnetRoutes(dto));
+        Try(() => entry.ownedSubnets = BuildOwnedSubnets(dto));
+        Try(() => entry.routes = BuildRouteEntries(dto));
+    }
+
+    private static Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.SubnetRoute> BuildSubnetRoutes(RouterSave dto)
+    {
+        var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.SubnetRoute>();
+        foreach (var r in dto.RoutingTable ?? new List<SubnetRoute>())
         {
-            var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.SubnetRoute>();
-            foreach (var r in dto.RoutingTable ?? new List<SubnetRoute>())
+            try
             {
-                try
-                {
-                    var e = new global::Il2Cpp.Router.SubnetRoute();
-                    e.sourceVlanId = r.SourceVlanId;
-                    e.subnetCidr = r.SubnetCidr ?? "";
-                    e.targetVlanId = r.TargetVlanId;
-                    e.targetIp = r.TargetIp ?? "";
-                    list.Add(e);
-                }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                var e = new global::Il2Cpp.Router.SubnetRoute();
+                e.sourceVlanId = r.SourceVlanId;
+                e.subnetCidr = r.SubnetCidr ?? "";
+                e.targetVlanId = r.TargetVlanId;
+                e.targetIp = r.TargetIp ?? "";
+                list.Add(e);
             }
-            entry.routingTable = list;
-        });
-        Try(() =>
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+        return list;
+    }
+
+    private static Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.OwnedSubnet> BuildOwnedSubnets(RouterSave dto)
+    {
+        var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.OwnedSubnet>();
+        foreach (var s in dto.OwnedSubnets ?? new List<OwnedSubnet>())
         {
-            var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.OwnedSubnet>();
-            foreach (var s in dto.OwnedSubnets ?? new List<OwnedSubnet>())
+            try
             {
-                try
-                {
-                    var e = new global::Il2Cpp.Router.OwnedSubnet();
-                    e.vlanId = s.VlanId;
-                    e.subnetCidr = s.SubnetCidr ?? "";
-                    list.Add(e);
-                }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                var e = new global::Il2Cpp.Router.OwnedSubnet();
+                e.vlanId = s.VlanId;
+                e.subnetCidr = s.SubnetCidr ?? "";
+                list.Add(e);
             }
-            entry.ownedSubnets = list;
-        });
-        Try(() =>
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+        return list;
+    }
+
+    private static Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.RouteEntry> BuildRouteEntries(RouterSave dto)
+    {
+        var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.RouteEntry>();
+        foreach (var r in dto.Routes ?? new List<RouteEntry>())
         {
-            var list = new Il2CppSystem.Collections.Generic.List<global::Il2Cpp.Router.RouteEntry>();
-            foreach (var r in dto.Routes ?? new List<RouteEntry>())
+            try
             {
-                try
-                {
-                    var e = new global::Il2Cpp.Router.RouteEntry();
-                    e.routeId = r.RouteId;
-                    e.sourceVlanId = r.SourceVlanId;
-                    e.sourceIp = r.SourceIp ?? "";
-                    e.targetVlanId = r.TargetVlanId;
-                    e.targetIp = r.TargetIp ?? "";
-                    list.Add(e);
-                }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                var e = new global::Il2Cpp.Router.RouteEntry();
+                e.routeId = r.RouteId;
+                e.sourceVlanId = r.SourceVlanId;
+                e.sourceIp = r.SourceIp ?? "";
+                e.targetVlanId = r.TargetVlanId;
+                e.targetIp = r.TargetIp ?? "";
+                list.Add(e);
             }
-            entry.routes = list;
-        });
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
+        return list;
     }
 
     public static RouterSave ReadRouter(global::Il2Cpp.RouterSaveData entry)
@@ -98,51 +104,57 @@ public static partial class GregNetworkDeviceSaves
         if (entry == null) return dto;
         Try(() => dto.Asn = entry.asn);
         Try(() => dto.NextRouteId = entry.nextRouteId);
-        Try(() =>
-        {
-            var list = entry.routingTable;
-            if (list == null) return;
-            foreach (var e in list)
-            {
-                if (e == null) continue;
-                var r = new SubnetRoute();
-                try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.RoutingTable.Add(r);
-            }
-        });
-        Try(() =>
-        {
-            var list = entry.ownedSubnets;
-            if (list == null) return;
-            foreach (var e in list)
-            {
-                if (e == null) continue;
-                var s = new OwnedSubnet();
-                try { s.VlanId = e.vlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { s.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.OwnedSubnets.Add(s);
-            }
-        });
-        Try(() =>
-        {
-            var list = entry.routes;
-            if (list == null) return;
-            foreach (var e in list)
-            {
-                if (e == null) continue;
-                var r = new RouteEntry();
-                try { r.RouteId = e.routeId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.SourceIp = e.sourceIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.Routes.Add(r);
-            }
-        });
+        Try(() => ReadSubnetRoutes(entry, dto));
+        Try(() => ReadOwnedSubnets(entry, dto));
+        Try(() => ReadRouteEntries(entry, dto));
         return dto;
+    }
+
+    private static void ReadSubnetRoutes(global::Il2Cpp.RouterSaveData entry, RouterSave dto)
+    {
+        var list = entry.routingTable;
+        if (list == null) return;
+        foreach (var e in list)
+        {
+            if (e == null) continue;
+            var r = new SubnetRoute();
+            try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.RoutingTable.Add(r);
+        }
+    }
+
+    private static void ReadOwnedSubnets(global::Il2Cpp.RouterSaveData entry, RouterSave dto)
+    {
+        var list = entry.ownedSubnets;
+        if (list == null) return;
+        foreach (var e in list)
+        {
+            if (e == null) continue;
+            var s = new OwnedSubnet();
+            try { s.VlanId = e.vlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { s.SubnetCidr = e.subnetCidr ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.OwnedSubnets.Add(s);
+        }
+    }
+
+    private static void ReadRouteEntries(global::Il2Cpp.RouterSaveData entry, RouterSave dto)
+    {
+        var list = entry.routes;
+        if (list == null) return;
+        foreach (var e in list)
+        {
+            if (e == null) continue;
+            var r = new RouteEntry();
+            try { r.RouteId = e.routeId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.SourceVlanId = e.sourceVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.SourceIp = e.sourceIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.TargetVlanId = e.targetVlanId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { r.TargetIp = e.targetIp ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.Routes.Add(r);
+        }
     }
 
     // ── Firewall ─────────────────────────────────────────────────────────────

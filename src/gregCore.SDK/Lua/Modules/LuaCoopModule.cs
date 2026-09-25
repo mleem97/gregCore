@@ -15,8 +15,15 @@ public static class LuaCoopModule
     public static void Register(Table greg, Script script, string modId)
     {
         var coop = new Table(script);
+        RegisterSession(coop, modId);
+        RegisterPeers(coop, script, modId);
+        RegisterMaintenance(coop);
+        greg["coop"] = coop;
+    }
 
-        // greg.coop.ensure() → bool
+    private static void RegisterSession(Table coop, string modId)
+    {
+        // greg.coop.ensure() -> bool
         coop["ensure"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregCoop.EnsureSession(); }
@@ -27,65 +34,80 @@ public static class LuaCoopModule
             }
         });
 
-        // greg.coop.shutdown() → bool
+        // greg.coop.shutdown() -> bool
         coop["shutdown"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregCoop.ShutdownSession(); }
             catch { return false; }
         });
+    }
 
-        // greg.coop.peers() → array of {id, x, y, z, yaw}
-        coop["peers"] = (Func<Table>)(() =>
-        {
-            try
-            {
-                var result = new Table(script);
-                int i = 1;
-                foreach (var p in gregCore.Core.Networking.GregCoop.GetPeers())
-                {
-                    try
-                    {
-                        if (p == null) continue;
-                        var t = new Table(script);
-                        t["id"] = (double)p.PeerId;
-                        t["x"] = (double)p.Position.x;
-                        t["y"] = (double)p.Position.y;
-                        t["z"] = (double)p.Position.z;
-                        t["yaw"] = (double)p.Yaw;
-                        result[i++] = t;
-                    }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                LuaLog.Error($"[LuaMod:{modId}] coop.peers() failed: {ex.Message}");
-                return new Table(script);
-            }
-        });
+    private static void RegisterPeers(Table coop, Script script, string modId)
+    {
+        // greg.coop.peers() -> array of {id, x, y, z, yaw}
+        coop["peers"] = (Func<Table>)(() => ListPeers(script, modId));
 
-        // greg.coop.remove_avatar(peerId) → bool
+        // greg.coop.remove_avatar(peerId) -> bool
         coop["remove_avatar"] = (Func<double, bool>)((peerId) =>
         {
             try { return gregCore.Core.Networking.GregCoop.RemoveAvatar((ulong)peerId); }
             catch { return false; }
         });
+    }
 
-        // greg.coop.resend() → bool
+    private static Table ListPeers(Script script, string modId)
+    {
+        try
+        {
+            var result = new Table(script);
+            int i = 1;
+            foreach (var p in gregCore.Core.Networking.GregCoop.GetPeers())
+            {
+                try
+                {
+                    if (p == null) continue;
+                    result[i++] = ToPeerTable(script, p);
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            }
+            return result;
+        }
+        catch (Exception ex)
+        {
+            LuaLog.Error($"[LuaMod:{modId}] coop.peers() failed: {ex.Message}");
+            return new Table(script);
+        }
+    }
+
+    private static Table ToPeerTable(Script script, gregCore.Core.Networking.GregCoop.PeerInfo p)
+    {
+        var t = new Table(script);
+        try
+        {
+            t["id"] = (double)p.PeerId;
+            t["x"] = (double)p.Position.x;
+            t["y"] = (double)p.Position.y;
+            t["z"] = (double)p.Position.z;
+            t["yaw"] = (double)p.Yaw;
+        }
+        catch { }
+        return t;
+    }
+
+    private static void RegisterMaintenance(Table coop)
+    {
+        // greg.coop.resend() -> bool
         coop["resend"] = (Func<bool>)(() =>
         {
             try { return gregCore.Core.Networking.GregCoop.ForceResend(); }
             catch { return false; }
         });
 
-        // greg.coop.peer_timeout() → number
+        // greg.coop.peer_timeout() -> number
         coop["peer_timeout"] = (Func<double>)(() =>
         {
             try { return (double)gregCore.Core.Networking.GregCoop.GetPeerTimeout(); }
             catch { return 0.0; }
         });
-
-        greg["coop"] = coop;
     }
 }

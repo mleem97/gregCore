@@ -195,7 +195,7 @@ public static class RustFFIBridge
         try
         {
             if (Directory.Exists(legacyDir) && Directory.GetFiles(legacyDir, "*.dll").Length > 0)
-                MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Veraltet: Rust-Dateien unter ./Plugins/Rust werden ignoriert - bitte nach ./UserLibs/Rust verschieben.");
+                MelonLoader.MelonLogger.Warning("[gregCore][Dirs] Deprecated: Rust files under ./Plugins/Rust are ignored - move them to ./UserLibs/Rust.");
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
 

@@ -16,7 +16,7 @@ using gregCore.Core.Models;
 
 namespace gregCore.Infrastructure.Scripting.Lua;
 
-public sealed class LuaHookBindingGenerator
+public sealed partial class LuaHookBindingGenerator
 {
     private readonly GregEventBus _eventBus;
     private readonly string _hooksFilePath;
@@ -77,62 +77,8 @@ public sealed class LuaHookBindingGenerator
         try
         {
             var hooksTable = new Table(script);
-
-            foreach (var kvp in _hooksByGroup)
-            {
-                string groupName = kvp.Key.ToLowerInvariant();
-                var groupTable = new Table(script);
-
-                foreach (var hook in kvp.Value)
-                {
-                    string luaMethodName = "on_" + ToSnakeCase(hook.MethodName);
-                    string fullHookId = $"greg.{hook.Group}.{hook.MethodName}";
-
-                    // Create subscription function
-                    groupTable[luaMethodName] = (Action<Closure>)(callback =>
-                    {
-                        _eventBus.Subscribe(fullHookId, payload =>
-                        {
-                            try
-                            {
-                                var luaPayload = Modules.GregEventLuaModule.PayloadToTable(script, payload);
-                                callback.Call(luaPayload);
-                            }
-                            catch (Exception ex)
-                            {
-                                MelonLogger.Error($"[LuaMod:{modId}] Hook handler error for '{fullHookId}': {ex.Message}");
-                            }
-                        });
-                    });
-                }
-
-                // Also add a list function to discover available hooks
-                groupTable["list"] = (Func<Table>)(() =>
-                {
-                    var list = new Table(script);
-                    int i = 1;
-                    foreach (var hook in kvp.Value)
-                    {
-                        list[i++] = "on_" + ToSnakeCase(hook.MethodName);
-                    }
-                    return list;
-                });
-
-                hooksTable[groupName] = groupTable;
-            }
-
-            // Add top-level list function
-            hooksTable["groups"] = (Func<Table>)(() =>
-            {
-                var list = new Table(script);
-                int i = 1;
-                foreach (var group in _hooksByGroup.Keys.OrderBy(k => k))
-                {
-                    list[i++] = group.ToLowerInvariant();
-                }
-                return list;
-            });
-
+            RegisterAllGroups(script, hooksTable, modId);
+            RegisterGroupList(script, hooksTable);
             greg["hooks"] = hooksTable;
         }
         catch (Exception ex)
@@ -177,92 +123,189 @@ public sealed class LuaHookBindingGenerator
     private static List<HookDefinition> ParseHooksJson(string json)
     {
         var hooks = new List<HookDefinition>();
-
-        // Remove whitespace and newlines for easier parsing
-        int pos = 0;
-        HookDefinition? current = null;
-
-        while (pos < json.Length)
+        try
         {
-            // Find next key-value pair
+            int pos = 0;
+            HookDefinition? current = null;
+            while (TryReadPair(json, ref pos, out string key, out string? value, out bool skipped))
+            {
+                if (skipped) continue;
+                current = ApplyHookField(hooks, current, key, value);
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaHookGen] Parse failed: {ex.Message}");
+        }
+        return hooks;
+    }
+
+    private static bool TryReadPair(string json, ref int pos, out string key, out string? value, out bool skipped)
+    {
+        key = "";
+        value = null;
+        skipped = false;
+        try
+        {
+            if (!TryReadKey(json, ref pos, out key)) return false;
+            if (!SkipColon(json, ref pos)) return false;
+            SkipWhitespace(json, ref pos);
+            if (pos >= json.Length) return false;
+            if (json[pos] == '[')
+            {
+                SkipArray(json, ref pos);
+                skipped = true;
+                return true;
+            }
+            value = ReadScalar(json, ref pos);
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static bool TryReadKey(string json, ref int pos, out string key)
+    {
+        key = "";
+        try
+        {
             int keyStart = json.IndexOf('"', pos);
-            if (keyStart < 0) break;
-
+            if (keyStart < 0) return false;
             int keyEnd = json.IndexOf('"', keyStart + 1);
-            if (keyEnd < 0) break;
-
-            string key = json.Substring(keyStart + 1, keyEnd - keyStart - 1);
+            if (keyEnd < 0) return false;
+            key = json.Substring(keyStart + 1, keyEnd - keyStart - 1);
             pos = keyEnd + 1;
+            return true;
+        }
+        catch { return false; }
+    }
 
-            // Skip to value
+    private static bool SkipColon(string json, ref int pos)
+    {
+        try
+        {
             int colonPos = json.IndexOf(':', pos);
-            if (colonPos < 0) break;
+            if (colonPos < 0) return false;
             pos = colonPos + 1;
+            return true;
+        }
+        catch { return false; }
+    }
 
-            // Skip whitespace
+    private static void SkipWhitespace(string json, ref int pos)
+    {
+        try
+        {
             while (pos < json.Length && char.IsWhiteSpace(json[pos])) pos++;
+        }
+        catch { }
+    }
 
-            if (pos >= json.Length) break;
+    private static void SkipArray(string json, ref int pos)
+    {
+        try
+        {
+            int depth = 1;
+            pos++;
+            while (pos < json.Length && depth > 0)
+            {
+                if (json[pos] == '[') depth++;
+                else if (json[pos] == ']') depth--;
+                pos++;
+            }
+        }
+        catch { }
+    }
 
-            string? value = null;
+    private static string? ReadScalar(string json, ref int pos)
+    {
+        try
+        {
             if (json[pos] == '"')
             {
                 int valStart = pos + 1;
                 int valEnd = json.IndexOf('"', valStart);
-                if (valEnd < 0) break;
-                value = json.Substring(valStart, valEnd - valStart);
+                if (valEnd < 0) return null;
+                string v = json.Substring(valStart, valEnd - valStart);
                 pos = valEnd + 1;
+                return v;
             }
-            else if (json[pos] == '[')
-            {
-                // Skip array (Parameters)
-                int depth = 1;
-                pos++;
-                while (pos < json.Length && depth > 0)
-                {
-                    if (json[pos] == '[') depth++;
-                    else if (json[pos] == ']') depth--;
-                    pos++;
-                }
-                continue;
-            }
-            else
-            {
-                // Boolean or number
-                int valStart = pos;
-                while (pos < json.Length && json[pos] != ',' && json[pos] != '}') pos++;
-                value = json.Substring(valStart, pos - valStart).Trim();
-            }
+            int start = pos;
+            while (pos < json.Length && json[pos] != ',' && json[pos] != '}') pos++;
+            return json.Substring(start, pos - start).Trim();
+        }
+        catch { return null; }
+    }
 
-            switch (key)
+    private static HookDefinition? ApplyHookField(List<HookDefinition> hooks, HookDefinition? current, string key, string? value)
+    {
+        try
+        {
+            if (key == "Group") return NewHook(value);
+            ApplyNonGroup(hooks, current, key, value);
+        }
+        catch { }
+        return current;
+    }
+
+    private static HookDefinition NewHook(string? value)
+    {
+        try
+        {
+            string g = value;
+            if (string.IsNullOrEmpty(g)) g = "Unknown";
+            return new HookDefinition { Group = g };
+        }
+        catch { return new HookDefinition { Group = "Unknown" }; }
+    }
+
+    private static void ApplyNonGroup(List<HookDefinition> hooks, HookDefinition? current, string key, string? value)
+    {
+        try
+        {
+            if (key == "ClassName") SetClass(current, value);
+            else if (key == "MethodName") SetMethod(current, value);
+            else if (key == "ReturnType") SetReturn(current, value);
+            else if (key == "IsVoid") CompleteHook(hooks, current, value);
+        }
+        catch { }
+    }
+
+    private static void SetClass(HookDefinition? current, string? value)
+    {
+        try { if (current != null) current.ClassName = Coalesce(value); }
+        catch { }
+    }
+
+    private static void SetMethod(HookDefinition? current, string? value)
+    {
+        try { if (current != null) current.MethodName = Coalesce(value); }
+        catch { }
+    }
+
+    private static void SetReturn(HookDefinition? current, string? value)
+    {
+        try { if (current != null) current.ReturnType = Coalesce(value, "Void"); }
+        catch { }
+    }
+
+    private static string Coalesce(string? value, string fallback = "")
+    {
+        try { return string.IsNullOrEmpty(value) ? fallback : value; }
+        catch { return fallback; }
+    }
+
+    private static void CompleteHook(List<HookDefinition> hooks, HookDefinition? current, string? value)
+    {
+        try
+        {
+            if (current == null) return;
+            current.IsVoid = value?.Trim().ToLower() == "true";
+            if (current.Group != null && current.MethodName != null)
             {
-                case "Group":
-                    current = new HookDefinition { Group = value ?? "Unknown" };
-                    break;
-                case "ClassName":
-                    if (current != null) current.ClassName = value ?? "";
-                    break;
-                case "MethodName":
-                    if (current != null) current.MethodName = value ?? "";
-                    break;
-                case "ReturnType":
-                    if (current != null) current.ReturnType = value ?? "Void";
-                    break;
-                case "IsVoid":
-                    if (current != null)
-                    {
-                        current.IsVoid = value?.Trim().ToLower() == "true";
-                        // IsVoid is typically the last relevant field before Parameters
-                        if (current.Group != null && current.MethodName != null)
-                        {
-                            hooks.Add(current);
-                        }
-                    }
-                    break;
+                hooks.Add(current);
             }
         }
-
-        return hooks;
+        catch { }
     }
 
     // ─── Inner Types ─────────────────────────────────────────────────

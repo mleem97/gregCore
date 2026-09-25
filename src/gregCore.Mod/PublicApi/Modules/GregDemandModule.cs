@@ -45,80 +45,123 @@ public sealed class GregDemandModule
     public DemandScanResult Scan(DemandOptions options)
     {
         var result = new DemandScanResult { DryRun = options.DryRun };
-        var (doRoute, doFeed, doProducts) = DemandPlanner.ResolveActions(options);
-        bool observe = options.DryRun;
-        // High-end upkeep: host only, never DryRun, only when enabled.
-        bool doHighEnd = !options.DryRun && options.CanWriteWorld && options.HighEndEnabled;
+        var customers = FindCustomers();
+        if (customers == null) return result;
+        foreach (var cb in customers)
+        {
+            try { ScanOne(cb, options, result); }
+            catch (Exception ex) { LogMemberFailure(ex); }
+        }
+        LogSummary(options, result);
+        return result;
+    }
 
-        global::Il2Cpp.CustomerBase[]? customers;
+    private static global::Il2Cpp.CustomerBase[] FindCustomers()
+    {
         try
         {
-            customers = UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>();
+            return UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>();
         }
         catch (Exception ex)
         {
             MelonLogger.Error("[gregCore][Demand] Customer scan failed: " + ex.GetBaseException().Message);
-            return result;
+            return null;
         }
+    }
 
-        if (customers == null) return result;
-
-        foreach (var cb in customers)
+    private void ScanOne(global::Il2Cpp.CustomerBase cb, DemandOptions options, DemandScanResult result)
+    {
+        try
         {
-            if (cb == null) continue;
+            if (cb == null) return;
             int customerId;
             try { customerId = cb.customerID; }
-            catch { continue; } // destroyed object
-
+            catch { return; }
             result.Customers++;
-            try
+            var (doRoute, doFeed, doProducts) = DemandPlanner.ResolveActions(options);
+            bool observe = options.DryRun;
+            bool doHighEnd = !options.DryRun && options.CanWriteWorld && options.HighEndEnabled;
+            bool metBefore = ReadSatisfied(cb);
+            RouteAll(cb, customerId, options, result, doRoute);
+            FeedAll(cb, customerId, options, result, doFeed, observe);
+            EnsureProducts(cb, customerId, options, result, doProducts, observe);
+            DrainHighEnd(cb, customerId, options, result, doHighEnd);
+            TrackSatisfaction(cb, customerId, options, result, metBefore, doRoute, doFeed, doProducts);
+        }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
+
+    private void RouteAll(global::Il2Cpp.CustomerBase cb, int customerId, DemandOptions options, DemandScanResult result, bool doRoute)
+    {
+        try
+        {
+            var subnets = ReadSubnets(cb);
+            if (subnets == null) return;
+            foreach (var kv in subnets)
             {
-                bool metBefore = ReadSatisfied(cb);
-                var subnets = ReadSubnets(cb);
-                if (subnets != null)
-                {
-                    foreach (var kv in subnets)
-                    {
-                        result.Apps++;
-                        result.Routed += TryAutoRoute(cb, customerId, kv.Key, kv.Value, options.DryRun, doRoute, options.Quiet);
-                    }
-                }
-                if (doFeed || observe) result.FedTotal += TryAutoFeed(cb, customerId, options, doFeed);
-
-                if (doProducts || observe)
-                    result.ProductsAdded += TryEnsureProducts(cb, customerId, options, doProducts);
-
-                // High-end upkeep AFTER the feed: subtract the margin so the
-                // customer permanently needs (multiplier - 1) more. Host only.
-                if (doHighEnd)
-                {
-                    float drained = TryHighEndUpkeep(cb, customerId, options);
-                    if (drained > 0f)
-                    {
-                        result.HighEndDrained += drained;
-                        result.HighEndCustomers++;
-                    }
-                }
-
-                bool metAfter = doFeed ? ReadSatisfied(cb) : metBefore;
-                bool? wasMet = _satisfiedByCustomer.TryGetValue(customerId, out bool prev) ? prev : null;
-                _satisfiedByCustomer[customerId] = metAfter;
-                if (DemandPlanner.IsNewlySatisfied(wasMet, metAfter, doFeed || doRoute || doProducts))
-                {
-                    result.NewlySatisfied.Add(customerId);
-                    EmitToast($"Kunde {customerId} vollstaendig versorgt.");
-                    MelonLogger.Msg($"[gregCore][Demand] Kunde {customerId} ist jetzt vollstaendig versorgt.");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMemberFailure(ex);
+                result.Apps++;
+                result.Routed += TryAutoRoute(cb, customerId, kv.Key, kv.Value, options.DryRun, doRoute, options.Quiet);
             }
         }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
 
-        if ((doRoute || doFeed || doProducts || options.DryRun) && !options.Quiet)
-            MelonLogger.Msg("[gregCore][Demand] Scan: " + result.Summary);
-        return result;
+    private void FeedAll(global::Il2Cpp.CustomerBase cb, int customerId, DemandOptions options, DemandScanResult result, bool doFeed, bool observe)
+    {
+        try
+        {
+            if (doFeed || observe) result.FedTotal += TryAutoFeed(cb, customerId, options, doFeed);
+        }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
+
+    private void EnsureProducts(global::Il2Cpp.CustomerBase cb, int customerId, DemandOptions options, DemandScanResult result, bool doProducts, bool observe)
+    {
+        try
+        {
+            if (doProducts || observe)
+                result.ProductsAdded += TryEnsureProducts(cb, customerId, options, doProducts);
+        }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
+
+    private void DrainHighEnd(global::Il2Cpp.CustomerBase cb, int customerId, DemandOptions options, DemandScanResult result, bool doHighEnd)
+    {
+        try
+        {
+            if (!doHighEnd) return;
+            float drained = TryHighEndUpkeep(cb, customerId, options);
+            if (drained <= 0f) return;
+            result.HighEndDrained += drained;
+            result.HighEndCustomers++;
+        }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
+
+    private void TrackSatisfaction(global::Il2Cpp.CustomerBase cb, int customerId, DemandOptions options, DemandScanResult result, bool metBefore, bool doRoute, bool doFeed, bool doProducts)
+    {
+        try
+        {
+            bool metAfter = doFeed ? ReadSatisfied(cb) : metBefore;
+            bool? wasMet = _satisfiedByCustomer.TryGetValue(customerId, out bool prev) ? prev : null;
+            _satisfiedByCustomer[customerId] = metAfter;
+            if (!DemandPlanner.IsNewlySatisfied(wasMet, metAfter, doFeed || doRoute || doProducts)) return;
+            result.NewlySatisfied.Add(customerId);
+            EmitToast($"Customer {customerId} fully supplied.");
+            MelonLogger.Msg($"[gregCore][Demand] Customer {customerId} is now fully supplied.");
+        }
+        catch (Exception ex) { LogMemberFailure(ex); }
+    }
+
+    private static void LogSummary(DemandOptions options, DemandScanResult result)
+    {
+        try
+        {
+            var (doRoute, doFeed, doProducts) = DemandPlanner.ResolveActions(options);
+            if ((doRoute || doFeed || doProducts || options.DryRun) && !options.Quiet)
+                MelonLogger.Msg("[gregCore][Demand] Scan: " + result.Summary);
+        }
+        catch { }
     }
 
     // New products: provision missing desired apps via SetUpApp.
@@ -181,38 +224,53 @@ public sealed class GregDemandModule
     {
         try
         {
-            int vlanId = -1;
-            try
-            {
-                var vlans = cb.GetVlanIdsPerApp();
-                if (vlans == null || !vlans.TryGetValue(appId, out vlanId)) return 0;
-            }
-            catch (Exception ex) { LogMemberFailure(ex); return 0; }
-
-            string[]? ips = ReadUsableIps(cb, appId);
+            if (!TryReadVlan(cb, appId, out int vlanId)) return 0;
+            string[] ips = ReadUsableIps(cb, appId);
             if (ips == null || ips.Length == 0) return 0;
-
             string routeKey = DemandPlanner.BuildRouteKey(customerId, appId);
             if (IsRouteRegistered(cb, routeKey)) return 1;
-            if (!write)
-            {
-                if (!quiet)
-                    MelonLogger.Msg(string.Format(System.Globalization.CultureInfo.InvariantCulture,
-                        "[gregCore][Demand][DRY] Kunde {0} App {1}: wuerde Subnetz '{2}' auf VLAN {3} routen ({4} IPs, Key '{5}').",
-                        customerId, appId, subnet, vlanId, ips.Length, routeKey));
-                return 1;
-            }
+            if (!write) return LogDryRoute(customerId, appId, subnet, vlanId, ips.Length, routeKey, quiet);
+            return TryRegisterRoute(cb, customerId, appId, subnet, vlanId, routeKey, ips);
+        }
+        catch (Exception ex) { LogMemberFailure(ex); return 0; }
+    }
 
+    private bool TryReadVlan(global::Il2Cpp.CustomerBase cb, int appId, out int vlanId)
+    {
+        vlanId = -1;
+        try
+        {
+            var vlans = cb.GetVlanIdsPerApp();
+            if (vlans == null || !vlans.TryGetValue(appId, out vlanId)) return false;
+            return true;
+        }
+        catch (Exception ex) { LogMemberFailure(ex); return false; }
+    }
+
+    private static int LogDryRoute(int customerId, int appId, string subnet, int vlanId, int ipCount, string routeKey, bool quiet)
+    {
+        try
+        {
+            if (!quiet)
+                MelonLogger.Msg(string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    "[gregCore][Demand][DRY] Customer {0} App {1}: would route subnet '{2}' on VLAN {3} ({4} IPs, Key '{5}').",
+                    customerId, appId, subnet, vlanId, ipCount, routeKey));
+            return 1;
+        }
+        catch { return 1; }
+    }
+
+    private int TryRegisterRoute(global::Il2Cpp.CustomerBase cb, int customerId, int appId, string subnet, int vlanId, string routeKey, string[] ips)
+    {
+        try
+        {
             var il2cppIps = new Il2CppStringArray(ips.Length);
             for (int i = 0; i < ips.Length; i++) il2cppIps[i] = ips[i];
-            if (cb.TryRegisterRoutedSubnet(vlanId, routeKey, il2cppIps))
-            {
-                MelonLogger.Msg(string.Format(System.Globalization.CultureInfo.InvariantCulture, 
-                    "[gregCore][Demand] Kunde {0} App {1}: Subnetz '{2}' auf VLAN {3} geroutet.",
-                    customerId, appId, subnet, vlanId));
-                return 1;
-            }
-            return 0;
+            if (!cb.TryRegisterRoutedSubnet(vlanId, routeKey, il2cppIps)) return 0;
+            MelonLogger.Msg(string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "[gregCore][Demand] Customer {0} App {1}: routed subnet '{2}' on VLAN {3}.",
+                customerId, appId, subnet, vlanId));
+            return 1;
         }
         catch (Exception ex) { LogMemberFailure(ex); return 0; }
     }

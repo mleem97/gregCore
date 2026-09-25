@@ -102,105 +102,211 @@ public class FFIBridge : IDisposable
 
     private void LoadMod(string dllPath)
     {
-        // Guard: niemals aus `.deactivated` laden.
-        if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(dllPath))
-        {
-            _logger.Warning($"Rust mod uebersprungen (deaktiviert): {dllPath}");
-            return;
-        }
+        if (IsDeactivated(dllPath)) return;
         var fileName = Path.GetFileName(dllPath);
         _logger.Msg($"Loading Rust mod: {fileName}");
-
-        CrashLog.Log($"LoadMod: about to call LoadLibrary for '{fileName}'");
-        var handle = LoadLibrary(dllPath);
-        if (handle == IntPtr.Zero)
-        {
-            var error = Marshal.GetLastWin32Error();
-            throw new Exception($"LoadLibrary failed with error code {error}");
-        }
-        CrashLog.Log($"LoadMod: LoadLibrary succeeded for '{fileName}', handle=0x{handle.ToInt64():X}");
-
+        var handle = OpenLibrary(dllPath, fileName);
+        if (handle == IntPtr.Zero) return;
         var mod = new RustMod { FilePath = dllPath, Handle = handle };
+        ReadModInfo(mod, handle, fileName);
+        if (!RunModInit(mod, handle, fileName)) return;
+        RegisterModConfig(mod);
+        ResolveOptional(mod, handle);
+        CrashLog.Log($"LoadMod: finished loading '{mod.Name}' successfully");
+        _loadedMods.Add(mod);
+    }
 
-        // mod_info
-        var modInfoPtr = GetProcAddress(handle, "mod_info");
-        if (modInfoPtr != IntPtr.Zero)
+    private bool IsDeactivated(string dllPath)
+    {
+        try
+        {
+            if (global::gregCore.Infrastructure.IO.GregDeactivatedGuard.IsDeactivatedPath(dllPath))
+            {
+                _logger.Warning($"Rust mod skipped (deactivated): {dllPath}");
+                return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private IntPtr OpenLibrary(string dllPath, string fileName)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: about to call LoadLibrary for '{fileName}'");
+            var handle = LoadLibrary(dllPath);
+            if (handle == IntPtr.Zero)
+            {
+                var error = Marshal.GetLastWin32Error();
+                throw new Exception($"LoadLibrary failed with error code {error}");
+            }
+            CrashLog.Log($"LoadMod: LoadLibrary succeeded for '{fileName}', handle=0x{handle.ToInt64():X}");
+            return handle;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"LoadLibrary failed for '{fileName}': {ex.Message}");
+            return IntPtr.Zero;
+        }
+    }
+
+    private void ReadModInfo(RustMod mod, IntPtr handle, string fileName)
+    {
+        try
+        {
+            var modInfoPtr = GetProcAddress(handle, "mod_info");
+            if (modInfoPtr == IntPtr.Zero)
+            {
+                _logger.Warning($"  '{fileName}' has no mod_info() export.");
+                return;
+            }
+            var info = InvokeModInfo(modInfoPtr, fileName);
+            ApplyModInfo(mod, info);
+        }
+        catch (Exception ex) { _logger.Warning($"  mod_info failed: {ex.Message}"); }
+    }
+
+    private static ModInfoFFI InvokeModInfo(IntPtr modInfoPtr, string fileName)
+    {
+        try
         {
             var modInfoFn = Marshal.GetDelegateForFunctionPointer<ModInfoDelegate>(modInfoPtr);
             CrashLog.Log($"LoadMod: about to call modInfoFn() for '{fileName}'");
             var info = modInfoFn();
             CrashLog.Log($"LoadMod: modInfoFn() returned for '{fileName}'");
+            return info;
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Log($"LoadMod: modInfoFn() failed for '{fileName}': {ex.Message}");
+            return new ModInfoFFI();
+        }
+    }
 
-            mod.Id = Marshal.PtrToStringAnsi(info.Id) ?? "unknown";
-            mod.Name = Marshal.PtrToStringAnsi(info.Name) ?? "Unknown";
-            mod.Version = Marshal.PtrToStringAnsi(info.Version) ?? "0.0.0";
-            mod.Author = Marshal.PtrToStringAnsi(info.Author) ?? "Unknown";
-            var description = Marshal.PtrToStringAnsi(info.Description) ?? "";
-
+    private void ApplyModInfo(RustMod mod, ModInfoFFI info)
+    {
+        try
+        {
+            mod.Id = PtrToString(info.Id, "unknown");
+            mod.Name = PtrToString(info.Name, "Unknown");
+            mod.Version = PtrToString(info.Version, "0.0.0");
+            mod.Author = PtrToString(info.Author, "Unknown");
+            var description = PtrToString(info.Description, "");
             _logger.Msg($"  Mod: {mod.Name} v{mod.Version} by {mod.Author}");
             _logger.Msg($"  Description: {description}");
         }
-        else
-        {
-            _logger.Warning($"  '{fileName}' has no mod_info() export.");
-        }
+        catch { }
+    }
 
-        // mod_init
-        var modInitPtr = GetProcAddress(handle, "mod_init");
-        if (modInitPtr != IntPtr.Zero)
+    private static string PtrToString(IntPtr ptr, string fallback)
+    {
+        try { return Marshal.PtrToStringAnsi(ptr) ?? fallback; }
+        catch { return fallback; }
+    }
+
+    private bool RunModInit(RustMod mod, IntPtr handle, string fileName)
+    {
+        try
         {
+            var modInitPtr = GetProcAddress(handle, "mod_init");
+            if (modInitPtr == IntPtr.Zero)
+            {
+                _logger.Warning($"  '{fileName}' has no mod_init() export.");
+                return true;
+            }
             var modInitFn = Marshal.GetDelegateForFunctionPointer<ModInitDelegate>(modInitPtr);
             CrashLog.Log($"LoadMod: about to call modInitFn() for '{mod.Name}'");
             if (!modInitFn(_apiManager.GetTablePointer()))
             {
                 _logger.Error($"  Mod '{mod.Name}' mod_init() returned false.");
                 FreeLibrary(handle);
-                return;
+                return false;
             }
             CrashLog.Log($"LoadMod: modInitFn() succeeded for '{mod.Name}'");
             _logger.Msg($"  Mod '{mod.Name}' initialized.");
+            return true;
         }
-        else
+        catch (Exception ex) { _logger.Error($"  mod_init failed: {ex.Message}"); return false; }
+    }
+
+    private void RegisterModConfig(RustMod mod)
+    {
+        try
         {
-            _logger.Warning($"  '{fileName}' has no mod_init() export.");
+            if (!string.IsNullOrEmpty(mod.Id) && mod.Id != "unknown")
+            {
+                ModConfigSystem.SetModInfo(mod.Id, mod.Author, mod.Version);
+            }
         }
+        catch { }
+    }
 
-        if (!string.IsNullOrEmpty(mod.Id) && mod.Id != "unknown")
+    private void ResolveOptional(RustMod mod, IntPtr handle)
+    {
+        try
         {
-            ModConfigSystem.SetModInfo(mod.Id, mod.Author, mod.Version);
+            ResolveUpdate(mod, handle);
+            ResolveScene(mod, handle);
+            ResolveShutdown(mod, handle);
+            ResolveEvent(mod, handle);
         }
+        catch { }
+    }
 
-        // Optional exports
-        CrashLog.Log($"LoadMod: resolving optional export 'mod_update' for '{mod.Name}'");
-        var updatePtr = GetProcAddress(handle, "mod_update");
-        if (updatePtr != IntPtr.Zero)
-            mod.Update = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(updatePtr);
-
-        CrashLog.Log($"LoadMod: resolving optional export 'mod_fixed_update' for '{mod.Name}'");
-        var fixedUpdatePtr = GetProcAddress(handle, "mod_fixed_update");
-        if (fixedUpdatePtr != IntPtr.Zero)
-            mod.FixedUpdate = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(fixedUpdatePtr);
-
-        CrashLog.Log($"LoadMod: resolving optional export 'mod_on_scene_loaded' for '{mod.Name}'");
-        var sceneLoadedPtr = GetProcAddress(handle, "mod_on_scene_loaded");
-        if (sceneLoadedPtr != IntPtr.Zero)
-            mod.OnSceneLoaded = Marshal.GetDelegateForFunctionPointer<ModOnSceneLoadedDelegate>(sceneLoadedPtr);
-
-        CrashLog.Log($"LoadMod: resolving optional export 'mod_shutdown' for '{mod.Name}'");
-        var shutdownPtr = GetProcAddress(handle, "mod_shutdown");
-        if (shutdownPtr != IntPtr.Zero)
-            mod.Shutdown = Marshal.GetDelegateForFunctionPointer<ModShutdownDelegate>(shutdownPtr);
-
-        CrashLog.Log($"LoadMod: resolving optional export 'mod_on_event' for '{mod.Name}'");
-        var onEventPtr = GetProcAddress(handle, "mod_on_event");
-        if (onEventPtr != IntPtr.Zero)
+    private void ResolveUpdate(RustMod mod, IntPtr handle)
+    {
+        try
         {
-            mod.OnEvent = Marshal.GetDelegateForFunctionPointer<ModOnEventDelegate>(onEventPtr);
-            _logger.Msg($"  Mod '{mod.Name}' supports game events.");
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_update' for '{mod.Name}'");
+            var updatePtr = GetProcAddress(handle, "mod_update");
+            if (updatePtr != IntPtr.Zero)
+                mod.Update = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(updatePtr);
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_fixed_update' for '{mod.Name}'");
+            var fixedUpdatePtr = GetProcAddress(handle, "mod_fixed_update");
+            if (fixedUpdatePtr != IntPtr.Zero)
+                mod.FixedUpdate = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(fixedUpdatePtr);
         }
+        catch { }
+    }
 
-        CrashLog.Log($"LoadMod: finished loading '{mod.Name}' successfully");
-        _loadedMods.Add(mod);
+    private void ResolveScene(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_on_scene_loaded' for '{mod.Name}'");
+            var sceneLoadedPtr = GetProcAddress(handle, "mod_on_scene_loaded");
+            if (sceneLoadedPtr != IntPtr.Zero)
+                mod.OnSceneLoaded = Marshal.GetDelegateForFunctionPointer<ModOnSceneLoadedDelegate>(sceneLoadedPtr);
+        }
+        catch { }
+    }
+
+    private void ResolveShutdown(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_shutdown' for '{mod.Name}'");
+            var shutdownPtr = GetProcAddress(handle, "mod_shutdown");
+            if (shutdownPtr != IntPtr.Zero)
+                mod.Shutdown = Marshal.GetDelegateForFunctionPointer<ModShutdownDelegate>(shutdownPtr);
+        }
+        catch { }
+    }
+
+    private void ResolveEvent(RustMod mod, IntPtr handle)
+    {
+        try
+        {
+            CrashLog.Log($"LoadMod: resolving optional export 'mod_on_event' for '{mod.Name}'");
+            var onEventPtr = GetProcAddress(handle, "mod_on_event");
+            if (onEventPtr != IntPtr.Zero)
+            {
+                mod.OnEvent = Marshal.GetDelegateForFunctionPointer<ModOnEventDelegate>(onEventPtr);
+                _logger.Msg($"  Mod '{mod.Name}' supports game events.");
+            }
+        }
+        catch { }
     }
 
     public void OnUpdate(float deltaTime)

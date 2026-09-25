@@ -37,26 +37,22 @@ public static class LuaComputerModule
     public static void Register(Table greg, Script script, string modId)
     {
         var t = new Table(script);
+        RegisterShortcuts(t, script, modId);
+        RegisterApps(t, script, modId);
+        RegisterAppState(t, script, modId);
+        RegisterListings(t, script);
+        greg["computer"] = t;
+    }
 
+    private static void RegisterShortcuts(Table t, Script script, string modId)
+    {
         // greg.computer.register_shortcut(id, label, fn_or_appid)
         // fn (Closure) runs on click; string opens the app with that id.
         t["register_shortcut"] = (Func<string, string, DynValue, bool>)((id, label, target) =>
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(label)) return false;
-                if (target.Type == DataType.Function)
-                {
-                    var fn = target.Function;
-                    return GregComputer.RegisterShortcut(modId, id, label,
-                        () => SafeCall(modId, fn));
-                }
-                if (target.Type == DataType.String && !string.IsNullOrWhiteSpace(target.String))
-                {
-                    return GregComputer.RegisterShortcut(modId, id, label, null, target.String);
-                }
-                MelonLogger.Warning($"[LuaMod:{modId}] computer.register_shortcut needs a function or app id.");
-                return false;
+                return TryRegisterShortcut(modId, id, label, target);
             }
             catch (Exception ex)
             {
@@ -65,26 +61,48 @@ public static class LuaComputerModule
             }
         });
 
-        // greg.computer.unregister_shortcut(id) → bool
+        // greg.computer.unregister_shortcut(id) -> bool
         t["unregister_shortcut"] = (Func<string, bool>)((id) =>
         {
             try { return GregComputer.UnregisterShortcut(modId, id ?? ""); }
             catch { return false; }
         });
+    }
 
-        // greg.computer.register_app(appId, title, on_open_fn[, on_close_fn]) → bool
+    private static bool TryRegisterShortcut(string modId, string id, string label, DynValue target)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(label)) return false;
+            if (target.Type == DataType.Function)
+            {
+                var fn = target.Function;
+                return GregComputer.RegisterShortcut(modId, id, label,
+                    () => SafeCall(modId, fn));
+            }
+            if (target.Type == DataType.String && !string.IsNullOrWhiteSpace(target.String))
+            {
+                return GregComputer.RegisterShortcut(modId, id, label, null, target.String);
+            }
+            MelonLogger.Warning($"[LuaMod:{modId}] computer.register_shortcut needs a function or app id.");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaMod:{modId}] computer.register_shortcut failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static void RegisterApps(Table t, Script script, string modId)
+    {
+        // greg.computer.register_app(appId, title, on_open_fn[, on_close_fn]) -> bool
         // on_open_fn(handleId): build content with panel_add_* calls.
         t["register_app"] = (Func<string, string, Closure, DynValue, bool>)((appId, title, onOpen, onClose) =>
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(appId) || onOpen == null) return false;
-                Closure? onCloseFn = onClose.Type == DataType.Function ? onClose.Function : null;
-                var entry = new LuaApp { ModId = modId, OnOpen = onOpen, OnClose = onCloseFn };
-                lock (_gate) { _luaApps[modId + "\u0000" + appId] = entry; }
-                EnsureHandlers(modId);
-                return GregComputer.RegisterApp(modId, appId, title ?? appId,
-                    build: null, onClosed: null, framePage: false);
+                return TryRegisterApp(modId, appId, title, onOpen, onClose);
             }
             catch (Exception ex)
             {
@@ -93,7 +111,7 @@ public static class LuaComputerModule
             }
         });
 
-        // greg.computer.unregister_app(appId) → bool
+        // greg.computer.unregister_app(appId) -> bool
         t["unregister_app"] = (Func<string, bool>)((appId) =>
         {
             try
@@ -103,15 +121,37 @@ public static class LuaComputerModule
             }
             catch { return false; }
         });
+    }
 
-        // greg.computer.open_app(appId) → bool
+    private static bool TryRegisterApp(string modId, string appId, string title, Closure onOpen, DynValue onClose)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(appId) || onOpen == null) return false;
+            Closure? onCloseFn = onClose.Type == DataType.Function ? onClose.Function : null;
+            var entry = new LuaApp { ModId = modId, OnOpen = onOpen, OnClose = onCloseFn };
+            lock (_gate) { _luaApps[modId + "\u0000" + appId] = entry; }
+            EnsureHandlers(modId);
+            return GregComputer.RegisterApp(modId, appId, title ?? appId,
+                build: null, onClosed: null, framePage: false);
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaMod:{modId}] computer.register_app failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static void RegisterAppState(Table t, Script script, string modId)
+    {
+        // greg.computer.open_app(appId) -> bool
         t["open_app"] = (Func<string, bool>)((appId) =>
         {
             try { return GregComputer.TryOpenApp(appId ?? ""); }
             catch { return false; }
         });
 
-        // greg.computer.close_app() → bool (true when an app was open)
+        // greg.computer.close_app() -> bool (true when an app was open)
         t["close_app"] = (Func<bool>)(() =>
         {
             try
@@ -123,53 +163,58 @@ public static class LuaComputerModule
             catch { return false; }
         });
 
-        // greg.computer.current_app() → string ("" when none)
+        // greg.computer.current_app() -> string ("" when none)
         t["current_app"] = (Func<string>)(() =>
         {
             try { return GregComputer.CurrentAppId ?? ""; }
             catch { return ""; }
         });
+    }
 
-        // greg.computer.list_shortcuts() → array of {mod, id, label, app}
-        t["list_shortcuts"] = (Func<Table>)(() =>
+    private static void RegisterListings(Table t, Script script)
+    {
+        // greg.computer.list_shortcuts() -> array of {mod, id, label, app}
+        t["list_shortcuts"] = (Func<Table>)(() => ListShortcuts(script));
+
+        // greg.computer.list_apps() -> array of {mod, app, title}
+        t["list_apps"] = (Func<Table>)(() => ListApps(script));
+    }
+
+    private static Table ListShortcuts(Script script)
+    {
+        var out_ = new Table(script);
+        try
         {
-            var out_ = new Table(script);
-            try
+            int i = 1;
+            foreach (var s in GregComputer.Shortcuts())
             {
-                int i = 1;
-                foreach (var s in GregComputer.Shortcuts())
-                {
-                    if (s == null) continue;
-                    var row = new Table(script);
-                    row["mod"] = s.ModId; row["id"] = s.Id;
-                    row["label"] = s.Label; row["app"] = s.AppId;
-                    out_[i++] = row;
-                }
+                if (s == null) continue;
+                var row = new Table(script);
+                row["mod"] = s.ModId; row["id"] = s.Id;
+                row["label"] = s.Label; row["app"] = s.AppId;
+                out_[i++] = row;
             }
-            catch { }
-            return out_;
-        });
+        }
+        catch { }
+        return out_;
+    }
 
-        // greg.computer.list_apps() → array of {mod, app, title}
-        t["list_apps"] = (Func<Table>)(() =>
+    private static Table ListApps(Script script)
+    {
+        var out_ = new Table(script);
+        try
         {
-            var out_ = new Table(script);
-            try
+            int i = 1;
+            foreach (var a in GregComputer.Apps())
             {
-                int i = 1;
-                foreach (var a in GregComputer.Apps())
-                {
-                    if (a == null) continue;
-                    var row = new Table(script);
-                    row["mod"] = a.ModId; row["app"] = a.AppId; row["title"] = a.Title;
-                    out_[i++] = row;
-                }
+                if (a == null) continue;
+                var row = new Table(script);
+                row["mod"] = a.ModId; row["app"] = a.AppId; row["title"] = a.Title;
+                out_[i++] = row;
             }
-            catch { }
-            return out_;
-        });
-
-        greg["computer"] = t;
+        }
+        catch { }
+        return out_;
     }
 
     public static void UnregisterAll(string modId)
@@ -178,7 +223,22 @@ public static class LuaComputerModule
         {
             lock (_gate)
             {
-                foreach (var k in new List<string>(_luaApps.Keys))
+                CloseOwnedHandles(modId);
+                RemoveOwnedEntries(modId);
+                DetachHandlers(modId);
+            }
+            GregComputer.UnregisterAll(modId);
+        }
+        catch { }
+    }
+
+    private static void CloseOwnedHandles(string modId)
+    {
+        try
+        {
+            foreach (var k in new List<string>(_luaApps.Keys))
+            {
+                try
                 {
                     if (_luaApps.TryGetValue(k, out var entry) && entry != null
                         && entry.ModId == modId && !string.IsNullOrEmpty(entry.Handle))
@@ -186,21 +246,48 @@ public static class LuaComputerModule
                         try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
                         entry.Handle = "";
                     }
+                }
+                catch { }
+            }
+        }
+        catch { }
+    }
+
+    private static void RemoveOwnedEntries(string modId)
+    {
+        try
+        {
+            foreach (var k in new List<string>(_luaApps.Keys))
+            {
+                try
+                {
                     if (k.StartsWith(modId + "\u0000", StringComparison.Ordinal))
                         _luaApps.Remove(k);
                 }
-                if (_openedHandlers.TryGetValue(modId, out var opened) && opened != null)
-                {
-                    try { GregComputer.AppOpened -= opened; } catch { }
-                    _openedHandlers.Remove(modId);
-                }
-                if (_closedHandlers.TryGetValue(modId, out var closed) && closed != null)
-                {
-                    try { GregComputer.AppClosed -= closed; } catch { }
-                    _closedHandlers.Remove(modId);
-                }
+                catch { }
             }
-            GregComputer.UnregisterAll(modId);
+        }
+        catch { }
+    }
+
+    private static void DetachHandlers(string modId)
+    {
+        try
+        {
+            if (_openedHandlers.TryGetValue(modId, out var opened) && opened != null)
+            {
+                try { GregComputer.AppOpened -= opened; } catch { }
+                _openedHandlers.Remove(modId);
+            }
+        }
+        catch { }
+        try
+        {
+            if (_closedHandlers.TryGetValue(modId, out var closed) && closed != null)
+            {
+                try { GregComputer.AppClosed -= closed; } catch { }
+                _closedHandlers.Remove(modId);
+            }
         }
         catch { }
     }
@@ -226,24 +313,8 @@ public static class LuaComputerModule
             LuaApp? entry;
             lock (_gate) { _luaApps.TryGetValue(modId + "\u0000" + appId, out entry); }
             if (entry?.OnOpen == null) return;
-            if (!string.IsNullOrEmpty(entry.Handle))
-            {
-                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
-                entry.Handle = "";
-            }
-            string handle = "";
-            try
-            {
-                string title = appId;
-                try
-                {
-                    if (GregComputer.TryGetApp(appId, out var app) && app != null
-                        && !string.IsNullOrWhiteSpace(app.Title)) title = app.Title;
-                }
-                catch { }
-                handle = LuaTabletModule.OpenTabletForApp(title);
-            }
-            catch { }
+            ClosePreviousHandle(entry);
+            string handle = OpenHandleForApp(appId);
             entry.Handle = handle ?? "";
             if (string.IsNullOrEmpty(entry.Handle)) return;
             SafeCall(modId, entry.OnOpen, entry.Handle);
@@ -252,6 +323,40 @@ public static class LuaComputerModule
         {
             MelonLogger.Error($"[LuaMod:{modId}] computer app open failed: {ex.Message}");
         }
+    }
+
+    private static void ClosePreviousHandle(LuaApp entry)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(entry.Handle))
+            {
+                try { LuaTabletModule.CloseTablet(entry.Handle); } catch { }
+                entry.Handle = "";
+            }
+        }
+        catch { }
+    }
+
+    private static string OpenHandleForApp(string appId)
+    {
+        try
+        {
+            string title = ResolveAppTitle(appId);
+            return LuaTabletModule.OpenTabletForApp(title);
+        }
+        catch { return ""; }
+    }
+
+    private static string ResolveAppTitle(string appId)
+    {
+        try
+        {
+            if (GregComputer.TryGetApp(appId, out var app) && app != null
+                && !string.IsNullOrWhiteSpace(app.Title)) return app.Title;
+        }
+        catch { }
+        return appId;
     }
 
     private static void OnAppClosed(string modId, string appId)

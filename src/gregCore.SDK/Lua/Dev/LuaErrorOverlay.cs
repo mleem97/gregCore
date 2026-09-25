@@ -44,8 +44,38 @@ public sealed class LuaErrorOverlay
 
     private void BuildOrUpdateUI()
     {
-        if (_root == null)
+        try
         {
+            EnsureRoot();
+            if (_root == null) return;
+            _root.Clear();
+            float currentTime = Time.realtimeSinceStartup;
+            PruneExpired(currentTime);
+            if (_errors.Count == 0) return;
+            for (int i = _errors.Count - 1; i >= 0; i--)
+            {
+                try
+                {
+                    var box = BuildErrorBox(_errors[i], currentTime);
+                    if (box != null) _root.Add(box);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error($"[LuaErrorOverlay] Build box failed: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaErrorOverlay] Build failed: {ex.Message}");
+        }
+    }
+
+    private void EnsureRoot()
+    {
+        try
+        {
+            if (_root != null) return;
             _root = new VisualElement
             {
                 name = "ErrorOverlay",
@@ -64,52 +94,79 @@ public sealed class LuaErrorOverlay
                     backgroundColor = Color.clear
                 }
             };
-
             GregUIManager.RegisterPanel("ErrorOverlay", _root);
         }
-
-        _root.Clear();
-
-        float currentTime = Time.realtimeSinceStartup;
-        _errors.RemoveAll(e => e.Dismissed || (currentTime - e.Timestamp) > _autoHideDuration);
-
-        if (_errors.Count == 0) return;
-
-        for (int i = _errors.Count - 1; i >= 0; i--)
+        catch (Exception ex)
         {
-            var error = _errors[i];
+            MelonLogger.Error($"[LuaErrorOverlay] Root failed: {ex.Message}");
+        }
+    }
+
+    private void PruneExpired(float currentTime)
+    {
+        try
+        {
+            _errors.RemoveAll(e => e.Dismissed || (currentTime - e.Timestamp) > _autoHideDuration);
+        }
+        catch { }
+    }
+
+    private VisualElement? BuildErrorBox(ErrorEntry error, float currentTime)
+    {
+        try
+        {
             float elapsed = currentTime - error.Timestamp;
             float alpha = Mathf.Clamp01(1f - (elapsed / _autoHideDuration) * 0.5f);
-            float boxHeight = string.IsNullOrEmpty(error.StackTrace) ? 50f : 80f;
+            var box = CreateBox(error, alpha);
+            AddTitle(box, error, alpha);
+            AddStack(box, error, alpha);
+            AddDismiss(box, error);
+            AddTimer(box, elapsed, alpha);
+            return box;
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[LuaErrorOverlay] Box failed: {ex.Message}");
+            return null;
+        }
+    }
 
-            var errorBox = new VisualElement
+    private static VisualElement CreateBox(ErrorEntry error, float alpha)
+    {
+        float boxHeight = string.IsNullOrEmpty(error.StackTrace) ? 50f : 80f;
+        return new VisualElement
+        {
+            style =
             {
-                style =
-                {
-                    width = 500,
-                    height = boxHeight,
-                    backgroundColor = new Color(0.15f, 0.05f, 0.05f, alpha * 0.9f),
-                    borderTopColor = new Color(1f, 0.32f, 0.32f, alpha),
-                    borderBottomColor = new Color(1f, 0.32f, 0.32f, alpha),
-                    borderLeftColor = new Color(1f, 0.32f, 0.32f, alpha),
-                    borderRightColor = new Color(1f, 0.32f, 0.32f, alpha),
-                    borderTopWidth = 2,
-                    borderBottomWidth = 2,
-                    borderLeftWidth = 2,
-                    borderRightWidth = 2,
-                    borderTopLeftRadius = 6,
-                    borderTopRightRadius = 6,
-                    borderBottomLeftRadius = 6,
-                    borderBottomRightRadius = 6,
-                    marginBottom = 5,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 50,
-                    position = Position.Relative
-                }
-            };
+                width = 500,
+                height = boxHeight,
+                backgroundColor = new Color(0.15f, 0.05f, 0.05f, alpha * 0.9f),
+                borderTopColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderBottomColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderLeftColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderRightColor = new Color(1f, 0.32f, 0.32f, alpha),
+                borderTopWidth = 2,
+                borderBottomWidth = 2,
+                borderLeftWidth = 2,
+                borderRightWidth = 2,
+                borderTopLeftRadius = 6,
+                borderTopRightRadius = 6,
+                borderBottomLeftRadius = 6,
+                borderBottomRightRadius = 6,
+                marginBottom = 5,
+                paddingTop = 8,
+                paddingBottom = 8,
+                paddingLeft = 10,
+                paddingRight = 50,
+                position = Position.Relative
+            }
+        };
+    }
 
+    private static void AddTitle(VisualElement box, ErrorEntry error, float alpha)
+    {
+        try
+        {
             var titleLabel = new Label($"[{error.ModId}] {error.Message}")
             {
                 style =
@@ -120,23 +177,34 @@ public sealed class LuaErrorOverlay
                     marginBottom = 4
                 }
             };
-            errorBox.Add(titleLabel);
+            box.Add(titleLabel);
+        }
+        catch { }
+    }
 
-            if (!string.IsNullOrEmpty(error.StackTrace))
+    private static void AddStack(VisualElement box, ErrorEntry error, float alpha)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(error.StackTrace)) return;
+            var stackLabel = new Label(error.StackTrace)
             {
-                var stackLabel = new Label(error.StackTrace)
+                style =
                 {
-                    style =
-                    {
-                        fontSize = 11,
-                        color = new Color(0.7f, 0.7f, 0.7f, alpha),
-                        whiteSpace = WhiteSpace.Normal
-                    }
-                };
-                errorBox.Add(stackLabel);
-            }
+                    fontSize = 11,
+                    color = new Color(0.7f, 0.7f, 0.7f, alpha),
+                    whiteSpace = WhiteSpace.Normal
+                }
+            };
+            box.Add(stackLabel);
+        }
+        catch { }
+    }
 
-            // Dismiss button
+    private void AddDismiss(VisualElement box, ErrorEntry error)
+    {
+        try
+        {
             var dismissBtn = new Button
             {
                 text = "✕",
@@ -149,7 +217,7 @@ public sealed class LuaErrorOverlay
                     height = 20,
                     fontSize = 12,
                     backgroundColor = Color.clear,
-                    color = new Color(0.7f, 0.7f, 0.7f, alpha),
+                    color = new Color(0.7f, 0.7f, 0.7f, 0.9f),
                     borderTopWidth = 0,
                     borderBottomWidth = 0,
                     borderLeftWidth = 0,
@@ -161,9 +229,15 @@ public sealed class LuaErrorOverlay
                 error.Dismissed = true;
                 BuildOrUpdateUI();
             }));
-            errorBox.Add(dismissBtn);
+            box.Add(dismissBtn);
+        }
+        catch { }
+    }
 
-            // Timer indicator
+    private void AddTimer(VisualElement box, float elapsed, float alpha)
+    {
+        try
+        {
             var timerLabel = new Label($"{_autoHideDuration - elapsed:F0}s")
             {
                 style =
@@ -175,10 +249,9 @@ public sealed class LuaErrorOverlay
                     left = 10
                 }
             };
-            errorBox.Add(timerLabel);
-
-            _root.Add(errorBox);
+            box.Add(timerLabel);
         }
+        catch { }
     }
 
     /// <summary>

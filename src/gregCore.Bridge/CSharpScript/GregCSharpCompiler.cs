@@ -61,83 +61,121 @@ public static class GregCSharpCompiler
             MelonLogger.Warning($"[CSharpCompiler] Cannot compile '{modId}': Roslyn not available.");
             return null;
         }
-
         try
         {
-            var parseText = _csharpSyntaxTreeType!.GetMethod("ParseText", new[] { typeof(string) });
-            if (parseText == null)
-            {
-                MelonLogger.Error("[CSharpCompiler] ParseText method not found.");
-                return null;
-            }
-
-            var syntaxTrees = new List<object>();
-            foreach (var file in sourceFiles)
-            {
-                if (!File.Exists(file)) continue;
-                string code = File.ReadAllText(file);
-                dynamic tree = parseText.Invoke(null, new object[] { code })!;
-                syntaxTrees.Add(tree);
-            }
-
+            if (!TryParseTrees(sourceFiles, out List<object> syntaxTrees)) return null;
             if (syntaxTrees.Count == 0)
             {
                 MelonLogger.Warning($"[CSharpCompiler:{modId}] No valid source files to compile.");
                 return null;
             }
-
-            var createFromFile = _metadataReferenceType!.GetMethod("CreateFromFile", new[] { typeof(string) });
-            if (createFromFile == null)
-            {
-                MelonLogger.Error("[CSharpCompiler] CreateFromFile method not found.");
-                return null;
-            }
-
-            var references = new List<object>();
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (asm.IsDynamic || string.IsNullOrEmpty(asm.Location)) continue;
-                try
-                {
-                    dynamic reference = createFromFile.Invoke(null, new object[] { asm.Location })!;
-                    references.Add(reference);
-                }
-                catch { /* ignore unloadable refs */ }
-            }
-
-            dynamic compilation = ((dynamic)_compilationType!).Create(modId + "_dyn");
-
-            foreach (var tree in syntaxTrees)
-                compilation = compilation.AddSyntaxTrees(tree);
-
-            foreach (var reference in references)
-                compilation = compilation.AddReferences(reference);
-
-            using var ms = new MemoryStream();
-            dynamic emitResult = compilation.Emit(ms);
-
-            if (!emitResult.Success)
-            {
-                foreach (var diagnostic in emitResult.Diagnostics)
-                {
-                    string msg = diagnostic.GetMessage();
-                    int severity = (int)diagnostic.Severity;
-                    // Roslyn DiagnosticSeverity: Hidden=0, Info=1, Warning=2, Error=3
-                    if (severity == 3)
-                        MelonLogger.Error($"[CSharpCompiler:{modId}] {msg}");
-                    else
-                        MelonLogger.Warning($"[CSharpCompiler:{modId}] {msg}");
-                }
-                return null;
-            }
-
-            ms.Seek(0, SeekOrigin.Begin);
-            return Assembly.Load(ms.ToArray());
+            if (!TryBuildReferences(out List<object> references)) return null;
+            return TryEmit(modId, syntaxTrees, references);
         }
         catch (Exception ex)
         {
             MelonLogger.Error($"[CSharpCompiler] Compilation failed for '{modId}': {ex.Message}");
             return null;
         }
+    }
+
+    private static bool TryParseTrees(string[] sourceFiles, out List<object> syntaxTrees)
+    {
+        syntaxTrees = new List<object>();
+        try
+        {
+            var parseText = _csharpSyntaxTreeType!.GetMethod("ParseText", new[] { typeof(string) });
+            if (parseText == null)
+            {
+                MelonLogger.Error("[CSharpCompiler] ParseText method not found.");
+                return false;
+            }
+            foreach (var file in sourceFiles)
+            {
+                try
+                {
+                    if (!File.Exists(file)) continue;
+                    string code = File.ReadAllText(file);
+                    dynamic tree = parseText.Invoke(null, new object[] { code })!;
+                    syntaxTrees.Add(tree);
+                }
+                catch { /* ignore unreadable file */ }
+            }
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static bool TryBuildReferences(out List<object> references)
+    {
+        references = new List<object>();
+        try
+        {
+            var createFromFile = _metadataReferenceType!.GetMethod("CreateFromFile", new[] { typeof(string) });
+            if (createFromFile == null)
+            {
+                MelonLogger.Error("[CSharpCompiler] CreateFromFile method not found.");
+                return false;
+            }
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    if (asm.IsDynamic || string.IsNullOrEmpty(asm.Location)) continue;
+                    dynamic reference = createFromFile.Invoke(null, new object[] { asm.Location })!;
+                    references.Add(reference);
+                }
+                catch { /* ignore unloadable refs */ }
+            }
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static Assembly TryEmit(string modId, List<object> syntaxTrees, List<object> references)
+    {
+        try
+        {
+            dynamic compilation = ((dynamic)_compilationType!).Create(modId + "_dyn");
+            foreach (var tree in syntaxTrees)
+                compilation = compilation.AddSyntaxTrees(tree);
+            foreach (var reference in references)
+                compilation = compilation.AddReferences(reference);
+            using var ms = new MemoryStream();
+            dynamic emitResult = compilation.Emit(ms);
+            if (!emitResult.Success)
+            {
+                LogDiagnostics(modId, emitResult);
+                return null;
+            }
+            ms.Seek(0, SeekOrigin.Begin);
+            return Assembly.Load(ms.ToArray());
+        }
+        catch (Exception ex)
+        {
+            MelonLogger.Error($"[CSharpCompiler] Emit failed for '{modId}': {ex.Message}");
+            return null;
+        }
+    }
+
+    private static void LogDiagnostics(string modId, dynamic emitResult)
+    {
+        try
+        {
+            foreach (var diagnostic in emitResult.Diagnostics)
+            {
+                try
+                {
+                    string msg = diagnostic.GetMessage();
+                    int severity = (int)diagnostic.Severity;
+                    if (severity == 3)
+                        MelonLogger.Error($"[CSharpCompiler:{modId}] {msg}");
+                    else
+                        MelonLogger.Warning($"[CSharpCompiler:{modId}] {msg}");
+                }
+                catch { }
+            }
+        }
+        catch { }
     }
 }

@@ -130,65 +130,80 @@ public sealed class GregEventBus : IGregEventBus, IDisposable
     private bool PublishDirect(string hookName, EventPayload payload)
     {
         if (_disposed) return true;
-        Action<EventPayload>[]? handlersToInvoke = null;
+        if (!TryGetHandlers(hookName, out Action<EventPayload>[] handlersToInvoke)) return true;
+        if (handlersToInvoke == null || handlersToInvoke.Length == 0) return true;
+        return InvokeAll(hookName, payload, handlersToInvoke);
+    }
 
-        _rwLock.EnterReadLock();
+    private bool TryGetHandlers(string hookName, out Action<EventPayload>[] handlers)
+    {
+        handlers = null;
         try
         {
-            if (_isDirty)
-            {
-                _rwLock.ExitReadLock();
-                _rwLock.EnterWriteLock();
-                try
-                {
-                    if (_isDirty)
-                    {
-                        _cachedHandlers.Clear();
-                        foreach (var kvp in _handlers)
-                        {
-                            _cachedHandlers[kvp.Key] = kvp.Value.ToArray();
-                        }
-                        _isDirty = false;
-                    }
-                }
-                finally
-                {
-                    _rwLock.ExitWriteLock();
-                    _rwLock.EnterReadLock();
-                }
-            }
-
-            _cachedHandlers.TryGetValue(hookName, out handlersToInvoke);
-        }
-        finally
-        {
-            _rwLock.ExitReadLock();
-        }
-
-        if (handlersToInvoke == null || handlersToInvoke.Length == 0) return true;
-
-        var currentPayload = payload with { HookName = hookName };
-        int handlersExecuted = 0;
-
-        foreach (var handler in handlersToInvoke)
-        {
+            _rwLock.EnterReadLock();
             try
             {
-                handler(currentPayload);
-                handlersExecuted++;
-                if (currentPayload.IsCancelable && currentPayload.IsCancelled)
-                {
-                    return false;
-                }
+                if (_isDirty) RefreshCacheLocked();
+                _cachedHandlers.TryGetValue(hookName, out handlers);
+                return true;
             }
-            catch (Exception ex)
+            finally
             {
-                _logger.Error($"Error in handler for {hookName}", ex);
+                _rwLock.ExitReadLock();
             }
         }
+        catch { return false; }
+    }
 
-        _totalEventsProcessed++;
-        return true;
+    private void RefreshCacheLocked()
+    {
+        try
+        {
+            _rwLock.ExitReadLock();
+            _rwLock.EnterWriteLock();
+            try
+            {
+                if (!_isDirty) return;
+                _cachedHandlers.Clear();
+                foreach (var kvp in _handlers)
+                {
+                    _cachedHandlers[kvp.Key] = kvp.Value.ToArray();
+                }
+                _isDirty = false;
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
+                _rwLock.EnterReadLock();
+            }
+        }
+        catch { }
+    }
+
+    private bool InvokeAll(string hookName, EventPayload payload, Action<EventPayload>[] handlers)
+    {
+        try
+        {
+            var currentPayload = payload with { HookName = hookName };
+            foreach (var handler in handlers)
+            {
+                try
+                {
+                    handler(currentPayload);
+                    if (currentPayload.IsCancelable && currentPayload.IsCancelled)
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Error in handler for {hookName}", ex);
+                }
+            }
+            _totalEventsProcessed++;
+            return true;
+        }
+        catch { return true; }
     }
 
     /// <summary>

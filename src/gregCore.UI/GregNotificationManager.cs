@@ -155,14 +155,27 @@ namespace gregCore.UI
         private static void CreateToast(string message, float duration, string icon, Color accent)
         {
             if (_container == null) return;
+            EvictOldest();
 
+            var toast = NewToastShell(accent);
+            AddToastIcon(toast, icon, 28f, 10f);
+            toast.Add(NewToastLabel(message, 13));
+
+            PublishToast(toast, duration);
+        }
+
+        private static void EvictOldest()
+        {
             while (_active.Count >= MaxActive)
             {
                 var oldest = _active[0].element;
                 try { oldest?.RemoveFromHierarchy(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 _active.RemoveAt(0);
             }
+        }
 
+        private static VisualElement NewToastShell(Color accent)
+        {
             var toast = new VisualElement();
             toast.style.backgroundColor = GregUITheme.SurfaceDark;
             toast.style.borderLeftWidth = 4;
@@ -179,18 +192,23 @@ namespace gregCore.UI
             toast.style.opacity = 0;
             toast.style.translate = new Translate(100, 0);
             toast.style.flexDirection = FlexDirection.Row;
+            return toast;
+        }
 
-            var iconEl = GregIconToolkit.Icon(icon, 28f);
-            if (iconEl != null)
-            {
-                iconEl.style.marginRight = 10f;
-                iconEl.style.alignSelf = Align.Center;
-                toast.Add(iconEl);
-            }
+        private static void AddToastIcon(VisualElement toast, string icon, float size, float margin)
+        {
+            var iconEl = GregIconToolkit.Icon(icon, size);
+            if (iconEl == null) return;
+            iconEl.style.marginRight = margin;
+            iconEl.style.alignSelf = Align.Center;
+            toast.Add(iconEl);
+        }
 
+        private static Label NewToastLabel(string message, int fontSize)
+        {
             var label = new Label(message);
             label.style.color = new Color(0.95f, 0.95f, 0.97f);
-            label.style.fontSize = 13;
+            label.style.fontSize = fontSize;
             label.style.whiteSpace = WhiteSpace.Normal;
             label.style.flexGrow = 1f;
             // Toolkit default font is unusable in IL2CPP builds (text
@@ -201,8 +219,11 @@ namespace gregCore.UI
                 if (f != null) label.style.unityFont = f;
             }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-            toast.Add(label);
+            return label;
+        }
 
+        private static void PublishToast(VisualElement toast, float duration)
+        {
             _container.Add(toast);
             _active.Add((toast, Time.time + duration));
 
@@ -217,31 +238,23 @@ namespace gregCore.UI
             Texture2D cover, string fallbackIcon, float duration)
         {
             if (_container == null) return;
+            EvictOldest();
 
-            while (_active.Count >= MaxActive)
+            var toast = NewToastShell(GregUITheme.PrimaryAccent);
+            var art = BuildRichArt(cover, fallbackIcon);
+            if (art != null)
             {
-                var oldest = _active[0].element;
-                try { oldest?.RemoveFromHierarchy(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                _active.RemoveAt(0);
+                art.style.marginRight = 12f;
+                art.style.alignSelf = Align.Center;
+                toast.Add(art);
             }
+            toast.Add(BuildRichColumn(lineTop, lineTitle, lineSub));
 
-            var toast = new VisualElement();
-            toast.style.backgroundColor = GregUITheme.SurfaceDark;
-            toast.style.borderLeftWidth = 4;
-            toast.style.borderLeftColor = GregUITheme.PrimaryAccent;
-            toast.style.borderTopLeftRadius = 4;
-            toast.style.borderTopRightRadius = 4;
-            toast.style.borderBottomLeftRadius = 4;
-            toast.style.borderBottomRightRadius = 4;
-            toast.style.paddingLeft = 12;
-            toast.style.paddingRight = 12;
-            toast.style.paddingTop = 10;
-            toast.style.paddingBottom = 10;
-            toast.style.marginBottom = 8;
-            toast.style.opacity = 0;
-            toast.style.translate = new Translate(100, 0);
-            toast.style.flexDirection = FlexDirection.Row;
+            PublishToast(toast, duration);
+        }
 
+        private static VisualElement BuildRichArt(Texture2D cover, string fallbackIcon)
+        {
             VisualElement art = null;
             try
             {
@@ -259,13 +272,11 @@ namespace gregCore.UI
                 }
             }
             catch { art = null; }
-            if (art != null)
-            {
-                art.style.marginRight = 12f;
-                art.style.alignSelf = Align.Center;
-                toast.Add(art);
-            }
+            return art;
+        }
 
+        private static VisualElement BuildRichColumn(string lineTop, string lineTitle, string lineSub)
+        {
             var col = new VisualElement();
             col.style.flexDirection = FlexDirection.Column;
             col.style.flexGrow = 1f;
@@ -274,16 +285,7 @@ namespace gregCore.UI
             AddRichLine(col, lineTop, 11f, new Color(0.65f, 0.65f, 0.7f), false, f2);
             AddRichLine(col, lineTitle, 17f, new Color(1f, 1f, 1f), true, f2);
             AddRichLine(col, lineSub, 13f, new Color(0.88f, 0.88f, 0.88f), false, f2);
-            toast.Add(col);
-
-            _container.Add(toast);
-            _active.Add((toast, Time.time + duration));
-
-            toast.schedule.Execute(new Action<TimerState>(_ =>
-            {
-                toast.style.opacity = 1;
-                toast.style.translate = new Translate(0, 0);
-            })).StartingIn(10);
+            return col;
         }
 
         private static void AddRichLine(VisualElement parent, string text, float size, Color color, bool bold, Font font)

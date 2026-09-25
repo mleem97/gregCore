@@ -18,7 +18,7 @@ public static class CrashLog
     {
         try
         {
-            _logPath = Path.Combine(gameRoot, "dc_modloader_debug.log");
+            _logPath = BuildLogPath(gameRoot);
             var header =
                 $"===== RustBridge Debug Log ====={Environment.NewLine}" +
                 $"Started: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}{Environment.NewLine}" +
@@ -26,6 +26,18 @@ public static class CrashLog
             File.WriteAllText(_logPath, header);
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    // gameRoot is config-provided, but never trusted blindly: must be a
+    // rooted local directory path without traversal segments.
+    private static string BuildLogPath(string gameRoot)
+    {
+        if (string.IsNullOrWhiteSpace(gameRoot)) return null;
+        string full = Path.GetFullPath(gameRoot);
+        if (!Path.IsPathRooted(full)) return null;
+        if (full.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            .Any(seg => seg == "..")) return null;
+        return Path.Combine(full, "dc_modloader_debug.log");
     }
 
     public static void Log(string msg)

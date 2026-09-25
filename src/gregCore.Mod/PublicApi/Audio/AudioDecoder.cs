@@ -9,7 +9,7 @@ namespace gregCore.PublicApi.Audio;
 // so we decode to float PCM (interleaved) ourselves.
 // Formats: WAV (PCM 8/16/24/32 + IEEE float, manual), MP3 (NLayer, managed).
 // OGG currently not supported (clear warning instead of a crash).
-public static class AudioDecoder
+public static partial class AudioDecoder
 {
     public static bool TryDecode(string filePath, byte[] data, out float[] samples, out int channels, out int frequency)
     {
@@ -40,89 +40,150 @@ public static class AudioDecoder
         frequency = 0;
         try
         {
-            if (data.Length < 44) return false;
-            if (ReadAscii(data, 0, 4) != "RIFF" || ReadAscii(data, 8, 4) != "WAVE") return false;
-
-            int fmtChannels = 0;
-            int fmtRate = 0;
-            int fmtBits = 0;
-            int fmtAudio = 0;
-            int dataOff = -1;
-            int dataLen = 0;
-
-            int pos = 12;
-            while (pos + 8 <= data.Length)
-            {
-                string id = ReadAscii(data, pos, 4);
-                int size = ReadInt32LE(data, pos + 4);
-                if (size < 0 || pos + 8 + size > data.Length) break;
-                if (id == "fmt " && size >= 16)
-                {
-                    fmtAudio = ReadInt16LE(data, pos + 8);
-                    fmtChannels = ReadInt16LE(data, pos + 10);
-                    fmtRate = ReadInt32LE(data, pos + 12);
-                    fmtBits = ReadInt16LE(data, pos + 22);
-                }
-                else if (id == "data")
-                {
-                    dataOff = pos + 8;
-                    dataLen = size;
-                }
-                pos += 8 + size + (size & 1);
-            }
-
-            if (dataOff < 0 || fmtChannels <= 0 || fmtRate <= 0) return false;
-            if (fmtAudio != 1 && fmtAudio != 3) return false; // only PCM + IEEE float
-            if (fmtAudio == 3 && fmtBits != 32) return false;
-
-            int bytesPerSample = fmtBits / 8;
-            int frames = dataLen / (bytesPerSample * fmtChannels);
-            if (frames <= 0) return false;
-            var out_ = new float[frames * fmtChannels];
-            for (int f = 0; f < frames; f++)
-            {
-                for (int c = 0; c < fmtChannels; c++)
-                {
-                    int o = dataOff + (f * fmtChannels + c) * bytesPerSample;
-                    float v = 0f;
-                    if (fmtAudio == 3)
-                    {
-                        v = BitConverter.ToSingle(data, o);
-                    }
-                    else if (fmtBits == 8)
-                    {
-                        v = (data[o] - 128) / 128f;
-                    }
-                    else if (fmtBits == 16)
-                    {
-                        v = (short)(data[o] | (data[o + 1] << 8)) / 32768f;
-                    }
-                    else if (fmtBits == 24)
-                    {
-                        int s = data[o] | (data[o + 1] << 8) | (data[o + 2] << 16);
-                        if ((s & 0x800000) != 0) s |= unchecked((int)0xFF000000);
-                        v = s / 8388608f;
-                    }
-                    else if (fmtBits == 32)
-                    {
-                        v = (int)((uint)data[o] | ((uint)data[o + 1] << 8) | ((uint)data[o + 2] << 16) | ((uint)data[o + 3] << 24)) / 2147483648f;
-                    }
-                    else return false;
-                    if (v > 1f) v = 1f;
-                    else if (v < -1f) v = -1f;
-                    out_[f * fmtChannels + c] = v;
-                }
-            }
-            samples = out_;
-            channels = fmtChannels;
-            frequency = fmtRate;
-            return true;
+            if (!HasRiffHeader(data)) return false;
+            if (!TryParseChunks(data, out int fmtChannels, out int fmtRate, out int fmtBits, out int fmtAudio, out int dataOff, out int dataLen)) return false;
+            if (!IsSupportedFormat(fmtChannels, fmtRate, fmtAudio, fmtBits)) return false;
+            var fmt = new PcmFormat(fmtChannels, fmtRate, fmtBits, fmtAudio);
+            return TryConvertPcm(data, dataOff, dataLen, fmt, out samples, out channels, out frequency);
         }
         catch (Exception ex)
         {
             MelonLogger.Warning("[MusicPlayer] WAV-Decode failed: " + ex.GetBaseException().Message);
             return false;
         }
+    }
+
+    private static bool HasRiffHeader(byte[] data)
+    {
+        try
+        {
+            if (data.Length < 44) return false;
+            return ReadAscii(data, 0, 4) == "RIFF" && ReadAscii(data, 8, 4) == "WAVE";
+        }
+        catch { return false; }
+    }
+
+    private static bool TryParseChunks(byte[] data, out int fmtChannels, out int fmtRate, out int fmtBits, out int fmtAudio, out int dataOff, out int dataLen)
+    {
+        fmtChannels = 0; fmtRate = 0; fmtBits = 0; fmtAudio = 0; dataOff = -1; dataLen = 0;
+        try
+        {
+            int pos = 12;
+            while (pos + 8 <= data.Length)
+            {
+                string id = ReadAscii(data, pos, 4);
+                int size = ReadInt32LE(data, pos + 4);
+                if (size < 0 || pos + 8 + size > data.Length) break;
+                if (id == "fmt " && size >= 16) ReadFmt(data, pos, out fmtAudio, out fmtChannels, out fmtRate, out fmtBits);
+                else if (id == "data") { dataOff = pos + 8; dataLen = size; }
+                pos += 8 + size + (size & 1);
+            }
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static void ReadFmt(byte[] data, int pos, out int audio, out int channels, out int rate, out int bits)
+    {
+        audio = 0; channels = 0; rate = 0; bits = 0;
+        try
+        {
+            audio = ReadInt16LE(data, pos + 8);
+            channels = ReadInt16LE(data, pos + 10);
+            rate = ReadInt32LE(data, pos + 12);
+            bits = ReadInt16LE(data, pos + 22);
+        }
+        catch { }
+    }
+
+    private static bool IsSupportedFormat(int channels, int rate, int audio, int bits)
+    {
+        try
+        {
+            if (!HasValidChannelRate(channels, rate)) return false;
+            if (!IsKnownAudioKind(audio)) return false;
+            return HasSupportedBitDepth(audio, bits);
+        }
+        catch { return false; }
+    }
+
+    private readonly struct PcmFormat
+    {
+        public readonly int Channels;
+        public readonly int Rate;
+        public readonly int Bits;
+        public readonly int Audio;
+
+        public PcmFormat(int channels, int rate, int bits, int audio)
+        {
+            Channels = channels;
+            Rate = rate;
+            Bits = bits;
+            Audio = audio;
+        }
+    }
+
+    private static bool TryConvertPcm(byte[] data, int dataOff, int dataLen, PcmFormat fmt, out float[] samples, out int channels, out int frequency)
+    {
+        samples = null; channels = 0; frequency = 0;
+        try
+        {
+            if (dataOff < 0) return false;
+            int bytesPerSample = fmt.Bits / 8;
+            int frames = dataLen / (bytesPerSample * fmt.Channels);
+            if (frames <= 0) return false;
+            var out_ = new float[frames * fmt.Channels];
+            for (int f = 0; f < frames; f++)
+            {
+                for (int c = 0; c < fmt.Channels; c++)
+                {
+                    int o = dataOff + (f * fmt.Channels + c) * bytesPerSample;
+                    float v = DecodeSample(data, o, fmt.Bits, fmt.Audio);
+                    out_[f * fmt.Channels + c] = ClampSample(v);
+                }
+            }
+            samples = out_;
+            channels = fmt.Channels;
+            frequency = fmt.Rate;
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static float DecodeSample(byte[] data, int o, int bits, int audio)
+    {
+        try
+        {
+            if (audio == 3) return BitConverter.ToSingle(data, o);
+            if (bits == 8) return (data[o] - 128) / 128f;
+            if (bits == 16) return (short)(data[o] | (data[o + 1] << 8)) / 32768f;
+            if (bits == 24) return Decode24(data, o);
+            if (bits == 32) return (int)((uint)data[o] | ((uint)data[o + 1] << 8) | ((uint)data[o + 2] << 16) | ((uint)data[o + 3] << 24)) / 2147483648f;
+            return 0f;
+        }
+        catch { return 0f; }
+    }
+
+    private static float Decode24(byte[] data, int o)
+    {
+        try
+        {
+            int s = data[o] | (data[o + 1] << 8) | (data[o + 2] << 16);
+            if ((s & 0x800000) != 0) s |= unchecked((int)0xFF000000);
+            return s / 8388608f;
+        }
+        catch { return 0f; }
+    }
+
+    private static float ClampSample(float v)
+    {
+        try
+        {
+            if (v > 1f) return 1f;
+            if (v < -1f) return -1f;
+            return v;
+        }
+        catch { return 0f; }
     }
 
     // --- MP3 (NLayer, purely managed) ---
@@ -136,21 +197,8 @@ public static class AudioDecoder
             using (var ms = new MemoryStream(data, false))
             using (var mpeg = new NLayer.MpegFile(ms))
             {
-                int ch = mpeg.Channels;
-                int rate = mpeg.SampleRate;
-                if (ch <= 0 || rate <= 0) return false;
-                var all = new List<float>(rate * ch * 8);
-                var buf = new float[rate * ch];
-                while (true)
-                {
-                    int read = 0;
-                    try { read = mpeg.ReadSamples(buf, 0, buf.Length); }
-                    catch { break; }
-                    if (read <= 0) break;
-                    for (int i = 0; i < read; i++) all.Add(buf[i]);
-                    if (read < buf.Length) break;
-                }
-                if (all.Count == 0) return false;
+                if (!TryReadMp3Header(mpeg, out int ch, out int rate)) return false;
+                if (!TryReadMp3Samples(mpeg, ch, rate, out List<float> all)) return false;
                 samples = all.ToArray();
                 channels = ch;
                 frequency = rate;
@@ -162,6 +210,38 @@ public static class AudioDecoder
             MelonLogger.Warning("[MusicPlayer] MP3-Decode failed: " + ex.GetBaseException().Message);
             return false;
         }
+    }
+
+    private static bool TryReadMp3Header(NLayer.MpegFile mpeg, out int ch, out int rate)
+    {
+        ch = 0; rate = 0;
+        try
+        {
+            ch = mpeg.Channels;
+            rate = mpeg.SampleRate;
+            return ch > 0 && rate > 0;
+        }
+        catch { return false; }
+    }
+
+    private static bool TryReadMp3Samples(NLayer.MpegFile mpeg, int ch, int rate, out List<float> all)
+    {
+        all = new List<float>(rate * ch * 8);
+        try
+        {
+            var buf = new float[rate * ch];
+            while (true)
+            {
+                int read = 0;
+                try { read = mpeg.ReadSamples(buf, 0, buf.Length); }
+                catch { break; }
+                if (read <= 0) break;
+                for (int i = 0; i < read; i++) all.Add(buf[i]);
+                if (read < buf.Length) break;
+            }
+            return all.Count > 0;
+        }
+        catch { return false; }
     }
 
     private static string ReadAscii(byte[] d, int off, int len)

@@ -47,114 +47,290 @@ public sealed class GregKeyPump
         Keyboard? kb;
         try { kb = Keyboard.current; } catch { return false; }
         if (kb == null) return false;
-
         try
         {
-            // Backspace incl. hold-to-repeat.
-            try
-            {
-                if (kb.backspaceKey.wasReleasedThisFrame) _backspaceHeldSince = -1f;
-                else if (kb.backspaceKey.wasPressedThisFrame)
-                {
-                    if (BackspaceOnce(ref buffer)) changed = true;
-                    _backspaceHeldSince = Time.realtimeSinceStartup;
-                    _lastBackspaceRepeat = Time.realtimeSinceStartup;
-                }
-                else if (_backspaceHeldSince >= 0f && kb.backspaceKey.isPressed)
-                {
-                    float held = Time.realtimeSinceStartup - _backspaceHeldSince;
-                    if (held >= BackspaceInitialDelay && !string.IsNullOrEmpty(buffer))
-                    {
-                        float interval = held >= 1.2f ? BackspaceFastInterval : BackspaceSlowInterval;
-                        if (Time.realtimeSinceStartup - _lastBackspaceRepeat >= interval)
-                        {
-                            _lastBackspaceRepeat = Time.realtimeSinceStartup;
-                            if (BackspaceOnce(ref buffer)) changed = true;
-                        }
-                    }
-                    else if (string.IsNullOrEmpty(buffer)) _backspaceHeldSince = -1f;
-                }
-            }
-            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-
-            // Ctrl+Backspace = clear whole field.
-            try
-            {
-                if ((kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed) && kb.backspaceKey.wasPressedThisFrame)
-                {
-                    if (!string.IsNullOrEmpty(buffer)) { buffer = ""; changed = true; }
-                    return changed;
-                }
-            }
-            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-
-            if (buffer != null && buffer.Length >= Math.Max(1, maxLength)) return changed;
-
-            bool shift = false;
-            try { shift = kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed; } catch { /* ignored */ }
-
-            if (allowNewline)
-            {
-                try
-                {
-                    if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame)
-                    {
-                        buffer = (buffer ?? "") + "\n";
-                        return true;
-                    }
-                }
-                catch { /* ignored */ }
-                try
-                {
-                    if (kb.tabKey.wasPressedThisFrame)
-                    {
-                        buffer = (buffer ?? "") + "  ";
-                        changed = true;
-                    }
-                }
-                catch { /* ignored */ }
-            }
-
+            PumpBackspace(kb, ref buffer, ref changed);
+            if (TryClearAll(kb, ref buffer, ref changed)) return changed;
+            if (IsFull(buffer, maxLength)) return changed;
+            bool shift = ReadShift(kb);
+            if (TryConsumeNewline(kb, ref buffer, ref changed, allowNewline)) return true;
             int cap = Math.Max(1, maxLength);
-            try { if (kb.spaceKey.wasPressedThisFrame) AppendChar(' ', ref buffer, ref changed, cap); } catch { /* ignored */ }
+            PumpAll(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        return changed;
+    }
 
-            PumpLetter(kb.aKey, shift ? 'A' : 'a', ref buffer, ref changed, cap);
-            PumpLetter(kb.bKey, shift ? 'B' : 'b', ref buffer, ref changed, cap);
-            PumpLetter(kb.cKey, shift ? 'C' : 'c', ref buffer, ref changed, cap);
-            PumpLetter(kb.dKey, shift ? 'D' : 'd', ref buffer, ref changed, cap);
-            PumpLetter(kb.eKey, shift ? 'E' : 'e', ref buffer, ref changed, cap);
-            PumpLetter(kb.fKey, shift ? 'F' : 'f', ref buffer, ref changed, cap);
-            PumpLetter(kb.gKey, shift ? 'G' : 'g', ref buffer, ref changed, cap);
-            PumpLetter(kb.hKey, shift ? 'H' : 'h', ref buffer, ref changed, cap);
-            PumpLetter(kb.iKey, shift ? 'I' : 'i', ref buffer, ref changed, cap);
-            PumpLetter(kb.jKey, shift ? 'J' : 'j', ref buffer, ref changed, cap);
-            PumpLetter(kb.kKey, shift ? 'K' : 'k', ref buffer, ref changed, cap);
-            PumpLetter(kb.lKey, shift ? 'L' : 'l', ref buffer, ref changed, cap);
-            PumpLetter(kb.mKey, shift ? 'M' : 'm', ref buffer, ref changed, cap);
-            PumpLetter(kb.nKey, shift ? 'N' : 'n', ref buffer, ref changed, cap);
-            PumpLetter(kb.oKey, shift ? 'O' : 'o', ref buffer, ref changed, cap);
-            PumpLetter(kb.pKey, shift ? 'P' : 'p', ref buffer, ref changed, cap);
-            PumpLetter(kb.qKey, shift ? 'Q' : 'q', ref buffer, ref changed, cap);
-            PumpLetter(kb.rKey, shift ? 'R' : 'r', ref buffer, ref changed, cap);
-            PumpLetter(kb.sKey, shift ? 'S' : 's', ref buffer, ref changed, cap);
-            PumpLetter(kb.tKey, shift ? 'T' : 't', ref buffer, ref changed, cap);
-            PumpLetter(kb.uKey, shift ? 'U' : 'u', ref buffer, ref changed, cap);
-            PumpLetter(kb.vKey, shift ? 'V' : 'v', ref buffer, ref changed, cap);
-            PumpLetter(kb.wKey, shift ? 'W' : 'w', ref buffer, ref changed, cap);
-            PumpLetter(kb.xKey, shift ? 'X' : 'x', ref buffer, ref changed, cap);
-            PumpLetter(kb.yKey, shift ? 'Y' : 'y', ref buffer, ref changed, cap);
-            PumpLetter(kb.zKey, shift ? 'Z' : 'z', ref buffer, ref changed, cap);
+    private static bool IsFull(string? buffer, int maxLength)
+    {
+        try { return buffer != null && buffer.Length >= Math.Max(1, maxLength); }
+        catch { return false; }
+    }
 
-            PumpKey(kb.digit1Key, shift ? '!' : '1', ref buffer, ref changed, cap);
-            PumpKey(kb.digit2Key, shift ? '@' : '2', ref buffer, ref changed, cap);
-            PumpKey(kb.digit3Key, shift ? '#' : '3', ref buffer, ref changed, cap);
-            PumpKey(kb.digit4Key, shift ? '$' : '4', ref buffer, ref changed, cap);
-            PumpKey(kb.digit5Key, shift ? '%' : '5', ref buffer, ref changed, cap);
-            PumpKey(kb.digit6Key, shift ? '^' : '6', ref buffer, ref changed, cap);
-            PumpKey(kb.digit7Key, shift ? '&' : '7', ref buffer, ref changed, cap);
-            PumpKey(kb.digit8Key, shift ? '*' : '8', ref buffer, ref changed, cap);
-            PumpKey(kb.digit9Key, shift ? '(' : '9', ref buffer, ref changed, cap);
-            PumpKey(kb.digit0Key, shift ? ')' : '0', ref buffer, ref changed, cap);
+    private static bool TryConsumeNewline(Keyboard? kb, ref string? buffer, ref bool changed, bool allowNewline)
+    {
+        try
+        {
+            if (!allowNewline) return false;
+            if (TryNewline(kb, ref buffer)) return true;
+            PumpTab(kb, ref buffer, ref changed);
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private static void PumpAll(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpSpace(kb, ref buffer, ref changed, cap);
+            PumpAlphabet(kb, shift, ref buffer, ref changed, cap);
+            PumpDigits(kb, shift, ref buffer, ref changed, cap);
+            PumpSymbols(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private void PumpBackspace(Keyboard? kb, ref string? buffer, ref bool changed)
+    {
+        try
+        {
+            if (kb.backspaceKey.wasReleasedThisFrame) _backspaceHeldSince = -1f;
+            else if (kb.backspaceKey.wasPressedThisFrame) PressBackspace(ref buffer, ref changed);
+            else if (_backspaceHeldSince >= 0f && kb.backspaceKey.isPressed) RepeatBackspace(ref buffer, ref changed);
+        }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+    }
+
+    private void PressBackspace(ref string? buffer, ref bool changed)
+    {
+        try
+        {
+            if (BackspaceOnce(ref buffer)) changed = true;
+            _backspaceHeldSince = Time.realtimeSinceStartup;
+            _lastBackspaceRepeat = Time.realtimeSinceStartup;
+        }
+        catch { }
+    }
+
+    private void RepeatBackspace(ref string? buffer, ref bool changed)
+    {
+        try
+        {
+            float held = Time.realtimeSinceStartup - _backspaceHeldSince;
+            if (held < BackspaceInitialDelay)
+            {
+                if (string.IsNullOrEmpty(buffer)) _backspaceHeldSince = -1f;
+                return;
+            }
+            if (string.IsNullOrEmpty(buffer)) { _backspaceHeldSince = -1f; return; }
+            float interval = held >= 1.2f ? BackspaceFastInterval : BackspaceSlowInterval;
+            if (Time.realtimeSinceStartup - _lastBackspaceRepeat < interval) return;
+            _lastBackspaceRepeat = Time.realtimeSinceStartup;
+            if (BackspaceOnce(ref buffer)) changed = true;
+        }
+        catch { }
+    }
+
+    private static bool TryClearAll(Keyboard? kb, ref string? buffer, ref bool changed)
+    {
+        try
+        {
+            if ((kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed) && kb.backspaceKey.wasPressedThisFrame)
+            {
+                if (!string.IsNullOrEmpty(buffer)) { buffer = ""; changed = true; }
+                return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private static bool ReadShift(Keyboard? kb)
+    {
+        try { return kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed; } catch { return false; }
+    }
+
+    private static bool TryNewline(Keyboard? kb, ref string? buffer)
+    {
+        try
+        {
+            if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame)
+            {
+                buffer = (buffer ?? "") + "\n";
+                return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    private static void PumpTab(Keyboard? kb, ref string? buffer, ref bool changed)
+    {
+        try
+        {
+            if (!kb.tabKey.wasPressedThisFrame) return;
+            buffer = (buffer ?? "") + "  ";
+            changed = true;
+        }
+        catch { }
+    }
+
+    private static void PumpSpace(Keyboard? kb, ref string? buffer, ref bool changed, int cap)
+    {
+        try { if (kb.spaceKey.wasPressedThisFrame) AppendChar(' ', ref buffer, ref changed, cap); } catch { }
+    }
+
+    private static void PumpAlphabet(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpLettersAtoM(kb, shift, ref buffer, ref changed, cap);
+            PumpLettersNtoZ(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static char Pick(bool shift, char lower, char upper)
+    {
+        try { return shift ? upper : lower; }
+        catch { return lower; }
+    }
+
+    private static void PumpLettersAtoM(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpLettersAtoG(kb, shift, ref buffer, ref changed, cap);
+            PumpLettersHtoM(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpLettersAtoG(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpLetter(kb.aKey, Pick(shift, 'a', 'A'), ref buffer, ref changed, cap);
+            PumpLetter(kb.bKey, Pick(shift, 'b', 'B'), ref buffer, ref changed, cap);
+            PumpLetter(kb.cKey, Pick(shift, 'c', 'C'), ref buffer, ref changed, cap);
+            PumpLetter(kb.dKey, Pick(shift, 'd', 'D'), ref buffer, ref changed, cap);
+            PumpLetter(kb.eKey, Pick(shift, 'e', 'E'), ref buffer, ref changed, cap);
+            PumpLetter(kb.fKey, Pick(shift, 'f', 'F'), ref buffer, ref changed, cap);
+            PumpLetter(kb.gKey, Pick(shift, 'g', 'G'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpLettersHtoM(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpLetter(kb.hKey, Pick(shift, 'h', 'H'), ref buffer, ref changed, cap);
+            PumpLetter(kb.iKey, Pick(shift, 'i', 'I'), ref buffer, ref changed, cap);
+            PumpLetter(kb.jKey, Pick(shift, 'j', 'J'), ref buffer, ref changed, cap);
+            PumpLetter(kb.kKey, Pick(shift, 'k', 'K'), ref buffer, ref changed, cap);
+            PumpLetter(kb.lKey, Pick(shift, 'l', 'L'), ref buffer, ref changed, cap);
+            PumpLetter(kb.mKey, Pick(shift, 'm', 'M'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpLettersNtoZ(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpLettersNtoS(kb, shift, ref buffer, ref changed, cap);
+            PumpLettersTtoZ(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpLettersNtoS(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpLetter(kb.nKey, Pick(shift, 'n', 'N'), ref buffer, ref changed, cap);
+            PumpLetter(kb.oKey, Pick(shift, 'o', 'O'), ref buffer, ref changed, cap);
+            PumpLetter(kb.pKey, Pick(shift, 'p', 'P'), ref buffer, ref changed, cap);
+            PumpLetter(kb.qKey, Pick(shift, 'q', 'Q'), ref buffer, ref changed, cap);
+            PumpLetter(kb.rKey, Pick(shift, 'r', 'R'), ref buffer, ref changed, cap);
+            PumpLetter(kb.sKey, Pick(shift, 's', 'S'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpLettersTtoZ(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpLetter(kb.tKey, Pick(shift, 't', 'T'), ref buffer, ref changed, cap);
+            PumpLetter(kb.uKey, Pick(shift, 'u', 'U'), ref buffer, ref changed, cap);
+            PumpLetter(kb.vKey, Pick(shift, 'v', 'V'), ref buffer, ref changed, cap);
+            PumpLetter(kb.wKey, Pick(shift, 'w', 'W'), ref buffer, ref changed, cap);
+            PumpLetter(kb.xKey, Pick(shift, 'x', 'X'), ref buffer, ref changed, cap);
+            PumpLetter(kb.yKey, Pick(shift, 'y', 'Y'), ref buffer, ref changed, cap);
+            PumpLetter(kb.zKey, Pick(shift, 'z', 'Z'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpDigits(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpTopDigits(kb, shift, ref buffer, ref changed, cap);
+            PumpNumpad(kb, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpTopDigits(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpTopDigitsLow(kb, shift, ref buffer, ref changed, cap);
+            PumpTopDigitsHigh(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpTopDigitsLow(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpKey(kb.digit1Key, Pick(shift, '1', '!'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit2Key, Pick(shift, '2', '@'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit3Key, Pick(shift, '3', '#'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit4Key, Pick(shift, '4', '$'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit5Key, Pick(shift, '5', '%'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpTopDigitsHigh(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            if (kb == null) return;
+            PumpKey(kb.digit6Key, Pick(shift, '6', '^'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit7Key, Pick(shift, '7', '&'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit8Key, Pick(shift, '8', '*'), ref buffer, ref changed, cap);
+            PumpKey(kb.digit9Key, Pick(shift, '9', '('), ref buffer, ref changed, cap);
+            PumpKey(kb.digit0Key, Pick(shift, '0', ')'), ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpNumpad(Keyboard? kb, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
             PumpKey(kb.numpad1Key, '1', ref buffer, ref changed, cap);
             PumpKey(kb.numpad2Key, '2', ref buffer, ref changed, cap);
             PumpKey(kb.numpad3Key, '3', ref buffer, ref changed, cap);
@@ -165,21 +341,45 @@ public sealed class GregKeyPump
             PumpKey(kb.numpad8Key, '8', ref buffer, ref changed, cap);
             PumpKey(kb.numpad9Key, '9', ref buffer, ref changed, cap);
             PumpKey(kb.numpad0Key, '0', ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
 
+    private static void PumpSymbols(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
+            PumpSymbolsA(kb, shift, ref buffer, ref changed, cap);
+            PumpSymbolsB(kb, shift, ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpSymbolsA(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
             PumpKey(kb.minusKey, shift ? '_' : '-', ref buffer, ref changed, cap);
             PumpKey(kb.equalsKey, shift ? '+' : '=', ref buffer, ref changed, cap);
             PumpKey(kb.leftBracketKey, shift ? '{' : '[', ref buffer, ref changed, cap);
             PumpKey(kb.rightBracketKey, shift ? '}' : ']', ref buffer, ref changed, cap);
             PumpKey(kb.semicolonKey, shift ? ':' : ';', ref buffer, ref changed, cap);
             PumpKey(kb.quoteKey, shift ? '"' : '\'', ref buffer, ref changed, cap);
+        }
+        catch { }
+    }
+
+    private static void PumpSymbolsB(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
+    {
+        try
+        {
             PumpKey(kb.commaKey, shift ? '<' : ',', ref buffer, ref changed, cap);
             PumpKey(kb.periodKey, shift ? '>' : '.', ref buffer, ref changed, cap);
             PumpKey(kb.slashKey, shift ? '?' : '/', ref buffer, ref changed, cap);
             PumpKey(kb.backslashKey, shift ? '|' : '\\', ref buffer, ref changed, cap);
             PumpKey(kb.backquoteKey, shift ? '~' : '`', ref buffer, ref changed, cap);
         }
-        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-        return changed;
+        catch { }
     }
 
     private static bool BackspaceOnce(ref string? buffer)

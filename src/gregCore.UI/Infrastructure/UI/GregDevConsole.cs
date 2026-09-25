@@ -191,92 +191,109 @@ namespace gregCore.Infrastructure.UI
         {
             try
             {
-                _panel = GregPanelBuilder.Create("Developer Console")
-                    .SetSize(700, 450)
-                    .SetPosition(50, 50)
-                    .Build(GregUILayerType.Overlay);
-
-                var root = _panel.Root;
+                var root = CreatePanelRoot();
                 if (root == null) return;
-
-                var defaultScroll = root.Q<ScrollView>("PanelContent");
-                if (defaultScroll != null)
-                {
-                    defaultScroll.RemoveFromHierarchy();
-                }
-
-                _logScrollView = new ScrollView();
-                _logScrollView.name = "ConsoleLogScroll";
-                _logScrollView.style.flexGrow = 1;
-                _logScrollView.style.backgroundColor = new Color(0.05f, 0.05f, 0.06f, 0.8f);
-                _logScrollView.style.borderTopLeftRadius = 4;
-                _logScrollView.style.borderTopRightRadius = 4;
-                _logScrollView.style.borderBottomLeftRadius = 4;
-                _logScrollView.style.borderBottomRightRadius = 4;
-                _logScrollView.style.marginBottom = 8;
-                _logScrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
-                _logScrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
-
-                _logContainer = _logScrollView.contentContainer;
-                root.Add(_logScrollView);
-
-                var inputRow = new VisualElement();
-                inputRow.style.flexDirection = FlexDirection.Row;
-                inputRow.style.height = 30;
-                inputRow.style.alignItems = Align.Center;
-
-                var prompt = new Label(">");
-                prompt.style.color = GregUITheme.PrimaryAccent;
-                prompt.style.width = 20;
-                prompt.style.unityFontStyleAndWeight = FontStyle.Bold;
-                inputRow.Add(prompt);
-
-                _inputField = new TextField();
-                _inputField.style.flexGrow = 1;
-                _inputField.style.height = 30;
-                _inputField.RegisterCallback<KeyDownEvent>(new Action<KeyDownEvent>(evt =>
-                {
-                    if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
-                    {
-                        SubmitCommand();
-                        evt.StopPropagation();
-                    }
-                }));
-                inputRow.Add(_inputField);
-
-                var submitBtn = new Button();
-                submitBtn.text = "Send";
-                submitBtn.style.width = 60;
-                submitBtn.style.height = 30;
-                submitBtn.style.marginLeft = 8;
-                submitBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => SubmitCommand()));
-                inputRow.Add(submitBtn);
-
-                root.Add(inputRow);
-
-                var buttonRow = new VisualElement();
-                buttonRow.style.flexDirection = FlexDirection.Row;
-                buttonRow.style.marginTop = 8;
-
-                var clearBtn = new Button();
-                clearBtn.text = "Clear";
-                clearBtn.style.width = 80;
-                clearBtn.style.height = 28;
-                clearBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>
-                {
-                    _logs.Clear();
-                    RefreshLogDisplay();
-                }));
-                buttonRow.Add(clearBtn);
-
-                root.Add(buttonRow);
-
+                root.Add(CreateLogView());
+                root.Add(CreateInputRow());
+                root.Add(CreateButtonRow());
                 RefreshLogDisplay();
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[GregDevConsole] BuildUI failed: {ex.Message}");
             }
+        }
+
+        private VisualElement CreatePanelRoot()
+        {
+            try
+            {
+                _panel = GregPanelBuilder.Create("Developer Console")
+                    .SetSize(700, 450)
+                    .SetPosition(50, 50)
+                    .Build(GregUILayerType.Overlay);
+                var root = _panel.Root;
+                if (root == null) return null;
+                var defaultScroll = root.Q<ScrollView>("PanelContent");
+                if (defaultScroll != null)
+                {
+                    defaultScroll.RemoveFromHierarchy();
+                }
+                return root;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[GregDevConsole] Panel failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private ScrollView CreateLogView()
+        {
+            _logScrollView = new ScrollView();
+            _logScrollView.name = "ConsoleLogScroll";
+            _logScrollView.style.flexGrow = 1;
+            _logScrollView.style.backgroundColor = new Color(0.05f, 0.05f, 0.06f, 0.8f);
+            _logScrollView.style.borderTopLeftRadius = 4;
+            _logScrollView.style.borderTopRightRadius = 4;
+            _logScrollView.style.borderBottomLeftRadius = 4;
+            _logScrollView.style.borderBottomRightRadius = 4;
+            _logScrollView.style.marginBottom = 8;
+            _logScrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
+            _logScrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            _logContainer = _logScrollView.contentContainer;
+            return _logScrollView;
+        }
+
+        private VisualElement CreateInputRow()
+        {
+            var inputRow = new VisualElement();
+            inputRow.style.flexDirection = FlexDirection.Row;
+            inputRow.style.height = 30;
+            inputRow.style.alignItems = Align.Center;
+            var prompt = new Label(">");
+            prompt.style.color = GregUITheme.PrimaryAccent;
+            prompt.style.width = 20;
+            prompt.style.unityFontStyleAndWeight = FontStyle.Bold;
+            inputRow.Add(prompt);
+            _inputField = new TextField();
+            _inputField.style.flexGrow = 1;
+            _inputField.style.height = 30;
+            _inputField.RegisterCallback<KeyDownEvent>(new Action<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+                {
+                    SubmitCommand();
+                    evt.StopPropagation();
+                }
+            }));
+            inputRow.Add(_inputField);
+            var submitBtn = new Button();
+            submitBtn.text = "Send";
+            submitBtn.style.width = 60;
+            submitBtn.style.height = 30;
+            submitBtn.style.marginLeft = 8;
+            submitBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ => SubmitCommand()));
+            inputRow.Add(submitBtn);
+            return inputRow;
+        }
+
+        private VisualElement CreateButtonRow()
+        {
+            var buttonRow = new VisualElement();
+            buttonRow.style.flexDirection = FlexDirection.Row;
+            buttonRow.style.marginTop = 8;
+            var clearBtn = new Button();
+            clearBtn.text = "Clear";
+            clearBtn.style.width = 80;
+            clearBtn.style.height = 28;
+            clearBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>
+            {
+                _logs.Clear();
+                RefreshLogDisplay();
+            }));
+            buttonRow.Add(clearBtn);
+            return buttonRow;
         }
 
         private void RefreshLogDisplay()
@@ -333,73 +350,113 @@ namespace gregCore.Infrastructure.UI
         {
             try
             {
-                var parts = text.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                string cmd = parts.Length > 0 ? parts[0].ToLowerInvariant() : "";
-                switch (cmd)
-                {
-                    case "help":
-                        AddRaw("[INFO] Commands: help, clear, mods, menus, keys, version");
-                        break;
-                    case "clear":
-                        _logs.Clear();
-                        RefreshLogDisplay();
-                        break;
-                    case "mods":
-                        try
-                        {
-                            var mods = Core.Mods.GregModRegistry.All();
-                            if (mods == null || mods.Count == 0) { AddRaw("[INFO] No mods registered."); break; }
-                            foreach (var m in mods)
-                            {
-                                if (m == null) continue;
-                                AddRaw($"[INFO] {m.Name} v{m.Version}");
-                            }
-                        }
-                        catch (Exception ex) { AddRaw($"[ERROR] mods: {ex.Message}"); }
-                        break;
-                    case "menus":
-                        try
-                        {
-                            var menus = GregMenuRegistry.Snapshot();
-                            if (menus == null || menus.Count == 0) { AddRaw("[INFO] No menus registered."); break; }
-                            foreach (var m in menus)
-                            {
-                                if (m == null) continue;
-                                AddRaw($"[INFO] {m.MenuId} [{(m.Open ? "Offen" : "Zu")}]");
-                            }
-                        }
-                        catch (Exception ex) { AddRaw($"[ERROR] menus: {ex.Message}"); }
-                        break;
-                    case "keys":
-                        try
-                        {
-                            var entries = GregHudRegistry.All();
-                            if (entries == null || entries.Count == 0) { AddRaw("[INFO] No hotkeys registered."); break; }
-                            foreach (var e in entries)
-                            {
-                                if (e == null) continue;
-                                AddRaw($"[INFO] {e.Key} -> {e.Label}");
-                            }
-                        }
-                        catch (Exception ex) { AddRaw($"[ERROR] keys: {ex.Message}"); }
-                        break;
-                    case "version":
-                        try
-                        {
-                            var v = typeof(GregDevConsole).Assembly.GetName().Version;
-                            AddRaw($"[INFO] gregCore {v}");
-                        }
-                        catch (Exception ex) { AddRaw($"[ERROR] version: {ex.Message}"); }
-                        break;
-                    default:
-                        AddRaw($"[ERROR] Unknown command '{cmd}'. Type 'help'.");
-                        break;
-                }
+                string cmd = ParseCommand(text);
+                if (TryRunBuiltin(cmd)) return;
+                if (TryRunInfo(cmd)) return;
+                AddRaw($"[ERROR] Unknown command '{cmd}'. Type 'help'.");
             }
             catch (Exception ex)
             {
                 AddRaw($"[ERROR] Command failed: {ex.Message}");
             }
+        }
+
+        private static string ParseCommand(string text)
+        {
+            try
+            {
+                var parts = text.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                return parts.Length > 0 ? parts[0].ToLowerInvariant() : "";
+            }
+            catch { return ""; }
+        }
+
+        private bool TryRunBuiltin(string cmd)
+        {
+            try
+            {
+                if (cmd == "help")
+                {
+                    AddRaw("[INFO] Commands: help, clear, mods, menus, keys, version");
+                    return true;
+                }
+                if (cmd == "clear")
+                {
+                    _logs.Clear();
+                    RefreshLogDisplay();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] builtin: {ex.Message}"); return true; }
+        }
+
+        private bool TryRunInfo(string cmd)
+        {
+            try
+            {
+                if (cmd == "mods") { ShowMods(); return true; }
+                if (cmd == "menus") { ShowMenus(); return true; }
+                if (cmd == "keys") { ShowKeys(); return true; }
+                if (cmd == "version") { ShowVersion(); return true; }
+                return false;
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] info: {ex.Message}"); return true; }
+        }
+
+        private void ShowMods()
+        {
+            try
+            {
+                var mods = Core.Mods.GregModRegistry.All();
+                if (mods == null || mods.Count == 0) { AddRaw("[INFO] No mods registered."); return; }
+                foreach (var m in mods)
+                {
+                    if (m == null) continue;
+                    AddRaw($"[INFO] {m.Name} v{m.Version}");
+                }
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] mods: {ex.Message}"); }
+        }
+
+        private void ShowMenus()
+        {
+            try
+            {
+                var menus = GregMenuRegistry.Snapshot();
+                if (menus == null || menus.Count == 0) { AddRaw("[INFO] No menus registered."); return; }
+                foreach (var m in menus)
+                {
+                    if (m == null) continue;
+                    AddRaw($"[INFO] {m.MenuId} [{(m.Open ? "Offen" : "Zu")}]");
+                }
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] menus: {ex.Message}"); }
+        }
+
+        private void ShowKeys()
+        {
+            try
+            {
+                var entries = GregHudRegistry.All();
+                if (entries == null || entries.Count == 0) { AddRaw("[INFO] No hotkeys registered."); return; }
+                foreach (var e in entries)
+                {
+                    if (e == null) continue;
+                    AddRaw($"[INFO] {e.Key} -> {e.Label}");
+                }
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] keys: {ex.Message}"); }
+        }
+
+        private void ShowVersion()
+        {
+            try
+            {
+                var v = typeof(GregDevConsole).Assembly.GetName().Version;
+                AddRaw($"[INFO] gregCore {v}");
+            }
+            catch (Exception ex) { AddRaw($"[ERROR] version: {ex.Message}"); }
         }
     }
 }

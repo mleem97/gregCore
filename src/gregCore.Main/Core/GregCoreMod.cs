@@ -33,7 +33,7 @@ namespace gregCore.Core
     /// Provides the modding framework backbone, IL2CPP type registration,
     /// UI Toolkit initialization, dynamic hook patching, and gregExt discovery.
     /// </summary>
-    public sealed class GregCoreMod : MelonMod
+    public sealed partial class GregCoreMod : MelonMod
     {
         public static GregCoreMod Instance { get; private set; } = null!;
         public static IGregAPI? PublicAPI { get; private set; }
@@ -47,13 +47,24 @@ namespace gregCore.Core
         {
             Instance = this;
             MelonLogger.Msg("--- " + BuildInfo.ShortLabel + " ---");
-            gregCore.Infrastructure.Logging.DevLog.Msg("Framework-Lebenszyklus gestartet (Flavor " + BuildInfo.Flavor + ").");
+            gregCore.Infrastructure.Logging.DevLog.Msg("Framework lifecycle started (Flavor " + BuildInfo.Flavor + ").");
+            DisableIncompatibleMods();
+            EnsureDirectories();
+            WriteDoctorReport();
+            InitSocial();
+            RegisterIl2CppTypes();
+            BuildServiceGraph();
+            InitUi();
+            InitHooks();
+        }
 
-            // Compatibility guard: unpatch old 404 ID mod if present
-            // (again on scene load for late-loading mods).
+        private void DisableIncompatibleMods()
+        {
             try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        }
 
-            // Directory policy: ensure layout + report violations.
+        private static void EnsureDirectories()
+        {
             try
             {
                 string root = MelonLoader.Utils.MelonEnvironment.GameRootDirectory;
@@ -62,7 +73,10 @@ namespace gregCore.Core
                 gregCore.Infrastructure.IO.GregDirectoryPolicy.LogReport(violations);
             }
             catch (Exception ex) { MelonLogger.Warning($"[gregCore] Directory policy failed: {ex.Message}"); }
+        }
 
+        private static void WriteDoctorReport()
+        {
             try
             {
                 var doctorPath = Path.Combine(MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "gregCore", "doctor.json");
@@ -71,9 +85,7 @@ namespace gregCore.Core
                     MelonLoader.Utils.MelonEnvironment.UserDataDirectory);
                 GregDoctor.Write(doctorPath, report);
                 MelonLogger.Msg($"[gregCore] Doctor: {report.Status}{(string.IsNullOrEmpty(report.ErrorCode) ? "" : $" ({report.ErrorCode})")}");
-                gregCore.Infrastructure.Logging.DevLog.Msg("Doctor-Report: " + doctorPath);
-                // Latch the verdict for fail-safe patches (HwId rewrites run
-                // only on supported builds; otherwise vanilla passthrough).
+                gregCore.Infrastructure.Logging.DevLog.Msg("Doctor report: " + doctorPath);
                 bool supported = string.IsNullOrEmpty(report.ErrorCode)
                     && string.Equals(report.Status, "SUPPORTED_GAME_BUILD", StringComparison.Ordinal);
                 gregCore.Core.Diagnostics.GregGameCompat.MarkEvaluated(supported);
@@ -86,30 +98,35 @@ namespace gregCore.Core
                 gregCore.Core.Diagnostics.GregGameCompat.MarkEvaluated(false);
                 MelonLogger.Warning($"[gregCore] Doctor report failed: {ex.Message}");
             }
+        }
 
-            // Initialize Social Services
+        private static void InitSocial()
+        {
             try
             {
                 Infrastructure.Social.DiscordService.Initialize();
             }
             catch (Exception ex) { MelonLogger.Error($"[Discord] Init error: {ex.Message}"); }
+        }
 
-            // Register persistent IL2CPP components
+        private static void RegisterIl2CppTypes()
+        {
             try
             {
                 ClassInjector.RegisterTypeInIl2Cpp<GregHardwareID>();
                 ClassInjector.RegisterTypeInIl2Cpp<GregSettingsHub>();
                 ClassInjector.RegisterTypeInIl2Cpp<GregDevConsole>();
                 MelonLogger.Msg("[gregCore] IL2CPP types registered.");
-                gregCore.Infrastructure.Logging.DevLog.Msg("IL2CPP-Typen registriert (GregHardwareID, GregSettingsHub, GregDevConsole).");
+                gregCore.Infrastructure.Logging.DevLog.Msg("IL2CPP types registered (GregHardwareID, GregSettingsHub, GregDevConsole).");
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] IL2CPP type registration failed: {ex.Message}");
             }
+        }
 
-            // Build the shared service graph exactly once. This wires the public API,
-            // performance governor, settings, plugin registry and canonical hook bus.
+        private void BuildServiceGraph()
+        {
             try
             {
                 var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
@@ -123,31 +140,34 @@ namespace gregCore.Core
                 if (EventBus == null || HookBus == null)
                     throw new GregInitException("Bootstrap did not register the shared event and hook buses.");
                 MelonLogger.Msg("[gregCore] Shared service graph initialized.");
-                gregCore.Infrastructure.Logging.DevLog.Msg("Service-Graph verdrahtet: EventBus=" + (EventBus != null)
-                    + ", HookBus=" + (HookBus != null) + ", API=" + (API.GregAPI.LogSink != null) + ".");
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[gregCore] Bootstrap failed: {ex.Message}");
-                // Keep lifecycle diagnostics alive if an optional game dependency is
-                // absent. The fallback is deliberately not registered as a service.
-                try
-                {
-                    var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
-                    EventBus ??= new GregEventBus(logger);
-                    HookBus ??= new GregHookBus(logger);
-                    API.GregAPI.LogSink = (m, t) => GregDevConsole.Instance?.AddLog(m, t);
-                    API.GregAPI.Initialize(logger, EventBus, HookBus,
-                        GregServiceContainer.Get<IGregPersistenceService>()
-                        ?? new Infrastructure.Config.GregPersistenceService(logger));
-                }
-                catch (Exception fallbackEx)
-                {
-                    MelonLogger.Error($"[gregCore] Event bus fallback failed: {fallbackEx.Message}");
-                }
+                BuildServiceFallback();
             }
+        }
 
-            // Initialize UI Toolkit root
+        private void BuildServiceFallback()
+        {
+            try
+            {
+                var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
+                EventBus ??= new GregEventBus(logger);
+                HookBus ??= new GregHookBus(logger);
+                API.GregAPI.LogSink = (m, t) => GregDevConsole.Instance?.AddLog(m, t);
+                API.GregAPI.Initialize(logger, EventBus, HookBus,
+                    GregServiceContainer.Get<IGregPersistenceService>()
+                    ?? new Infrastructure.Config.GregPersistenceService(logger));
+            }
+            catch (Exception fallbackEx)
+            {
+                MelonLogger.Error($"[gregCore] Event bus fallback failed: {fallbackEx.Message}");
+            }
+        }
+
+        private static void InitUi()
+        {
             try
             {
                 GregUIManager.Initialize();
@@ -161,34 +181,15 @@ namespace gregCore.Core
             {
                 MelonLogger.Error($"[gregCore] UI initialization failed: {ex.Message}");
             }
+        }
 
-            // Initialize Harmony and dynamic hook patcher
+        private void InitHooks()
+        {
             try
             {
                 HarmonyInstance = new HarmonyLib.Harmony("gregCore.dynamic.hooks");
-                try
-                {
-                    gregCore.Infrastructure.Persistence.GregSaveGuard.Install(HarmonyInstance);
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[gregCore] SaveGuard failed: {ex.Message}");
-                }
-                if (EventBus != null && HookBus != null)
-                {
-                    var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
-                    gregCore.GameApi.GregGameModuleHost.Configure(HarmonyInstance, EventBus, logger);
-                    GregNativeEventHooks.Install(logger, HookBus, EventBus, HarmonyInstance);
-                    try
-                    {
-                        gregCore.GameLayer.Hooks.NativeModLoaderHooks.Install(logger, EventBus, HarmonyInstance);
-                    }
-                    catch (Exception hookEx)
-                    {
-                        MelonLogger.Error($"[gregCore] NativeModLoaderHooks failed: {hookEx.Message}");
-                    }
-                    gregCore.Infrastructure.Logging.DevLog.Msg("Harmony-Hooks installiert: GregSaveGuard, GregNativeEventHooks, NativeModLoaderHooks.");
-                }
+                InstallSaveGuard();
+                InstallNativeHooks();
             }
             catch (Exception ex)
             {
@@ -196,92 +197,140 @@ namespace gregCore.Core
             }
         }
 
-        public override void OnUpdate()
+        private static void InstallSaveGuard()
         {
-            if (_shutdownRequested) return;
-
-            // Deferred late initialization (Load-Order Safety)
-            if (!_lateInitCompleted)
-            {
-                _lateInitCompleted = true;
-                try
-                {
-                    DiscoverGregExtHosts();
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[gregCore] gregExt discovery failed: {ex.Message}");
-                }
-
-                try
-                {
-                    GregServiceContainer.Get<IGregPluginRegistry>()?.LoadAll();
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[gregCore] Mod registry activation failed: {ex.Message}");
-                }
-                try
-                {
-                    var nativeService = GregServiceContainer.Get<IGregNativeModService>();
-                    nativeService?.RefreshGameSnapshot();
-                    nativeService?.LoadGregNativePlugins();
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[gregCore] Native mod activation failed: {ex.Message}");
-                }
-                try
-                {
-                    var fingerprint = gregCore.Core.Diagnostics.GameFingerprint.Capture(
-                        global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory);
-                    if (!string.IsNullOrWhiteSpace(fingerprint.AssemblyCSharpSha256) &&
-                        !string.Equals(fingerprint.AssemblyCSharpSha256,
-                            gregCore.GameApi.GregGameApiRegistry.SourceSha256,
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        MelonLogger.Warning("[gregCore] GameApi drift: Assembly-CSharp differs from generation source. " +
-                            "Re-run tools/GameApiGenerator/regenerate.sh after game updates.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Warning($"[gregCore] GameApi drift check skipped: {ex.Message}");
-                }
-                try
-                {
-                    var modsDir = System.IO.Path.Combine(global::MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "Mods", "Scripts");
-                    GregLanguageRegistry.ScanAndActivate(modsDir);
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Error($"[gregCore] Language host activation failed: {ex.Message}");
-                }
-
-                MelonLogger.Msg("[gregCore] Framework initialization complete.");
-            }
-
-            // Update UI systems
             try
             {
-                GregNotificationManager.Update();
+                gregCore.Infrastructure.Persistence.GregSaveGuard.Install(HarmonyInstance);
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"[gregCore] Notification update failed: {ex.Message}");
+                MelonLogger.Error($"[gregCore] SaveGuard failed: {ex.Message}");
             }
+        }
 
-            // Registered mod keybinds: poll + fire OnPress (registry owns
-            // conflict-free keys; mods that registered must not poll themselves).
+        private void InstallNativeHooks()
+        {
+            try
+            {
+                if (EventBus == null || HookBus == null) return;
+                var logger = new gregCore.Infrastructure.Logging.ConsoleLogger(LoggerInstance);
+                gregCore.GameApi.GregGameModuleHost.Configure(HarmonyInstance, EventBus, logger);
+                GregNativeEventHooks.Install(logger, HookBus, EventBus, HarmonyInstance);
+                TryInstallModLoaderHooks(logger);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] Native hooks failed: {ex.Message}");
+            }
+        }
+
+        private void TryInstallModLoaderHooks(gregCore.Infrastructure.Logging.ConsoleLogger logger)
+        {
+            try
+            {
+                gregCore.GameLayer.Hooks.NativeModLoaderHooks.Install(logger, EventBus, HarmonyInstance);
+            }
+            catch (Exception hookEx)
+            {
+                MelonLogger.Error($"[gregCore] NativeModLoaderHooks failed: {hookEx.Message}");
+            }
+        }
+
+        public override void OnUpdate()
+        {
+            if (_shutdownRequested) return;
+            if (!_lateInitCompleted)
+            {
+                _lateInitCompleted = true;
+                RunLateInit();
+            }
+            TickNotifications();
+            TickKeybinds();
+            TickServices();
+            TickFonts();
+            TickMenus();
+            TickModHub();
+        }
+
+        private static void RunLateInit()
+        {
+            DiscoverHostsSafe();
+            LoadPluginsSafe();
+            LoadNativeSafe();
+            CheckApiDriftSafe();
+            ActivateLanguagesSafe();
+            MelonLogger.Msg("[gregCore] Framework initialization complete.");
+        }
+
+        private static void DiscoverHostsSafe()
+        {
+            try { DiscoverGregExtHosts(); }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] gregExt discovery failed: {ex.Message}"); }
+        }
+
+        private static void LoadPluginsSafe()
+        {
+            try { GregServiceContainer.Get<IGregPluginRegistry>()?.LoadAll(); }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Mod registry activation failed: {ex.Message}"); }
+        }
+
+        private static void LoadNativeSafe()
+        {
+            try
+            {
+                var nativeService = GregServiceContainer.Get<IGregNativeModService>();
+                nativeService?.RefreshGameSnapshot();
+                nativeService?.LoadGregNativePlugins();
+            }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Native mod activation failed: {ex.Message}"); }
+        }
+
+        private static void CheckApiDriftSafe()
+        {
+            try
+            {
+                var fingerprint = gregCore.Core.Diagnostics.GameFingerprint.Capture(
+                    global::MelonLoader.Utils.MelonEnvironment.GameRootDirectory);
+                if (!string.IsNullOrWhiteSpace(fingerprint.AssemblyCSharpSha256) &&
+                    !string.Equals(fingerprint.AssemblyCSharpSha256,
+                        gregCore.GameApi.GregGameApiRegistry.SourceSha256,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    MelonLogger.Warning("[gregCore] GameApi drift: Assembly-CSharp differs from generation source. " +
+                        "Re-run tools/GameApiGenerator/regenerate.sh after game updates.");
+                }
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[gregCore] GameApi drift check skipped: {ex.Message}"); }
+        }
+
+        private static void ActivateLanguagesSafe()
+        {
+            try
+            {
+                var modsDir = System.IO.Path.Combine(global::MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "Mods", "Scripts");
+                GregLanguageRegistry.ScanAndActivate(modsDir);
+            }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Language host activation failed: {ex.Message}"); }
+        }
+
+        private static void TickNotifications()
+        {
+            try { GregNotificationManager.Update(); }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Notification update failed: {ex.Message}"); }
+        }
+
+        private static void TickKeybinds()
+        {
             try
             {
                 GregServiceContainer.Get<gregCore.Infrastructure.Settings.Services.GregInputBindingService>()?.OnUpdate();
             }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Keybind update failed: {ex.Message}");
-            }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Keybind update failed: {ex.Message}"); }
+        }
 
+        private static void TickServices()
+        {
             try
             {
                 if (GregServiceContainer.Get<gregCore.Infrastructure.Performance.GregPerformanceGovernor>() is { } governor)
@@ -292,32 +341,23 @@ namespace gregCore.Core
                 if (GregServiceContainer.Get<IGregPluginRegistry>() is GregPluginRegistry registry)
                     registry.Update(Time.deltaTime);
             }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Update callback failed: {ex.Message}");
-            }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Update callback failed: {ex.Message}"); }
+        }
 
-            // Font search: retries periodically until game fonts are found
-            try
-            {
-                GregFontLoader.Tick();
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Font search tick failed: {ex.Message}");
-            }
+        private static void TickFonts()
+        {
+            try { GregFontLoader.Tick(); }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Font search tick failed: {ex.Message}"); }
+        }
 
-            // Mod menus: input lock + panel animations/drag (UI kit)
-            try
-            {
-                gregCore.UI.GregMenuRegistry.Tick(Time.deltaTime);
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Menu registry tick failed: {ex.Message}");
-            }
+        private static void TickMenus()
+        {
+            try { gregCore.UI.GregMenuRegistry.Tick(Time.deltaTime); }
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Menu registry tick failed: {ex.Message}"); }
+        }
 
-            // F1: central mod hub
+        private static void TickModHub()
+        {
             try
             {
                 var kb = UnityEngine.InputSystem.Keyboard.current;
@@ -325,57 +365,19 @@ namespace gregCore.Core
                     gregCore.UI.GregModHub.Toggle();
                 gregCore.UI.GregModHub.Refresh();
             }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"[gregCore] Mod-Hub tick failed: {ex.Message}");
-            }
-
-            // FlushDeferredEvents does not exist (anymore): GetStats() reports
-            // any queued events; no flush is intended.
+            catch (Exception ex) { MelonLogger.Error($"[gregCore] Mod-Hub tick failed: {ex.Message}"); }
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             try
             {
-                // Compatibility guard (second run: catches late-loading
-                // incompatible ID mods; handled ones are skipped).
-                try { gregCore.GameLayer.Patches.Hardware.IncompatibleModGuard.DisableIncompatibleIdMods(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                // Network session: scene is stable, co-op lookups are safe from here on.
-                try { gregCore.Infrastructure.Networking.GregNetSession.NotifySceneLoaded(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                // Load the mods' save sidecars for this save game.
-                try { gregCore.Infrastructure.Persistence.GregSaveGuard.LoadSidecarsForCurrentSave(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                // Lazy font search — fonts are only available after scene load
+                NotifySceneGuards();
                 GregFontLoader.SearchFonts();
-
-                if (sceneName != "MainMenu")
-                {
-                    GregUIOverrideManager.HideVanillaUI();
-                    Infrastructure.Social.DiscordService.UpdatePresence("Managing Infrastructure", $"Scene: {sceneName}");
-                }
-                else
-                {
-                    Infrastructure.Social.DiscordService.UpdatePresence("Planning Next Build", "Main Menu");
-                }
+                UpdateScenePresence(sceneName);
                 GregLanguageRegistry.OnSceneLoaded(sceneName);
-                (GregServiceContainer.Get<IGregPluginRegistry>() as GregPluginRegistry)?.SceneLoaded(sceneName);
-
-                // Notify mods about scene change
-                var scenePayload = new gregCore.Core.Models.EventPayload
-                {
-                    HookName = "gregMod.lifecycle.sceneLoaded",
-                    OccurredAtUtc = DateTime.UtcNow,
-                    Data = new Dictionary<string, object>
-                    {
-                        { "buildIndex", buildIndex },
-                        { "sceneName", sceneName }
-                    }
-                };
-                HookBus?.Dispatch("gregMod.lifecycle.sceneLoaded", scenePayload);
-                EventBus?.Publish("gregMod.lifecycle.sceneLoaded", scenePayload);
-                // Deprecated compatibility bridge.
-                HookBus?.Dispatch("greg.lifecycle.SceneLoaded", scenePayload);
-                EventBus?.Publish("greg.lifecycle.SceneLoaded", scenePayload);
+                NotifyPluginSceneLoaded(sceneName);
+                PublishSceneLoaded(buildIndex, sceneName);
             }
             catch (Exception ex)
             {

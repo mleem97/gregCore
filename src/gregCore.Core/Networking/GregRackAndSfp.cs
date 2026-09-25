@@ -299,63 +299,69 @@ public static class GregRackAndSfp
         Try(() => dto.Price = template.price);
         Try(() => dto.HasCustomColor = template.hasCustomColor);
         Try(() => dto.RackColor = template.rackColor);
-        Try(() =>
-        {
-            var list = template.devices;
-            if (list == null) return;
-            foreach (var d in list)
-            {
-                if (d == null) continue;
-                var td = new TemplateDevice();
-                try { td.Kind = d.kind; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { td.PrefabID = d.prefabID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { td.PositionIndex = d.positionIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { td.SizeInU = d.sizeInU; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { td.Label = d.label ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.Devices.Add(td);
-            }
-        });
-        Try(() =>
-        {
-            var list = template.sfps;
-            if (list == null) return;
-            foreach (var s in list)
-            {
-                if (s == null) continue;
-                var ts = new TemplateSfp();
-                try { ts.DeviceIndex = s.deviceIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { ts.PortLocalPos = s.portLocalPos; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { ts.SfpType = s.sfpType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.Sfps.Add(ts);
-            }
-        });
-        Try(() =>
-        {
-            var list = template.cables;
-            if (list == null) return;
-            foreach (var c in list)
-            {
-                if (c == null) continue;
-                var tc = new TemplateCable();
-                try { tc.DeviceIndexA = c.deviceIndexA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { tc.PortLocalPosA = c.portLocalPosA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { tc.DeviceIndexB = c.deviceIndexB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { tc.PortLocalPosB = c.portLocalPosB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try { tc.Color = c.color; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                try
-                {
-                    var wps = c.waypointRackLocalPos;
-                    if (wps != null)
-                        foreach (var v in wps)
-                        {
-                            try { tc.Waypoints.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                        }
-                }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                dto.Cables.Add(tc);
-            }
-        });
+        Try(() => ReadTemplateDevices(template, dto));
+        Try(() => ReadTemplateSfps(template, dto));
+        Try(() => ReadTemplateCables(template, dto));
         return dto;
+    }
+
+    private static void ReadTemplateDevices(global::Il2Cpp.RackTemplate template, RackTemplateDto dto)
+    {
+        var list = template.devices;
+        if (list == null) return;
+        foreach (var d in list)
+        {
+            if (d == null) continue;
+            var td = new TemplateDevice();
+            try { td.Kind = d.kind; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { td.PrefabID = d.prefabID; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { td.PositionIndex = d.positionIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { td.SizeInU = d.sizeInU; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { td.Label = d.label ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.Devices.Add(td);
+        }
+    }
+
+    private static void ReadTemplateSfps(global::Il2Cpp.RackTemplate template, RackTemplateDto dto)
+    {
+        var list = template.sfps;
+        if (list == null) return;
+        foreach (var s in list)
+        {
+            if (s == null) continue;
+            var ts = new TemplateSfp();
+            try { ts.DeviceIndex = s.deviceIndex; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { ts.PortLocalPos = s.portLocalPos; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { ts.SfpType = s.sfpType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.Sfps.Add(ts);
+        }
+    }
+
+    private static void ReadTemplateCables(global::Il2Cpp.RackTemplate template, RackTemplateDto dto)
+    {
+        var list = template.cables;
+        if (list == null) return;
+        foreach (var c in list)
+        {
+            if (c == null) continue;
+            var tc = new TemplateCable();
+            try { tc.DeviceIndexA = c.deviceIndexA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { tc.PortLocalPosA = c.portLocalPosA; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { tc.DeviceIndexB = c.deviceIndexB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { tc.PortLocalPosB = c.portLocalPosB; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { tc.Color = c.color; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try
+            {
+                var wps = c.waypointRackLocalPos;
+                if (wps != null)
+                    foreach (var v in wps)
+                    {
+                        try { tc.Waypoints.Add(v); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    }
+            }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            dto.Cables.Add(tc);
+        }
     }
 
     public static bool DeleteTemplate(string templateId)

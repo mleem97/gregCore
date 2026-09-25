@@ -49,7 +49,7 @@ public sealed class ComputerApp
     public bool FramePage { get; init; } = true;
 }
 
-public static class GregComputer
+public static partial class GregComputer
 {
     public const string ButtonPrefix = "greg-computer-";
     public const string HookShortcutClicked = "greg.COMPUTER.ShortcutClicked";
@@ -153,25 +153,85 @@ public static class GregComputer
         try
         {
             if (string.IsNullOrWhiteSpace(modId)) return 0;
-            int n = 0;
-            string? openOwned = null;
-            lock (_gate)
-            {
-                foreach (var k in _shortcuts.Keys.ToArray())
-                    if (_shortcuts[k] != null && _shortcuts[k].ModId == modId && _shortcuts.Remove(k)) n++;
-                foreach (var k in _apps.Keys.ToArray())
-                    if (_apps[k] != null && _apps[k].ModId == modId && _apps.Remove(k)) n++;
-                if (!string.IsNullOrEmpty(_currentAppId))
-                {
-                    var cur = _apps.Values.FirstOrDefault(a => a != null && a.AppId == _currentAppId);
-                    if (cur == null) openOwned = _currentAppId; // owner gone with its app entry
-                }
-            }
+            int n = RemoveOwned(modId);
+            string openOwned = FindOrphanedApp();
             if (openOwned != null) CloseApp();
             if (n > 0) RaiseChanged();
             return n;
         }
         catch { return 0; }
+    }
+
+    private static int RemoveOwned(string modId)
+    {
+        try
+        {
+            int n = RemoveOwnedShortcuts(modId);
+            n += RemoveOwnedApps(modId);
+            return n;
+        }
+        catch { return 0; }
+    }
+
+    private static int RemoveOwnedShortcuts(string modId)
+    {
+        int n = 0;
+        try
+        {
+            string[] keys;
+            lock (_gate) { keys = _shortcuts.Keys.ToArray(); }
+            foreach (var k in keys)
+            {
+                try
+                {
+                    lock (_gate)
+                    {
+                        if (_shortcuts.TryGetValue(k, out var s) && s != null && s.ModId == modId && _shortcuts.Remove(k)) n++;
+                    }
+                }
+                catch { }
+            }
+        }
+        catch { }
+        return n;
+    }
+
+    private static int RemoveOwnedApps(string modId)
+    {
+        int n = 0;
+        try
+        {
+            string[] keys;
+            lock (_gate) { keys = _apps.Keys.ToArray(); }
+            foreach (var k in keys)
+            {
+                try
+                {
+                    lock (_gate)
+                    {
+                        if (_apps.TryGetValue(k, out var a) && a != null && a.ModId == modId && _apps.Remove(k)) n++;
+                    }
+                }
+                catch { }
+            }
+        }
+        catch { }
+        return n;
+    }
+
+    private static string FindOrphanedApp()
+    {
+        try
+        {
+            lock (_gate)
+            {
+                if (string.IsNullOrEmpty(_currentAppId)) return null;
+                var cur = _apps.Values.FirstOrDefault(a => a != null && a.AppId == _currentAppId);
+                if (cur == null) return _currentAppId;
+                return null;
+            }
+        }
+        catch { return null; }
     }
 
     public static IReadOnlyList<ComputerShortcut> Shortcuts()
@@ -239,27 +299,11 @@ public static class GregComputer
 
     public static void CloseApp()
     {
-        string closing = "";
-        Action? onClosed = null;
         try
         {
-            lock (_gate)
-            {
-                closing = _currentAppId;
-                _currentAppId = "";
-                if (!string.IsNullOrEmpty(closing))
-                {
-                    var app = _apps.Values.FirstOrDefault(a => a != null && a.AppId == closing);
-                    onClosed = app?.OnClosed;
-                }
-            }
-            HideAppPage(closing);
-            if (!string.IsNullOrEmpty(closing))
-            {
-                try { onClosed?.Invoke(); } catch { }
-                try { AppClosed?.Invoke(closing); } catch { }
-                SafeEmit(HookAppClosed, new Dictionary<string, object> { { "AppId", closing } });
-            }
+            var state = TakeClosing();
+            HideAppPage(state.Closing);
+            NotifyClosed(state.Closing, state.OnClosed);
         }
         catch { }
     }
@@ -304,200 +348,4 @@ public static class GregComputer
         catch { }
     }
 
-    // ── Presentation (Unity; best-effort, never throws) ──────────────────────
-
-    internal static string MenuIdFor(string appId) => "computer.app." + appId;
-
-    public static void Sync(global::Il2Cpp.ComputerShop? shop)
-    {
-        try
-        {
-            if (shop == null || shop.Pointer == IntPtr.Zero) return;
-            RemoveStaleButtons(shop);
-            InjectShortcuts(shop);
-            var current = CurrentAppId;
-            if (!string.IsNullOrEmpty(current) && _appPage == null && TryGetApp(current, out var app) && app != null)
-                ShowAppPage(app);
-        }
-        catch { }
-    }
-
-    public static void OnComputerClosed()
-    {
-        try { CloseApp(); } catch { }
-    }
-
-    private static void RemoveStaleButtons(global::Il2Cpp.ComputerShop shop)
-    {
-        try
-        {
-            var buttons = shop.GetComponentsInChildren<UnityEngine.UI.Button>(true);
-            if (buttons == null) return;
-            var wanted = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var s in Shortcuts())
-            {
-                try { wanted.Add(ButtonName(s)); } catch { }
-            }
-            foreach (var b in buttons)
-            {
-                try
-                {
-                    if (b == null || b.gameObject == null) continue;
-                    var n = b.gameObject.name ?? "";
-                    if (n.StartsWith(ButtonPrefix, StringComparison.Ordinal) && !wanted.Contains(n))
-                        UnityEngine.Object.Destroy(b.gameObject);
-                }
-                catch { }
-            }
-        }
-        catch { }
-    }
-
-    private static void InjectShortcuts(global::Il2Cpp.ComputerShop shop)
-    {
-        try
-        {
-            var all = Shortcuts();
-            if (all.Count == 0) return;
-            var buttons = shop.GetComponentsInChildren<UnityEngine.UI.Button>(true);
-            if (buttons == null || buttons.Count == 0) return;
-
-            UnityEngine.UI.Button? template = null;
-            foreach (var b in buttons)
-            {
-                try
-                {
-                    if (b == null || b.gameObject == null) continue;
-                    var n = b.gameObject.name ?? "";
-                    if (n.StartsWith(ButtonPrefix, StringComparison.Ordinal)) continue;
-                    if (string.IsNullOrEmpty(ReadLabel(b))) continue;
-                    template = b;
-                    break;
-                }
-                catch { }
-            }
-            if (template == null) return;
-            var container = template.transform != null ? template.transform.parent : null;
-            if (container == null) return;
-
-            foreach (var s in all)
-            {
-                try
-                {
-                    var name = ButtonName(s);
-                    if (container.Find(name) != null) continue;
-                    var clone = UnityEngine.Object.Instantiate(template.gameObject, container, false);
-                    if (clone == null) continue;
-                    clone.name = name;
-                    try { clone.transform.localPosition = Vector3.zero; } catch { }
-                    try { clone.transform.localScale = Vector3.one; } catch { }
-                    SetLabel(clone, s.Label);
-                    var btn = clone.GetComponent<UnityEngine.UI.Button>();
-                    if (btn == null)
-                    {
-                        try { UnityEngine.Object.Destroy(clone); } catch { }
-                        continue;
-                    }
-                    try { btn.onClick.RemoveAllListeners(); } catch { }
-                    var captured = s;
-                    try
-                    {
-                        btn.onClick.AddListener(DelegateSupport.ConvertDelegate<UnityAction>(
-                            new Action(() => InvokeShortcut(captured.ModId, captured.Id))));
-                    }
-                    catch { }
-                    try { clone.SetActive(true); } catch { }
-                }
-                catch { }
-            }
-        }
-        catch { }
-    }
-
-    private static string ButtonName(ComputerShortcut s)
-    {
-        try
-        {
-            var safe = new string((s.ModId + "-" + s.Id)
-                .Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray());
-            if (string.IsNullOrEmpty(safe)) safe = "x";
-            return ButtonPrefix + safe;
-        }
-        catch { return ButtonPrefix + "x"; }
-    }
-
-    private static string ReadLabel(UnityEngine.UI.Button b)
-    {
-        try
-        {
-            var text = b.GetComponentInChildren<UnityEngine.UI.Text>(true);
-            if (text != null && !string.IsNullOrEmpty(text.text)) return text.text;
-            var tmp = b.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (tmp != null && !string.IsNullOrEmpty(tmp.text)) return tmp.text;
-        }
-        catch { }
-        return "";
-    }
-
-    private static void SetLabel(GameObject root, string label)
-    {
-        try
-        {
-            var text = root.GetComponentInChildren<UnityEngine.UI.Text>(true);
-            if (text != null) { try { text.text = label; } catch { } return; }
-            var tmp = root.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (tmp != null) { try { tmp.text = label; } catch { } }
-        }
-        catch { }
-    }
-
-    private static void ShowAppPage(ComputerApp app)
-    {
-        try
-        {
-            HideAppPage("");
-            var builder = GregPanelBuilder.Create(app.Title).SetSize(560, 640).Build();
-            try { app.Build?.Invoke(builder); }
-            catch (Exception ex)
-            {
-                MelonLogger.Warning($"[gregCore][Computer] App '{app.AppId}' build failed: {ex.GetBaseException().Message}");
-            }
-            builder.AddSpacer(8).AddSeparator().AddButton("\u2190 Back to computer", () => CloseApp());
-            builder.Show();
-            _appPage = builder;
-            try
-            {
-                GregMenuRegistry.RegisterMenu(MenuIdFor(app.AppId), new GregMenuOptions
-                {
-                    LockCamera = false,
-                    LockMovement = true,
-                    LockInteract = true,
-                    ShowCursor = true,
-                    PanelWidth = 560f,
-                });
-                GregMenuRegistry.SetOpen(MenuIdFor(app.AppId), true);
-            }
-            catch { }
-        }
-        catch { }
-    }
-
-    private static void HideAppPage(string closingAppId)
-    {
-        try
-        {
-            var page = _appPage;
-            _appPage = null;
-            if (page != null)
-            {
-                try { page.Hide(); } catch { }
-                try { page.Destroy(); } catch { }
-            }
-            if (!string.IsNullOrEmpty(closingAppId))
-            {
-                try { GregMenuRegistry.SetOpen(MenuIdFor(closingAppId), false); } catch { }
-            }
-        }
-        catch { }
-    }
 }

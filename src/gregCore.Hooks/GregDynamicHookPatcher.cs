@@ -16,7 +16,7 @@ namespace gregCore.GameLayer.Hooks
     /// Dynamically applies Harmony patches for all hooks defined in game_hooks.json.
     /// Uses a generic postfix to dispatch events to GregEventBus.
     /// </summary>
-    public sealed class GregDynamicHookPatcher
+    public sealed partial class GregDynamicHookPatcher
     {
         private readonly HarmonyLib.Harmony _harmony;
         private readonly GregEventBus _eventBus;
@@ -47,87 +47,10 @@ namespace gregCore.GameLayer.Hooks
                 _logger.Warning($"Hooks file not found: {hooksFilePath}");
                 return;
             }
-
             try
             {
                 var json = File.ReadAllText(hooksFilePath);
-                // The release manifest is deliberately an object. Refuse the legacy
-                // unbound inventory here: installing every discovered member is unsafe.
-                if (!json.TrimStart().StartsWith("{", StringComparison.Ordinal))
-                {
-                    _report.ManifestVersion = "legacy-rejected";
-                    _report.Skipped.Add(new HookInstallEntry { HookId = "legacy-inventory", Status = "skipped", ErrorClass = "ManifestNotBoundToBuild", TargetMember = hooksFilePath });
-                    _logger.Warning("Rejected legacy unbound hook inventory; use framework/greg_hooks.json.");
-                    return;
-                }
-                var manifest = JsonConvert.DeserializeObject<GregHooksManifest>(json);
-                InstallFromManifest(manifest, Path.GetDirectoryName(hooksFilePath) ?? Directory.GetCurrentDirectory());
-                return;
-
-#pragma warning disable CS0162
-                var hooks = JsonConvert.DeserializeObject<List<GameHookJsonDef>>(json);
-
-                if (hooks == null || hooks.Count == 0)
-                {
-                    _logger.Warning("No hooks found in hooks file.");
-                    return;
-                }
-
-                TotalHooks = hooks.Count;
-                _logger.Info($"[DynamicPatcher] Loaded {hooks.Count} hook definitions from manifest.");
-
-                // Group by unique method to avoid duplicate patches
-                var methodGroups = new Dictionary<MethodBase, List<GameHookJsonDef>>();
-
-                foreach (var hook in hooks)
-                {
-                    try
-                    {
-                        var method = ResolveMethod(hook);
-                        if (method == null)
-                        {
-                            _failedCount++;
-                            continue;
-                        }
-
-                        if (!methodGroups.TryGetValue(method, out var list))
-                        {
-                            list = new List<GameHookJsonDef>();
-                            methodGroups[method] = list;
-                        }
-                        list.Add(hook);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Debug($"Failed to resolve hook {hook.ClassName}.{hook.MethodName}: {ex.Message}");
-                        _failedCount++;
-                    }
-                }
-
-                // Apply patches
-                foreach (var kvp in methodGroups)
-                {
-                    try
-                    {
-                        var method = kvp.Key;
-                        var hookNames = kvp.Value.Select(h => GetHookName(h)).ToList();
-
-                        lock (_globalMethodToHookNames)
-                        {
-                            _globalMethodToHookNames[method] = hookNames;
-                        }
-
-                        _harmony.Patch(method, postfix: new HarmonyMethod(typeof(GregDynamicHookPatcher), nameof(GenericPostfix)));
-                        _installedCount++;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warning($"Failed to patch {kvp.Key.DeclaringType?.Name}.{kvp.Key.Name}: {ex.Message}");
-                        _failedCount++;
-                    }
-                }
-
-                _logger.Info($"[DynamicPatcher] Installed {_installedCount} patches, failed {_failedCount} hooks.");
+                if (!TryInstallManifestJson(json, hooksFilePath)) return;
             }
             catch (Exception ex)
             {
@@ -135,38 +58,99 @@ namespace gregCore.GameLayer.Hooks
             }
         }
 
+        private bool TryInstallManifestJson(string json, string hooksFilePath)
+        {
+            try
+            {
+                if (!json.TrimStart().StartsWith("{", StringComparison.Ordinal))
+                {
+                    RejectLegacy(hooksFilePath);
+                    return false;
+                }
+                var manifest = JsonConvert.DeserializeObject<GregHooksManifest>(json);
+                InstallFromManifest(manifest, Path.GetDirectoryName(hooksFilePath) ?? Directory.GetCurrentDirectory());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to install manifest hooks", ex);
+                return false;
+            }
+        }
+
+        private void RejectLegacy(string hooksFilePath)
+        {
+            try
+            {
+                _report.ManifestVersion = "legacy-rejected";
+                _report.Skipped.Add(new HookInstallEntry { HookId = "legacy-inventory", Status = "skipped", ErrorClass = "ManifestNotBoundToBuild", TargetMember = hooksFilePath });
+                _logger.Warning("Rejected legacy unbound hook inventory; use framework/greg_hooks.json.");
+            }
+            catch { }
+        }
+
         public void InstallFromManifest(GregHooksManifest? manifest, string manifestDirectory)
         {
             if (manifest == null) { _report.Skipped.Add(new HookInstallEntry { Status="skipped", ErrorClass="InvalidManifest" }); return; }
             _report.ManifestVersion = manifest.ManifestVersion > 0 ? manifest.ManifestVersion.ToString() : manifest.Version.ToString();
             TotalHooks = manifest.Hooks.Count;
-            var gameRoot = Directory.GetParent(manifestDirectory)?.Parent?.FullName ?? manifestDirectory;
-            var fingerprint = Core.Diagnostics.GameFingerprint.Capture(gameRoot);
-            var fingerprintKnown = !string.IsNullOrWhiteSpace(manifest.AssemblyFingerprint) && manifest.AssemblyFingerprint != "UNKNOWN";
-            var fingerprintMatches = fingerprintKnown && string.Equals(manifest.AssemblyFingerprint, fingerprint.CombinedSha256, StringComparison.OrdinalIgnoreCase);
-            _report.FingerprintMatch = fingerprintMatches ? "match" : fingerprintKnown ? "mismatch" : "unknown";
-            if (!fingerprintMatches)
+            if (!CheckFingerprint(manifest, manifestDirectory)) return;
+            InstallAll(manifest);
+        }
+
+        private bool CheckFingerprint(GregHooksManifest manifest, string manifestDirectory)
+        {
+            try
+            {
+                string gameRoot = ResolveGameRoot(manifestDirectory);
+                var fingerprint = CaptureGameFingerprint(gameRoot);
+                bool known = IsKnownFingerprint(manifest);
+                bool matches = IsFingerprintMatch(manifest, fingerprint, known);
+                _report.FingerprintMatch = FingerprintStatus(matches, known);
+                if (matches) return true;
+                DisableAll(manifest);
+                return false;
+            }
+            catch { return false; }
+        }
+
+        private void DisableAll(GregHooksManifest manifest)
+        {
+            try
             {
                 _report.SafeMode = true;
                 foreach (var hook in manifest.Hooks)
                     _report.Disabled.Add(Entry(hook, "disabled", "UnknownOrMismatchedBuild", null));
                 _logger.Warning($"Hook manifest fingerprint {_report.FingerprintMatch}; risky hooks disabled.");
-                return;
             }
+            catch { }
+        }
 
-            foreach (var hook in manifest.Hooks)
+        private void InstallAll(GregHooksManifest manifest)
+        {
+            try
             {
-                if (!string.Equals(hook.Status, "implemented", StringComparison.OrdinalIgnoreCase)) { _report.Skipped.Add(Entry(hook, "skipped", "NotImplemented", null)); continue; }
-                try
+                foreach (var hook in manifest.Hooks)
                 {
-                    var method = ResolveManifestMethod(hook);
-                    if (method == null) { _report.Failed.Add(Entry(hook, "failed", "TargetNotFound", null)); continue; }
-                    lock (_globalMethodToHookNames) _globalMethodToHookNames[method] = new List<string> { hook.Name };
-                    _harmony.Patch(method, postfix: new HarmonyMethod(typeof(GregDynamicHookPatcher), nameof(GenericPostfix)));
-                    _installedCount++; _report.Installed.Add(Entry(hook, "installed", "", method));
+                    try { InstallOne(hook); }
+                    catch (Exception ex) { _failedCount++; _report.Failed.Add(Entry(hook, "failed", ex.GetType().Name, null, ex)); _logger.Warning($"Hook {hook.Id} failed: {ex.Message}"); }
                 }
-                catch (Exception ex) { _failedCount++; _report.Failed.Add(Entry(hook, "failed", ex.GetType().Name, null, ex)); _logger.Warning($"Hook {hook.Id} failed: {ex.Message}"); }
             }
+            catch { }
+        }
+
+        private void InstallOne(GregHookDef hook)
+        {
+            try
+            {
+                if (!string.Equals(hook.Status, "implemented", StringComparison.OrdinalIgnoreCase)) { _report.Skipped.Add(Entry(hook, "skipped", "NotImplemented", null)); return; }
+                var method = ResolveManifestMethod(hook);
+                if (method == null) { _report.Failed.Add(Entry(hook, "failed", "TargetNotFound", null)); return; }
+                lock (_globalMethodToHookNames) _globalMethodToHookNames[method] = new List<string> { hook.Name };
+                _harmony.Patch(method, postfix: new HarmonyMethod(typeof(GregDynamicHookPatcher), nameof(GenericPostfix)));
+                _installedCount++; _report.Installed.Add(Entry(hook, "installed", "", method));
+            }
+            catch (Exception ex) { _failedCount++; _report.Failed.Add(Entry(hook, "failed", ex.GetType().Name, null, ex)); _logger.Warning($"Hook {hook.Id} failed: {ex.Message}"); }
         }
 
         private MethodBase? ResolveManifestMethod(GregHookDef hook)
@@ -313,55 +297,82 @@ namespace gregCore.GameLayer.Hooks
         public static void GenericPostfix(MethodBase __originalMethod, object[] __args)
         {
             if (_globalEventBus == null) return;
+            if (!TryGetHookNames(__originalMethod, out List<string> hookNames)) return;
+            var payload = BuildPayload(__originalMethod, __args);
+            DispatchAll(hookNames, payload);
+        }
 
-            List<string>? hookNames;
-            lock (_globalMethodToHookNames)
+        private static bool TryGetHookNames(MethodBase method, out List<string> hookNames)
+        {
+            hookNames = null;
+            try
             {
-                if (!_globalMethodToHookNames.TryGetValue(__originalMethod, out hookNames)) return;
-            }
-
-            var payloadData = new Dictionary<string, object>
-            {
-                { "method", __originalMethod.Name },
-                { "type", __originalMethod.DeclaringType?.Name ?? "Unknown" }
-            };
-
-            if (__args != null && __args.Length > 0)
-            {
-                var parameters = __originalMethod.GetParameters();
-                for (int i = 0; i < Math.Min(__args.Length, parameters.Length); i++)
+                lock (_globalMethodToHookNames)
                 {
-                    try
-                    {
-                        payloadData[$"arg_{parameters[i].Name}"] = __args[i] ?? "null";
-                    }
-                    catch
-                    {
-                        payloadData[$"arg_{i}"] = "<unavailable>";
-                    }
+                    if (!_globalMethodToHookNames.TryGetValue(method, out hookNames)) return false;
+                    return hookNames != null;
                 }
             }
+            catch { return false; }
+        }
 
-            var payload = new EventPayload
+        private static EventPayload BuildPayload(MethodBase method, object[] args)
+        {
+            var data = new Dictionary<string, object>
+            {
+                { "method", method.Name },
+                { "type", method.DeclaringType?.Name ?? "Unknown" }
+            };
+            AppendArgs(data, method, args);
+            return new EventPayload
             {
                 HookName = "",
                 OccurredAtUtc = DateTime.UtcNow,
-                Data = payloadData,
+                Data = data,
                 IsCancelable = false,
                 IsCancelled = false
             };
+        }
 
-            foreach (var hookName in hookNames)
+        private static void AppendArgs(Dictionary<string, object> data, MethodBase method, object[] args)
+        {
+            try
             {
-                try
+                if (args == null || args.Length == 0) return;
+                var parameters = method.GetParameters();
+                int n = Math.Min(args.Length, parameters.Length);
+                for (int i = 0; i < n; i++)
                 {
-                    _globalEventBus.Publish(hookName, payload with { HookName = hookName });
-                }
-                catch (Exception ex)
-                {
-                    _globalLogger?.Error($"Hook dispatch failed for {hookName}", ex);
+                    try
+                    {
+                        data[$"arg_{parameters[i].Name}"] = args[i] ?? "null";
+                    }
+                    catch
+                    {
+                        data[$"arg_{i}"] = "<unavailable>";
+                    }
                 }
             }
+            catch { }
+        }
+
+        private static void DispatchAll(List<string> hookNames, EventPayload payload)
+        {
+            try
+            {
+                foreach (var hookName in hookNames)
+                {
+                    try
+                    {
+                        _globalEventBus.Publish(hookName, payload with { HookName = hookName });
+                    }
+                    catch (Exception ex)
+                    {
+                        _globalLogger?.Error($"Hook dispatch failed for {hookName}", ex);
+                    }
+                }
+            }
+            catch { }
         }
     }
 

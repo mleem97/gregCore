@@ -17,7 +17,7 @@ public class GregKeybindRegistry
     /// requester silently — a request for one of these is auto-resolved away.
     /// Escape cancels edits and closes menus game-wide; F1 opens the gregCore hub.
     /// </summary>
-    public static readonly HashSet<KeyCode> GameReservedKeys = new()
+    public static System.Collections.Generic.IReadOnlySet<KeyCode> GameReservedKeys { get; } = new HashSet<KeyCode>()
     {
         KeyCode.Escape,
         KeyCode.F1,
@@ -105,7 +105,12 @@ public class GregKeybindRegistry
     /// not taken by any entry except <paramref name="except"/> (which keeps
     /// its own key). Null when the pool is exhausted.
     /// </summary>
-    public KeyCode? FindFreeKey(KeybindEntry? except = null)
+    public KeyCode? FindFreeKey()
+    {
+        return FindFreeKey(null);
+    }
+
+    public KeyCode? FindFreeKey(KeybindEntry? except)
     {
         string? exceptId = except != null ? except.GetFullId() : null;
         foreach (var candidate in FallbackPool)

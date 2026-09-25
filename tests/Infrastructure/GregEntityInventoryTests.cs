@@ -101,7 +101,7 @@ public class GregEntityInventoryTests
             + "Firewall\tfirewall#0\tnot-a-uid\tcluster:x\n"
             + "broken-line\n"
             + "SfpModule\tsfp#3\tgregUID:SfpModule:001122334455\t\n";
-        var uids = GregEntityInventory.ParseUidMap(tsv, out var hints);
+        var (uids, hints) = GregEntityInventory.ParseUidMap(tsv);
         uids.Should().HaveCount(2);
         uids["Router\nrouter#0"].Should().Be("gregUID:Router:AABBCCDDEEFF");
         hints["Router\nrouter#0"].Should().Be("asn:1/routes:2");

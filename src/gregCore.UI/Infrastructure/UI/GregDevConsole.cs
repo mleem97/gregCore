@@ -15,7 +15,7 @@ namespace gregCore.Infrastructure.UI
         public static GregDevConsole Instance { get; private set; } = null!;
 
         /// <summary>Framework menu ID of the console (for input lock/cursor).</summary>
-        public const string MenuId = "greg.console";
+        public static string MenuId { get; } = "greg.console";
 
         private readonly List<string> _logs = new();
         private readonly Queue<(string line, LogType type)> _pendingLines = new();
@@ -47,7 +47,12 @@ namespace gregCore.Infrastructure.UI
 
         public bool IsOpen => _visible;
 
-        public void AddLog(string msg, string type = "INFO")
+        public void AddLog(string msg)
+        {
+            AddLog(msg, "INFO");
+        }
+
+        public void AddLog(string msg, string type)
         {
             string typeStr = string.IsNullOrEmpty(type) ? "INFO" : type;
             MelonLoader.MelonLogger.Msg($"[{typeStr}] {msg}");

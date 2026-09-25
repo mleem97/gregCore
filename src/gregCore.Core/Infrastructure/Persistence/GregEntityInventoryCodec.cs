@@ -124,7 +124,7 @@ public static partial class GregEntityInventory
         try
         {
             if (string.IsNullOrEmpty(content)) return;
-            var uids = ParseUidMap(content, out var hints);
+            var (uids, hints) = ParseUidMap(content);
             if (uids.Count == 0 && hints.Count == 0) return;
             lock (_gate)
             {
@@ -136,13 +136,13 @@ public static partial class GregEntityInventory
     }
 
     /// <summary>Pure TSV logic (kindKey -&gt; uid/hint), unit-testable without the game.</summary>
-    public static Dictionary<string, string> ParseUidMap(string content, out Dictionary<string, string> hints)
+    public static (Dictionary<string, string> uids, Dictionary<string, string> hints) ParseUidMap(string content)
     {
-        hints = new Dictionary<string, string>(StringComparer.Ordinal);
+        var hints = new Dictionary<string, string>(StringComparer.Ordinal);
         var uids = new Dictionary<string, string>(StringComparer.Ordinal);
         try
         {
-            if (string.IsNullOrEmpty(content)) return uids;
+            if (string.IsNullOrEmpty(content)) return (uids, hints);
             var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var raw in lines)
             {
@@ -162,7 +162,7 @@ public static partial class GregEntityInventory
             }
         }
         catch { /* ignored: optional persistence, game continues without sidecar */ }
-        return uids;
+        return (uids, hints);
     }
 
     private static void LoadPersistedMap(string dir, string name)
@@ -174,7 +174,7 @@ public static partial class GregEntityInventory
             string content = null;
             try { if (File.Exists(path)) content = File.ReadAllText(path); } catch { return; }
             if (string.IsNullOrEmpty(content)) return;
-            var uids = ParseUidMap(content, out var hints);
+            var (uids, hints) = ParseUidMap(content);
             lock (_gate)
             {
                 _persistedUid.Clear();

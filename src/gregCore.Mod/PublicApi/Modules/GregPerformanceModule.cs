@@ -74,7 +74,10 @@ public sealed class GregPerformanceModule
     public void SetAutoSaveInterval(float minutes) => Configure(GetProfile() with { AutoSaveIntervalMinutes = minutes });
 
     // ── Operations ───────────────────────────────────────────────────────────
-    public Task<T> QueueOperation<T>(string name, Func<Task<T>> operation, OperationPriority priority = OperationPriority.Normal)
+    public Task<T> QueueOperation<T>(string name, Func<Task<T>> operation)
+        => QueueOperation(name, operation, OperationPriority.Normal);
+
+    public Task<T> QueueOperation<T>(string name, Func<Task<T>> operation, OperationPriority priority)
         => _governor.QueueOperationAsync(name, operation, priority);
 
     public void SetMaxConcurrentOperations(int max) => Configure(GetProfile() with { MaxConcurrentOps = max });

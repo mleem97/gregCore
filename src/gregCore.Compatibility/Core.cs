@@ -35,7 +35,7 @@ public static class CrashLog
         if (string.IsNullOrWhiteSpace(gameRoot)) return null;
         string full = Path.GetFullPath(gameRoot);
         if (!Path.IsPathRooted(full)) return null;
-        if (full.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+        if (full.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar })
             .Any(seg => seg == "..")) return null;
         return Path.Combine(full, "dc_modloader_debug.log");
     }

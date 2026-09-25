@@ -13,7 +13,12 @@ namespace gregCore.Infrastructure.Settings.Services
             _logger = logger.ForContext("NotificationService");
         }
 
-        public void Show(string title, string message, float duration = 5f)
+        public void Show(string title, string message)
+        {
+            Show(title, message, 5f);
+        }
+
+        public void Show(string title, string message, float duration)
         {
             _logger.Info($"Notification: {title} - {message}");
             GregNotificationManager.Show(string.IsNullOrWhiteSpace(title) ? message : $"{title}: {message}", duration);

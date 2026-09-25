@@ -33,7 +33,7 @@ public static partial class EntityManager
     {
         public uint Id = 0;
         public GameObject GO = null!;
-        public Animator? Animator;
+        public Animator? Animator = null;
         public NavMeshAgent? NavAgent;
         public bool WaitingForUMA = false;
         public float UMAWaitStart = 0f;
@@ -48,7 +48,7 @@ public static partial class EntityManager
         public bool HasCrouchParam = false;
         public bool HasSittingParam = false;
         public bool HasCarryingParam = false;
-        public GameObject? NameTagGO;
+        public GameObject? NameTagGO = null;
         public Vector3 LastPos;
         public GameObject? CarryProxyGO;
         public Transform? HandBone;

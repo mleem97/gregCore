@@ -258,7 +258,7 @@ public sealed partial class LuaRepl
         inputRow.Add(CreatePrompt());
         _inputField = CreateInputField();
         inputRow.Add(_inputField);
-        inputRow.Add(CreateRunButton(replScript));
+        inputRow.Add(CreateRunButton());
         return inputRow;
     }
 
@@ -294,7 +294,7 @@ public sealed partial class LuaRepl
         return field;
     }
 
-    private Button CreateRunButton(Script replScript)
+    private Button CreateRunButton()
     {
         var runButton = new Button
         {

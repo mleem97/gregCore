@@ -57,7 +57,12 @@ namespace gregCore.API
         public static GregSettingsProxy Settings { get; } = new GregSettingsProxy();
         public static GregHooksProxy Hooks { get; } = new GregHooksProxy();
 
-        public static void Log(string msg, string type = "INFO")
+        public static void Log(string msg)
+        {
+            Log(msg, "INFO");
+        }
+
+        public static void Log(string msg, string type)
         {
             var sink = LogSink;
             if (sink != null)

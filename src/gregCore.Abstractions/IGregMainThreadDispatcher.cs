@@ -4,5 +4,6 @@ public interface IGregMainThreadDispatcher
 {
     bool IsMainThread { get; }
     void Enqueue(Action action);
-    int Drain(int maxItems = 256);
+    int Drain();
+    int Drain(int maxItems);
 }

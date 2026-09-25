@@ -107,7 +107,7 @@ public static partial class AudioDecoder
         catch { return false; }
     }
 
-    private readonly struct PcmFormat
+    private readonly struct PcmFormat : IEquatable<PcmFormat>
     {
         public readonly int Channels;
         public readonly int Rate;
@@ -120,6 +120,22 @@ public static partial class AudioDecoder
             Rate = rate;
             Bits = bits;
             Audio = audio;
+        }
+
+        public bool Equals(PcmFormat other)
+        {
+            return Channels == other.Channels && Rate == other.Rate
+                && Bits == other.Bits && Audio == other.Audio;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PcmFormat other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Channels, Rate, Bits, Audio);
         }
     }
 

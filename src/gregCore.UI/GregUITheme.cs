@@ -47,7 +47,12 @@ namespace gregCore.UI
             return Color.magenta;
         }
 
-        public static void ApplyTextStyle(Label label, bool isHeadline = false)
+        public static void ApplyTextStyle(Label label)
+        {
+            ApplyTextStyle(label, false);
+        }
+
+        public static void ApplyTextStyle(Label label, bool isHeadline)
         {
             label.style.fontSize = isHeadline ? 20 : 14;
             label.style.color = isHeadline ? TextPrimary : new Color(0.88f, 0.88f, 0.88f);

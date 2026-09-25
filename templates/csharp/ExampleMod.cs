@@ -15,7 +15,7 @@ public sealed class Example : GregMod
         _subscription = On("gregMod.lifecycle.sceneLoaded", OnScene);
     }
 
-    private void OnScene(EventPayload payload)
+    private void OnScene(EventPayload _)
     {
         MainThread.Enqueue(() => Logger.Info("Scene callback handled on the main thread."));
     }

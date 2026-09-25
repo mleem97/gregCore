@@ -433,7 +433,22 @@ public sealed class GregSafeTextField : VisualElement
 
     public event Action<string>? Changed;
 
-    public GregSafeTextField(string initialValue = "", int maxLength = 512, bool multiline = false)
+    public GregSafeTextField()
+        : this("", 512, false)
+    {
+    }
+
+    public GregSafeTextField(string initialValue)
+        : this(initialValue, 512, false)
+    {
+    }
+
+    public GregSafeTextField(string initialValue, int maxLength)
+        : this(initialValue, maxLength, false)
+    {
+    }
+
+    public GregSafeTextField(string initialValue, int maxLength, bool multiline)
     {
         MaxLength = Math.Max(1, maxLength);
         Multiline = multiline;

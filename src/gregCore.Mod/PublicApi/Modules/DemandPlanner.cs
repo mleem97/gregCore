@@ -130,7 +130,12 @@ public static class DemandPlanner
 
     // Poisson distribution: inter-arrival time in seconds for
     // randomly distributed demand events.
-    public static float SamplePoissonInterval(float ratePerSecond, System.Random? rng = null)
+    public static float SamplePoissonInterval(float ratePerSecond)
+    {
+        return SamplePoissonInterval(ratePerSecond, null);
+    }
+
+    public static float SamplePoissonInterval(float ratePerSecond, System.Random? rng)
     {
         if (ratePerSecond <= 0f) return float.MaxValue;
         rng ??= System.Random.Shared;
@@ -141,7 +146,12 @@ public static class DemandPlanner
 
     // Randomly selects apps that receive a demand increase.
     // maxApps: maximum affected apps per event (0 = all).
-    public static List<int> SelectDemandTargets(int totalApps, int maxApps, System.Random? rng = null)
+    public static List<int> SelectDemandTargets(int totalApps, int maxApps)
+    {
+        return SelectDemandTargets(totalApps, maxApps, null);
+    }
+
+    public static List<int> SelectDemandTargets(int totalApps, int maxApps, System.Random? rng)
     {
         rng ??= System.Random.Shared;
         var targets = new List<int>();

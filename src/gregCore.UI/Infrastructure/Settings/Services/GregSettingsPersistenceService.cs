@@ -18,10 +18,18 @@ public class GregSettingsPersistenceService
     private readonly string _settingsFile;
 
     public GregSettingsPersistenceService(
+        IGregLogger logger,
+        GregKeybindRegistry keybindRegistry,
+        GregModSettingsService modSettingsService)
+        : this(logger, keybindRegistry, modSettingsService, null)
+    {
+    }
+
+    public GregSettingsPersistenceService(
         IGregLogger logger, 
         GregKeybindRegistry keybindRegistry, 
         GregModSettingsService modSettingsService,
-        IGregEventBus? eventBus = null)
+        IGregEventBus? eventBus)
     {
         _logger = logger.ForContext("SettingsPersistence");
         _keybindRegistry = keybindRegistry;

@@ -72,9 +72,27 @@ static MemberRow Row(string assembly, TypeDefinition type, string kind, string n
 static bool IsRelevant(TypeDefinition t, string member) => !t.FullName.Contains("UnityEngine", StringComparison.OrdinalIgnoreCase)
     && !t.FullName.Contains("System.", StringComparison.OrdinalIgnoreCase) && !member.StartsWith("<", StringComparison.Ordinal)
     && (t.Namespace.StartsWith("Il2Cpp", StringComparison.OrdinalIgnoreCase) || t.Namespace.StartsWith("DataCenter", StringComparison.OrdinalIgnoreCase));
-static string Domain(string type) { var s=type.ToLowerInvariant(); return s.Contains("player") ? "Player" : s.Contains("network") || s.Contains("server") ? "Network" : s.Contains("save") ? "Save" : s.Contains("ui") ? "UI" : s.Contains("shop") || s.Contains("coin") ? "Economy" : "Gameplay"; }
-static string StableId(MemberRow x) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("|", x.Assembly,x.Type,x.Kind,x.Name,x.Signature)))).ToLowerInvariant()[..16];
-static string SafeName(string s) => new string(s.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant() is { Length: > 0 } v ? v : "unknown";
+static string Domain(string type)
+{
+    var s = type.ToLowerInvariant();
+    if (s.Contains("player")) return "Player";
+    if (s.Contains("network") || s.Contains("server")) return "Network";
+    if (s.Contains("save")) return "Save";
+    if (s.Contains("ui")) return "UI";
+    if (s.Contains("shop") || s.Contains("coin")) return "Economy";
+    return "Gameplay";
+}
+static string StableId(MemberRow x)
+{
+    string raw = string.Join("|", x.Assembly, x.Type, x.Kind, x.Name, x.Signature);
+    return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(raw))).ToLowerInvariant()[..16];
+}
+static string SafeName(string s)
+{
+    string clean = new string(s.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+    if (clean.Length > 0) return clean;
+    return "unknown";
+}
 static string Find(string root, string file, string preferred)
 {
     var p = Path.Combine(root, preferred);
@@ -82,8 +100,22 @@ static string Find(string root, string file, string preferred)
     if (!Directory.Exists(root)) return p;
     return Directory.GetFiles(root, file, SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault() ?? p;
 }
-static void WriteJson<T>(string path,T value) => File.WriteAllText(path, JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented=true }), new UTF8Encoding(false));
-static void WriteCsv(string path,List<MemberRow> rows) { using var w=new StreamWriter(path,false,new UTF8Encoding(false)); w.WriteLine("assembly,type,kind,name,signature,static,visibility,domain,moddingRelevant,risk,exclusionReason"); foreach(var x in rows) w.WriteLine(string.Join(",", new[]{x.Assembly,x.Type,x.Kind,x.Name,x.Signature,x.Static.ToString().ToLowerInvariant(),x.Visibility,x.Domain,x.ModdingRelevant.ToString().ToLowerInvariant(),x.Risk,x.ExclusionReason}.Select(Csv))); static string Csv(string x)=>"\""+x.Replace("\"","\"\"")+"\""; }
+static void WriteJson<T>(string path, T value)
+{
+    string json = JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true });
+    File.WriteAllText(path, json, new UTF8Encoding(false));
+}
+static void WriteCsv(string path, List<MemberRow> rows)
+{
+    using var w = new StreamWriter(path, false, new UTF8Encoding(false));
+    w.WriteLine("assembly,type,kind,name,signature,static,visibility,domain,moddingRelevant,risk,exclusionReason");
+    foreach (var x in rows)
+    {
+        w.WriteLine(string.Join(",", new[] { x.Assembly, x.Type, x.Kind, x.Name, x.Signature, x.Static.ToString().ToLowerInvariant(), x.Visibility, x.Domain, x.ModdingRelevant.ToString().ToLowerInvariant(), x.Risk, x.ExclusionReason }.Select(Csv)));
+    }
+
+    static string Csv(string x) => "\"" + x.Replace("\"", "\"\"") + "\"";
+}
 
 record Args(string? GameRoot,string? Output) { public static Args Parse(string[] a) => new(a.SkipWhile(x=>x!="--game-root").Skip(1).FirstOrDefault(), a.SkipWhile(x=>x!="--output").Skip(1).FirstOrDefault()); }
 record Fingerprint { public string GameBuild{get;init;}="UNKNOWN"; public string UnityVersion{get;init;}="UNKNOWN"; public string MelonLoaderVersion{get;init;}="UNKNOWN"; public string Il2CppInteropVersion{get;init;}="UNKNOWN"; public string AssemblyCSharpSha256{get;init;}=""; public string GameAssemblySha256{get;init;}=""; public string MetadataSha256{get;init;}=""; public string CombinedSha256{get;init;}=""; public Fingerprint(string root,string[] files) { GameBuild=ReadVersion(root); UnityVersion=ProductVersion(root,"UnityPlayer.dll"); MelonLoaderVersion=AssemblyVersion(root,"MelonLoader.dll"); Il2CppInteropVersion=AssemblyVersion(root,"Il2CppInterop.Runtime.dll"); AssemblyCSharpSha256=Hash(files[0]); GameAssemblySha256=Hash(files[1]); MetadataSha256=Hash(files[2]); CombinedSha256=HashText(string.Join("\n",GameBuild,AssemblyCSharpSha256,GameAssemblySha256,MetadataSha256,UnityVersion,MelonLoaderVersion,Il2CppInteropVersion)); } }

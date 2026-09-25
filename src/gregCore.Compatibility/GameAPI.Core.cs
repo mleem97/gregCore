@@ -248,6 +248,7 @@ public partial class GameAPIManager
     // Legacy v7 ABI slots are intentionally inert. Data Center owns Steam,
     // lobby and co-op lifecycle now; gregCore must not open a second session.
     private ulong SteamGetMyIdImpl() => 0;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private IntPtr SteamGetFriendNameImpl(ulong steamId) => IntPtr.Zero;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamCreateLobbyImpl(uint lobbyType, uint maxPlayers) { return 0; }

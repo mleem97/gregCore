@@ -425,7 +425,12 @@ namespace gregCore.UI
             return this;
         }
 
-        public GregPanelBuilder AddSpacer(float height = 20f)
+        public GregPanelBuilder AddSpacer()
+        {
+            return AddSpacer(20f);
+        }
+
+        public GregPanelBuilder AddSpacer(float height)
         {
             if (_contentContainer == null) return this;
 

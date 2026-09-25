@@ -153,7 +153,7 @@ public sealed partial class LuaRepl
             _root.Add(CreateHeader());
             _outputScroll = CreateOutputScroll();
             _root.Add(_outputScroll);
-            _root.Add(CreateInputRow(replScript));
+            _root.Add(CreateInputRow());
             GregUIManager.RegisterPanel("LuaREPL", _root);
         }
         catch (Exception ex)
@@ -245,7 +245,7 @@ public sealed partial class LuaRepl
         };
     }
 
-    private VisualElement CreateInputRow(Script replScript)
+    private VisualElement CreateInputRow()
     {
         var inputRow = new VisualElement
         {

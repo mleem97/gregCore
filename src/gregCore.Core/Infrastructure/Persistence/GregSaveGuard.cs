@@ -73,7 +73,7 @@ public static class GregSaveGuard
     }
 
     public static bool BackupEnabled { get; set; } = true;
-    public static int MaxBackupsPerSave = 3;
+    public static int MaxBackupsPerSave { get; set; } = 3;
     private static bool _optOutWarned;
 
     /// <summary>
@@ -440,7 +440,7 @@ public static class GregSaveGuard
         if (id < 0) return false;
         if (vanillaCount > 0 && id < vanillaCount) return false; // valid vanilla ID
 
-        int target = ResolveVanillaTarget(id, vanillaCount);
+        int target = ResolveVanillaTarget(id);
         if (target < 0 || target == id) return false;
         try { sfd.prefabID = target; } catch { return false; }
         MelonLogger.Warning($"[gregCore][Save] SFP module #{index}: prefabID {id} -> {target} ({phase}, vanilla fallback).");
@@ -459,7 +459,7 @@ public static class GregSaveGuard
         catch { return -1; }
     }
 
-    private static int ResolveVanillaTarget(int customId, int vanillaCount)
+    private static int ResolveVanillaTarget(int customId)
     {
         lock (_vanillaMaps)
         {

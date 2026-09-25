@@ -116,7 +116,7 @@ namespace greg.CommonShop
         private static bool TryGetLowerName(string name, out string lower)
         {
             lower = "";
-            try { lower = name.ToLower(); return true; }
+            try { lower = name.ToLowerInvariant(); return true; }
             catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
     }

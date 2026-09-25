@@ -69,7 +69,7 @@ public static class GoFFIBridge
             _apiTable.log_error = AddDelegate<LogDelegate>(ptr => GregAPI.LogError(Marshal.PtrToStringAnsi(ptr) ?? ""));
             _apiTable.show_notification = AddDelegate<LogDelegate>(ptr => GregAPI.ShowNotification(Marshal.PtrToStringAnsi(ptr) ?? ""));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupPlayer()
@@ -87,7 +87,7 @@ public static class GoFFIBridge
                 x = pos.x; y = pos.y; z = pos.z; ry = pos.y;
             });
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupWorld()
@@ -104,7 +104,7 @@ public static class GoFFIBridge
             _apiTable.dispatch_repair_server = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairServer());
             _apiTable.dispatch_repair_switch = AddDelegate<DispatchDelegate>(() => GregAPI.DispatchRepairSwitch());
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupTime()
@@ -123,7 +123,7 @@ public static class GoFFIBridge
             _apiTable.trigger_save = AddDelegate<DispatchDelegate>(() => { GregAPI.TriggerSave(); return 0; });
             _apiTable.get_difficulty = AddDelegate<GetIntDelegate>(() => GregAPI.GetDifficulty());
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupEvents()
@@ -136,7 +136,7 @@ public static class GoFFIBridge
             });
             _apiTable.fire_event = AddDelegate<EventActionDelegate>((id, data) => GregAPI.FireEvent(((GregEventId)id).ToString(), data));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupHooks()
@@ -146,7 +146,7 @@ public static class GoFFIBridge
             _apiTable.on_hook = AddDelegate<OnHookDelegate>((hookPtr, cbPtr) => OnHookCalled(hookPtr, cbPtr));
             _apiTable.fire_hook = AddDelegate<FireHookDelegate>((hookPtr, jsonPtr) => FireHookCalled(hookPtr, jsonPtr));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void OnHookCalled(IntPtr hookPtr, IntPtr cbPtr)
@@ -157,7 +157,7 @@ public static class GoFFIBridge
             var callback = Marshal.GetDelegateForFunctionPointer<HookActionDelegate>(cbPtr);
             GregAPI.Hooks.On(hookName, payloadObj => InvokeHookCallback(callback, payloadObj));
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void InvokeHookCallback(HookActionDelegate callback, object payloadObj)
@@ -174,11 +174,11 @@ public static class GoFFIBridge
             jPtr = Marshal.StringToHGlobalAnsi(json);
             callback(hPtr, tPtr, jPtr);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         finally
         {
             try { if (hPtr != IntPtr.Zero) Marshal.FreeHGlobal(hPtr); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
-            try { if (tPtr != IntPtr.Zero) Marshal.FreeHGlobal(tPtr); } catch { }
+            try { if (tPtr != IntPtr.Zero) Marshal.FreeHGlobal(tPtr); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             try { if (jPtr != IntPtr.Zero) Marshal.FreeHGlobal(jPtr); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
     }
@@ -193,7 +193,7 @@ public static class GoFFIBridge
             var payload = new gregCore.Sdk.Models.GregPayload(hookName, "GoMod") { Data = data };
             GregAPI.Hooks.Fire(hookName, payload);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void SetupConfig()
@@ -205,7 +205,7 @@ public static class GoFFIBridge
             _apiTable.config_get_bool = AddDelegate<ConfigGetBoolDelegate>((modId, key, def) =>
                 GregAPI.ConfigGetBool(Marshal.PtrToStringAnsi(modId) ?? "unknown", Marshal.PtrToStringAnsi(key) ?? "unknown", def > 0) ? 1u : 0u);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static IntPtr AddDelegate<T>(T del) where T : Delegate

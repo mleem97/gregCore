@@ -216,6 +216,8 @@ public partial class GameAPIManager
             case 4: // PatchPanelId
                 if (TrySetPatchPanelId(ptr, newValue)) return 1;
                 break;
+            default:
+                break;
         }
         return 0;
     }

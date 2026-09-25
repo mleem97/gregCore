@@ -371,6 +371,16 @@ public static class RustFFIBridge
             h.Add(config_set_string); h.Add(config_get_string);
             return h.ToHashCode();
         }
+
+        public static bool operator ==(GregCoreAPI left, GregCoreAPI right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GregCoreAPI left, GregCoreAPI right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     class RustPlugin

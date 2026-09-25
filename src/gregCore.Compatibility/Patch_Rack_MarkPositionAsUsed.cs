@@ -10,7 +10,7 @@ namespace DataCenterModLoader;
 [HarmonyPatch(typeof(Rack), nameof(Rack.MarkPositionAsUsed))]
 internal static class Patch_Rack_MarkPositionAsUsed
 {
-    internal static bool SuppressEvents = false;
+    internal static bool SuppressEvents { get; set; } = false;
     internal static Dictionary<int, (string objectId, byte objectType)> PendingRestores = new();
     internal static Dictionary<int, (string objectId, byte objectType)> InstalledObjects = new();
 
@@ -99,7 +99,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
             if (positions == null || index < 0 || index >= positions.Count) return null;
             return positions[index];
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     private static bool IdentifyInstalledObject(int rackPosUid, out string objectId, out byte objectType)
@@ -151,7 +151,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                     return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
         objectId = null!;
         objectType = 0;
@@ -172,7 +172,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                     return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
         objectId = null!;
         objectType = 0;
@@ -193,7 +193,7 @@ internal static class Patch_Rack_MarkPositionAsUsed
                     return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
         objectId = null!;
         objectType = 0;

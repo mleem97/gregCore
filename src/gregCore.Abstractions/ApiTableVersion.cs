@@ -8,5 +8,5 @@ namespace gregCore.Core.Models;
 
 public static class ApiTableVersion
 {
-    public const int Current = 12;
+    public static int Current { get; } = 12;
 }

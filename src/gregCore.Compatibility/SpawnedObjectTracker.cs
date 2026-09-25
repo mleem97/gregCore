@@ -10,7 +10,7 @@ namespace DataCenterModLoader;
 internal static class SpawnedObjectTracker
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S2386:Mutable fields should not be declared public", Justification = "Harmony cross-patch coordination flag: written and read by cooperating patch classes in the same assembly (see usages). Must stay mutable.")]
-    internal static bool SuppressEvents = false;
+    internal static bool SuppressEvents { get; set; } = false;
 
     private static readonly HashSet<int> _knownInstances = new();
     private static readonly HashSet<string> _knownIds = new();
@@ -62,7 +62,7 @@ internal static class SpawnedObjectTracker
             CrashLog.Log($"[WorldSync] DetectNewObjects: new object '{objectId}' type={objectType} prefab={prefabId} pos=({pos.x:F1},{pos.y:F1},{pos.z:F1})");
             EventDispatcher.FireObjectSpawned(objectId, objectType, prefabId, pos, rot);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool TryResolveNewServer(UsableObject uo, int instId,
@@ -91,12 +91,12 @@ internal static class SpawnedObjectTracker
             server.ServerID = objectId;
             return objectId;
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static byte ReadServerType(Server server)
     {
-        try { return (byte)server.serverType; } catch { return 0; }
+        try { return (byte)server.serverType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return 0; }
     }
 
     private static bool TryResolveNewSwitch(UsableObject uo,
@@ -125,7 +125,7 @@ internal static class SpawnedObjectTracker
             sw.switchId = objectId;
             return objectId;
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static int FindSwitchPrefabIndex(NetworkSwitch sw)
@@ -137,10 +137,10 @@ internal static class SpawnedObjectTracker
             string swName = StripCloneSuffix(sw.gameObject?.name ?? "");
             for (int i = 0; i < mgr.switchesPrefabs.Count; i++)
             {
-                try { if (mgr.switchesPrefabs[i]?.name == swName) return i; } catch { }
+                try { if (mgr.switchesPrefabs[i]?.name == swName) return i; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return 0;
     }
 
@@ -151,7 +151,7 @@ internal static class SpawnedObjectTracker
             if (name.EndsWith("(Clone)")) name = name.Substring(0, name.Length - 7);
             return name;
         }
-        catch { return name; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return name; }
     }
 
     private static bool TryResolveNewPatchPanel(UsableObject uo,
@@ -180,7 +180,7 @@ internal static class SpawnedObjectTracker
             pp.patchPanelId = objectId;
             return objectId;
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static int ResolvePanelPrefab(PatchPanel pp)
@@ -192,7 +192,7 @@ internal static class SpawnedObjectTracker
             var prefabGo = mgr.GetPatchPanelPrefab(pp.patchPanelType);
             if (prefabGo != null) return pp.patchPanelType;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return 0;
     }
 
@@ -221,7 +221,7 @@ internal static class SpawnedObjectTracker
             string id = ReadKnownId(uo);
             if (!string.IsNullOrEmpty(id)) _knownIds.Add(id);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static string ReadKnownId(UsableObject uo)
@@ -232,7 +232,7 @@ internal static class SpawnedObjectTracker
             var sw = uo.TryCast<NetworkSwitch>(); if (sw != null) return sw.switchId ?? "";
             var pp = uo.TryCast<PatchPanel>(); if (pp != null) return pp.patchPanelId ?? "";
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return "";
     }
 

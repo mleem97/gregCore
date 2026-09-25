@@ -11,7 +11,7 @@ namespace gregCore.Bridge.CSharpScript;
 /// <summary>
 /// Orchestrates discovery, compilation, and lifecycle of C# script mods.
 /// </summary>
-public sealed class GregCSharpScriptBridge
+public static class GregCSharpScriptBridge
 {
     private static readonly List<GregCSharpModContext> _mods = new();
     private static bool _initialized;

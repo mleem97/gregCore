@@ -265,6 +265,7 @@ public static partial class GregEntityInventory
     /// (key + hint) wins, otherwise hint repair across the whole list,
     /// otherwise a new UID. Prevents UID churn on list rebuild.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Reserved for the hint-repair pass (persisted UID hints across list rebuilds, see FreshData.Hints). Intentionally unwired until GregEntityInventoryCollect enables it.")]
     private static string ResolvePersistedUid(InventoryKind kind, string nativeKey, string hint,
         Dictionary<string, string> hints, HashSet<string> usedUids)
     {

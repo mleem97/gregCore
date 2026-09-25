@@ -16,7 +16,7 @@ namespace DataCenterModLoader;
 internal static class Patch_UsableObject_InteractOnClick
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S2386:Mutable fields should not be declared public", Justification = "Harmony cross-patch coordination flag: written and read by cooperating patch classes in the same assembly (see usages). Must stay mutable.")]
-    internal static bool SuppressEvents = false;
+    internal static bool SuppressEvents { get; set; } = false;
 
     [ThreadStatic] private static int _prevNumObjects;
     [ThreadStatic] private static int _prevObjectInHand;

@@ -420,6 +420,8 @@ public static partial class ModConfigSystem
                     case ConfigEntryType.Float:
                         sb.Append($"    \"{escapedKey}\": {{ \"type\": \"float\", \"value\": {entry.FloatValue.ToString(System.Globalization.CultureInfo.InvariantCulture)} }}");
                         break;
+                    default:
+                        break;
                 }
             }
 

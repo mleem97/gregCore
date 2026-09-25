@@ -213,8 +213,10 @@ public static partial class EntityManager
     {
         if (entity.AnimParamsDiscovered) return;
         if (entity.Animator == null)
+        {
             entity.Animator = entity.GO.GetComponentInChildren<Animator>();
-        if (entity.Animator == null) return;
+            if (entity.Animator == null) return;
+        }
 
         entity.Animator.applyRootMotion = false;
         try

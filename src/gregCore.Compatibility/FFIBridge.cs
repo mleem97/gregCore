@@ -139,7 +139,7 @@ public class FFIBridge : IDisposable
             if (handle == IntPtr.Zero)
             {
                 var error = Marshal.GetLastWin32Error();
-                throw new Exception($"LoadLibrary failed with error code {error}");
+                throw new InvalidOperationException($"LoadLibrary failed with error code {error}");
             }
             CrashLog.Log($"LoadMod: LoadLibrary succeeded for '{fileName}', handle=0x{handle.ToInt64():X}");
             return handle;

@@ -20,10 +20,10 @@ namespace gregCore.Lang;
 public static class LangCodes
 {
     /// <summary>Fallback language. Every mod must ship <c>en.json</c>.</summary>
-    public const string Fallback = "en";
+    public static string Fallback { get; } = "en";
 
     /// <summary>Preference value that selects the system language.</summary>
-    public const string Auto = "auto";
+    public static string Auto { get; } = "auto";
 
     private static readonly Dictionary<string, string> SystemNameToCode =
         new(StringComparer.OrdinalIgnoreCase)

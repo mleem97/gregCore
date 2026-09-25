@@ -107,7 +107,7 @@ public static partial class CustomEmployeeManager
                 fallbackRaw.color = new Color(0.0f, 0.6f, 0.7f, 1f);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static bool TryResolvePortraitPath(string employeeId, out string? imagePath)
@@ -145,7 +145,7 @@ public static partial class CustomEmployeeManager
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return true;
     }
 
@@ -180,7 +180,7 @@ public static partial class CustomEmployeeManager
             if (contentGrid == null) contentGrid = hr.transform.Find("Grid")!;
             return contentGrid;
         }
-        catch { return null!; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null!; }
     }
 
     private static void RefreshGridCards(Transform contentGrid)
@@ -193,7 +193,7 @@ public static partial class CustomEmployeeManager
                 if (cardTransform != null) UpdateCard(cardTransform, entry);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void LogHierarchy(Transform t, int depth)
@@ -205,7 +205,7 @@ public static partial class CustomEmployeeManager
             LogHierarchyNode(t, depth);
             LogHierarchyChildren(t, depth);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         if (depth == 0) CrashLog.Log("=== end hierarchy dump ===");
     }
 
@@ -224,7 +224,7 @@ public static partial class CustomEmployeeManager
             string compsStr = CollectComponentNames(t);
             CrashLog.Log($"{indent}{t.name}{activeFlag}{compsStr}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static string CollectComponentNames(Transform t)
@@ -241,11 +241,11 @@ public static partial class CustomEmployeeManager
                     var comp = components[i];
                     if (comp != null) compNames.Add(comp.GetIl2CppType().Name);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             return compNames.Count > 0 ? " [" + string.Join(", ", compNames) + "]" : "";
         }
-        catch { return ""; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static void LogHierarchyChildren(Transform t, int depth)
@@ -254,9 +254,9 @@ public static partial class CustomEmployeeManager
         {
             for (int i = 0; i < t.childCount; i++)
             {
-                try { LogHierarchy(t.GetChild(i), depth + 1); } catch { }
+                try { LogHierarchy(t.GetChild(i), depth + 1); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

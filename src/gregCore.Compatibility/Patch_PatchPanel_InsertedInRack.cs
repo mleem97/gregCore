@@ -23,15 +23,15 @@ internal static class Patch_PatchPanel_InsertedInRack
 
     private static string ReadPanelId(PatchPanel? instance)
     {
-        try { return instance?.patchPanelId ?? ""; } catch { return ""; }
+        try { return instance?.patchPanelId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return ""; }
     }
 
     private static int ResolveRackUid(PatchPanel? instance, PatchPanelSaveData? save)
     {
         int rackPosUid = -1;
-        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { }
-        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { }
-        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { }
+        try { rackPosUid = instance?.currentRackPosition?.rackPosGlobalUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        if (rackPosUid <= 0) try { rackPosUid = instance?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+        if (rackPosUid <= 0) try { rackPosUid = save?.rackPositionUID ?? -1; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return rackPosUid;
     }
 
@@ -44,7 +44,7 @@ internal static class Patch_PatchPanel_InsertedInRack
             ApplyRestoredId(instance, rackPosUid, currentId, pending.Value.objectId, "restored clone ID");
             return true;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     private static void TryRestoreInstalled(PatchPanel? instance, int rackPosUid, string currentId)
@@ -63,10 +63,10 @@ internal static class Patch_PatchPanel_InsertedInRack
         try
         {
             if (string.IsNullOrEmpty(stableId) || currentId == stableId) return;
-            try { if (instance != null) instance.patchPanelId = stableId; } catch { }
-            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { }
+            try { if (instance != null) instance.patchPanelId = stableId; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { if (instance != null) instance.rackPositionUID = rackPosUid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             CrashLog.Log($"[WorldSync] PatchPanel.InsertedInRack: {label} '{currentId}' → '{stableId}' rackUid={rackPosUid}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 }

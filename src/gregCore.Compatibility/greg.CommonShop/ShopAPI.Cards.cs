@@ -13,7 +13,7 @@ namespace greg.CommonShop
         /// cart API is unavailable on this game build. Keeps vanilla buy,
         /// checkout and stacking intact; adds visuals plus notify-only OnBuy.
         /// </summary>
-        private static void CreateShopCardLegacy(ComputerShop shop, Transform container, ShopItem template, CustomShopItem data)
+        private static void CreateShopCardLegacy(Transform container, ShopItem template, CustomShopItem data)
         {
             try
             {

@@ -88,7 +88,7 @@ public static partial class GregNetworkDeviceSaves
 
     public sealed class CableEndpoint
     {
-        public string Type = "";
+        public string Type { get; set; } = "";
         public Vector3 Position { get; set; }
         public int CustomerID { get; set; }
         public string SwitchID { get; set; } = "";

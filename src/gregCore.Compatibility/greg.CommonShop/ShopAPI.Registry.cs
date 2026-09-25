@@ -20,7 +20,7 @@ namespace greg.CommonShop
         private static bool IsVanillaTemplateType(CustomShopItem item)
         {
             try { return Enum.IsDefined(typeof(PlayerManager.ObjectInHand), item.TemplateType); }
-            catch { return true; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return true; }
         }
 
         private static bool TryValidateExistingClaim(int customId, string modName)
@@ -39,8 +39,8 @@ namespace greg.CommonShop
                 }
                 return true;
             }
-            catch (InvalidOperationException) { throw; }
-            catch { return false; }
+            catch (InvalidOperationException) { throw; } /* ignored: defensive best-effort (CONVENTIONS.md) */
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static string GetClaimField(Dictionary<string, string> entry, string key, string fallback)
@@ -49,7 +49,7 @@ namespace greg.CommonShop
             {
                 if (entry != null && entry.TryGetValue(key, out var v)) return v;
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return fallback;
         }
 
@@ -65,7 +65,7 @@ namespace greg.CommonShop
                 SaveIDRegistry();
                 _log.Msg($"Registered new custom ID [{customId}] to mod '{modName}' for '{item.Name}'.");
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void LoadIDRegistry()
@@ -81,7 +81,7 @@ namespace greg.CommonShop
                 if (TryLoadCurrentFormat(jsonString)) return;
                 TryLoadLegacyFormat(jsonString);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static bool TryMigrateLegacyRegistry(string path)
@@ -94,10 +94,10 @@ namespace greg.CommonShop
                     Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                     File.Copy(LegacyRegistryFilePath, path, overwrite: false);
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static bool TryLoadCurrentFormat(string jsonString)
@@ -109,7 +109,7 @@ namespace greg.CommonShop
                 _log.Msg($"Loaded {_usedCustomIDs.Count} claimed custom IDs from registry.");
                 return true;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
 
         private static void TryLoadLegacyFormat(string jsonString)

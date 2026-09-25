@@ -120,7 +120,8 @@ public static class GregDirectoryPolicy
                 try
                 {
                     if (type.IsInterface || type.IsAbstract) continue;
-                    for (var b = type.BaseType; b != null;)
+                    var b = type.BaseType;
+                    while (b != null)
                     {
                         string name = null;
                         try { name = b.FullName; } catch { break; }

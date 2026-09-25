@@ -38,7 +38,7 @@ public static class GregShopItems
 
     public static void UnregisterPrefab(int itemId)
     {
-        try { lock (_resolvers) { _resolvers.Remove(itemId); } } catch { }
+        try { lock (_resolvers) { _resolvers.Remove(itemId); } } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     public static bool TryGetBaseId(int itemId, out int baseItemId)
@@ -55,7 +55,7 @@ public static class GregShopItems
                 }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return false;
     }
 
@@ -70,10 +70,10 @@ public static class GregShopItems
                 _resolvers.TryGetValue(itemId, out r);
             }
             if (r?.Resolve == null) return false;
-            try { prefab = r.Resolve(); } catch { prefab = null; }
+            try { prefab = r.Resolve(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  prefab = null; }
             return prefab != null;
         }
-        catch { return false; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
     }
 
     // ── Shop structure lookup ────────────────────────────────────────────────
@@ -90,11 +90,11 @@ public static class GregShopItems
             {
                 if (si == null || si.shopItemSO == null) continue;
                 int t = 0;
-                try { t = (int)si.shopItemSO.itemType; } catch { continue; }
+                try { t = (int)si.shopItemSO.itemType; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  continue; }
                 if (t == (int)itemType) return si;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return null;
     }
 
@@ -112,11 +112,11 @@ public static class GregShopItems
                     var section = parent.transform.Find(sectionName);
                     if (section != null) return section.gameObject;
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             }
             return parent;
         }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
     }
 
     // ── Button dedup + creation ──────────────────────────────────────────────
@@ -147,20 +147,20 @@ public static class GregShopItems
                 if (ChildHasGuid(tr, i, guid)) return true;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         return false;
     }
 
     private static bool ChildHasGuid(Transform tr, int index, string guid)
     {
         GameObject child = null;
-        try { child = tr.GetChild(index)?.gameObject; } catch { return false; }
+        try { child = tr.GetChild(index)?.gameObject; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         if (child == null) return false;
         global::Il2Cpp.ShopItem si = null;
-        try { si = child.GetComponent<global::Il2Cpp.ShopItem>(); } catch { return false; }
+        try { si = child.GetComponent<global::Il2Cpp.ShopItem>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         if (si == null) return false;
         string g = null;
-        try { g = si.guid; } catch { return false; }
+        try { g = si.guid; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         return string.Equals(g, guid, StringComparison.Ordinal);
     }
 
@@ -206,7 +206,7 @@ public static class GregShopItems
     {
         GameObject cloned = null;
         try { cloned = UnityEngine.Object.Instantiate(spec.Template.gameObject, spec.Parent.transform, false); }
-        catch { return null; }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return null; }
         if (cloned == null) return null;
         Try(() => cloned.name = "ShopItem_" + spec.Label.Replace(" ", "_").Replace("(", "").Replace(")", ""));
         Try(() => cloned.transform.localPosition = Vector3.zero);
@@ -218,10 +218,10 @@ public static class GregShopItems
         global::Il2Cpp.ShopItemSO so, ShopButtonSpec spec)
     {
         global::Il2Cpp.ShopItem item = null;
-        try { item = cloned.GetComponent<global::Il2Cpp.ShopItem>(); } catch { }
+        try { item = cloned.GetComponent<global::Il2Cpp.ShopItem>(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         if (item == null)
         {
-            try { UnityEngine.Object.Destroy(cloned); } catch { }
+            try { UnityEngine.Object.Destroy(cloned); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null;
         }
         Try(() => item.shopItemSO = so);

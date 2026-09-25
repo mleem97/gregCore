@@ -37,6 +37,16 @@ public struct GameApiTable : IEquatable<GameApiTable>
     {
         return HashCode.Combine(GetVersion, RegisterEventHandler, SendNetworkMessage);
     }
+
+    public static bool operator ==(GameApiTable left, GameApiTable right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(GameApiTable left, GameApiTable right)
+    {
+        return !left.Equals(right);
+    }
 }
 
 public static class ApiTableGuard

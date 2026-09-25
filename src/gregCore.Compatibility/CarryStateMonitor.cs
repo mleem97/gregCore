@@ -58,7 +58,7 @@ internal static class CarryStateMonitor
             if ((now - _suppressTick) > System.Diagnostics.Stopwatch.Frequency / 2)
                 _suppressNextDrop = false;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     private static void CheckDropTransition(int curNumObjects, int curObjectInHand)
@@ -71,7 +71,7 @@ internal static class CarryStateMonitor
             _suppressNextDrop = false;
             Patch_UsableObject_InteractOnClick.ClearHeldObject();
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
     }
 
     internal static void Reset()

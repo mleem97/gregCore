@@ -3,6 +3,7 @@ using System.IO;
 
 namespace gregCore.GameLayer.Hooks
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1118:Utility classes should not have public constructors", Justification = "Partial declaration holding only static helpers; instance members live in GregDynamicHookPatcher.cs.")]
     public sealed partial class GregDynamicHookPatcher
     {
         // Resolves the game root from the manifest directory (two levels up).

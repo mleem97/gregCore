@@ -151,7 +151,7 @@ public static class GregCustomers
         if (cb == null || string.IsNullOrWhiteSpace(ip)) return false;
         try
         {
-            var _ = cb.gameObject; // liveness
+            _ = cb.gameObject; // liveness
             return cb.IsIPPresent(ip);
         }
         catch { return false; }
@@ -162,7 +162,7 @@ public static class GregCustomers
         if (cb == null || string.IsNullOrWhiteSpace(ip)) return -1;
         try
         {
-            var _ = cb.gameObject; // liveness
+            _ = cb.gameObject; // liveness
             return cb.GetAppIDForIP(ip);
         }
         catch { return -1; }
@@ -187,7 +187,7 @@ public static class GregCustomers
         catch { arr = null; }
         try
         {
-            var _ = cb.gameObject; // liveness
+            _ = cb.gameObject; // liveness
             return cb.TryRegisterRoutedSubnet(targetVlanId, routeKey, arr);
         }
         catch (Exception ex)
@@ -202,7 +202,7 @@ public static class GregCustomers
         if (cb == null || string.IsNullOrEmpty(routeKey)) return false;
         try
         {
-            var _ = cb.gameObject; // liveness
+            _ = cb.gameObject; // liveness
             cb.TryUnregisterRoutedSubnet(routeKey);
             return true;
         }
@@ -223,7 +223,7 @@ public static class GregCustomers
         if (data == null) return false;
         try
         {
-            var _ = cb.gameObject; // liveness
+            _ = cb.gameObject; // liveness
             cb.LoadData(data);
             return true;
         }
@@ -241,7 +241,7 @@ public static class GregCustomers
         if (card == null || item == null) return false;
         try
         {
-            var _ = card.gameObject; // liveness
+            _ = card.gameObject; // liveness
             card.SetCustomer(item);
             return true;
         }

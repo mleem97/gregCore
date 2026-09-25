@@ -41,7 +41,7 @@ public static class GregShop
         public string ItemType { get; set; } = "";
         public int Quantity { get; set; } = 1;
         public int TotalPrice { get; set; }
-        public Color ItemColor = Color.white;
+        public Color ItemColor { get; set; } = Color.white;
         public bool HasCustomColor;
     }
 

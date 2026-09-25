@@ -91,12 +91,12 @@ public partial class GameAPIManager
 
     private static bool _netWatchEnabled;
 
-    private void SetNetWatchEnabledImpl(uint value)
+    private static void SetNetWatchEnabledImpl(uint value)
     {
         _netWatchEnabled = value != 0;
     }
 
-    private uint IsNetWatchEnabledImpl() { return _netWatchEnabled ? 1u : 0u; }
+    private static uint IsNetWatchEnabledImpl() { return _netWatchEnabled ? 1u : 0u; }
     private uint GetNetWatchStatsImpl() { return 0; }
 
 
@@ -251,6 +251,7 @@ public partial class GameAPIManager
     private IntPtr SteamGetFriendNameImpl(ulong steamId) => IntPtr.Zero;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamCreateLobbyImpl(uint lobbyType, uint maxPlayers) { return 0; }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamJoinLobbyImpl(ulong lobbyId) { return 0; }
     private void SteamLeaveLobbyImpl() { /* Intentionally inert: native Data Center owns lobby callbacks. */ }
     private ulong SteamGetLobbyIdImpl() { return 0; }
@@ -258,7 +259,9 @@ public partial class GameAPIManager
     private uint SteamGetLobbyMemberCountImpl() { return 0; }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private ulong SteamGetLobbyMemberByIndexImpl(uint index) { return 0; }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private int SteamSetLobbyDataImpl(IntPtr key, IntPtr value) { return 0; }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]
     private IntPtr SteamGetLobbyDataImpl(IntPtr key) { return IntPtr.Zero; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "S1172:Unused method parameters should be removed", Justification = "Native FFI delegate signature is fixed by the C ABI (see GameAPI.Bind.cs). Parameter intentionally unused in this inert stub.")]

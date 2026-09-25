@@ -45,7 +45,7 @@ namespace greg.CommonShop
                         i.TemplateType == p.TemplateType &&
                         Nullable.Equals(i.BackgroundColor, p.BackgroundColor)))).ToList();
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return items;
         }
 
@@ -57,7 +57,7 @@ namespace greg.CommonShop
                 foreach (var catGroup in categoryGroups)
                     InjectCategoryGroup(shop, catGroup, ctx);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void InjectCategoryGroup(ComputerShop shop, IGrouping<string, CustomShopItem> catGroup, InjectionContext ctx)
@@ -69,7 +69,7 @@ namespace greg.CommonShop
                 foreach (var subGroup in subGroups)
                     InjectSubGroup(shop, mainCategory, subGroup.Key, subGroup, ctx);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void InjectSubGroup(ComputerShop shop, string mainCategory, string subCategory, IEnumerable<CustomShopItem> items, InjectionContext ctx)
@@ -83,7 +83,7 @@ namespace greg.CommonShop
                     InjectSingleItem(shop, container, data, ctx);
                 ctx.Grids.Add(container);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void ClearModCards(Transform container)
@@ -97,10 +97,10 @@ namespace greg.CommonShop
                         if (container.GetChild(i).name.StartsWith("ModCard_"))
                             Object.DestroyImmediate(container.GetChild(i).gameObject);
                     }
-                    catch { }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void InjectSingleItem(ComputerShop shop, Transform container, CustomShopItem data, InjectionContext ctx)
@@ -120,9 +120,9 @@ namespace greg.CommonShop
                     ctx.UsedTemplates.Add(template);
                     TryApplyLocked(data, card);
                 }
-                else CreateShopCardLegacy(shop, container, template, data);
+                else CreateShopCardLegacy(container, template, data);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void TryApplyLocked(CustomShopItem data, GameObject card)
@@ -132,25 +132,25 @@ namespace greg.CommonShop
                 if (gregCore.Core.Mods.GregCustomItemPresets.IsLocked(data.Name))
                     ShopCard.ApplyLocked(card);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void FinalizeInjection(ComputerShop shop, InjectionContext ctx)
         {
-            try { RebuildShopLayout(shop); } catch { }
+            try { RebuildShopLayout(shop); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             try
             {
                 foreach (var template in ctx.UsedTemplates)
                     RestoreTemplateButton(template);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             try
             {
                 foreach (var grid in ctx.Grids)
                     ShopUI.FixGridHeight(grid);
             }
-            catch { }
-            try { ShopUI.UpdateLayoutHeight(shop); } catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            try { ShopUI.UpdateLayoutHeight(shop); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static void RebuildShopLayout(ComputerShop shop)
@@ -160,10 +160,10 @@ namespace greg.CommonShop
                 var sr = shop.shopItemParent.GetComponentInParent<ScrollRect>();
                 if (sr?.content != null)
                 {
-                    try { LayoutRebuilder.ForceRebuildLayoutImmediate(sr.content); } catch { }
+                    try { LayoutRebuilder.ForceRebuildLayoutImmediate(sr.content); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
         }
 
         private static ShopItem FindTemplateWithFallback(ComputerShop shop, CustomShopItem data)
@@ -186,7 +186,7 @@ namespace greg.CommonShop
                         return vanillaItem;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
@@ -200,7 +200,7 @@ namespace greg.CommonShop
                     return shop.shopItems[0];
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return null!;
         }
 
@@ -218,7 +218,7 @@ namespace greg.CommonShop
                     try { cap.ButtonBuyItem(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
                 }));
             }
-            catch { /* best-effort: vanilla card keeps previous wiring */ }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  /* best-effort: vanilla card keeps previous wiring */ }
         }
 
         private static bool HasExternalModConflict(ComputerShop shop, CustomShopItem data)
@@ -234,7 +234,7 @@ namespace greg.CommonShop
                     if (IsSameResultItem(uiItem, data, targetID)) return true;
                 }
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
             return false;
         }
 
@@ -246,7 +246,7 @@ namespace greg.CommonShop
                     uiItem.shopItemSO.itemType == data.TemplateType &&
                     uiItem.shopItemSO.itemID == targetID;
             }
-            catch { return false; }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  return false; }
         }
     }
 }

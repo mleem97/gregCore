@@ -66,16 +66,39 @@ built-in node — move to a dedicated agent/VM later). Required tooling:
    repository `mleem97/gregCore`, Behaviours: *Discover branches* + *Discover
    pull requests from origin*. The `Jenkinsfile` at repo root is picked up
    automatically.
-2. **Webhook limitation (important):** Jenkins sits on a LAN IP
-   (`192.168.178.129`), which github.com cannot reach — a classic webhook
-   will never fire. Pick one:
-   - (a) **SCM polling:** Multibranch → *Scan Multibranch Pipeline Triggers*
-     → *Periodically if not otherwise run* (e.g. every 15 min), or
-   - (b) **Relay:** `smee.io` channel + local `smee-client` forwarding to
-     `http://192.168.178.129:8080/github-webhook/`, webhook URL = smee URL, or
-   - (c) Give Jenkins a public route (Tailscale Funnel / reverse proxy with
-     a `github-webhook/` path) and register a standard GitHub webhook.
-   Recommendation: start with (a), move to (c) once stable.
+2. **Webhook (empfohlen): cloudflared-Tunnel (Zero Trust).** Jenkins und
+   Mantis hängen im LAN und bekommen je einen öffentlichen Hostnamen,
+   SonarQube bleibt bewusst LAN-only (Jenkins→SonarQube läuft
+   Server-zu-Server; SonarQubes PR-Decoration nach GitHub ist outbound
+   und braucht kein Inbound):
+   ```bash
+   # einmalig (Account mit Domain in Cloudflare Zero Trust):
+   cloudflared tunnel login
+   cloudflared tunnel create homelab
+   cloudflared tunnel route dns homelab jenkins.example.com
+   cloudflared tunnel route dns homelab mantis.example.com
+   # ~/.cloudflared/config.yml:
+   # tunnel: homelab
+   # ingress:
+   #   - hostname: jenkins.example.com
+   #     service: http://192.168.178.129:8080
+   #   - hostname: mantis.example.com
+   #     service: http://192.168.178.127:80
+   #   - service: http_status:404
+   cloudflared service install && systemctl enable --now cloudflared
+   ```
+   Danach: Jenkins → Manage → System → **Jenkins URL** =
+   `https://jenkins.example.com` (sonst zeigen Status-Links und Mantis-
+   Tickets auf die LAN-Adresse). GitHub-Webhook =
+   `https://jenkins.example.com/github-webhook/` (Events: push + pull
+   request; der `/github-webhook/`-Endpoint braucht kein CSRF-Crumb).
+   Mantis: `config_inc.php` → `$g_path =
+   'https://mantis.example.com/';` und `$g_allow_signup = OFF;`
+   (Signup aus, HTTPS kommt von Cloudflare Edge, Jenkins→Mantis läuft
+   weiter über die LAN-URL im `Jenkinsfile`).
+3. **Fallbacks ohne Tunnel:** (a) Multibranch → *Scan → Periodically if
+   not otherwise run* (alle 15 Min), (b) `smee.io`-Relay auf
+   `http://192.168.178.129:8080/github-webhook/`.
 3. The pipeline publishes checks named **`tests`**, **`build-linux`**,
    **`docs`** via the Checks API — exactly the names branch protection
    should require (see section 6). PR builds additionally get the standard

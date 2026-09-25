@@ -136,7 +136,7 @@ public static class GregModHub
     public static void PollClicks()
     {
         if (!_open || _clickables.Count == 0) return;
-        try { GregClickRouter.RouteClicks(_clickables, ref _lastRealClickUtc); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+        try { GregClickRouter.RouteClicks(_clickables, _lastRealClickUtc); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void Rebuild()

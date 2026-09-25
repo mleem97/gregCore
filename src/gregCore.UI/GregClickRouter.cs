@@ -22,7 +22,7 @@ namespace gregCore.UI
         // One click pass. Returns true if an action fired.
         // lastRealClickUtc: mod sets it on real callbacks; routing
         // stays silent for 500ms afterwards (dedup).
-        public static bool RouteClicks(List<Clickable> clickables, ref DateTime lastRealClickUtc)
+        public static bool RouteClicks(List<Clickable> clickables, DateTime lastRealClickUtc)
         {
             if (clickables == null || clickables.Count == 0) return false;
             try

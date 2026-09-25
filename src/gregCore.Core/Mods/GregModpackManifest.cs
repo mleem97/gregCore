@@ -94,7 +94,7 @@ public sealed class GregModpackManifest
                     result.LibraryFolders.Add(dir);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return result;
     }
 

@@ -63,7 +63,7 @@ namespace greg.UI.Settings
                 if (byMenu != null) return byMenu;
                 return FindTabByLabel(modName);
             }
-            catch { }
+            catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             return null;
         }
 

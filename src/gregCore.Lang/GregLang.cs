@@ -24,7 +24,7 @@ namespace gregCore.Lang;
 public static class GregLang
 {
     /// <summary>Mod id of gregCore's own table (<c>Mods/Data/gregCore/</c>).</summary>
-    public const string CoreModId = "gregCore";
+    public static string CoreModId { get; } = "gregCore";
 
     private static readonly object Gate = new();
     private static GregLangStore _store;

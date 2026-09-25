@@ -11,7 +11,7 @@ namespace gregCore.Infrastructure.IO;
 
 public static class GregDeactivatedGuard
 {
-    public const string DeactivatedFolderName = ".deactivated";
+    public static string DeactivatedFolderName { get; } = ".deactivated";
 
     /// <summary>
     /// True when any path segment equals `.deactivated` (case-insensitive).

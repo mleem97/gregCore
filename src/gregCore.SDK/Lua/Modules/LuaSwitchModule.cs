@@ -198,11 +198,11 @@ public static class LuaSwitchModule
             if (sw == null) return null;
             var info = new Table(script);
             string id = "";
-            try { id = sw.switchId ?? ""; } catch { }
+            try { id = sw.switchId ?? ""; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             info["id"] = string.IsNullOrEmpty(id) ? sw.GetHashCode().ToString() : id;
             info["hash"] = sw.GetHashCode();
-            try { info["is_on"] = sw.isOn; } catch { }
-            try { info["is_broken"] = sw.isBroken; } catch { }
+            try { info["is_on"] = sw.isOn; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+            try { info["is_broken"] = sw.isBroken; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             try
             {
                 var pos = sw.transform != null ? sw.transform.position : UnityEngine.Vector3.zero;

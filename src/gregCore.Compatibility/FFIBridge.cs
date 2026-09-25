@@ -212,7 +212,7 @@ public class FFIBridge : IDisposable
             _logger.Msg($"  Mod: {mod.Name} v{mod.Version} by {mod.Author}");
             _logger.Msg($"  Description: {description}");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static string PtrToString(IntPtr ptr, string fallback)
@@ -255,7 +255,7 @@ public class FFIBridge : IDisposable
                 ModConfigSystem.SetModInfo(mod.Id, mod.Author, mod.Version);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void ResolveOptional(RustMod mod, IntPtr handle)
@@ -267,7 +267,7 @@ public class FFIBridge : IDisposable
             ResolveShutdown(mod, handle);
             ResolveEvent(mod, handle);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void ResolveUpdate(RustMod mod, IntPtr handle)
@@ -283,7 +283,7 @@ public class FFIBridge : IDisposable
             if (fixedUpdatePtr != IntPtr.Zero)
                 mod.FixedUpdate = Marshal.GetDelegateForFunctionPointer<ModUpdateDelegate>(fixedUpdatePtr);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void ResolveScene(RustMod mod, IntPtr handle)
@@ -295,7 +295,7 @@ public class FFIBridge : IDisposable
             if (sceneLoadedPtr != IntPtr.Zero)
                 mod.OnSceneLoaded = Marshal.GetDelegateForFunctionPointer<ModOnSceneLoadedDelegate>(sceneLoadedPtr);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void ResolveShutdown(RustMod mod, IntPtr handle)
@@ -307,7 +307,7 @@ public class FFIBridge : IDisposable
             if (shutdownPtr != IntPtr.Zero)
                 mod.Shutdown = Marshal.GetDelegateForFunctionPointer<ModShutdownDelegate>(shutdownPtr);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void ResolveEvent(RustMod mod, IntPtr handle)
@@ -322,7 +322,7 @@ public class FFIBridge : IDisposable
                 _logger.Msg($"  Mod '{mod.Name}' supports game events.");
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public void OnUpdate(float deltaTime)

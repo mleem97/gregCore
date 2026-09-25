@@ -197,7 +197,7 @@ public sealed partial class LuaHookBindingGenerator
         {
             while (pos < json.Length && char.IsWhiteSpace(json[pos])) pos++;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SkipArray(string json, ref int pos)
@@ -213,7 +213,7 @@ public sealed partial class LuaHookBindingGenerator
                 pos++;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static string? ReadScalar(string json, ref int pos)
@@ -243,7 +243,7 @@ public sealed partial class LuaHookBindingGenerator
             if (key == "Group") return NewHook(value);
             ApplyNonGroup(hooks, current, key, value);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return current;
     }
 
@@ -267,25 +267,25 @@ public sealed partial class LuaHookBindingGenerator
             else if (key == "ReturnType") SetReturn(current, value);
             else if (key == "IsVoid") CompleteHook(hooks, current, value);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SetClass(HookDefinition? current, string? value)
     {
         try { if (current != null) current.ClassName = Coalesce(value); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SetMethod(HookDefinition? current, string? value)
     {
         try { if (current != null) current.MethodName = Coalesce(value); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void SetReturn(HookDefinition? current, string? value)
     {
         try { if (current != null) current.ReturnType = Coalesce(value, "Void"); }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static string Coalesce(string? value, string fallback = "")
@@ -305,7 +305,7 @@ public sealed partial class LuaHookBindingGenerator
                 hooks.Add(current);
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     // ─── Inner Types ─────────────────────────────────────────────────

@@ -164,7 +164,7 @@ public static class GregCables
         if (link == null) return false;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             link.SetConnectionSpeed(speed);
             return true;
         }
@@ -180,7 +180,7 @@ public static class GregCables
         if (link == null || module == null) return false;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             link.InsertSFP(speed, type, module);
             return true;
         }
@@ -196,7 +196,7 @@ public static class GregCables
         if (link == null) return false;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             link.RemoveSFP();
             return true;
         }
@@ -212,7 +212,7 @@ public static class GregCables
         if (link == null) return false;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             if (!link.IsAllowedToDoSecondAction()) return false;
             link.SecondActionOnClick();
             return true;
@@ -229,7 +229,7 @@ public static class GregCables
         if (link == null) return false;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             link.LabelActionOnClick();
             return true;
         }
@@ -245,7 +245,7 @@ public static class GregCables
         if (link == null) return null;
         try
         {
-            var _ = link.gameObject; // liveness
+            _ = link.gameObject; // liveness
             if (createIfMissing)
             {
                 try { link.CreateRopeAttachPoint(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }

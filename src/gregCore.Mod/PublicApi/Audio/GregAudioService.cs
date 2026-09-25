@@ -23,7 +23,7 @@ namespace gregCore.PublicApi.Audio;
 [ExcludeFromCodeCoverage(Justification = "Runtime audio over live game objects; needs running game.")]
 public static partial class GregAudioService
 {
-    public const float CrossfadeDuration = 2.5f;
+    public static float CrossfadeDuration { get; } = 2.5f;
     public static int CacheCapacity { get; } = 3;
 
     // Fires when a track ends naturally (not on stop/pause).

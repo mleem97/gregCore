@@ -66,7 +66,7 @@ public static class GregGameSettings
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.LoadSettings();
             return true;
         }
@@ -84,7 +84,7 @@ public static class GregGameSettings
         float clamped = Math.Max(0f, Math.Min(1f, volume));
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             setter(inst, clamped);
             return true;
         }

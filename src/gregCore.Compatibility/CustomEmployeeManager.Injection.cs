@@ -111,7 +111,7 @@ public static partial class CustomEmployeeManager
             }
             CopyFallbackLayouts(grid, contentGO);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void CopyGridLayoutGroup(GridLayoutGroup src, GameObject contentGO)
@@ -129,7 +129,7 @@ public static partial class CustomEmployeeManager
             dstLayout.padding = src.padding;
             CrashLog.Log($"CustomEmployee: Copied GridLayoutGroup (cellSize={dstLayout.cellSize}, spacing={dstLayout.spacing}, constraint={dstLayout.constraint}, count={dstLayout.constraintCount})");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void CopyFallbackLayouts(Transform grid, GameObject contentGO)
@@ -154,7 +154,7 @@ public static partial class CustomEmployeeManager
                 dst.padding = vLayout.padding;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void MoveChildrenToContent(Transform grid, Transform content)
@@ -168,7 +168,7 @@ public static partial class CustomEmployeeManager
                 child.SetParent(content, false);
             CrashLog.Log($"CustomEmployee: Moved {childrenToMove.Count} children from Grid to Content");
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void ConfigureScrollRect(GameObject scrollGO, GameObject contentGO, RectTransform viewportRect)
@@ -186,7 +186,7 @@ public static partial class CustomEmployeeManager
             scrollComp.inertia = true;
             scrollComp.decelerationRate = 0.1f;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     public static void InjectIntoHRSystem(HRSystem hrSystem)
@@ -270,7 +270,7 @@ public static partial class CustomEmployeeManager
                 return grid!;
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         return null!;
     }
 
@@ -324,7 +324,7 @@ public static partial class CustomEmployeeManager
                 catch (Exception ex) { CrashLog.LogException($"CreateCard({entry.EmployeeId})", ex); }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static Transform? FindLowestCommonAncestor(Transform a, Transform b)

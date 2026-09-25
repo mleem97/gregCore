@@ -88,7 +88,7 @@ public sealed class GregKeyPump
             PumpDigits(kb, shift, ref buffer, ref changed, cap);
             PumpSymbols(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void PumpBackspace(Keyboard? kb, ref string? buffer, ref bool changed)
@@ -110,7 +110,7 @@ public sealed class GregKeyPump
             _backspaceHeldSince = Time.realtimeSinceStartup;
             _lastBackspaceRepeat = Time.realtimeSinceStartup;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void RepeatBackspace(ref string? buffer, ref bool changed)
@@ -129,7 +129,7 @@ public sealed class GregKeyPump
             _lastBackspaceRepeat = Time.realtimeSinceStartup;
             if (BackspaceOnce(ref buffer)) changed = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static bool TryClearAll(Keyboard? kb, ref string? buffer, ref bool changed)
@@ -173,12 +173,12 @@ public sealed class GregKeyPump
             buffer = (buffer ?? "") + "  ";
             changed = true;
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpSpace(Keyboard? kb, ref string? buffer, ref bool changed, int cap)
     {
-        try { if (kb.spaceKey.wasPressedThisFrame) AppendChar(' ', ref buffer, ref changed, cap); } catch { }
+        try { if (kb.spaceKey.wasPressedThisFrame) AppendChar(' ', ref buffer, ref changed, cap); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpAlphabet(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -188,7 +188,7 @@ public sealed class GregKeyPump
             PumpLettersAtoM(kb, shift, ref buffer, ref changed, cap);
             PumpLettersNtoZ(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static char Pick(bool shift, char lower, char upper)
@@ -204,7 +204,7 @@ public sealed class GregKeyPump
             PumpLettersAtoG(kb, shift, ref buffer, ref changed, cap);
             PumpLettersHtoM(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpLettersAtoG(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -220,7 +220,7 @@ public sealed class GregKeyPump
             PumpLetter(kb.fKey, Pick(shift, 'f', 'F'), ref buffer, ref changed, cap);
             PumpLetter(kb.gKey, Pick(shift, 'g', 'G'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpLettersHtoM(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -235,7 +235,7 @@ public sealed class GregKeyPump
             PumpLetter(kb.lKey, Pick(shift, 'l', 'L'), ref buffer, ref changed, cap);
             PumpLetter(kb.mKey, Pick(shift, 'm', 'M'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpLettersNtoZ(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -245,7 +245,7 @@ public sealed class GregKeyPump
             PumpLettersNtoS(kb, shift, ref buffer, ref changed, cap);
             PumpLettersTtoZ(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpLettersNtoS(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -260,7 +260,7 @@ public sealed class GregKeyPump
             PumpLetter(kb.rKey, Pick(shift, 'r', 'R'), ref buffer, ref changed, cap);
             PumpLetter(kb.sKey, Pick(shift, 's', 'S'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpLettersTtoZ(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -276,7 +276,7 @@ public sealed class GregKeyPump
             PumpLetter(kb.yKey, Pick(shift, 'y', 'Y'), ref buffer, ref changed, cap);
             PumpLetter(kb.zKey, Pick(shift, 'z', 'Z'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpDigits(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -286,7 +286,7 @@ public sealed class GregKeyPump
             PumpTopDigits(kb, shift, ref buffer, ref changed, cap);
             PumpNumpad(kb, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpTopDigits(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -296,7 +296,7 @@ public sealed class GregKeyPump
             PumpTopDigitsLow(kb, shift, ref buffer, ref changed, cap);
             PumpTopDigitsHigh(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpTopDigitsLow(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -310,7 +310,7 @@ public sealed class GregKeyPump
             PumpKey(kb.digit4Key, Pick(shift, '4', '$'), ref buffer, ref changed, cap);
             PumpKey(kb.digit5Key, Pick(shift, '5', '%'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpTopDigitsHigh(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -324,7 +324,7 @@ public sealed class GregKeyPump
             PumpKey(kb.digit9Key, Pick(shift, '9', '('), ref buffer, ref changed, cap);
             PumpKey(kb.digit0Key, Pick(shift, '0', ')'), ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpNumpad(Keyboard? kb, ref string? buffer, ref bool changed, int cap)
@@ -342,7 +342,7 @@ public sealed class GregKeyPump
             PumpKey(kb.numpad9Key, '9', ref buffer, ref changed, cap);
             PumpKey(kb.numpad0Key, '0', ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpSymbols(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -352,7 +352,7 @@ public sealed class GregKeyPump
             PumpSymbolsA(kb, shift, ref buffer, ref changed, cap);
             PumpSymbolsB(kb, shift, ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpSymbolsA(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -366,7 +366,7 @@ public sealed class GregKeyPump
             PumpKey(kb.semicolonKey, shift ? ':' : ';', ref buffer, ref changed, cap);
             PumpKey(kb.quoteKey, shift ? '"' : '\'', ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void PumpSymbolsB(Keyboard? kb, bool shift, ref string? buffer, ref bool changed, int cap)
@@ -379,7 +379,7 @@ public sealed class GregKeyPump
             PumpKey(kb.backslashKey, shift ? '|' : '\\', ref buffer, ref changed, cap);
             PumpKey(kb.backquoteKey, shift ? '~' : '`', ref buffer, ref changed, cap);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static bool BackspaceOnce(ref string? buffer)

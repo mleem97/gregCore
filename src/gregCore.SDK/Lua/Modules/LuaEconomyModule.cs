@@ -34,7 +34,7 @@ public static class LuaEconomyModule
                 var t = new Table(script);
                 t["total_salary"] = (double)sheet.TotalMonthlySalary;
                 int months = 0;
-                try { months = sheet.History != null ? sheet.History.Count : 0; } catch { }
+                try { months = sheet.History != null ? sheet.History.Count : 0; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
                 t["months"] = months;
                 return DynValue.FromObject(script, t);
             }

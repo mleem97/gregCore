@@ -113,7 +113,7 @@ public sealed class LuaErrorOverlay
         {
             _errors.RemoveAll(e => e.Dismissed || (currentTime - e.Timestamp) > _autoHideDuration);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private VisualElement? BuildErrorBox(ErrorEntry error, float currentTime)
@@ -184,7 +184,7 @@ public sealed class LuaErrorOverlay
             };
             box.Add(titleLabel);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private static void AddStack(VisualElement box, ErrorEntry error, float alpha)
@@ -203,7 +203,7 @@ public sealed class LuaErrorOverlay
             };
             box.Add(stackLabel);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void AddDismiss(VisualElement box, ErrorEntry error)
@@ -236,7 +236,7 @@ public sealed class LuaErrorOverlay
             }));
             box.Add(dismissBtn);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     private void AddTimer(VisualElement box, float elapsed, float alpha)
@@ -256,7 +256,7 @@ public sealed class LuaErrorOverlay
             };
             box.Add(timerLabel);
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 
     /// <summary>

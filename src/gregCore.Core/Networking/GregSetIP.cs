@@ -67,7 +67,7 @@ public static class GregSetIP
         {
             try
             {
-                var _ = inst.gameObject; // liveness
+                _ = inst.gameObject; // liveness
                 string mask = inst.GetMaskFromCidr(cidr);
                 if (!string.IsNullOrEmpty(mask)) return mask;
             }
@@ -84,7 +84,7 @@ public static class GregSetIP
         if (inst == null) return result;
         Try(() =>
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             var arr = inst.GetUsableIPsFromSubnet(subnet);
             if (arr == null) return;
             int n = 0;
@@ -109,7 +109,7 @@ public static class GregSetIP
         if (inst == null) return "";
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             return inst.GetFirstUsableIPFromSubnet(subnet) ?? "";
         }
         catch { return ""; }
@@ -122,7 +122,7 @@ public static class GregSetIP
         if (inst == null || server == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ShowCanvas(server);
             return true;
         }
@@ -139,7 +139,7 @@ public static class GregSetIP
         if (inst == null) return false;
         try
         {
-            var _ = inst.gameObject; // liveness
+            _ = inst.gameObject; // liveness
             inst.ClickButtonCancel();
             return true;
         }

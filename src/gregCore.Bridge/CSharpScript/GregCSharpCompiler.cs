@@ -173,9 +173,9 @@ public static class GregCSharpCompiler
                     else
                         MelonLogger.Warning($"[CSharpCompiler:{modId}] {msg}");
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
-        catch { }
+        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
 }

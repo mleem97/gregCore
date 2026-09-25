@@ -241,8 +241,9 @@ public static partial class GameHooks
     {
         try
         {
-            // No NetworkMap fast path for patch panels (no such registry
-            // on the game type) — scene scan only.
+            // No NetworkMap fast path for patch panels: the game type has
+            // no patchPanels registry (verified against game assemblies —
+            // only servers/switches exist). Scene scan only.
             int ppUpdated = RefreshPatchPanelRefsFromScene();
 
             if (ppUpdated > 0)
@@ -253,6 +254,7 @@ public static partial class GameHooks
             CrashLog.Log($"[WorldSync] EnsureAllRackPositionUIDs: patchpanel ref update failed: {ex.Message}");
         }
     }
+
 
     private static int RefreshPatchPanelRefsFromScene()
     {

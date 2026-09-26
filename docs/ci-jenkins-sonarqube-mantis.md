@@ -132,12 +132,39 @@ Replace the dead required contexts with ones Jenkins actually reports:
   running both gates stale-mate merges (two sources of truth).
 
 ## 7. Rollout to mod repos
-
 `gregMod.*` repos share one shape (`build.sh`, `src/`, `references/`).
 Copy this `Jenkinsfile`, changing only `SONAR_PROJECT_KEY` (one SonarQube
 project per mod, e.g. `gregMod-Trainer`) and the build command
 (`./build.sh Trainer` instead of `dotnet build`). Later: extract a Shared
 Library (`vars/gregModPipeline.groovy`) so all mods share one definition.
+
+## 8. SonarQube → Mantis issue sync (fully automatic)
+
+Every pipeline run executes `scripts/sonar_to_mantis.py` (stdlib-only
+Python, no pip needed) right after the SonarQube analysis:
+
+- **Create:** one Mantis ticket per open SonarQube issue, summary
+  `[sonar:<project>:<key>] [SEVERITY/TYPE] rule: file:line`, description
+  with full message + deep link to the issue
+  (`https://check.gregframework.eu/project/issues?...`).
+- **Dedup:** the `[sonar:…]` marker is searched in open project tickets —
+  no duplicates, ever.
+- **Resolve-back:** tickets whose SonarQube issue is CLOSED/RESOLVED get a
+  closing note and are set to resolved (status id configurable via
+  `MANTIS_RESOLVED_STATUS_ID`, default `80`).
+- **Throttling:** `MAX_TICKETS_PER_RUN` (default `50`) caps creations per
+  run — a large backlog converges over consecutive builds instead of
+  flooding Mantis.
+- **Never red:** missing tokens, unreachable hosts, API errors → warning
+  in the log, exit 0. `DRY_RUN=1` logs actions without touching Mantis.
+- **PR decoration:** on pull-request builds the scanner gets
+  `sonar.pullrequest.{key,branch,base}` automatically, so SonarQube
+  annotates the PR *and* the sync queries PR-scoped issues
+  (`SONAR_PR` wins over `SONAR_BRANCH`).
+
+Required: the same `sonar-token` / `mantis-api-token` credentials plus
+`MANTIS_PROJECT_ID` / `MANTIS_CATEGORY_ID` in the `Jenkinsfile` site
+config (the sync reuses them, no extra setup).
 
 ## Troubleshooting
 

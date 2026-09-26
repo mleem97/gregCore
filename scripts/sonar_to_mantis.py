@@ -47,6 +47,9 @@ def env(name, default=None, required=False):
 
 def http(method, url, token=None, bearer=False, payload=None, timeout=30):
     data = None
+    scheme = urllib.parse.urlsplit(url).scheme.lower()
+    if scheme not in ("http", "https"):
+        return -1, {"_error": f"refused non-http(s) URL scheme: {scheme!r}"}
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
     if token:
         headers["Authorization"] = (f"Bearer {token}" if bearer else token)
@@ -157,70 +160,65 @@ def sonar_link(base, project, key, pr):
     return f"{base.rstrip('/')}/project/issues?{urllib.parse.urlencode(params)}"
 
 
-def main():
-    dry = os.environ.get("DRY_RUN", "") == "1"
-    sonar_url = env("SONAR_URL", required=True)
-    sonar_token = env("SONAR_TOKEN", required=True)
-    project = env("SONAR_PROJECT", "gregCore")
-    pr = os.environ.get("SONAR_PR", "") or None
-    branch = os.environ.get("SONAR_BRANCH", "") or None
-    mantis_url = env("MANTIS_URL", required=True)
-    mantis_token = env("MANTIS_TOKEN", required=True)
-    mantis_project = env("MANTIS_PROJECT_ID", required=True)
-    mantis_category = env("MANTIS_CATEGORY_ID", required=True)
-    resolved_status = int(env("MANTIS_RESOLVED_STATUS_ID", "80"))
-    max_new = int(env("MAX_TICKETS_PER_RUN", "50"))
+def load_config():
+    return {
+        "dry": os.environ.get("DRY_RUN", "") == "1",
+        "sonar_url": env("SONAR_URL", required=True),
+        "sonar_token": env("SONAR_TOKEN", required=True),
+        "project": env("SONAR_PROJECT", "gregCore"),
+        "pr": os.environ.get("SONAR_PR", "") or None,
+        "branch": os.environ.get("SONAR_BRANCH", "") or None,
+        "mantis_url": env("MANTIS_URL", required=True),
+        "mantis_token": env("MANTIS_TOKEN", required=True),
+        "mantis_project": env("MANTIS_PROJECT_ID", required=True),
+        "mantis_category": env("MANTIS_CATEGORY_ID", required=True),
+        "resolved_status": int(env("MANTIS_RESOLVED_STATUS_ID", "80")),
+        "max_new": int(env("MAX_TICKETS_PER_RUN", "50")),
+    }
 
-    try:
-        issues = fetch_sonar_open_issues(sonar_url, sonar_token,
-                                         project, branch, pr)
-        existing = fetch_mantis_open_sonar_tickets(mantis_url, mantis_token,
-                                                   mantis_project)
-    except SystemExit:
-        raise
-    except Exception as ex:
-        print(f"[sonar-mantis] sync aborted (non-blocking): {ex}")
-        return 0
 
-    print(f"[sonar-mantis] SonarQube open issues: {len(issues)}, "
-          f"tracked Mantis tickets: {len(existing)}"
-          + (" (DRY RUN)" if dry else ""))
+def build_ticket_body(cfg, issue):
+    project, key = cfg["project"], issue.get("key", "")
+    rule = issue.get("rule", "?")
+    severity = issue.get("severity", "?")
+    kind = issue.get("type", "?")
+    comp = short_path(issue.get("component", "?"), project)
+    line = issue.get("line", "?")
+    message = (issue.get("message", "") or "").strip()
+    marker = f"[sonar:{project}:{key}]"
+    summary = f"{marker} [{severity}/{kind}] {rule}: {comp}:{line}"
+    summary = summary[:125] + "..." if len(summary) > 128 else summary
+    return summary, {
+        "summary": summary,
+        "description": (
+            f"SonarQube issue {key} ({severity}/{kind}, rule {rule})\n"
+            f"File: {comp}, line: {line}\n\n{message}\n\n"
+            f"Open in SonarQube: "
+            f"{sonar_link(cfg['sonar_url'], project, key, cfg['pr'])}"
+        ),
+        "project": {"id": int(cfg["mantis_project"])},
+        "category": {"id": int(cfg["mantis_category"])},
+    }
 
-    # 1) Create tickets for untracked issues (capped per run).
+
+def create_tickets(cfg, issues, existing):
+    """Create tickets for untracked issues (capped per run)."""
     created = 0
     for issue in issues:
         key = issue.get("key", "")
         if not key or key in existing:
             continue
-        if created >= max_new:
-            print(f"[sonar-mantis] cap reached ({max_new}/run), "
+        if created >= cfg["max_new"]:
+            print(f"[sonar-mantis] cap reached ({cfg['max_new']}/run), "
                   f"remainder converges on later builds.")
             break
-        rule = issue.get("rule", "?")
-        severity = issue.get("severity", "?")
-        kind = issue.get("type", "?")
-        comp = short_path(issue.get("component", "?"), project)
-        line = issue.get("line", "?")
-        message = (issue.get("message", "") or "").strip()
-        marker = f"[sonar:{project}:{key}]"
-        summary = f"{marker} [{severity}/{kind}] {rule}: {comp}:{line}"
-        summary = summary[:125] + "..." if len(summary) > 128 else summary
-        body = {
-            "summary": summary,
-            "description": (
-                f"SonarQube issue {key} ({severity}/{kind}, rule {rule})\n"
-                f"File: {comp}, line: {line}\n\n{message}\n\n"
-                f"Open in SonarQube: {sonar_link(sonar_url, project, key, pr)}"
-            ),
-            "project": {"id": int(mantis_project)},
-            "category": {"id": int(mantis_category)},
-        }
-        if dry:
+        summary, body = build_ticket_body(cfg, issue)
+        if cfg["dry"]:
             print(f"[sonar-mantis] DRY-RUN create: {summary[:100]}")
         else:
             status, data = http(
-                "POST", f"{mantis_url.rstrip('/')}/api/rest/issues/",
-                token=mantis_token, payload=body)
+                "POST", f"{cfg['mantis_url'].rstrip('/')}/api/rest/issues/",
+                token=cfg["mantis_token"], payload=body)
             if status in (200, 201):
                 print(f"[sonar-mantis] created Mantis "
                       f"#{(data.get('issue') or {}).get('id', '?')} for {key}")
@@ -230,44 +228,68 @@ def main():
                 continue
         existing[key] = -1
         created += 1
+    return created
 
-    # 2) Resolve tickets whose SonarQube issue is fixed.
-    # (Keys created this run are still OPEN by definition - skip them.)
+
+def resolve_tickets(cfg, existing):
+    """Resolve tickets whose SonarQube issue is fixed."""
     tracked = {k: v for k, v in existing.items() if v != -1}
-    if tracked:
-        states = sonar_issue_states(sonar_url, sonar_token, list(tracked))
-        resolved = 0
-        for key, ticket_id in existing.items():
-            if ticket_id == -1:
-                continue  # created this run
-            state = states.get(key)
-            if state in ("CLOSED", "RESOLVED"):
-                note = (f"SonarQube reports this issue as {state} - "
-                        f"auto-resolving (verified by analysis).")
-                if dry:
-                    print(f"[sonar-mantis] DRY-RUN resolve #{ticket_id} "
-                          f"({key} is {state})")
-                else:
-                    http("POST",
-                         f"{mantis_url.rstrip('/')}/api/rest/issues/"
-                         f"{ticket_id}/notes",
-                         token=mantis_token, payload={"text": note})
-                    status, data = http(
-                        "PUT",
-                        f"{mantis_url.rstrip('/')}/api/rest/issues/{ticket_id}",
-                        token=mantis_token,
-                        payload={"status": {"id": resolved_status}})
-                    if status == 200:
-                        print(f"[sonar-mantis] resolved Mantis "
-                              f"#{ticket_id} ({key} is {state})")
-                        resolved += 1
-                    else:
-                        print(f"[sonar-mantis] resolve failed for "
-                              f"#{ticket_id}: HTTP {status}: {data}")
-        print(f"[sonar-mantis] done: {created} created, "
-              f"{resolved} resolved.")
-    else:
-        print(f"[sonar-mantis] done: {created} created, 0 resolved.")
+    if not tracked:
+        return 0
+    states = sonar_issue_states(cfg["sonar_url"], cfg["sonar_token"],
+                                list(tracked))
+    resolved = 0
+    for key, ticket_id in tracked.items():
+        state = states.get(key)
+        if state not in ("CLOSED", "RESOLVED"):
+            continue
+        note = (f"SonarQube reports this issue as {state} - "
+                f"auto-resolving (verified by analysis).")
+        if cfg["dry"]:
+            print(f"[sonar-mantis] DRY-RUN resolve #{ticket_id} "
+                  f"({key} is {state})")
+            continue
+        http("POST",
+             f"{cfg['mantis_url'].rstrip('/')}/api/rest/issues/"
+             f"{ticket_id}/notes",
+             token=cfg["mantis_token"], payload={"text": note})
+        status, data = http(
+            "PUT",
+            f"{cfg['mantis_url'].rstrip('/')}/api/rest/issues/{ticket_id}",
+            token=cfg["mantis_token"],
+            payload={"status": {"id": cfg["resolved_status"]}})
+        if status == 200:
+            print(f"[sonar-mantis] resolved Mantis "
+                  f"#{ticket_id} ({key} is {state})")
+            resolved += 1
+        else:
+            print(f"[sonar-mantis] resolve failed for "
+                  f"#{ticket_id}: HTTP {status}: {data}")
+    return resolved
+
+
+def main():
+    cfg = load_config()
+    try:
+        issues = fetch_sonar_open_issues(cfg["sonar_url"], cfg["sonar_token"],
+                                         cfg["project"], cfg["branch"],
+                                         cfg["pr"])
+        existing = fetch_mantis_open_sonar_tickets(cfg["mantis_url"],
+                                                   cfg["mantis_token"],
+                                                   cfg["mantis_project"])
+    except SystemExit:
+        raise
+    except Exception as ex:
+        print(f"[sonar-mantis] sync aborted (non-blocking): {ex}")
+        return 0
+
+    print(f"[sonar-mantis] SonarQube open issues: {len(issues)}, "
+          f"tracked Mantis tickets: {len(existing)}"
+          + (" (DRY RUN)" if cfg["dry"] else ""))
+
+    created = create_tickets(cfg, issues, existing)
+    resolved = resolve_tickets(cfg, existing)
+    print(f"[sonar-mantis] done: {created} created, {resolved} resolved.")
     return 0
 
 

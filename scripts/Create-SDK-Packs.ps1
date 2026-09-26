@@ -20,11 +20,11 @@ $ErrorActionPreference = "Stop"
 $RootDir = Split-Path $PSScriptRoot -Parent
 $ExamplesDir = Join-Path $RootDir "examples"
 
-Write-Host "=== gregCore SDK Pack Builder ===" -ForegroundColor Cyan
-Write-Host "Root: $RootDir"
-Write-Host "Examples: $ExamplesDir"
-Write-Host "Output: $OutputDir"
-Write-Host ""
+Write-Information "=== gregCore SDK Pack Builder ==="
+Write-Information "Root: $RootDir"
+Write-Information "Examples: $ExamplesDir"
+Write-Information "Output: $OutputDir"
+Write-Information ""
 
 # Ensure output dir exists
 if (!(Test-Path $OutputDir)) {
@@ -45,7 +45,7 @@ foreach ($sdk in $sdks) {
     $srcDir = Join-Path $ExamplesDir $sdk.Dir
     
     if (!(Test-Path $srcDir)) {
-        Write-Host "  [SKIP] $($sdk.Name) – No example under $srcDir" -ForegroundColor Yellow
+        Write-Information "  [SKIP] $($sdk.Name) – No example under $srcDir"
         continue
     }
 
@@ -100,9 +100,9 @@ See gregCore wiki: https://gregframework.eu/wiki/sdk/$($sdk.Name.ToLower())
     Compress-Archive -Path "$packDir\*" -DestinationPath $zipFile -Force
     
     $zipSize = (Get-Item $zipFile).Length / 1KB
-    Write-Host "  [OK] $($sdk.Name) → $zipFile ($([math]::Round($zipSize, 1)) KB)" -ForegroundColor Green
+    Write-Information "  [OK] $($sdk.Name) → $zipFile ($([math]::Round($zipSize, 1)) KB)"
     $packedCount++
 }
 
-Write-Host ""
-Write-Host "=== $packedCount SDK packs created in $OutputDir ===" -ForegroundColor Green
+Write-Information ""
+Write-Information "=== $packedCount SDK packs created in $OutputDir ==="

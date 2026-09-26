@@ -255,7 +255,7 @@ public static class BuildGregCoreFontBundle
             }
             ReportMissing();
         }
-        catch { }
+        catch { /* ignored: best-effort editor scan; failures surface via return value */ }
     }
 
     private static bool TryReportFound(string path)

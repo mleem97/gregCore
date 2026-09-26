@@ -27,12 +27,11 @@ Only the Python standard library is used (no pip needed on agents).
 """
 
 import json
+import http.client as httpclient
 import os
 import re
 import sys
 import urllib.parse
-import urllib.request
-import urllib.error
 
 MARKER_RE = re.compile(r"\[sonar:[^:\]]+:([A-Za-z0-9_\-]+)\]")
 
@@ -46,25 +45,35 @@ def env(name, default=None, required=False):
 
 
 def http(method, url, token=None, bearer=False, payload=None, timeout=30):
-    data = None
-    scheme = urllib.parse.urlsplit(url).scheme.lower()
-    if scheme not in ("http", "https"):
-        return -1, {"_error": f"refused non-http(s) URL scheme: {scheme!r}"}
+    # Plain http.client (no urlopen): only http(s) targets, explicit timeouts,
+    # no redirects/proxy-handler magic - exact, auditable behavior for CI.
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme.lower() not in ("http", "https"):
+        return -1, {"_error": f"refused non-http(s) URL scheme: {parts.scheme!r}"}
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
     if token:
         headers["Authorization"] = (f"Bearer {token}" if bearer else token)
-    if payload is not None:
-        data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    path = parts.path or "/"
+    if parts.query:
+        path += "?" + parts.query
+    conn_cls = (httpclient.HTTPSConnection if parts.scheme.lower() == "https"
+                else httpclient.HTTPConnection)
+    conn = conn_cls(parts.hostname, parts.port, timeout=timeout)
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = resp.read().decode("utf-8", "replace")
+        conn.request(method, path, body=data, headers=headers)
+        resp = conn.getresponse()
+        body = resp.read().decode("utf-8", "replace")
+        if 200 <= resp.status < 300:
             return resp.status, (json.loads(body) if body.strip() else {})
-    except urllib.error.HTTPError as ex:
-        detail = ex.read().decode("utf-8", "replace")[:300]
-        return ex.code, {"_error": detail}
-    except Exception as ex:  # network down, DNS, timeout, ...
+        return resp.status, {"_error": body[:300]}
+    except Exception as ex:  # network down, DNS, timeout, refused, ...
         return -1, {"_error": f"{type(ex).__name__}: {ex}"}
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def sonar_get(base, token, path, params):

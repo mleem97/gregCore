@@ -3,11 +3,14 @@
 End-to-end pipeline for gregCore (pilot, later template for `gregMod.*`).
 Default addresses (Marvin's LAN, override in `Jenkinsfile` site config):
 
-| Service   | URL                           |
-|-----------|-------------------------------|
-| Jenkins   | http://192.168.178.129:8080/  |
-| SonarQube | http://192.168.178.128:9000/  |
-| Mantis    | http://192.168.178.127/       |
+| Service   | Public (Cloudflare)                | LAN (Server-zu-Server)          |
+|-----------|--------------------------------------|---------------------------------|
+| Jenkins   | https://build.gregframework.eu/      | http://192.168.178.129:8080/    |
+| SonarQube | https://check.gregframework.eu/      | http://192.168.178.128:9000/    |
+| Mantis    | https://bugs.gregframework.eu/       | http://192.168.178.127/         |
+
+Interne Calls (Jenkins→SonarQube, Jenkins→Mantis, SonarQube-Webhook)
+laufen über LAN; Browser und GitHub-Webhooks nutzen die Public-URLs.
 
 Flow: GitHub push/PR → Jenkins Multibranch → build + test + SonarQube +
 Quality Gate → GitHub checks (`tests`, `build-linux`, `docs`) → Mantis
@@ -55,7 +58,10 @@ built-in node — move to a dedicated agent/VM later). Required tooling:
    versions).
 4. **Quality Gate** (SonarQube → Quality Gates): suggested starter —
    *New Code:* 0 Blocker/Critical issues, tests must exist. The pipeline
-   step `waitForQualityGate abortPipeline: true` enforces it.
+   step `waitForQualityGate abortPipeline: true` enforces it. For fast
+   feedback (instead of polling) add SonarQube → Administration →
+   Configuration → Webhooks → `http://192.168.178.129:8080/sonarqube-webhook/`
+   (LAN is fine — server to server).
 5. The .NET scanner (`dotnet-sonarscanner` global tool) is installed by the
    pipeline itself; coverage comes from the already-referenced
    `coverlet.collector/msbuild` packages (OpenCover format).
@@ -66,39 +72,16 @@ built-in node — move to a dedicated agent/VM later). Required tooling:
    repository `mleem97/gregCore`, Behaviours: *Discover branches* + *Discover
    pull requests from origin*. The `Jenkinsfile` at repo root is picked up
    automatically.
-2. **Webhook (empfohlen): cloudflared-Tunnel (Zero Trust).** Jenkins und
-   Mantis hängen im LAN und bekommen je einen öffentlichen Hostnamen,
-   SonarQube bleibt bewusst LAN-only (Jenkins→SonarQube läuft
-   Server-zu-Server; SonarQubes PR-Decoration nach GitHub ist outbound
-   und braucht kein Inbound):
-   ```bash
-   # einmalig (Account mit Domain in Cloudflare Zero Trust):
-   cloudflared tunnel login
-   cloudflared tunnel create homelab
-   cloudflared tunnel route dns homelab jenkins.example.com
-   cloudflared tunnel route dns homelab mantis.example.com
-   # ~/.cloudflared/config.yml:
-   # tunnel: homelab
-   # ingress:
-   #   - hostname: jenkins.example.com
-   #     service: http://192.168.178.129:8080
-   #   - hostname: mantis.example.com
-   #     service: http://192.168.178.127:80
-   #   - service: http_status:404
-   cloudflared service install && systemctl enable --now cloudflared
-   ```
-   Danach: Jenkins → Manage → System → **Jenkins URL** =
-   `https://jenkins.example.com` (sonst zeigen Status-Links und Mantis-
-   Tickets auf die LAN-Adresse). GitHub-Webhook =
-   `https://jenkins.example.com/github-webhook/` (Events: push + pull
-   request; der `/github-webhook/`-Endpoint braucht kein CSRF-Crumb).
-   Mantis: `config_inc.php` → `$g_path =
-   'https://mantis.example.com/';` und `$g_allow_signup = OFF;`
-   (Signup aus, HTTPS kommt von Cloudflare Edge, Jenkins→Mantis läuft
-   weiter über die LAN-URL im `Jenkinsfile`).
-3. **Fallbacks ohne Tunnel:** (a) Multibranch → *Scan → Periodically if
-   not otherwise run* (alle 15 Min), (b) `smee.io`-Relay auf
-   `http://192.168.178.129:8080/github-webhook/`.
+2. **Webhook (done):** GitHub → Settings → Webhooks →
+   `https://build.gregframework.eu/github-webhook/` (push + pull_request,
+   JSON) is registered and active. Jenkins braucht dafür das
+   *GitHub Branch Source*-Plugin; der `/github-webhook/`-Endpoint braucht
+   kein CSRF-Crumb. Payload-Zustellung prüfen: GitHub → Webhook →
+   *Recent Deliveries*.
+3. The pipeline publishes checks named **`tests`**, **`build-linux`**,
+   **`docs`** via the Checks API — exactly the names branch protection
+   should require (see section 6). PR builds additionally get the standard
+   Branch-Source statuses for free.
 3. The pipeline publishes checks named **`tests`**, **`build-linux`**,
    **`docs`** via the Checks API — exactly the names branch protection
    should require (see section 6). PR builds additionally get the standard
@@ -106,18 +89,34 @@ built-in node — move to a dedicated agent/VM later). Required tooling:
 
 ## 5. Mantis wiring
 
-1. Mantis → My Account → **API Tokens → Create** (needs a Mantis ≥ 2.x with
-   REST enabled — default on) → Jenkins **Secret text** credential ID
-   `mantis-api-token`.
-2. Find numeric IDs: `GET /api/rest/projects/` (Authorization: token) lists
+1. Jenkins → Manage → System → **Jenkins URL** =
+   `https://build.gregframework.eu/` (sonst zeigen Check-Run-Links und
+   Mantis-Tickets auf die LAN-Adresse).
+2. Mantis `config_inc.php` (public Betrieb hinter Cloudflare):
+   `$g_path = 'https://bugs.gregframework.eu/';` und `$g_allow_signup =
+   OFF;` (HTTPS terminiert an der Cloudflare Edge; Jenkins→Mantis läuft
+   weiter über die LAN-URL im `Jenkinsfile`).
+3. **REST-API-Routing (Pflicht für den Jenkins-Reporter):**
+   `https://bugs.gregframework.eu/api/rest/` antwortet aktuell mit der
+   Mantis-404-Seite — der Webserver reicht `/api/rest/*` nicht an
+   `index.php` weiter. Nginx-Fix (sinngemäß auch für andere Server):
+   ```nginx
+   location /api/rest/ {
+       try_files $uri $uri/ /api/rest/index.php?$query_string;
+   }
+   ```
+   Danach antwortet `GET /api/rest/` mit JSON statt HTML.
+4. Mantis → My Account → **API Tokens → Create** → Jenkins **Secret text**
+   credential ID `mantis-api-token`.
+5. Find numeric IDs: `GET /api/rest/projects/` (Authorization: token) lists
    projects; categories via `GET /api/rest/projects/{id}`. Put them in the
    `Jenkinsfile` site config (`MANTIS_PROJECT_ID`, `MANTIS_CATEGORY_ID` —
    defaults are `1`/`1`, adjust to your instance).
-3. Install the **Mantis Source Control Integration** plugin and point it at
+6. Install the **Mantis Source Control Integration** plugin and point it at
    the GitHub repos. Team convention from then on: commit messages carry
    `Fixes #<issue>` / `Related to #<issue>` (Conventional Commits stay as
    prefix, e.g. `fix: crash on empty save (Fixes #123)`).
-4. Red builds file an issue `[CI] <job> #<n> failed (<branch>)` with job
+7. Red builds file an issue `[CI] <job> #<n> failed (<branch>)` with job
    URL, branch and commit (guarded with `|| true` — reporting never fails
    the build).
 

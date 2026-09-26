@@ -1,0 +1,5 @@
+{
+  "lang.changed": "Language: {0} (pref: {1}).",
+  "pref.language.name": "Language",
+  "pref.language.desc": "UI language for Greg mods (two-letter code, or 'auto' = system language). Translations: Mods/Data/<modId>/<lang>.json."
+}

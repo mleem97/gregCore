@@ -1,15 +1,15 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Erstellt SDK-Packs für alle unterstützten Sprachen (Lua, JS, Python, Go, Rust).
-    Jedes Pack wird als ZIP für Workshop-Upload vorbereitet.
+    Creates SDK packs for all supported languages (Lua, JS, Python, Go, Rust).
+    Each pack is prepared as a ZIP for workshop upload.
 
 .DESCRIPTION
-    Kopiert Beispiel-Mods + Dokumentation in sdk/packs/{Sprache}/ und erstellt ZIPs.
-    Wird von Deploy-Release-ToWorkshop.ps1 aufgerufen.
+    Copies example mods + documentation into sdk/packs/{language}/ and creates ZIPs.
+    Called by Deploy-Release-ToWorkshop.ps1.
 
 .PARAMETER OutputDir
-    Zielverzeichnis für die erstellten ZIP-Packs. Default: sdk/packs
+    Target directory for the created ZIP packs. Default: sdk/packs
 #>
 
 param(
@@ -20,11 +20,11 @@ $ErrorActionPreference = "Stop"
 $RootDir = Split-Path $PSScriptRoot -Parent
 $ExamplesDir = Join-Path $RootDir "examples"
 
-Write-Host "=== gregCore SDK Pack Builder ===" -ForegroundColor Cyan
-Write-Host "Root: $RootDir"
-Write-Host "Examples: $ExamplesDir"
-Write-Host "Output: $OutputDir"
-Write-Host ""
+Write-Information "=== gregCore SDK Pack Builder ==="
+Write-Information "Root: $RootDir"
+Write-Information "Examples: $ExamplesDir"
+Write-Information "Output: $OutputDir"
+Write-Information ""
 
 # Ensure output dir exists
 if (!(Test-Path $OutputDir)) {
@@ -45,7 +45,7 @@ foreach ($sdk in $sdks) {
     $srcDir = Join-Path $ExamplesDir $sdk.Dir
     
     if (!(Test-Path $srcDir)) {
-        Write-Host "  [SKIP] $($sdk.Name) – Kein Beispiel unter $srcDir" -ForegroundColor Yellow
+        Write-Information "  [SKIP] $($sdk.Name) – No example under $srcDir"
         continue
     }
 
@@ -77,19 +77,19 @@ foreach ($sdk in $sdks) {
     $readme = @"
 # gregCore $($sdk.Name) SDK
 
-$($sdk.Desc) für Data Center Modding.
+$($sdk.Desc) for Data Center modding.
 
 ## Installation
 
-1. Kopiere den Inhalt dieses Ordners nach ``Data Center/Mods/$($sdk.Name)Mods/``
-2. Stelle sicher, dass gregCore v1.1.0+ installiert ist
-3. Starte Data Center mit MelonLoader
+1. Copy the contents of this folder to ``Data Center/Mods/$($sdk.Name)Mods/``
+2. Make sure gregCore v1.1.0+ is installed
+3. Start Data Center with MelonLoader
 
 ## API
 
-Siehe gregCore Wiki: https://gregframework.eu/wiki/sdk/$($sdk.Name.ToLower())
+See gregCore wiki: https://gregframework.eu/wiki/sdk/$($sdk.Name.ToLower())
 
-## Unterstützung
+## Support
 
 - Discord: #modding-sdk
 - GitHub Issues: gregCore/issues
@@ -100,9 +100,9 @@ Siehe gregCore Wiki: https://gregframework.eu/wiki/sdk/$($sdk.Name.ToLower())
     Compress-Archive -Path "$packDir\*" -DestinationPath $zipFile -Force
     
     $zipSize = (Get-Item $zipFile).Length / 1KB
-    Write-Host "  [OK] $($sdk.Name) → $zipFile ($([math]::Round($zipSize, 1)) KB)" -ForegroundColor Green
+    Write-Information "  [OK] $($sdk.Name) → $zipFile ($([math]::Round($zipSize, 1)) KB)"
     $packedCount++
 }
 
-Write-Host ""
-Write-Host "=== $packedCount SDK-Packs erstellt in $OutputDir ===" -ForegroundColor Green
+Write-Information ""
+Write-Information "=== $packedCount SDK packs created in $OutputDir ==="

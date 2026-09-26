@@ -1,0 +1,13 @@
+[package]
+name = "greg_rust_example"
+version = "1.1.0"
+edition = "2021"
+# Requires a current stable toolchain (install via rustup).
+
+[lib]
+crate-type = ["cdylib"]
+name = "greg_rust_example"
+
+[profile.release]
+opt-level = "s"
+lto = true

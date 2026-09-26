@@ -1,14 +1,18 @@
 /**
  * gregCore JavaScript SDK – Example Mod
- * 
+ *
  * Demonstrates how to use the gregCore JS API via Jint scripting engine.
  * Place this file in: Data Center/Mods/JsMods/your_mod/main.js
- * 
+ *
  * Available APIs:
  *   greg.subscribe(eventId, callback)   – Subscribe to a greg event
  *   greg.fire_event(eventId, data)      – Fire a custom event
  *   greg.log(message)                   – Log to MelonLogger
+ *
+ * Note: `greg` is injected by the host at runtime (see templates/js/greg.d.ts).
  */
+
+/* global greg */
 
 // ─── Mod Metadata ────────────────────────────────────────────────────
 const MOD_NAME = "JsExampleMod";

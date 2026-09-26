@@ -27,6 +27,7 @@ Only the Python standard library is used (no pip needed on agents).
 """
 
 import json
+import contextlib
 import http.client as httpclient
 import os
 import re
@@ -60,20 +61,16 @@ def http(method, url, token=None, bearer=False, payload=None, timeout=30):
     conn_cls = (httpclient.HTTPSConnection if parts.scheme.lower() == "https"
                 else httpclient.HTTPConnection)
     conn = conn_cls(parts.hostname, parts.port, timeout=timeout)
-    try:
-        conn.request(method, path, body=data, headers=headers)
-        resp = conn.getresponse()
-        body = resp.read().decode("utf-8", "replace")
-        if 200 <= resp.status < 300:
-            return resp.status, (json.loads(body) if body.strip() else {})
-        return resp.status, {"_error": body[:300]}
-    except Exception as ex:  # network down, DNS, timeout, refused, ...
-        return -1, {"_error": f"{type(ex).__name__}: {ex}"}
-    finally:
+    with contextlib.closing(conn):
         try:
-            conn.close()
-        except Exception:
-            pass
+            conn.request(method, path, body=data, headers=headers)
+            resp = conn.getresponse()
+            body = resp.read().decode("utf-8", "replace")
+            if 200 <= resp.status < 300:
+                return resp.status, (json.loads(body) if body.strip() else {})
+            return resp.status, {"_error": body[:300]}
+        except Exception as ex:  # network down, DNS, timeout, refused, ...
+            return -1, {"_error": f"{type(ex).__name__}: {ex}"}
 
 
 def sonar_get(base, token, path, params):

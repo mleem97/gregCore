@@ -288,7 +288,7 @@ public static class BuildGregCoreFontBundle
                 Debug.Log($"[FontBundle]   Found: {Path.GetFileName(f)} ({new FileInfo(f).Length / 1024} KB)");
             }
         }
-        catch { }
+        catch { /* ignored: best-effort editor scan; failures surface via return value */ }
     }
 
     private static string[] GetFontAssetPaths()

@@ -75,7 +75,13 @@ static bool IsRelevant(TypeDefinition t, string member) => !t.FullName.Contains(
 static string Domain(string type) { var s=type.ToLowerInvariant(); return s.Contains("player") ? "Player" : s.Contains("network") || s.Contains("server") ? "Network" : s.Contains("save") ? "Save" : s.Contains("ui") ? "UI" : s.Contains("shop") || s.Contains("coin") ? "Economy" : "Gameplay"; }
 static string StableId(MemberRow x) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("|", x.Assembly,x.Type,x.Kind,x.Name,x.Signature)))).ToLowerInvariant()[..16];
 static string SafeName(string s) => new string(s.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant() is { Length: > 0 } v ? v : "unknown";
-static string Find(string root, string file, string preferred) { var p=Path.Combine(root, preferred); if(File.Exists(p)) return p; return Directory.Exists(root) ? Directory.GetFiles(root,file,SearchOption.AllDirectories).OrderBy(x=>x,StringComparer.Ordinal).FirstOrDefault() ?? p : p; }
+static string Find(string root, string file, string preferred)
+{
+    var p = Path.Combine(root, preferred);
+    if (File.Exists(p)) return p;
+    if (!Directory.Exists(root)) return p;
+    return Directory.GetFiles(root, file, SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault() ?? p;
+}
 static void WriteJson<T>(string path,T value) => File.WriteAllText(path, JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented=true }), new UTF8Encoding(false));
 static void WriteCsv(string path,List<MemberRow> rows) { using var w=new StreamWriter(path,false,new UTF8Encoding(false)); w.WriteLine("assembly,type,kind,name,signature,static,visibility,domain,moddingRelevant,risk,exclusionReason"); foreach(var x in rows) w.WriteLine(string.Join(",", new[]{x.Assembly,x.Type,x.Kind,x.Name,x.Signature,x.Static.ToString().ToLowerInvariant(),x.Visibility,x.Domain,x.ModdingRelevant.ToString().ToLowerInvariant(),x.Risk,x.ExclusionReason}.Select(Csv))); static string Csv(string x)=>"\""+x.Replace("\"","\"\"")+"\""; }
 

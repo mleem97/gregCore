@@ -27,4 +27,4 @@
 
 ## 2025-05-21 - Optimized Object Tracking via NetworkMap (EnsureAllRackPositionUIDs)
 **Learning:** Calling `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `EnsureAllRackPositionUIDs()` is an O(N) operation over all objects. This causes significant performance hitching during WorldSync loops.
-**Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty.
+**Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Note that values must be cast safely using `?.TryCast<T>()`.

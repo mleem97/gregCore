@@ -21,7 +21,7 @@ public sealed record HookMetadata(
 
 /// <summary>
     /// The central hook catalog (SDK layer).
-    /// Serves as the source of truth for all 1850 hooks.
+    /// Serves as the source of truth for all hooks in game_hooks.json (count is dynamic).
 /// </summary>
 public sealed class GregHookCatalog
 {

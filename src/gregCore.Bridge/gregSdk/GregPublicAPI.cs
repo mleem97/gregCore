@@ -146,12 +146,29 @@ namespace greg.Sdk
 
         /// <summary>
         /// Safe wrapper to get SaveData.instance with null and collected-object checks.
+        /// The singleton getter itself throws NullReferenceException inside its
+        /// ctor when no save is loaded (e.g. main menu) — that is a normal
+        /// "no save" state, not an error, so it returns null quietly. Callers
+        /// already treat null as "no save". Only unexpected failures log Error.
         /// </summary>
         public static Il2Cpp.SaveData? GetSaveDataSafe()
         {
+            Il2Cpp.SaveData? saveData;
             try
             {
-                var saveData = Il2Cpp.SaveData.instance;
+                saveData = Il2Cpp.SaveData.instance;
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore][PublicAPI] GetSaveDataSafe failed: {ex.Message}");
+                return null;
+            }
+            try
+            {
                 if (saveData == null || saveData.Pointer == IntPtr.Zero)
                     return null;
                 return saveData;

@@ -178,12 +178,28 @@ public static class LuaPatchModule
         var list = new System.Collections.Generic.List<Il2Cpp.PatchPanel>();
         try
         {
-            var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
-            if (found == null) return list;
-            foreach (var pp in found)
+            var nm = Il2Cpp.NetworkMap.instance;
+            if (nm != null && nm.patchPanels != null)
             {
-                try { if (pp != null) list.Add(pp); }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                foreach (var kvp in nm.patchPanels)
+                {
+                    try
+                    {
+                        var panel = kvp.Value?.TryCast<Il2Cpp.PatchPanel>();
+                        if (panel != null) list.Add(panel);
+                    }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
+                if (list.Count > 0) return list;
+            }
+            var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
+            if (found != null)
+            {
+                foreach (var pp in found)
+                {
+                    try { if (pp != null) list.Add(pp); }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
             }
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }

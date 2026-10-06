@@ -100,7 +100,7 @@ namespace greg.FasterSFP
                         if (n == "gregMod.MoreModules" || n == "gregMod.RealisticModules") { found = true; break; }
                     }
                 }
-                catch { }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) - melon list unreadable, assume no sibling */ }
                 _siblingOwnsModules = found;
                 if (found) MelonLogger.Msg("[FasterSFP] gregMod.MoreModules/RealisticModules detected — insert relabeling and shop routing disabled.");
                 return found;

@@ -60,6 +60,22 @@ public sealed class GregDemandModule
     {
         try
         {
+            // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) FindObjectsOfType
+            var nm = global::Il2Cpp.NetworkMap.instance;
+            if (nm != null)
+            {
+                var dict = nm.customerBases;
+                if (dict != null && dict.Count > 0)
+                {
+                    var list = new System.Collections.Generic.List<global::Il2Cpp.CustomerBase>(dict.Count);
+                    foreach (var kvp in dict)
+                    {
+                        var cb = kvp.Value?.TryCast<global::Il2Cpp.CustomerBase>();
+                        if (cb != null) list.Add(cb);
+                    }
+                    return list.ToArray();
+                }
+            }
             return UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>();
         }
         catch (Exception ex)

@@ -67,7 +67,7 @@ public sealed class GregDemandModule
                 var dict = nm.customerBases;
                 if (dict != null && dict.Count > 0)
                 {
-                    var list = new List<global::Il2Cpp.CustomerBase>(dict.Count);
+                    var list = new System.Collections.Generic.List<global::Il2Cpp.CustomerBase>(dict.Count);
                     foreach (var kvp in dict)
                     {
                         var cb = kvp.Value?.TryCast<global::Il2Cpp.CustomerBase>();

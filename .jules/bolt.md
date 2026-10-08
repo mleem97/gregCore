@@ -28,6 +28,7 @@
 ## 2025-05-21 - Optimized Object Tracking via NetworkMap (EnsureAllRackPositionUIDs)
 **Learning:** Calling `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `EnsureAllRackPositionUIDs()` is an O(N) operation over all objects. This causes significant performance hitching during WorldSync loops.
 **Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Note that values must be cast safely using `?.TryCast<T>()`.
+
 ## 2025-05-23 - Optimized Customer Query (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>()` in recurring demand polling mechanics (like cron workers or periodic demand scanners) causes significant CPU overhead and GC pressure as the game scene scales.
 **Action:** Replace `FindObjectsOfType<T>()` for customers with an O(1) dictionary lookup using `global::Il2Cpp.NetworkMap.instance.customerBases`, providing a fallback to `FindObjectsOfType` when the map is empty or uninitialized.

@@ -22,7 +22,7 @@ public sealed class GregHookCatalogService
     }
 
     /// <summary>
-    /// Loads all 1850 hooks from the game_hooks.json file.
+    /// Loads all hooks from the game_hooks.json file (count is dynamic).
     /// </summary>
     public void Initialize()
     {

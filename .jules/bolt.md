@@ -36,3 +36,7 @@
 ## 2024-05-22 - Optimized Server Lookup (Resources.FindObjectsOfTypeAll)
 **Learning:** Using `Resources.FindObjectsOfTypeAll<T>` to fetch a list of servers iterates over the entire Unity scene hierarchy (O(N) operation), which is extremely expensive, especially as the data center grows.
 **Action:** Optimized `GregServers.FindAll()` by utilizing the game-managed `Il2Cpp.NetworkMap.instance.servers` dictionary for O(1) loop iteration, providing a fallback to `FindObjectsOfTypeAll` only when the map is empty or uninitialized. Note that you must use `kvp.Value?.TryCast<T>()` for safe casting.
+
+## 2026-10-03 - Optimized FindAllBases (FindObjectsOfTypeAll)
+**Learning:** `GregCustomers.FindAllBases()` was using `UnityEngine.Resources.FindObjectsOfTypeAll<CustomerBase>()` which is an O(N) operation over all loaded assets in the scene. This method is called frequently through the network module when trying to read or interact with customers.
+**Action:** Use O(1) loop iteration by directly checking the dictionary `Il2Cpp.NetworkMap.instance.customerBases` first, and fallback to `FindObjectsOfTypeAll<T>` only when `NetworkMap` is unavailable or empty. Remember to use `?.TryCast<T>()` when retrieving values from IL2CPP dictionaries.

@@ -45,6 +45,17 @@ public static class GregCustomers
         var result = new List<global::Il2Cpp.CustomerBase>();
         Try(() =>
         {
+            var nm = global::Il2Cpp.NetworkMap.instance;
+            if (nm != null && nm.customerBases != null)
+            {
+                foreach (var kvp in nm.customerBases)
+                {
+                    var cb = kvp.Value?.TryCast<global::Il2Cpp.CustomerBase>();
+                    if (cb != null) result.Add(cb);
+                }
+                if (result.Count > 0) return;
+            }
+
             var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.CustomerBase>();
             if (all == null) return;
             foreach (var cb in all)

@@ -148,6 +148,7 @@ See [`docs/FrameworkAPI.md`](docs/FrameworkAPI.md) for the auto-generated hook r
 | Role | Contributor |
 |------|-------------|
 | **Codebase** | [mleem97](https://github.com/mleem97) ([TeamGreg Modding](https://github.com/teamGregModding)) |
+|  | [falon1000](https://github.com/falon1000) |
 
 ## Contributing
 

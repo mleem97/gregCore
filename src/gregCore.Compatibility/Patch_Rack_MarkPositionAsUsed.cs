@@ -138,6 +138,27 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
     private static bool TryFindInServers(int rackPosUid, out string objectId, out byte objectType)
     {
+        var netMap = global::Il2Cpp.NetworkMap.instance;
+        if (netMap != null && netMap.servers != null)
+        {
+            foreach (var kvp in netMap.servers)
+            {
+                var srv = kvp.Value?.TryCast<global::Il2Cpp.Server>();
+                if (srv == null) continue;
+                try
+                {
+                    if ((srv.currentRackPosition != null && srv.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                        || srv.rackPositionUID == rackPosUid)
+                    {
+                        objectId = srv.ServerID ?? "";
+                        objectType = (byte)srv.serverType;
+                        return true;
+                    }
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            }
+        }
+
         var allServers = UnityEngine.Object.FindObjectsOfType<Server>();
         foreach (var srv in allServers)
         {
@@ -160,6 +181,27 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
     private static bool TryFindInSwitches(int rackPosUid, out string objectId, out byte objectType)
     {
+        var netMap = global::Il2Cpp.NetworkMap.instance;
+        if (netMap != null && netMap.switches != null)
+        {
+            foreach (var kvp in netMap.switches)
+            {
+                var sw = kvp.Value?.TryCast<global::Il2Cpp.NetworkSwitch>();
+                if (sw == null) continue;
+                try
+                {
+                    if ((sw.currentRackPosition != null && sw.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                        || sw.rackPositionUID == rackPosUid)
+                    {
+                        objectId = sw.switchId ?? "";
+                        objectType = 4;
+                        return true;
+                    }
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            }
+        }
+
         foreach (var sw in UnityEngine.Object.FindObjectsOfType<NetworkSwitch>())
         {
             try
@@ -181,6 +223,27 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
     private static bool TryFindInPatchPanels(int rackPosUid, out string objectId, out byte objectType)
     {
+        var netMap = global::Il2Cpp.NetworkMap.instance;
+        if (netMap != null && netMap.patchPanels != null)
+        {
+            foreach (var kvp in netMap.patchPanels)
+            {
+                var pp = kvp.Value?.TryCast<global::Il2Cpp.PatchPanel>();
+                if (pp == null) continue;
+                try
+                {
+                    if ((pp.currentRackPosition != null && pp.currentRackPosition.rackPosGlobalUID == rackPosUid)
+                        || pp.rackPositionUID == rackPosUid)
+                    {
+                        objectId = pp.patchPanelId ?? "";
+                        objectType = 7;
+                        return true;
+                    }
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
+            }
+        }
+
         foreach (var pp in UnityEngine.Object.FindObjectsOfType<PatchPanel>())
         {
             try

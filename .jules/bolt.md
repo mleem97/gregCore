@@ -28,6 +28,7 @@
 ## 2025-05-21 - Optimized Object Tracking via NetworkMap (EnsureAllRackPositionUIDs)
 **Learning:** Calling `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `EnsureAllRackPositionUIDs()` is an O(N) operation over all objects. This causes significant performance hitching during WorldSync loops.
 **Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Note that values must be cast safely using `?.TryCast<T>()`.
+
 ## 2024-05-22 - Optimized Server Lookup (Resources.FindObjectsOfTypeAll)
 **Learning:** Using `Resources.FindObjectsOfTypeAll<T>` to fetch a list of servers iterates over the entire Unity scene hierarchy (O(N) operation), which is extremely expensive, especially as the data center grows.
 **Action:** Optimized `GregServers.FindAll()` by utilizing the game-managed `Il2Cpp.NetworkMap.instance.servers` dictionary for O(1) loop iteration, providing a fallback to `FindObjectsOfTypeAll` only when the map is empty or uninitialized. Note that you must use `kvp.Value?.TryCast<T>()` for safe casting.

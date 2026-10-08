@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
 
 ### Added
 
+- Game hooks (+7, sourced from workshop-mod usage): `Router.ApplyRoute`
+  (both overloads), `RouterConfiguration.CreateSubnetRowUI`,
+  `NetworkMap.GetAllRackedServers`, `NetworkMap.FindAllShortestPathsBetween`,
+  `MaliciousAttackManager.LaunchAttack`, `CoopWorldSync.SyncServerCustomer`
+  (`game_hooks.json` + `docs/FrameworkAPI.md`). Wrappers already generated;
+  no registry changes (no new classes).
 - Rust native SDK: `templates/rust/` (`Cargo.toml`, safe `src/greg.rs`
   bindings mirroring the ABI v1 table field-for-field with compile-time
   layout asserts, example `src/lib.rs`) and refreshed

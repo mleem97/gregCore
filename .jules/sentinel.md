@@ -25,3 +25,7 @@
 **Vulnerability:** In `GregIoLuaModule.cs`, the `list_files` function accepted a `pattern` string that was passed directly to `Directory.GetFiles(..., pattern, ...)`. Although standard file operations were sandbox-validated via `ResolveSafe`, the `pattern` argument wasn't validated, allowing paths like `../../` to be interpreted by `Directory.GetFiles`, causing directory traversal and reading files outside the Lua sandbox.
 **Learning:** `Directory.GetFiles` is vulnerable to path traversal if the `searchPattern` argument contains traversal characters like `..`, `/`, or `\`.
 **Prevention:** Always validate or sanitize user-provided search patterns to prevent unauthorized file system enumeration. Specifically for search patterns, deny any pattern that contains directory separators (`/` or `\`) or traversal characters (`..`).
+## 2024-05-14 - Path Traversal bypass via Backslash
+**Vulnerability:** Path traversal checks in Lua sandbox APIs only normalized forward slashes (`/`), allowing `\` to bypass directory containment checks on platforms where `\` is interpreted as a directory separator by the underlying IO APIs.
+**Learning:** Normalizing paths for directory traversal checks requires replacing both `/` and `\` with `Path.DirectorySeparatorChar` before path combination or validation.
+**Prevention:** Always normalize both `/` and `\` to `Path.DirectorySeparatorChar` before using `Path.GetFullPath` to validate sandbox boundaries.

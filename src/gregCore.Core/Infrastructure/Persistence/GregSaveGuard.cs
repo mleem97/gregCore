@@ -316,16 +316,32 @@ public static class GregSaveGuard
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (SaveGameData): " + ex.Message); }
     }
 
+    // Also writes sidecars, same gate as SaveGamePrefix: this is the shared
+    // fallback for SerializeToBytes/SaveGameData, the native save paths that
+    // do NOT go through SaveSystem.SaveGame(string,string) (e.g. the pause
+    // menu's "Save" action, which calls SaveGameData() directly). Without
+    // this, mod sidecar data (hotbar inventory, Backplanes variants, etc.)
+    // only ever persisted for saves that happened to route through SaveGame.
     private static void EnsureBackedUpForCurrentSlot()
     {
         try
         {
-            if (!BackupEnabled) { WarnOptOutOnce(); return; }
             string dir = null, name = null;
             try { dir = global::Il2Cpp.SaveSystem.saveDirPath; } catch { dir = null; }
             try { name = global::Il2Cpp.SaveSystem.loadSaveName; } catch { name = null; }
             if (string.IsNullOrWhiteSpace(dir) || string.IsNullOrWhiteSpace(name)) return;
-            BackupVanillaSave(dir, name);
+
+            bool backedUp = BackupEnabled && BackupVanillaSave(dir, name);
+            if (ResolveSaveWriteGate(BackupEnabled, backedUp))
+            {
+                WriteSidecars(dir, name);
+            }
+            else
+            {
+                WarnOptOutOnce();
+                MelonLogger.Error("[gregCore][Save] NO backup possible — mod sidecar files for '"
+                    + name + "' will NOT be written this run (vanilla save continues).");
+            }
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
     }
@@ -373,6 +389,15 @@ public static class GregSaveGuard
     {
         try
         {
+            // This fires reliably on every load, including a pause-menu
+            // "Load Game" that reuses the current scene (OnSceneWasLoaded,
+            // which LoadSidecarsForCurrentSave used to depend on exclusively,
+            // never fires for that case — so sidecar-backed restores like
+            // gregMod.Inventory's hotbar silently saw stale/empty data on any
+            // in-session reload). Priority.First on this patch guarantees
+            // sidecars are fresh before other mods' own LoadNetworkState
+            // postfixes run.
+            LoadSidecarsForCurrentSave();
             GregEntityInventory.RebuildFromNetworkData(networkData);
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Inventory (LoadNetworkState): " + ex.Message); }
@@ -383,8 +408,14 @@ public static class GregSaveGuard
         try
         {
             if (harmony == null || loadNetworkState == null) return false;
-            harmony.Patch(loadNetworkState,
-                postfix: new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix)));
+            // Priority.First: other mods' own LoadNetworkState postfixes (hotbar
+            // restore, port-module restore, ...) read sidecar data that must
+            // already be fresh by the time they run.
+            var postfix = new HarmonyMethod(typeof(GregSaveGuard), nameof(LoadNetworkStatePostfix))
+            {
+                priority = HarmonyLib.Priority.First
+            };
+            harmony.Patch(loadNetworkState, postfix: postfix);
             return true;
         }
         catch { return false; }
@@ -477,7 +508,21 @@ public static class GregSaveGuard
         return -1;
     }
 
-    // After scene load: read sidecars of the current save (idempotent).
+    // After scene load: read sidecars of the current save.
+    //
+    // Previously gated by "_loadedKey == dir|name" to avoid rereading on
+    // repeat NotifySceneGuards calls for the same load — but that gate
+    // treated "reloaded the same save slot again" (pause menu Load Game,
+    // without quitting to desktop) as a no-op forever after the first time
+    // in this process, so sidecars written by a save made mid-session (e.g.
+    // gregMod.Inventory's hotbar, gregMod.Backplanes' port-module restore)
+    // never got re-applied on that reload even though the files on disk
+    // were fresh. OnSceneWasLoaded fires once per actual load, so a plain
+    // debounce (same key within the same tick) is enough to dedupe without
+    // blocking a genuine subsequent reload.
+    private static string _lastLoadKey;
+    private static DateTime _lastLoadAt;
+
     public static void LoadSidecarsForCurrentSave()
     {
         try
@@ -489,7 +534,12 @@ public static class GregSaveGuard
             string key = dir + "|" + name;
             lock (_sidecars)
             {
-                if (string.Equals(_loadedKey, key, StringComparison.Ordinal)) return;
+                DateTime now = DateTime.UtcNow;
+                if (string.Equals(_lastLoadKey, key, StringComparison.Ordinal) &&
+                    (now - _lastLoadAt) < TimeSpan.FromSeconds(2))
+                    return;
+                _lastLoadKey = key;
+                _lastLoadAt = now;
                 _loadedKey = key;
                 foreach (var kv in _sidecars)
                 {

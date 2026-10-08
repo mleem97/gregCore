@@ -76,7 +76,8 @@ public static class LuaItemsModule
             string root = string.IsNullOrEmpty(modDir) ? "." : modDir;
             string combined = string.IsNullOrEmpty(subfolder)
                 ? root
-                : Path.Combine(root, subfolder.Replace('/', Path.DirectorySeparatorChar));
+                // [Security] Prevent path traversal using backslashes
+                : Path.Combine(root, subfolder.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar));
             string full = Path.GetFullPath(combined);
             string rootFull = Path.GetFullPath(root);
             string sep = rootFull.EndsWith(Path.DirectorySeparatorChar.ToString())

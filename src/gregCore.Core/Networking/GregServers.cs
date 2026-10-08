@@ -170,6 +170,28 @@ public static class GregServers
         var result = new List<global::Il2Cpp.Server>();
         Try(() =>
         {
+            // Optimization: Use O(1) lookup from game-managed NetworkMap instead of O(N) Resources.FindObjectsOfTypeAll
+            var nm = global::Il2Cpp.NetworkMap.instance;
+            if (nm != null && nm.servers != null)
+            {
+                foreach (var kvp in nm.servers)
+                {
+                    global::Il2Cpp.Server srv = null;
+                    try { srv = kvp.Value?.TryCast<global::Il2Cpp.Server>(); } catch { continue; }
+                    if (srv != null && srv.Pointer != IntPtr.Zero)
+                    {
+                        try
+                        {
+                            var go = srv.gameObject;
+                            if (go != null && go.scene.IsValid() && go.scene.isLoaded)
+                                result.Add(srv);
+                        }
+                        catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                    }
+                }
+                if (result.Count > 0) return;
+            }
+
             var all = Resources.FindObjectsOfTypeAll<global::Il2Cpp.Server>();
             if (all == null) return;
             foreach (var s in all)

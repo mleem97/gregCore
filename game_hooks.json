@@ -22930,5 +22930,113 @@
         "Type": "RaycastHit"
       }
     ]
+  },
+  {
+    "Group": "Settings",
+    "Namespace": "Il2Cpp",
+    "ClassName": "Router",
+    "MethodName": "ApplyRoute",
+    "ReturnType": "Void",
+    "IsVoid": true,
+    "Parameters": [
+      {
+        "Name": "route",
+        "Type": "RouteEntry"
+      }
+    ]
+  },
+  {
+    "Group": "Settings",
+    "Namespace": "Il2Cpp",
+    "ClassName": "Router",
+    "MethodName": "ApplyRoute",
+    "ReturnType": "Void",
+    "IsVoid": true,
+    "Parameters": [
+      {
+        "Name": "route",
+        "Type": "RouteEntry"
+      },
+      {
+        "Name": "componentByDevice",
+        "Type": "Dictionary\u00602"
+      },
+      {
+        "Name": "basesByCustomer",
+        "Type": "Dictionary\u00602"
+      }
+    ]
+  },
+  {
+    "Group": "VisualUI",
+    "Namespace": "Il2Cpp",
+    "ClassName": "RouterConfiguration",
+    "MethodName": "CreateSubnetRowUI",
+    "ReturnType": "Void",
+    "IsVoid": true,
+    "Parameters": [
+      {
+        "Name": "vlanId",
+        "Type": "Int32"
+      },
+      {
+        "Name": "subnetCidr",
+        "Type": "String"
+      }
+    ]
+  },
+  {
+    "Group": "Networking",
+    "Namespace": "Il2Cpp",
+    "ClassName": "NetworkMap",
+    "MethodName": "GetAllRackedServers",
+    "ReturnType": "IEnumerable\u00601",
+    "IsVoid": false,
+    "Parameters": []
+  },
+  {
+    "Group": "Networking",
+    "Namespace": "Il2Cpp",
+    "ClassName": "NetworkMap",
+    "MethodName": "FindAllShortestPathsBetween",
+    "ReturnType": "List\u00601",
+    "IsVoid": false,
+    "Parameters": [
+      {
+        "Name": "startDevice",
+        "Type": "String"
+      },
+      {
+        "Name": "targetDevice",
+        "Type": "String"
+      }
+    ]
+  },
+  {
+    "Group": "Maintenance",
+    "Namespace": "Il2Cpp",
+    "ClassName": "MaliciousAttackManager",
+    "MethodName": "LaunchAttack",
+    "ReturnType": "Void",
+    "IsVoid": true,
+    "Parameters": []
+  },
+  {
+    "Group": "Steam",
+    "Namespace": "Il2Cpp",
+    "ClassName": "CoopWorldSync",
+    "MethodName": "SyncServerCustomer",
+    "ReturnType": "Void",
+    "IsVoid": true,
+    "Parameters": [
+      {
+        "Name": "serverId",
+        "Type": "String"
+      },
+      {
+        "Name": "customerId",
+        "Type": "Int32"
+      }
+    ]
   }
 ]

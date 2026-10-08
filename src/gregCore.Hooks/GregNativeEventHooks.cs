@@ -8,7 +8,7 @@ namespace gregCore.GameLayer.Hooks;
 
 /// <summary>
 /// The Harmony bridge between the game and gregCore.
-/// Delegates to GregDynamicHookPatcher for all 1850+ hooks.
+/// Delegates to GregDynamicHookPatcher for all hooks defined in game_hooks.json.
 /// </summary>
 [HarmonyPatch]
 public sealed class GregNativeEventHooks : SafePatch

@@ -162,11 +162,31 @@ public sealed class GregDemandCronWorker : MonoBehaviour
         FireDemandEvent();
     }
 
+    private global::Il2Cpp.CustomerBase[] GetCustomers()
+    {
+        var nm = global::Il2Cpp.NetworkMap.instance;
+        if (nm != null)
+        {
+            var dict = nm.customerBases;
+            if (dict != null && dict.Count > 0)
+            {
+                var list = new System.Collections.Generic.List<global::Il2Cpp.CustomerBase>(dict.Count);
+                foreach (var kvp in dict)
+                {
+                    var cb = kvp.Value?.TryCast<global::Il2Cpp.CustomerBase>();
+                    if (cb != null) list.Add(cb);
+                }
+                return list.ToArray();
+            }
+        }
+        return UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>();
+    }
+
     private void FireDemandEvent()
     {
         try
         {
-            var customers = UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>();
+            var customers = GetCustomers();
             if (customers == null || customers.Length == 0) return;
 
             // Pick a random customer

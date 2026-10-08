@@ -80,6 +80,53 @@ namespace greg.FasterSFP
     [HarmonyPatch]
     public static class SFPPatch
     {
+        // gregMod.MoreModules / gregMod.RealisticModules own the same speed
+        // tiers (100G-6.4T) with their own prefab IDs. Relabeling their
+        // modules to 100-106 at insert time made the save restore them from
+        // this module's templates instead of theirs, so stand down entirely
+        // for insert relabeling and shop routing when either is loaded.
+        private static bool? _siblingOwnsModules;
+        internal static bool SiblingOwnsModules
+        {
+            get
+            {
+                if (_siblingOwnsModules.HasValue) return _siblingOwnsModules.Value;
+                bool found = false;
+                try
+                {
+                    foreach (var m in MelonLoader.MelonMod.RegisteredMelons)
+                    {
+                        string n = m?.Info?.Name;
+                        if (n == "gregMod.MoreModules" || n == "gregMod.RealisticModules") { found = true; break; }
+                    }
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) - melon list unreadable, assume no sibling */ }
+                _siblingOwnsModules = found;
+                if (found) MelonLogger.Msg("[FasterSFP] gregMod.MoreModules/RealisticModules detected — insert relabeling and shop routing disabled.");
+                return found;
+            }
+        }
+
+        // Template source: the vanilla QSFP+ module (name SFP_QSFP, normally
+        // index 3). Index 0 is SFP_RJ45 — cloning that produced copper (sfpType
+        // 0) templates that load can't seat in a fiber QSFP port.
+        private static GameObject FindQsfpBase(global::Il2Cpp.MainGameManager mgm)
+        {
+            var arr = mgm.sfpPrefabs;
+            for (int i = 0; i < arr.Length && i < 100; i++)
+            {
+                var go = arr[i];
+                if (go == null) continue;
+                if (go.name == "SFP_QSFP") return go;
+            }
+            for (int i = 0; i < arr.Length && i < 100; i++)
+            {
+                var go = arr[i];
+                var s = go != null ? go.GetComponent<SFPModule>() : null;
+                if (s != null && s.sfpType == 3) return go;
+            }
+            return arr.Length > 0 ? arr[0] : null;
+        }
         [HarmonyPatch(typeof(global::Il2Cpp.MainGameManager), nameof(global::Il2Cpp.MainGameManager.Awake))]
         [HarmonyPostfix]
         public static void SetupRegistry(global::Il2Cpp.MainGameManager __instance)
@@ -95,7 +142,7 @@ namespace greg.FasterSFP
                     var newArr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameObject>(maxId + 1);
                     for (int i = 0; i < __instance.sfpPrefabs.Length; i++) newArr[i] = __instance.sfpPrefabs[i];
                     
-                    var basePrefab = __instance.sfpPrefabs[0]; 
+                    var basePrefab = FindQsfpBase(__instance);
                     if (basePrefab != null)
                     {
                         foreach (var mod in Main.Modules)
@@ -131,6 +178,7 @@ namespace greg.FasterSFP
         {
             try
             {
+                if (SiblingOwnsModules) return true;
                 var mgm = MainGameManager.instance;
                 if (mgm == null || mgm.Pointer == System.IntPtr.Zero || mgm.sfpPrefabs == null) return true;
 
@@ -156,6 +204,7 @@ namespace greg.FasterSFP
         {
             try
             {
+                if (SiblingOwnsModules) return;
                 if (module == null || module.Pointer == System.IntPtr.Zero) return;
 
                 var usableObj = module.GetComponent<UsableObject>();

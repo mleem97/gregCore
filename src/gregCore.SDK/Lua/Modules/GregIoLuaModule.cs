@@ -286,7 +286,8 @@ public static class GregIoLuaModule
             throw new InvalidOperationException("Path cannot be empty");
 
         // Prevent path traversal
-        string normalized = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        // [Security] Prevent path traversal using backslashes
+        string normalized = relativePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         string fullPath = Path.GetFullPath(Path.Combine(dataDir, normalized));
         string dataDirFull = Path.GetFullPath(dataDir);
         string dataDirWithSep = dataDirFull.EndsWith(Path.DirectorySeparatorChar.ToString())

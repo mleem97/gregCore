@@ -29,3 +29,7 @@
 **Vulnerability:** Path traversal checks in Lua sandbox APIs only normalized forward slashes (`/`), allowing `\` to bypass directory containment checks on platforms where `\` is interpreted as a directory separator by the underlying IO APIs.
 **Learning:** Normalizing paths for directory traversal checks requires replacing both `/` and `\` with `Path.DirectorySeparatorChar` before path combination or validation.
 **Prevention:** Always normalize both `/` and `\` to `Path.DirectorySeparatorChar` before using `Path.GetFullPath` to validate sandbox boundaries.
+## 2024-10-24 - Path Traversal via Un-normalized Backslashes
+**Vulnerability:** In `GregIoLuaModule.cs`, the `ResolveSafe` function normalized forward slashes (`/`) to the OS directory separator to prevent traversal, but failed to normalize backslashes (`\`). This allowed path traversal on systems where `Path.Combine` and `Path.GetFullPath` interpret alternate separators (like `\`) as valid directory boundaries even if `Path.DirectorySeparatorChar` is `/`.
+**Learning:** When implementing path traversal or sandbox containment checks in C#, ensure both forward slashes (`/`) and backslashes (`\`) are normalized to `Path.DirectorySeparatorChar` before combining or validating paths.
+**Prevention:** Explicitly normalize both slash types to `Path.DirectorySeparatorChar` when sanitizing untrusted paths (replace `/` and `\` before validation).

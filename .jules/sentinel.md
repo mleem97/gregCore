@@ -33,3 +33,7 @@
 **Vulnerability:** In `GregIoLuaModule.cs`, the `ResolveSafe` function normalized forward slashes (`/`) to the OS directory separator to prevent traversal, but failed to normalize backslashes (`\`). This allowed path traversal on systems where `Path.Combine` and `Path.GetFullPath` interpret alternate separators (like `\`) as valid directory boundaries even if `Path.DirectorySeparatorChar` is `/`.
 **Learning:** When implementing path traversal or sandbox containment checks in C#, ensure both forward slashes (`/`) and backslashes (`\`) are normalized to `Path.DirectorySeparatorChar` before combining or validating paths.
 **Prevention:** Explicitly normalize both slash types to `Path.DirectorySeparatorChar` when sanitizing untrusted paths (replace `/` and `\` before validation).
+## 2024-10-24 - Path Traversal via Search Pattern: explicit slash checks
+**Vulnerability:** `SanitizeSearchPattern` in `GregIoLuaModule.cs` only rejected `Path.DirectorySeparatorChar` and `Path.AltDirectorySeparatorChar`. On platforms where neither matches a given slash (e.g. `\` on Linux), a crafted pattern could bypass the check while the underlying OS APIs still resolve the slash as a directory boundary, enabling traversal via `Directory.GetFiles`.
+**Learning:** Platform separator chars are insufficient for sandbox validation; explicitly reject both `/` and `\` in user-supplied search patterns.
+**Prevention:** In addition to the platform defaults, explicitly deny `/` and `\` in search patterns before passing them to file system enumeration APIs.

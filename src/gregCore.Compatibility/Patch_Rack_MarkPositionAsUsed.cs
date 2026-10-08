@@ -223,27 +223,8 @@ internal static class Patch_Rack_MarkPositionAsUsed
 
     private static bool TryFindInPatchPanels(int rackPosUid, out string objectId, out byte objectType)
     {
-        var netMap = global::Il2Cpp.NetworkMap.instance;
-        if (netMap != null && netMap.patchPanels != null)
-        {
-            foreach (var kvp in netMap.patchPanels)
-            {
-                var pp = kvp.Value?.TryCast<global::Il2Cpp.PatchPanel>();
-                if (pp == null) continue;
-                try
-                {
-                    if ((pp.currentRackPosition != null && pp.currentRackPosition.rackPosGlobalUID == rackPosUid)
-                        || pp.rackPositionUID == rackPosUid)
-                    {
-                        objectId = pp.patchPanelId ?? "";
-                        objectType = 7;
-                        return true;
-                    }
-                }
-                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */  }
-            }
-        }
-
+        // NOTE: Il2Cpp.NetworkMap has no patchPanels registry (verified against
+        // game assemblies, see GameHooks.Racks.cs) — scene scan is the only source.
         foreach (var pp in UnityEngine.Object.FindObjectsOfType<PatchPanel>())
         {
             try

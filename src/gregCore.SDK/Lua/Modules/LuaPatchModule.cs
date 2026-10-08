@@ -193,13 +193,11 @@ public static class LuaPatchModule
                 if (list.Count > 0) return list;
             }
             var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
-            if (found != null)
+            if (found == null) return list;
+            foreach (var pp in found)
             {
-                foreach (var pp in found)
-                {
-                    try { if (pp != null) list.Add(pp); }
-                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
-                }
+                try { if (pp != null) list.Add(pp); }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             }
         }
         catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }

@@ -28,6 +28,7 @@
 ## 2025-05-21 - Optimized Object Tracking via NetworkMap (EnsureAllRackPositionUIDs)
 **Learning:** Calling `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `EnsureAllRackPositionUIDs()` is an O(N) operation over all objects. This causes significant performance hitching during WorldSync loops.
 **Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Note that values must be cast safely using `?.TryCast<T>()`.
+
 ## 2025-05-24 - Optimized PatchPanel lookup in LuaPatchModule
 **Learning:** `FindAllPanels()` in `LuaPatchModule` used the expensive O(N) `UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>()` on every call, leading to large GC pressure and CPU overhead in Lua scripts.
 **Action:** Changed to use the O(1) game-managed `Il2Cpp.NetworkMap.instance.patchPanels` dictionary by default, keeping `FindObjectsOfType` strictly as a fallback.

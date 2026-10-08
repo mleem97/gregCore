@@ -413,14 +413,16 @@ public static class GregNetworkIdHealing
         foreach (var cable in data.cables)
         {
             if (cable == null) continue;
-            if (cable.startPoint != null && cable.startPoint.switchID != null && cable.startPoint.switchID.StartsWith(oldId))
+            if (cable.startPoint != null && cable.startPoint.switchID != null
+                && GregPanelEndpointMatcher.Matches(cable.startPoint.switchID, oldId))
             {
-                cable.startPoint.switchID = cable.startPoint.switchID.Replace(oldId, newGuid);
+                cable.startPoint.switchID = GregPanelEndpointMatcher.Remap(cable.startPoint.switchID, oldId, newGuid);
                 healedCables++;
             }
-            if (cable.endPoint != null && cable.endPoint.switchID != null && cable.endPoint.switchID.StartsWith(oldId))
+            if (cable.endPoint != null && cable.endPoint.switchID != null
+                && GregPanelEndpointMatcher.Matches(cable.endPoint.switchID, oldId))
             {
-                cable.endPoint.switchID = cable.endPoint.switchID.Replace(oldId, newGuid);
+                cable.endPoint.switchID = GregPanelEndpointMatcher.Remap(cable.endPoint.switchID, oldId, newGuid);
                 healedCables++;
             }
         }
@@ -469,6 +471,9 @@ public static class GregNetworkIdHealing
             // Skipped together with healing: pure vanilla passthrough.
             if (!GregGameCompat.HwIdRewritesAllowed) return;
             __instance.RequestRouteEvaluation();
+            // Load-time diagnosis for duplicate rack positions (Mantis #19):
+            // log-only, never mutates.
+            try { GregRackOverlapGuard.ScanAndReport(); } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
         }
         catch (Exception ex)
         {

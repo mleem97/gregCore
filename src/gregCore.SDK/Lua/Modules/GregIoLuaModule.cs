@@ -254,9 +254,12 @@ public static class GregIoLuaModule
     private static string SanitizeSearchPattern(string pattern)
     {
         string safe = string.IsNullOrWhiteSpace(pattern) ? "*.*" : pattern;
+        // [Security] Prevent path traversal via explicit slashes check
         if (safe.Contains("..") ||
             safe.IndexOf(Path.DirectorySeparatorChar) >= 0 ||
-            safe.IndexOf(Path.AltDirectorySeparatorChar) >= 0)
+            safe.IndexOf(Path.AltDirectorySeparatorChar) >= 0 ||
+            safe.IndexOf('/') >= 0 ||
+            safe.IndexOf('\\') >= 0)
             throw new UnauthorizedAccessException("Search pattern escapes sandbox.");
         foreach (char c in Path.GetInvalidFileNameChars())
         {

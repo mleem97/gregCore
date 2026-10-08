@@ -32,3 +32,7 @@
 ## 2025-05-24 - Optimized PatchPanel lookup in LuaPatchModule
 **Learning:** `FindAllPanels()` in `LuaPatchModule` used the expensive O(N) `UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>()` on every call, leading to large GC pressure and CPU overhead in Lua scripts.
 **Action:** Changed to use the O(1) game-managed `Il2Cpp.NetworkMap.instance.patchPanels` dictionary by default, keeping `FindObjectsOfType` strictly as a fallback.
+
+## 2024-05-22 - Optimized Server Lookup (Resources.FindObjectsOfTypeAll)
+**Learning:** Using `Resources.FindObjectsOfTypeAll<T>` to fetch a list of servers iterates over the entire Unity scene hierarchy (O(N) operation), which is extremely expensive, especially as the data center grows.
+**Action:** Optimized `GregServers.FindAll()` by utilizing the game-managed `Il2Cpp.NetworkMap.instance.servers` dictionary for O(1) loop iteration, providing a fallback to `FindObjectsOfTypeAll` only when the map is empty or uninitialized. Note that you must use `kvp.Value?.TryCast<T>()` for safe casting.

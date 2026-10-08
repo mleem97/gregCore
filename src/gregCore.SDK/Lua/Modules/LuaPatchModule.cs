@@ -178,6 +178,20 @@ public static class LuaPatchModule
         var list = new System.Collections.Generic.List<Il2Cpp.PatchPanel>();
         try
         {
+            var nm = Il2Cpp.NetworkMap.instance;
+            if (nm != null && nm.patchPanels != null)
+            {
+                foreach (var kvp in nm.patchPanels)
+                {
+                    try
+                    {
+                        var panel = kvp.Value?.TryCast<Il2Cpp.PatchPanel>();
+                        if (panel != null) list.Add(panel);
+                    }
+                    catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                }
+                if (list.Count > 0) return list;
+            }
             var found = UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>();
             if (found == null) return list;
             foreach (var pp in found)

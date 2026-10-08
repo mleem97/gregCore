@@ -691,6 +691,7 @@ They serve as the raw targets for Harmony Prefix/Postfix patches.
 
 | Class | Method | Return | Parameters |
 |-------|--------|--------|------------|
+| `Il2Cpp.MaliciousAttackManager` | `LaunchAttack` | `Void` | `()` |
 | `Il2Cpp.PacketSpawnerSystem` | `__ScheduleViaJobChunkExtension_0` | `JobHandle` | `(UpdatePacketsJob job, EntityQuery query, JobHandle dependency, SystemState& state, Boolean hasUserDefinedQuery)` |
 | `Il2Cpp.Technician` | `AssignJob` | `Void` | `(RepairJob job)` |
 | `Il2Cpp.Technician` | `RequestJobDelayed` | `IEnumerator` | `()` |
@@ -755,11 +756,13 @@ They serve as the raw targets for Harmony Prefix/Postfix patches.
 | `Il2Cpp.NetworkMap` | `CreateLACPGroup` | `Int32` | `(String deviceA, String deviceB, List`1 cableIds)` |
 | `Il2Cpp.NetworkMap` | `Disconnect` | `Void` | `(String from, String to)` |
 | `Il2Cpp.NetworkMap` | `FindAllReachablePathsFrom` | `Dictionary`2` | `(String startDevice)` |
+| `Il2Cpp.NetworkMap` | `FindAllShortestPathsBetween` | `List`1` | `(String startDevice, String targetDevice)` |
 | `Il2Cpp.NetworkMap` | `FindPhysicalPath` | `List`1` | `(String start, String target)` |
 | `Il2Cpp.NetworkMap` | `GenerateDeviceName` | `String` | `(TypeOfLink type, Vector3 position)` |
 | `Il2Cpp.NetworkMap` | `GetAllDevices` | `List`1` | `()` |
 | `Il2Cpp.NetworkMap` | `GetAllLACPGroups` | `Dictionary`2` | `()` |
 | `Il2Cpp.NetworkMap` | `GetAllNetworkSwitches` | `IEnumerable`1` | `()` |
+| `Il2Cpp.NetworkMap` | `GetAllRackedServers` | `IEnumerable`1` | `()` |
 | `Il2Cpp.NetworkMap` | `GetDevice` | `Device` | `(String name)` |
 | `Il2Cpp.NetworkMap` | `GetLACPGroupBetween` | `LACPGroup` | `(String deviceA, String deviceB)` |
 | `Il2Cpp.NetworkMap` | `GetLACPGroupForCable` | `LACPGroup` | `(Int32 cableId)` |
@@ -1056,6 +1059,8 @@ They serve as the raw targets for Harmony Prefix/Postfix patches.
 | `Il2Cpp.RectExtensions` | `InverseTransform` | `Rect` | `(Rect r, Transform transform)` |
 | `Il2Cpp.RectExtensions` | `Transform` | `Rect` | `(Rect r, Transform transform)` |
 | `Il2Cpp.Router` | `AddRoute` | `Boolean` | `(Int32 sourceVlanId, String subnetCidr, Int32 targetVlanId)` |
+| `Il2Cpp.Router` | `ApplyRoute` | `Void` | `(RouteEntry route)` |
+| `Il2Cpp.Router` | `ApplyRoute` | `Void` | `(RouteEntry route, Dictionary`2 componentByDevice, Dictionary`2 basesByCustomer)` |
 | `Il2Cpp.Router` | `ExchangeRoutes` | `Void` | `(Router neighbor)` |
 | `Il2Cpp.Router` | `WithdrawBgpRoutes` | `Void` | `()` |
 | `Il2Cpp.Router` | `_WithdrawBgpRoutes_b__16_1` | `Boolean` | `(SubnetRoute r)` |
@@ -1077,6 +1082,7 @@ They serve as the raw targets for Harmony Prefix/Postfix patches.
 
 | Class | Method | Return | Parameters |
 |-------|--------|--------|------------|
+| `Il2Cpp.CoopWorldSync` | `SyncServerCustomer` | `Void` | `(String serverId, Int32 customerId)` |
 | `Il2Cpp.SteamLeaderboards` | `Init` | `Void` | `()` |
 | `Il2Cpp.SteamLeaderboards` | `OnLeaderboardFound` | `Void` | `(LeaderboardFindResult_t result, Boolean ioFailure)` |
 | `Il2Cpp.SteamLeaderboards` | `RequestUserEntry` | `Void` | `()` |
@@ -1651,6 +1657,7 @@ They serve as the raw targets for Harmony Prefix/Postfix patches.
 | `Il2Cpp.RouterConfiguration` | `ButtonSetTargetVLAN` | `Void` | `()` |
 | `Il2Cpp.RouterConfiguration` | `ButtonSetVLAN` | `Void` | `()` |
 | `Il2Cpp.RouterConfiguration` | `CreateRouteRowUI` | `Void` | `(Int32 sVlan, Int32 tVlan, String subnetCidr)` |
+| `Il2Cpp.RouterConfiguration` | `CreateSubnetRowUI` | `Void` | `(Int32 vlanId, String subnetCidr)` |
 | `Il2Cpp.RouterConfiguration` | `_ButtonSetMask_b__17_0` | `Void` | `(String text)` |
 | `Il2Cpp.RouterConfiguration` | `_ButtonSetNeighborId_b__25_0` | `Void` | `(String text)` |
 | `Il2Cpp.RouterConfiguration` | `_ButtonSetSubnet_b__16_0` | `Void` | `(String text)` |

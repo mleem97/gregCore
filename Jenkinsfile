@@ -4,12 +4,16 @@
 //   1. Verifies game reference assemblies resolve (fail fast with a clear message)
 //   2. Builds gregCore.csproj (Release, no shared compilation — same flags as local)
 //   3. Runs the test suite (TRX report + OpenCover coverage via coverlet)
-//   4. Runs SonarQube analysis (.NET scanner) + enforces the Quality Gate
-//   5. Validates the wiki import (docs check, best-effort if node is present)
-//   6. Publishes GitHub checks named exactly like the branch-protection
+//   4. Runs SonarQube analysis (.NET scanner, incl. PR decoration) +
+//      enforces the Quality Gate
+//   5. Syncs every SonarQube issue to Mantis (create + auto-resolve,
+//      scripts/sonar_to_mantis.py) — runs before the gate on purpose
+//   6. Validates the wiki import (docs check, best-effort if node is present)
+//   7. Publishes GitHub checks named exactly like the branch-protection
 //      contexts: `tests`, `build-linux`, `docs`
-//   7. Archives build artifacts (DLLs, TRX, coverage)
-//   8. Files a Mantis issue when the build fails (needs MANTIS_* credentials)
+//   8. Archives build artifacts (DLLs, TRX, coverage)
+//   9. Files a Mantis issue when the build itself fails
+//      (needs MANTIS_* credentials; distinct from per-issue sync)
 //
 // Required Jenkins plugins: workflow-aggregator (Pipeline), git,
 // github-branch-source, sonar (SonarQube Scanner), mstest (TRX reports),
@@ -88,12 +92,18 @@ pipeline {
                         sh '''
                             dotnet tool install --global dotnet-sonarscanner || true
                             export PATH="$PATH:$HOME/.dotnet/tools"
+                            # PR decoration (only set on pull-request builds).
+                            PR_ARGS=""
+                            if [ -n "$CHANGE_ID" ]; then
+                                PR_ARGS="/d:sonar.pullrequest.key=$CHANGE_ID /d:sonar.pullrequest.branch=$CHANGE_BRANCH /d:sonar.pullrequest.base=$CHANGE_TARGET"
+                            fi
                             dotnet sonarscanner begin \
                                 /k:"$SONAR_PROJECT_KEY" \
                                 /v:"$BUILD_NUMBER" \
                                 /d:sonar.host.url="$SONAR_HOST_URL" \
                                 /d:sonar.token="$SONAR_TOKEN" \
-                                /d:sonar.cs.opencover.reportsPaths="tests/**/coverage.opencover.xml"
+                                /d:sonar.cs.opencover.reportsPaths="tests/**/coverage.opencover.xml" \
+                                $PR_ARGS
                         '''
                     }
                 }
@@ -125,6 +135,30 @@ pipeline {
                             dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
                         '''
                     }
+                }
+            }
+        }
+
+        stage('Report issues to Mantis') {
+            // Fully automatic SonarQube -> Mantis sync (scripts/sonar_to_mantis.py):
+            // one ticket per open issue (deduped), auto-resolve on fix.
+            // Runs BEFORE the Quality Gate on purpose: tickets must exist
+            // even when the gate goes red. Never fails the build: the script
+            // exits 0 on any infra problem.
+            steps {
+                withCredentials([
+                    string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN'),
+                    string(credentialsId: 'mantis-api-token', variable: 'MANTIS_TOKEN')
+                ]) {
+                    sh '''
+                        export SONAR_URL="$SONAR_HOST_URL" SONAR_PROJECT="$SONAR_PROJECT_KEY"
+                        if [ -n "$CHANGE_ID" ]; then
+                            export SONAR_PR="$CHANGE_ID"
+                        else
+                            export SONAR_BRANCH="$BRANCH_NAME"
+                        fi
+                        python3 scripts/sonar_to_mantis.py || echo "Mantis sync skipped (see log)."
+                    '''
                 }
             }
         }

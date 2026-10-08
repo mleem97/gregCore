@@ -28,4 +28,4 @@
 ## 2024-10-24 - Path Traversal via Un-normalized Backslashes
 **Vulnerability:** In `GregIoLuaModule.cs`, the `ResolveSafe` function normalized forward slashes (`/`) to the OS directory separator to prevent traversal, but failed to normalize backslashes (`\`). This allowed path traversal on systems where `Path.Combine` and `Path.GetFullPath` interpret alternate separators (like `\`) as valid directory boundaries even if `Path.DirectorySeparatorChar` is `/`.
 **Learning:** When implementing path traversal or sandbox containment checks in C#, ensure both forward slashes (`/`) and backslashes (`\`) are normalized to `Path.DirectorySeparatorChar` before combining or validating paths.
-**Prevention:** Explicitly use `.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)` to normalize both slash types when sanitizing untrusted paths.
+**Prevention:** Explicitly normalize both slash types to `Path.DirectorySeparatorChar` when sanitizing untrusted paths (e.g. replace `/` and `\` before validation).

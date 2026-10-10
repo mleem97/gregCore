@@ -13,13 +13,16 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-    <Version>1.2.1</Version>
-    <FileVersion>1.2.1</FileVersion>
-    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <Version>1.2.3</Version>
+    <FileVersion>1.2.3.0</FileVersion>
+    <AssemblyVersion>1.2.3.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="src\**\*.cs" />
+    <Compile Remove="src\greg.Multiplayer\**" />
+    <Compile Remove="src\gregCore.*/obj\**" />
+    <Compile Remove="src\gregCore.*/bin\**" />
     <None Include="README.md" />
   </ItemGroup>
 
@@ -33,7 +36,10 @@
     <Reference Include="Il2CppSystem.Core"><HintPath>references/Il2CppSystem.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>references/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>references/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>references/UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>references/UnityEngine.UnityWebRequestModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UI"><HintPath>references/UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><HintPath>references/UnityEngine.IMGUIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UIModule"><HintPath>references/UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AIModule"><HintPath>references/UnityEngine.AIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AnimationModule"><HintPath>references/UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
@@ -58,33 +64,28 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <PackageReference Include="MoonSharp" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLayer" Version="1.11.0" />
     <PackageReference Include="pythonnet" Version="3.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Icon-Pack: eingebettet (immer verfuegbar), Mods/gregIcons/ dient als Override/Custom-Schicht. -->
+    <EmbeddedResource Include="src\gregCore.UI\Icons\*.png">
+      <LogicalName>gregIcons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <!-- Automatic ILRepack disabled due to IL2CPP reference conflicts. Use deploy/unify-core.ps1 instead. -->
   <PropertyGroup>
     <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(GREG_GAME_MODS)' != ''">$(GREG_GAME_MODS)</GameModsPath>
-    <GameModsPath Condition="'$(GameModsPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods</GameModsPath>
+    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(OS)' == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\Data Center\Mods</GameModsPath>
+    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(OS)' != 'Windows_NT' AND EXISTS('$(HOME)/.local/share/Steam/steamapps/common/Data Center/Mods')">$(HOME)/.local/share/Steam/steamapps/common/Data Center/Mods</GameModsPath>
+    <GameModsPath Condition="'$(GameModsPath)' == '' AND '$(OS)' != 'Windows_NT' AND EXISTS('$(HOME)/.steam/steam/steamapps/common/Data Center/Mods')">$(HOME)/.steam/steam/steamapps/common/Data Center/Mods</GameModsPath>
   </PropertyGroup>
   <Target Name="DeployToGame" AfterTargets="CleanupAfterBuild" Condition="Exists('$(GameModsPath)')">
-    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
-          DestinationFolder="$(GameModsPath)"
-          OverwriteReadOnlyFiles="true"
-          ContinueOnError="ErrorAndContinue" />
-    <Error Condition="!Exists('$(GameModsPath)\$(AssemblyName).dll') OR '$([System.IO.File]::GetLastWriteTime(&quot;$(GameModsPath)\$(AssemblyName).dll&quot;).Ticks)' &lt; '$([System.IO.File]::GetLastWriteTime(&quot;$(OutputPath)$(AssemblyName).dll&quot;).Ticks)'"
-           Text="[Deploy FAILED] Could not copy $(AssemblyName).dll to $(GameModsPath) — is the game running and has the DLL locked? Close the game and rebuild." />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(GameModsPath)" OverwriteReadOnlyFiles="true" ContinueOnError="ErrorAndContinue" />
+    <Error Condition="!Exists('$(GameModsPath)\$(AssemblyName).dll') OR '$([System.IO.File]::GetLastWriteTime(&quot;$(GameModsPath)\$(AssemblyName).dll&quot;).Ticks)' &lt; '$([System.IO.File]::GetLastWriteTime(&quot;$(OutputPath)$(AssemblyName).dll&quot;).Ticks)'" Text="[Deploy FAILED] Could not copy $(AssemblyName).dll to $(GameModsPath) — is the game running and has the DLL locked? Close the game and rebuild." />
     <Message Text="[Deploy] $(AssemblyName).dll → $(GameModsPath)" Importance="high" />
   </Target>
 
-  <ItemGroup>
-    <Compile Remove="src\CI_Stubs.cs" />
-    <Compile Remove="tests\**" />
-    <Compile Remove="plugins\**" />
-    <Compile Remove="mods\**" />
-    <Compile Remove="lib\MoonSharp\**" />
-    <Compile Remove="temp_dump\**" />
-    <Compile Remove="src\greg.Multiplayer\**" />
-    <Compile Remove="src\Compatibility\DataCenterModLoader\**" />
-    <Compile Remove="src\API\CustomEmployeeManager.cs" />
-  </ItemGroup>
 </Project>

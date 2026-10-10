@@ -1,0 +1,7 @@
+{
+  "id": "fleet_doctor",
+  "name": "Fleet Doctor",
+  "version": "1.0.0",
+  "author": "teamGreg",
+  "description": "Showcase mod: watches servers and switches, dispatches technicians, keeps stats. Exercises switch/tech/config/save/json APIs."
+}

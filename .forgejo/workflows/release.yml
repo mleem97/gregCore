@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Stable SemVer to publish (for example 1.2.2)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve and validate stable version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          VERSION="${INPUT_VERSION:-$(tr -d '[:space:]' < VERSION)}"
+          python3 scripts/validate_version.py "$VERSION"
+          [[ "$VERSION" != *-* ]] || { echo "release workflow requires a stable SemVer without a prerelease suffix"; exit 1; }
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]] && [[ "$VERSION" != "$(tr -d '[:space:]' < VERSION)" ]]; then
+            echo "workflow input cannot override a push release"; exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create immutable release branch
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          BRANCH="release/v${VERSION}"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "$BRANCH already exists; refusing to rewrite it"
+            exit 0
+          fi
+          git switch -c "$BRANCH"
+          git push origin "$BRANCH"
+
+      - name: Create immutable tag and GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          TAG="v${VERSION}"
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag -a "$TAG" -m "gregCore $TAG"
+            git push origin "$TAG"
+          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "gregCore $TAG" --generate-notes --verify-tag || true

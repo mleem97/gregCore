@@ -24,3 +24,27 @@
 ## 2025-05-21 - Optimized GetRackCount calls (FindObjectsOfType)
 **Learning:** Using `UnityEngine.Object.FindObjectsOfType<Rack>` to simply get the rack count is an O(N) operation over all objects, creating unnecessary GC pressure and CPU overhead, especially as the data center grows.
 **Action:** Optimized `GetRackCount` implementation in `GameHooks.cs` by using the game-managed O(1) singleton `Il2Cpp.NetworkMap.instance.GetNumberOfDevices()` (index 2 for racks), providing a fallback to `FindObjectsOfType` only during uninitialized states.
+
+## 2025-05-21 - Optimized Object Tracking via NetworkMap (EnsureAllRackPositionUIDs)
+**Learning:** Calling `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `EnsureAllRackPositionUIDs()` is an O(N) operation over all objects. This causes significant performance hitching during WorldSync loops.
+**Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`, `.patchPanels`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Note that values must be cast safely using `?.TryCast<T>()`.
+
+## 2025-05-24 - Optimized PatchPanel lookup in LuaPatchModule
+**Learning:** `FindAllPanels()` in `LuaPatchModule` used the expensive O(N) `UnityEngine.Object.FindObjectsOfType<Il2Cpp.PatchPanel>()` on every call, leading to large GC pressure and CPU overhead in Lua scripts.
+**Action:** REVERTED 2026-10-08: `Il2Cpp.NetworkMap` has no `patchPanels` registry (verified against game assemblies, see `GameHooks.Racks.cs`) — scene scan remains the only source. Servers/switches keep their NetworkMap fast path.
+
+## 2024-05-22 - Optimized Server Lookup (Resources.FindObjectsOfTypeAll)
+**Learning:** Using `Resources.FindObjectsOfTypeAll<T>` to fetch a list of servers iterates over the entire Unity scene hierarchy (O(N) operation), which is extremely expensive, especially as the data center grows.
+**Action:** Optimized `GregServers.FindAll()` by utilizing the game-managed `Il2Cpp.NetworkMap.instance.servers` dictionary for O(1) loop iteration, providing a fallback to `FindObjectsOfTypeAll` only when the map is empty or uninitialized. Note that you must use `kvp.Value?.TryCast<T>()` for safe casting.
+
+## 2026-10-03 - Optimized FindAllBases (FindObjectsOfTypeAll)
+**Learning:** `GregCustomers.FindAllBases()` was using `UnityEngine.Resources.FindObjectsOfTypeAll<CustomerBase>()` which is an O(N) operation over all loaded assets in the scene. This method is called frequently through the network module when trying to read or interact with customers.
+**Action:** Use O(1) loop iteration by directly checking the dictionary `Il2Cpp.NetworkMap.instance.customerBases` first, and fallback to `FindObjectsOfTypeAll<T>` only when `NetworkMap` is unavailable or empty. Remember to use `?.TryCast<T>()` when retrieving values from IL2CPP dictionaries.
+
+## 2025-05-21 - Optimized FindObjectsOfType in Patch_Rack_MarkPositionAsUsed
+**Learning:** Checking for installed objects using `UnityEngine.Object.FindObjectsOfType<T>` on `Il2Cpp.Server`, `Il2Cpp.NetworkSwitch`, and `Il2Cpp.PatchPanel` in `TryFindInstalled` methods inside `Patch_Rack_MarkPositionAsUsed.cs` is an O(N) operation over all objects. This causes significant performance issues during rack position tracking updates.
+**Action:** Use O(1) loop iteration by directly checking the dictionaries inside `Il2Cpp.NetworkMap.instance` (`.servers`, `.switches`) first, and fallback to `FindObjectsOfType<T>` only when `NetworkMap` is unavailable or empty. Ensure values are cast safely using `?.TryCast<T>()`. NOTE (2026-10-08): panels have no NetworkMap registry — `TryFindInPatchPanels` keeps the scene scan (see `GameHooks.Racks.cs`).
+
+## 2025-05-23 - Optimized Customer Query (FindObjectsOfType)
+**Learning:** Using `UnityEngine.Object.FindObjectsOfType<global::Il2Cpp.CustomerBase>()` in recurring demand polling mechanics (like cron workers or periodic demand scanners) causes significant CPU overhead and GC pressure as the game scene scales.
+**Action:** Replace `FindObjectsOfType<T>()` for customers with an O(1) dictionary lookup using `global::Il2Cpp.NetworkMap.instance.customerBases`, providing a fallback to `FindObjectsOfType` when the map is empty or uninitialized.

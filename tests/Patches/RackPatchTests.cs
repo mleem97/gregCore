@@ -1,7 +1,7 @@
 /// <file-summary>
-/// Schicht:      Tests
-/// Zweck:        Tests für RackPatch Position-Registry-Logik.
-/// Maintainer:   Testet MarkPositionUsed/Free, GetUsedCount, ClearRack und Thread-Safety.
+/// Layer:       Tests
+/// Purpose:     Tests for RackPatch position registry logic.
+/// Maintainer:   Tests MarkPositionUsed/Free, GetUsedCount, ClearRack and thread safety.
 /// </file-summary>
 
 using System;

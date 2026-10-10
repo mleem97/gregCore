@@ -1,0 +1,44 @@
+name: Branch policy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [dev, pre-release, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  policy:
+    name: policy/branch-flow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce promotion direction
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [[ "$EVENT" != "pull_request" ]]; then exit 0; fi
+          case "$BASE" in
+            dev)
+              [[ "$HEAD" != "main" && "$HEAD" != "pre-release" && "$HEAD" != release/* ]] || { echo "dev accepts feature/fix/integration branches only"; exit 1; }
+              ;;
+            pre-release)
+              [[ "$HEAD" == "dev" ]] || { echo "pre-release may only be promoted from dev"; exit 1; }
+              ;;
+            main)
+              [[ "$HEAD" == "pre-release" ]] || { echo "main may only be promoted from pre-release"; exit 1; }
+              ;;
+          esac
+
+      - name: Enforce release branch immutability
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          if [[ "$BASE" == release/* ]]; then
+            echo "release branches are historical release snapshots and are not merge targets"
+            exit 1
+          fi

@@ -3,5 +3,5 @@
   "name": "Example Lua Mod",
   "version": "1.0.0",
   "author": "teamGreg",
-  "description": "Ein Beispiel-Mod für das gregCore Lua FFI."
+  "description": "An example mod for the gregCore Lua FFI."
 }

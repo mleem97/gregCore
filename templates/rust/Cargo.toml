@@ -1,0 +1,14 @@
+[package]
+name = "greg_example"
+version = "1.0.0"
+edition = "2021"
+# Requires a current stable toolchain (install via rustup). No pinned MSRV:
+# the bindings use modern FFI affordances (safe `extern "C"` calls).
+
+[lib]
+crate-type = ["cdylib"]
+name = "greg_example"
+
+[profile.release]
+opt-level = "s"
+lto = true

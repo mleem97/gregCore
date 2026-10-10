@@ -1,13 +1,13 @@
 /// <file-summary>
-/// Schicht:      Core
-/// Zweck:        Globale Usings und Projekt-Regeln
-/// Maintainer:   Keine externen/Unity Abhängigkeiten hier einfügen.
+/// Layer:       Core
+/// Purpose:     Global usings and project rules
+/// Maintainer:   Do not add external/Unity dependencies here.
 /// </file-summary>
 
 // SERIALIZER-REGEL:
 // System.Text.Json  → Runtime (Persistence, MCP, Events)
-// Newtonsoft.Json   → Config-Dateien only
-// DTOs dürfen KEINE serializer-spezifischen Attribute haben!
+// Newtonsoft.Json   → config files only
+// DTOs must NOT have serializer-specific attributes!
 
 global using System;
 global using System.Collections.Generic;

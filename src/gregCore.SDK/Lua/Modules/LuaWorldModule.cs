@@ -1,0 +1,166 @@
+/// <file-summary>
+/// Layer:       Infrastructure
+/// Purpose:      Lua API for world/time management.
+/// Maintainer:   greg.world.time_of_day(), day(), set_time_scale(), pause(), resume()
+/// </file-summary>
+
+using System;
+using MoonSharp.Interpreter;
+using MelonLoader;
+
+namespace gregCore.Infrastructure.Scripting.Lua.Modules;
+
+public static class LuaWorldModule
+{
+    public static void Register(Table greg, Script script, string modId)
+    {
+        var worldTable = new Table(script);
+        RegisterTimeOfDay(worldTable, modId);
+        RegisterTimeScale(worldTable, modId);
+        RegisterIsPaused(worldTable);
+        RegisterServerCount(worldTable);
+        RegisterOpenAllWalls(worldTable, modId);
+
+        greg["world"] = worldTable;
+    }
+
+    private static void RegisterTimeOfDay(Table t, string modId)
+    {
+
+        // greg.world.time_of_day() → number (0.0 - 1.0)
+        t["time_of_day"] = (Func<double>)(() =>
+        {
+            try { return API.GregAPI.GetTimeOfDay(); }
+            catch { return 0.0; }
+        });
+
+        // greg.world.day() → number
+        t["day"] = (Func<int>)(() =>
+        {
+            try { return (int)API.GregAPI.GetDay(); }
+            catch { return 1; }
+        });
+
+        // greg.world.seconds_in_day() → number
+        t["seconds_in_day"] = (Func<double>)(() =>
+        {
+            try { return API.GregAPI.GetSecondsInFullDay(); }
+            catch { return 1200.0; }
+        });
+
+        // greg.world.set_seconds_in_day(seconds)
+        t["set_seconds_in_day"] = (Action<double>)((val) =>
+        {
+            try { API.GregAPI.SetSecondsInFullDay((float)val); }
+            catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] world.set_seconds_in_day failed: {ex.Message}"); }
+        });
+    }
+
+    private static void RegisterTimeScale(Table t, string modId)
+    {
+
+        // greg.world.time_scale() → number
+        t["time_scale"] = (Func<double>)(() =>
+        {
+            try { return API.GregAPI.GetTimeScale(); }
+            catch { return 1.0; }
+        });
+
+        // greg.world.set_time_scale(scale)
+        t["set_time_scale"] = (Action<double>)((val) =>
+        {
+            try { API.GregAPI.SetTimeScale((float)val); }
+            catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] world.set_time_scale failed: {ex.Message}"); }
+        });
+
+        // greg.world.pause()
+        t["pause"] = (Action)(() =>
+        {
+            try { API.GregAPI.SetGamePaused(true); }
+            catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] world.pause failed: {ex.Message}"); }
+        });
+
+        // greg.world.resume()
+        t["resume"] = (Action)(() =>
+        {
+            try { API.GregAPI.SetGamePaused(false); }
+            catch (Exception ex) { MelonLogger.Error($"[LuaMod:{modId}] world.resume failed: {ex.Message}"); }
+        });
+    }
+
+    private static void RegisterIsPaused(Table t)
+    {
+
+        // greg.world.is_paused() → bool
+        t["is_paused"] = (Func<bool>)(() =>
+        {
+            try { return API.GregAPI.IsGamePaused(); }
+            catch { return false; }
+        });
+
+        // greg.world.scene() → string
+        t["scene"] = (Func<string>)(() =>
+        {
+            try { return API.GregAPI.GetCurrentScene(); }
+            catch { return "None"; }
+        });
+
+        // greg.world.difficulty() → number
+        t["difficulty"] = (Func<int>)(() =>
+        {
+            try { return API.GregAPI.GetDifficulty(); }
+            catch { return 1; }
+        });
+
+        // greg.world.save() → bool
+        t["save"] = (Func<bool>)(() =>
+        {
+            try { return API.GregAPI.TriggerSave() == 1; }
+            catch { return false; }
+        });
+    }
+
+    private static void RegisterServerCount(Table t)
+    {
+
+        // greg.world.server_count() → number
+        t["server_count"] = (Func<int>)(() =>
+        {
+            try { return (int)API.GregAPI.GetServerCount(); }
+            catch { return 0; }
+        });
+
+        // greg.world.rack_count() → number
+        t["rack_count"] = (Func<int>)(() =>
+        {
+            try { return (int)API.GregAPI.GetRackCount(); }
+            catch { return 0; }
+        });
+
+        // greg.world.switch_count() → number
+        t["switch_count"] = (Func<int>)(() =>
+        {
+            try { return (int)API.GregAPI.GetSwitchCount(); }
+            catch { return 0; }
+        });
+    }
+
+    private static void RegisterOpenAllWalls(Table t, string modId)
+    {
+
+        // greg.world.open_all_walls() → bool
+        t["open_all_walls"] = (Func<bool>)(() =>
+        {
+            try
+            {
+                global::greg.Sdk.GregPublicAPI.OpenAllWalls();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LuaLog.Error($"[LuaMod:{modId}] world.open_all_walls() failed: {ex.Message}");
+                return false;
+            }
+        });
+    }
+}

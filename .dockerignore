@@ -1,0 +1,13 @@
+# Keep the wiki image build context slim (context = repo root).
+.git/
+bin/
+obj/
+_Releases/
+Releases/
+references/
+wiki-site/node_modules/
+wiki-site/dist/
+wiki-site/.astro/
+.vs/
+.idea/
+*.user

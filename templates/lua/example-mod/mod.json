@@ -1,0 +1,9 @@
+{
+  "Id": "example.lua",
+  "Name": "Example Lua Mod",
+  "Version": "1.0.0",
+  "ApiVersion": "1.0.0",
+  "Loader": "Lua",
+  "Entrypoint": "main.lua",
+  "Dependencies": []
+}

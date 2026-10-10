@@ -162,58 +162,143 @@ def friendly_alias(method: str) -> str | None:
     return m.get(method)
 
 
+def _is_object_noise(method: str) -> bool:
+    # Inherited System.Object noise adds little control.
+    try:
+        return method in SKIP_OBJECT_METHODS
+    except Exception:
+        return False
+
+
+def _is_ctor_noise(method: str) -> bool:
+    # Constructors are not patchable hooks.
+    try:
+        if method in (".ctor", "cctor"):
+            return True
+        if method.startswith("_ctor"):
+            return True
+        return method == "_ctor"
+    except Exception:
+        return False
+
+
+def _is_native_ptr_noise(method: str) -> bool:
+    # Il2Cpp generated accessors are not stable hooks.
+    try:
+        if "NativeMethodInfoPtr" in method:
+            return True
+        return "NativeFieldInfoPtr" in method
+    except Exception:
+        return False
+
+
+def _is_hot_loop_excluded(method: str, include_hot_loops: bool) -> bool:
+    # Optional exclusion of per-frame hot loops.
+    try:
+        if include_hot_loops:
+            return False
+        return method in HOT_LOOP_METHODS
+    except Exception:
+        return False
+
+
+def _is_property_excluded(method: str, include_properties: bool) -> bool:
+    # Optional exclusion of get_/set_ accessors.
+    try:
+        if include_properties:
+            return False
+        if method.startswith("get_"):
+            return True
+        return method.startswith("set_")
+    except Exception:
+        return False
+
+
+def _is_private_noise(method: str) -> bool:
+    # Private Il2Cpp helpers (leading underscore) are not public surface.
+    try:
+        if not method.startswith("_"):
+            return False
+        if method.startswith("get_"):
+            return False
+        return not method.startswith("set_")
+    except Exception:
+        return False
+
+
 def should_emit(
     method: str,
     *,
     include_hot_loops: bool,
     include_properties: bool,
 ) -> bool:
-    if method in SKIP_OBJECT_METHODS:
+    if _is_object_noise(method):
         return False
-    if method in (".ctor", "cctor") or method.startswith("_ctor") or method == "_ctor":
+    if _is_ctor_noise(method):
         return False
-    if "NativeMethodInfoPtr" in method or "NativeFieldInfoPtr" in method:
+    if _is_native_ptr_noise(method):
         return False
-    if not include_hot_loops and method in HOT_LOOP_METHODS:
+    if _is_hot_loop_excluded(method, include_hot_loops):
         return False
-    if not include_properties and (method.startswith("get_") or method.startswith("set_")):
+    if _is_property_excluded(method, include_properties):
         return False
-    if method.startswith("_") and not method.startswith("get_") and not method.startswith("set_"):
+    if _is_private_noise(method):
         return False
     return True
 
 
-def build_hooks_for_class_region(
-    class_name: str,
-    region_code: str,
-    *,
-    include_hot_loops: bool,
-    include_properties: bool,
-) -> list[dict]:
-    dom = domain_for_class(class_name)
-    hooks: list[dict] = []
-    for m in METHOD_RE.finditer(region_code):
+def _parse_method_match(m) -> tuple[str, str, str] | None:
+    # Extracts (return type, name, params) from a regex match.
+    try:
         ret = m.group(1).strip()
         name = m.group(2).strip()
         params = m.group(3).strip()
         if not name:
-            continue
-        if not should_emit(
-            name,
-            include_hot_loops=include_hot_loops,
-            include_properties=include_properties,
-        ):
-            continue
+            return None
+        return (ret, name, params)
+    except Exception:
+        return None
 
+
+def _decide_strategy(name: str, ret: str) -> str:
+    # Guard-style methods need prefix observation.
+    try:
+        if name.startswith("Can"):
+            return "Prefix+Postfix"
+        if name.startswith("Try"):
+            return "Prefix+Postfix"
+        return _check_strategy(name, ret)
+    except Exception:
+        return "Postfix"
+
+
+def _check_strategy(name: str, ret: str) -> str:
+    # Check* returning bool usually gates behaviour.
+    try:
+        if not name.startswith("Check"):
+            return "Postfix"
+        if "bool" in ret.lower():
+            return "Prefix+Postfix"
+        return "Postfix"
+    except Exception:
+        return "Postfix"
+
+
+def _build_hook_entry(class_name: str, dom: str, name: str, ret: str, params: str) -> dict:
+    # Builds one hook descriptor entry.
+    try:
         sig = signature_key(params)
-        # Full steerability: domain + declaring type + method + signature (overloads never merged).
         hook_name = f"greg.{dom}.{class_name}.{name}.{sig}"
-
         patch_target = f"Il2Cpp.{class_name}::{name}({params})"
-        strategy = "Postfix"
-        if name.startswith("Can") or name.startswith("Try") or (name.startswith("Check") and "bool" in ret.lower()):
-            strategy = "Prefix+Postfix"
+        strategy = _decide_strategy(name, ret)
+        return _make_entry(class_name, dom, name, ret, params, hook_name, patch_target, strategy)
+    except Exception:
+        return {}
 
+
+def _make_entry(class_name: str, dom: str, name: str, ret: str, params: str, hook_name: str, patch_target: str, strategy: str) -> dict:
+    # Creates the descriptor dict with payload schema.
+    try:
         alias = friendly_alias(name)
         entry: dict = {
             "name": hook_name,
@@ -231,7 +316,37 @@ def build_hooks_for_class_region(
         }
         if alias:
             entry["friendlyAlias"] = f"greg.{dom}.{alias}"
-        hooks.append(entry)
+        return entry
+    except Exception:
+        return {}
+
+
+def build_hooks_for_class_region(
+    class_name: str,
+    region_code: str,
+    *,
+    include_hot_loops: bool,
+    include_properties: bool,
+) -> list[dict]:
+    dom = domain_for_class(class_name)
+    hooks: list[dict] = []
+    for m in METHOD_RE.finditer(region_code):
+        try:
+            parsed = _parse_method_match(m)
+            if parsed is None:
+                continue
+            ret, name, params = parsed
+            if not should_emit(
+                name,
+                include_hot_loops=include_hot_loops,
+                include_properties=include_properties,
+            ):
+                continue
+            entry = _build_hook_entry(class_name, dom, name, ret, params)
+            if entry:
+                hooks.append(entry)
+        except Exception:  # nosec: B112 - best-effort codegen: skip unparseable block
+            continue
     return hooks
 
 
@@ -262,74 +377,121 @@ def build_hooks_for_file(stem: str, code: str, *, include_hot_loops: bool, inclu
     return all_hooks
 
 
+def _build_arg_parser() -> argparse.ArgumentParser:
+    # Creates the CLI parser for merged-code extraction.
+    try:
+        ap = argparse.ArgumentParser()
+        ap.add_argument(
+            "--merged",
+            type=Path,
+            default=Path(__file__).resolve().parents[2] / "MergedCode.md",
+        )
+        ap.add_argument(
+            "--out",
+            type=Path,
+            default=Path(__file__).resolve().parents[1] / "framework" / "gregFramework" / "greg_hooks.json",
+        )
+        ap.add_argument("--max-hooks", type=int, default=0)
+        ap.add_argument(
+            "--no-hot-loops",
+            action="store_true",
+            help="Exclude Update/FixedUpdate/LateUpdate/OnGUI from catalog",
+        )
+        ap.add_argument(
+            "--no-properties",
+            action="store_true",
+            help="Exclude get_*/set_* property accessors",
+        )
+        return ap
+    except Exception:
+        return argparse.ArgumentParser()
+
+
+def _collect_all_hooks(text: str, include_hot: bool, include_prop: bool) -> tuple[list[dict], int]:
+    # Iterates code blocks and builds hook descriptors.
+    all_hooks: list[dict] = []
+    files = 0
+    try:
+        for header, code in iter_cs_blocks(text):
+            files += 1
+            stem = stem_from_header(header)
+            all_hooks.extend(
+                build_hooks_for_file(stem, code, include_hot_loops=include_hot, include_properties=include_prop)
+            )
+    except Exception:  # nosec: B110 - best-effort codegen: nothing to report
+        pass
+    return all_hooks, files
+
+
+def _deduplicate_hooks(all_hooks: list[dict]) -> list[dict]:
+    # De-dups by exact hook name only.
+    try:
+        seen: dict[str, dict] = {}
+        for h in all_hooks:
+            key = h["name"]
+            if key not in seen:
+                seen[key] = h
+        return list(seen.values())
+    except Exception:
+        return all_hooks
+
+
+def _apply_max_hooks(all_hooks: list[dict], max_hooks: int) -> list[dict]:
+    # Truncates the hook list when requested.
+    try:
+        if max_hooks > 0:
+            return all_hooks[:max_hooks]
+        return all_hooks
+    except Exception:
+        return all_hooks
+
+
+def _build_doc(args, all_hooks: list[dict], files: int, include_hot: bool, include_prop: bool) -> dict:
+    # Builds the output JSON document.
+    try:
+        return {
+            "version": 2,
+            "description": "Full public-method surface from MergedCode.md — unique id per overload. "
+            "Mods subscribe by exact `name`; use `friendlyAlias` where present for legacy docs.",
+            "generatedFrom": str(args.merged.resolve()),
+            "generationOptions": {
+                "includeHotLoops": include_hot,
+                "includePropertyAccessors": include_prop,
+            },
+            "legacyPrefixes": [],
+            "hooks": all_hooks,
+            "stats": {
+                "sourceFiles": files,
+                "hookCount": len(all_hooks),
+                "withHotLoop": sum(1 for h in all_hooks if h.get("hotLoop")),
+            },
+        }
+    except Exception:
+        return {"version": 2, "hooks": all_hooks}
+
+
+def _write_doc(args, doc: dict) -> None:
+    # Writes the JSON document to disk.
+    try:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    except Exception:  # nosec: B110 - best-effort codegen: nothing to report
+        pass
+
+
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument(
-        "--merged",
-        type=Path,
-        default=Path(__file__).resolve().parents[2] / "MergedCode.md",
-    )
-    ap.add_argument(
-        "--out",
-        type=Path,
-        default=Path(__file__).resolve().parents[1] / "framework" / "gregFramework" / "greg_hooks.json",
-    )
-    ap.add_argument("--max-hooks", type=int, default=0)
-    ap.add_argument(
-        "--no-hot-loops",
-        action="store_true",
-        help="Exclude Update/FixedUpdate/LateUpdate/OnGUI from catalog",
-    )
-    ap.add_argument(
-        "--no-properties",
-        action="store_true",
-        help="Exclude get_*/set_* property accessors",
-    )
+    ap = _build_arg_parser()
     args = ap.parse_args()
 
     text = args.merged.read_text(encoding="utf-8", errors="replace")
     include_hot = not args.no_hot_loops
     include_prop = not args.no_properties
 
-    all_hooks: list[dict] = []
-    files = 0
-    for header, code in iter_cs_blocks(text):
-        files += 1
-        stem = stem_from_header(header)
-        all_hooks.extend(
-            build_hooks_for_file(stem, code, include_hot_loops=include_hot, include_properties=include_prop)
-        )
-
-    # De-dup exact same hook name only (should not happen if signatures differ)
-    seen: dict[str, dict] = {}
-    for h in all_hooks:
-        key = h["name"]
-        if key not in seen:
-            seen[key] = h
-    all_hooks = list(seen.values())
-
-    if args.max_hooks > 0:
-        all_hooks = all_hooks[: args.max_hooks]
-
-    doc = {
-        "version": 2,
-        "description": "Full public-method surface from MergedCode.md — unique id per overload. "
-        "Mods subscribe by exact `name`; use `friendlyAlias` where present for legacy docs.",
-        "generatedFrom": str(args.merged.resolve()),
-        "generationOptions": {
-            "includeHotLoops": include_hot,
-            "includePropertyAccessors": include_prop,
-        },
-        "legacyPrefixes": [],
-        "hooks": all_hooks,
-        "stats": {
-            "sourceFiles": files,
-            "hookCount": len(all_hooks),
-            "withHotLoop": sum(1 for h in all_hooks if h.get("hotLoop")),
-        },
-    }
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    all_hooks, files = _collect_all_hooks(text, include_hot, include_prop)
+    all_hooks = _deduplicate_hooks(all_hooks)
+    all_hooks = _apply_max_hooks(all_hooks, args.max_hooks)
+    doc = _build_doc(args, all_hooks, files, include_hot, include_prop)
+    _write_doc(args, doc)
     print(f"Wrote {len(all_hooks)} hooks from {files} files -> {args.out}")
 
 

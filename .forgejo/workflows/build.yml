@@ -1,0 +1,121 @@
+name: gregCore CI
+
+on:
+  push:
+    branches: [dev, pre-release, main]
+  pull_request:
+    branches: [dev, pre-release, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-validation:
+    name: contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate API contracts
+        run: python3 scripts/validate_contracts.py
+
+  build:
+    name: build-${{ matrix.label }}
+    needs: contract-validation
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows
+          - os: ubuntu-latest
+            label: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore
+        run: dotnet restore gregCore.csproj
+
+      - name: Build Release
+        run: dotnet build gregCore.csproj -c Release -p:CI=true
+
+      - name: Build C# mod template
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet build templates/csharp/GregMod.Template.csproj -c Release -p:GregCorePath="$PWD/bin/Release/net6.0/gregCore.dll"
+
+      - name: Validate Lua template
+        if: matrix.os == 'ubuntu-latest'
+        run: python3 -m json.tool templates/lua/example-mod/mod.json >/dev/null
+
+      - name: Validate release version
+        if: matrix.os == 'ubuntu-latest'
+        run: python3 scripts/validate_version.py "$(tr -d '[:space:]' < VERSION)"
+
+      - name: Stage MelonLoader artifact
+        shell: bash
+        run: |
+          V=$(tr -d '[:space:]' < VERSION)
+          OUT="dist/melonloader-${{ matrix.label }}"
+          mkdir -p "$OUT/Mods"
+          cp bin/Release/net6.0/gregCore.dll "$OUT/Mods/"
+          cp game_hooks.json "$OUT/Mods/"
+          cp framework/greg_hooks.json "$OUT/Mods/"
+          cp README.md CHANGELOG.md "$OUT/"
+          cd dist
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            powershell -Command "Compress-Archive -Path 'melonloader-${{ matrix.label }}/*' -DestinationPath 'gregCore-v${V}-melonloader-${{ matrix.label }}.zip'"
+          else
+            zip -r "gregCore-v${V}-melonloader-${{ matrix.label }}.zip" "melonloader-${{ matrix.label }}"
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gregCore-${{ matrix.label }}-zips
+          path: dist/*.zip
+
+  tests:
+    name: tests
+    needs: contract-validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+      - name: Run tests
+        run: dotnet test tests/gregCore.Tests.csproj -c Release --no-restore --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+      - name: Upload coverage to Codacy
+        # Needs CODACY_PROJECT_TOKEN as a Forgejo Actions secret
+        # (repo Settings > Secrets). Skipped silently until set.
+        continue-on-error: true
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          if [ -z "$CODACY_PROJECT_TOKEN" ]; then echo "CODACY_PROJECT_TOKEN not set, skipping upload."; exit 0; fi
+          bash <(curl -Ls https://coverage.codacy.com/get.sh)
+          COV=$(find ./coverage -name coverage.cobertura.xml | head -1)
+          ./codacy-coverage-reporter report -l CSharp -r "$COV"
+
+  docs:
+    name: docs
+    needs: contract-validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate documentation links and examples
+        run: |
+          test -f docs/FrameworkAPI.md
+          test -f docs/modding/getting-started.md
+          test -f docs/maintainers/release-smoke-test.md
+          python3 -m json.tool templates/lua/example-mod/mod.json >/dev/null

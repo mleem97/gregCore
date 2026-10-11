@@ -195,6 +195,31 @@ namespace gregCore.Core
             {
                 MelonLogger.Error($"[gregCore] Dynamic hook initialization failed: {ex.Message}");
             }
+
+            // Universal IPC bridge (localhost only, opt-in via env).
+            // Lets ANY external tool (MCP server, scripts, agents) talk to the
+            // running game: ping/version, mods.list, hook.fire, ui.toast/notify,
+            // scripts.reload, log.tail. Disabled unless GREG_IPC_PORT is set.
+            try
+            {
+                string? portRaw = System.Environment.GetEnvironmentVariable("GREG_IPC_PORT");
+                if (!string.IsNullOrWhiteSpace(portRaw) && int.TryParse(portRaw.Trim(), out int ipcPort))
+                {
+                    string? ipcToken = System.Environment.GetEnvironmentVariable("GREG_IPC_TOKEN");
+                    var dispatcher = gregCore.PublicApi.greg._context?.MainThread;
+                    if (dispatcher != null)
+                    {
+                        if (gregCore.Bridge.Ipc.GregIpcBridge.Start(dispatcher, ipcPort, ipcToken))
+                            MelonLogger.Msg("[gregCore] IPC bridge listening on 127.0.0.1:"
+                                + gregCore.Bridge.Ipc.GregIpcBridge.ActualPort.ToString() + ".");
+                    }
+                    else MelonLogger.Warning("[gregCore] IPC bridge skipped: no main-thread dispatcher yet.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[gregCore] IPC bridge failed: {ex.Message}");
+            }
         }
 
         private static void InstallSaveGuard()

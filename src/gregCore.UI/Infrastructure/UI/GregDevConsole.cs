@@ -59,6 +59,22 @@ namespace gregCore.Infrastructure.UI
             AddRaw($"[{typeStr}] {msg}");
         }
 
+        /// <summary>
+        /// Thread-safe snapshot of the last <paramref name="n"/> log lines (for IPC/tooling).
+        /// </summary>
+        public System.Collections.Generic.List<string> Tail(int n)
+        {
+            try
+            {
+                lock (_logs)
+                {
+                    int take = System.Math.Max(0, System.Math.Min(n, _logs.Count));
+                    return _logs.GetRange(_logs.Count - take, take);
+                }
+            }
+            catch { return new System.Collections.Generic.List<string>(); }
+        }
+
         private void AddRaw(string line)
         {
             _logs.Add(line);

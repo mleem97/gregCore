@@ -7,6 +7,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
 
 ### Added
 
+- Universal IPC bridge (`GregIpcBridge`, opt-in via `GREG_IPC_PORT`/`GREG_IPC_TOKEN`):
+  localhost TCP/NDJSON adapter so ANY external tool (MCP server, scripts, agents)
+  can query/command the running game (ping/version, mods.list, hook.fire,
+  ui.toast/notify, scripts.reload, log.tail). Own ring-buffer-free protocol
+  helpers (IL2CPP-safe, no reflection), main-thread marshaling with 5 s timeout,
+  `GregDevConsole.Tail(n)`, xunit protocol tests, `docs/ipc-bridge.md`.
+
 - Game hooks (+7, sourced from workshop-mod usage): `Router.ApplyRoute`
   (both overloads), `RouterConfiguration.CreateSubnetRowUI`,
   `NetworkMap.GetAllRackedServers`, `NetworkMap.FindAllShortestPathsBetween`,

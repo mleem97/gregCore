@@ -108,7 +108,7 @@ run git push github main 2>/dev/null || true
 
 # --- 3) Attach version/release docs + DLLs to the GitHub release ----------------
 echo -e "\e[36m[releases/assets]\e[0m"
-VERSION="$(tr -d '[:space:]' < VERSION 2>/dev/null || echo '1.2.3')"
+VERSION="$(tr -d '[:space:]' < VERSION 2>/dev/null || echo '1.3.0')"
 TAG="v${VERSION}"
 
 ASSETS=()

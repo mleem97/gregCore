@@ -23,7 +23,7 @@ namespace ShiftHelperCs;
 // with its namespace adjusted to ShiftHelperCs (see Guidebook CSharp 01 Setup).
 
 [GregMod("shift_helper_cs", "ShiftHelper C#", "1.0.0")]
-[GregDependsOn("gregCore", "1.2.3")]
+[GregDependsOn("gregCore", "1.3.0")]
 public sealed class ShiftHelper : GregMod
 {
     private IDisposable? _coins;

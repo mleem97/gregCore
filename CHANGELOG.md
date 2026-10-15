@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-15
+
 ### Added
 
 - Universal IPC bridge (`GregIpcBridge`, opt-in via `GREG_IPC_PORT`/`GREG_IPC_TOKEN`):

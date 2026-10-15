@@ -17,7 +17,7 @@ Copy `templates/csharp/` (`ExampleMod.cs`, `GregHost.cs`, `GregMod.Template.cspr
 
 ```csharp
 [GregMod("my_csharp_mod", "My C# Mod", "1.0.0")]
-[GregDependsOn("gregCore", "1.2.3")]
+[GregDependsOn("gregCore", "1.3.0")]
 public sealed class MyMod : GregMod
 {
     public override void OnLoad()

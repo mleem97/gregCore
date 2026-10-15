@@ -9,7 +9,7 @@ Definitions for every term used across this wiki — the gregCore equivalent of 
 
 ### gregCore
 
-Modular .NET 6 IL2CPP mod framework for Data Center (v1.2.3). Provides Harmony patching, UI overlays, save engine, multi-mod registry, and scripting bridges. Loaded by MelonLoader 0.7+ or BepInEx 6+.
+Modular .NET 6 IL2CPP mod framework for Data Center (v1.3.0). Provides Harmony patching, UI overlays, save engine, multi-mod registry, and scripting bridges. Loaded by MelonLoader 0.7+ or BepInEx 6+.
 
 ### Data Center
 

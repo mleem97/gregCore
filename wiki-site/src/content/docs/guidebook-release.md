@@ -17,7 +17,7 @@ From working mod to a release others can install. Companion: [Developer Publishi
 ## 2. Versioning
 
 - SemVer everywhere: manifest `Version`, `[GregMod]` version, JS `version` in your ready-event.
-- Framework floor: document the gregCore version you built against (1.2.3) in the README (Lua `ApiVersion`/`Loader` fields and C# `[GregDependsOn("gregCore", "1.2.3")]` state it in-repo).
+- Framework floor: document the gregCore version you built against (1.3.0) in the README (Lua `ApiVersion`/`Loader` fields and C# `[GregDependsOn("gregCore", "1.3.0")]` state it in-repo).
 - Never reuse shop/item IDs or GUIDs; never rename a shipped custom event — add a new one.
 
 ## 3. Packaging per language

@@ -21,6 +21,6 @@ Roslyn runtime for `.cs` scripts. Prefer compiled C# mods ([Guidebook CSharp 01 
 
 ## How to prototype safely
 
-1. Pin the framework version you tested (`VERSION` 1.2.3) and re-verify each call in-game — preview surfaces change.
+1. Pin the framework version you tested (`VERSION` 1.3.0) and re-verify each call in-game — preview surfaces change.
 2. Keep preview code read-only and local (no saves, no UI, no networking) until its storage story exists.
 3. Watch the guidebook: tracks graduate here (JS did) with setup + project chapters when their surface stabilizes.

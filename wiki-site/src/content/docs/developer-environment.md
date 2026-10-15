@@ -23,10 +23,10 @@ dotnet build -c Release          # artifact: bin/Release/net6.0/gregCore.dll
 
 ```bash
 DOTNET_ROLL_FORWARD=Major dotnet test   # only needed without a .NET 6 runtime
-python3 scripts/validate_version.py 1.2.3
+python3 scripts/validate_version.py 1.3.0
 ```
 
-Single source of truth for the version is the `VERSION` file (currently `1.2.3`); `BuildInfo` stamps `-dev.0` on dev builds.
+Single source of truth for the version is the `VERSION` file (currently `1.3.0`); `BuildInfo` stamps `-dev.0` on dev builds.
 
 ## Key paths (repo root)
 

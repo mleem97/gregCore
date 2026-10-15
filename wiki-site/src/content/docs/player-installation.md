@@ -18,8 +18,8 @@ Install **exactly one** loader into your Data Center game folder:
 
 From the GitHub Releases page, pick the artifact matching your loader and OS:
 
-- `gregCore-v1.2.3-melonloader-windows.zip` / `-linux.zip`
-- `gregCore-v1.2.3-bepinex-windows.zip` / `-linux.zip`
+- `gregCore-v1.3.0-melonloader-windows.zip` / `-linux.zip`
+- `gregCore-v1.3.0-bepinex-windows.zip` / `-linux.zip`
 
 NuGet dependencies (Jint 4.8.0, LiteDB 5.0.21, Mono.Cecil 0.11.6, MoonSharp 2.0.0, Newtonsoft.Json 13.0.3, pythonnet 3.0.5) are **bundled in the release** — you do not install them separately.
 

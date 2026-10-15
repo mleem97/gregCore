@@ -26,7 +26,7 @@ UserData/gregCore/Mods/Lua/
   "author": "Your Name",
   "description": "A starter template for gregCore Lua modding.",
   "entry": "main.lua",
-  "min_framework_version": "1.2.3"
+  "min_framework_version": "1.3.0"
 }
 ```
 

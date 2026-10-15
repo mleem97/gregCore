@@ -23,7 +23,7 @@ public class GregAPI : IGregAPI
     private readonly GregNotificationService _notifications;
     private readonly GregValidationService _validation;
 
-    public string Version => "1.2.3";
+    public string Version => "1.3.0";
 
     public GregAPI(
         IGregLogger logger,

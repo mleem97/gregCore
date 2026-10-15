@@ -16,7 +16,7 @@ local ok, detail = greg.mods.ensure({mod = "other_mod", min_version = "1.0.0"})
 greg.mods.check()                -- {{owner, mod, detail}}; empty = ok
 ```
 
-C#: `[GregDependsOn("gregCore", "1.2.3")]` + `GregModDeps.Declare / EnsureLoaded / CheckAll`. Report missing deps in the log + Hub instead of throwing. There is no Oxide-style permission/group system — gating is per-mod via these declarations and your own settings.
+C#: `[GregDependsOn("gregCore", "1.3.0")]` + `GregModDeps.Declare / EnsureLoaded / CheckAll`. Report missing deps in the log + Hub instead of throwing. There is no Oxide-style permission/group system — gating is per-mod via these declarations and your own settings.
 
 ## 2. Performance
 

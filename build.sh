@@ -1,9 +1,9 @@
 #!/bin/bash
 # gregCore Build + Deploy - dual profile.
 #
-#   ./build.sh              Release-Build (normales Logging, Version 1.2.3)
+#   ./build.sh              Release-Build (normales Logging, Version 1.3.0)
 #   ./build.sh --dev        Dev-Build (Debug, erweitertes [Dev]-Logging via
-#                           #if DEBUG, Version 1.2.3-dev.0)
+#                           #if DEBUG, Version 1.3.0-dev.0)
 #   ./build.sh --deploy     gregCore.dll in den Spielordner kopieren (Mods/)
 #   ./build.sh --both       Release UND Dev bauen
 #
@@ -13,8 +13,8 @@
 # gewaehlte Variante als gregCore.dll in Mods/ und entfernt die andere.
 #
 # Flavor-Ausgabe (MelonInfo) steuert BuildInfo via Compile-Profil:
-#   Release -> 1.2.3        (kein [Dev]-Logging)
-#   Debug   -> 1.2.3-dev.0  ([Dev]-Logging aktiv)
+#   Release -> 1.3.0        (kein [Dev]-Logging)
+#   Debug   -> 1.3.0-dev.0  ([Dev]-Logging aktiv)
 set -e
 
 GAME_DIR="${DATACENTER_HOME:-$HOME/.local/share/Steam/steamapps/common/Data Center}"
@@ -39,7 +39,7 @@ mkdir -p "$HERE/Releases"
 build_one() {  # $1 = Release|Debug
   local cfg="$1" flavor ver dst
   echo -e "\e[36m== gregCore [$cfg] ==\e[0m"
-  if [ "$cfg" = "Debug" ]; then flavor="DEV"; ver="1.2.3-dev.0"; dst="gregCore.dev.dll"; else flavor="RELEASE"; ver="1.2.3"; dst="gregCore.dll"; fi
+  if [ "$cfg" = "Debug" ]; then flavor="DEV"; ver="1.3.0-dev.0"; dst="gregCore.dev.dll"; else flavor="RELEASE"; ver="1.3.0"; dst="gregCore.dll"; fi
   dotnet restore "$HERE/gregCore.csproj" >/dev/null
   dotnet build "$HERE/gregCore.csproj" --configuration "$cfg" --no-restore --nologo -v q
   cp -p "$HERE/bin/$cfg/net6.0/gregCore.dll" "$HERE/Releases/$dst"

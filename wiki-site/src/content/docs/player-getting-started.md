@@ -17,10 +17,10 @@ gregCore is a framework mod for the game **Data Center**. It does three things f
 
 | Requirement | Notes |
 |---|---|
-| Data Center (Steam), version 1.0.50.15 | The supported game version for gregCore 1.2.3 |
+| Data Center (Steam), version 1.0.50.15 | The supported game version for gregCore 1.3.0 |
 | Windows x64 or Linux x64 | macOS is not supported (no Apple test device on the team — contributors welcome) |
 | MelonLoader 0.7.2+ **or** BepInEx 6+ | Exactly one loader; both are supported |
-| gregCore 1.2.3 release ZIP | From the GitHub Releases page, matching your loader + OS |
+| gregCore 1.3.0 release ZIP | From the GitHub Releases page, matching your loader + OS |
 
 ## The 3-step path
 

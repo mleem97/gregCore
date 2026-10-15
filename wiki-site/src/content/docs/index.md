@@ -5,7 +5,7 @@ title: "gregCore Wiki"
 
 > Modular .NET 6 IL2CPP mod framework for **Data Center** — Harmony patching, UI overlays, save engine, scripting, and multi-mod architecture.
 
-**Current version:** 1.2.3 · **Game:** Data Center 1.0.50.15 · **Engine:** Unity 6000.5 (IL2CPP) · **Loaders:** MelonLoader 0.7+ / BepInEx 6+ (Windows + Linux x64) · **License:** Apache-2.0
+**Current version:** 1.3.0 · **Game:** Data Center 1.0.50.15 · **Engine:** Unity 6000.5 (IL2CPP) · **Loaders:** MelonLoader 0.7+ / BepInEx 6+ (Windows + Linux x64) · **License:** Apache-2.0
 
 This wiki is the complete guidebook for gregCore, structured after the Oxide docs model:
 

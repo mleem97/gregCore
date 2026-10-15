@@ -5,7 +5,7 @@ title: "Guidebook — Build Mods with C#, Lua, and JS"
 
 A hands-on guidebook that takes you from zero to a published Data Center mod. Pick **one** track — Lua, C#, or JavaScript — and build the same kind of mod in each. More languages (Python, Rust, Go, C# scripts) are in preview: see [Guidebook Next Languages](./guidebook-next-languages/).
 
-> Framework version: gregCore 1.2.3 · Game: Data Center 1.0.50.15 · Unity 6000.5 IL2CPP · Loaders: MelonLoader 0.7.2+ / BepInEx 6+ · License: Apache-2.0. Everything here is English-only.
+> Framework version: gregCore 1.3.0 · Game: Data Center 1.0.50.15 · Unity 6000.5 IL2CPP · Loaders: MelonLoader 0.7.2+ / BepInEx 6+ · License: Apache-2.0. Everything here is English-only.
 
 ## Which track?
 

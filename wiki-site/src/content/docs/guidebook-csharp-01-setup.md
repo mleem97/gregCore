@@ -55,7 +55,7 @@ Rule from `GregHost.cs`: methods touching `gregCore.*` types may **only** run wh
 
 ```csharp
 [GregMod("shift_helper_cs", "ShiftHelper C#", "1.0.0")]
-[GregDependsOn("gregCore", "1.2.3")]
+[GregDependsOn("gregCore", "1.3.0")]
 ```
 
 IDs are lowercase-dotted by convention (`gregMod.<Name>` appears in the registry). `GregModDeps` (`Declare / EnsureLoaded / CheckAll`) plus manifest diff (`GetLocalManifest / DiffManifests / FormatDiff`) handle runtime gating and co-op mod-sync.

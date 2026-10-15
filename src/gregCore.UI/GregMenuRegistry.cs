@@ -72,7 +72,13 @@ public static class GregMenuRegistry
             if (_menus.TryGetValue(menuId, out var e)) opener = e.Opener;
         }
         if (opener == null) return false;
-        try { opener(); return true; }
+        try
+        {
+            opener();
+            try { gregCore.Core.Diagnostics.GregEventLog.Emit("menu:" + menuId, "Menü geöffnet: " + menuId, "menu"); }
+            catch { /* event log must never break menus */ }
+            return true;
+        }
         catch (Exception ex)
         {
             MelonLogger.Warning($"[gregCore][UI] Menu opener failed ({menuId}): {ex.Message}");
@@ -105,7 +111,13 @@ public static class GregMenuRegistry
             if (_menus.TryGetValue(menuId, out var e)) closer = e.Closer;
         }
         if (closer == null) return false;
-        try { closer(); return true; }
+        try
+        {
+            closer();
+            try { gregCore.Core.Diagnostics.GregEventLog.Emit("menu:" + menuId, "Menü geschlossen: " + menuId, "menu"); }
+            catch { /* event log must never break menus */ }
+            return true;
+        }
         catch (Exception ex)
         {
             MelonLogger.Warning($"[gregCore][UI] Menu closer failed ({menuId}): {ex.Message}");

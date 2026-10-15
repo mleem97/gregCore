@@ -261,6 +261,8 @@ public static class GregSaveGuard
 
             gregCore.Infrastructure.Logging.DevLog.Msg("SaveGamePrefix: dir=" + dir + ", save=" + name
                 + ", BackupEnabled=" + BackupEnabled + ", Sidecars=" + _sidecars.Count + ".");
+            try { gregCore.Core.Diagnostics.GregEventLog.Emit("save:" + name, "Spielstand gespeichert: " + name + " (" + _sidecars.Count + " Sidecars)", "save"); }
+            catch { /* event log must never break saves */ }
             bool backedUp = BackupEnabled && BackupVanillaSave(dir, name);
             if (ResolveSaveWriteGate(BackupEnabled, backedUp))
             {
@@ -368,6 +370,8 @@ public static class GregSaveGuard
             if (!IsGameplayScene()) return;
             SanitizeSaveData(global::Il2Cpp.SaveData.instance, "Laden");
             gregCore.Infrastructure.Logging.DevLog.Msg("Load postfix executed (SaveData.instance available).");
+            try { gregCore.Core.Diagnostics.GregEventLog.Emit("save:load", "Spielstand geladen", "save"); }
+            catch { /* event log must never break loads */ }
         }
         catch (Exception ex) { MelonLogger.Warning("[gregCore][Save] Sanitize (Loading): " + ex.Message); }
     }

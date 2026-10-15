@@ -22,6 +22,7 @@ namespace gregCore.Infrastructure.UI
         private readonly object _pendingSync = new object();
         private bool _feedSubscribed;
         private bool _visible;
+        private bool _showEvents;
         private GregPanelBuilder? _panel;
         private ScrollView? _logScrollView;
         private TextField? _inputField;
@@ -314,6 +315,17 @@ namespace gregCore.Infrastructure.UI
                 RefreshLogDisplay();
             }));
             buttonRow.Add(clearBtn);
+            var eventsBtn = new Button();
+            eventsBtn.text = "Events";
+            eventsBtn.style.width = 80;
+            eventsBtn.style.height = 28;
+            eventsBtn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>
+            {
+                _showEvents = !_showEvents;
+                eventsBtn.text = _showEvents ? "Logs" : "Events";
+                RefreshLogDisplay();
+            }));
+            buttonRow.Add(eventsBtn);
             return buttonRow;
         }
 
@@ -321,6 +333,35 @@ namespace gregCore.Infrastructure.UI
         {
             if (_logContainer == null) return;
             _logContainer.Clear();
+
+            if (_showEvents)
+            {
+                try
+                {
+                    var rows = gregCore.Core.Diagnostics.GregEventLog.Snapshot();
+                    int shown = 0;
+                    foreach (var row in rows)
+                    {
+                        if (shown >= 50) break;
+                        var eventLabel = new Label(gregCore.Core.Diagnostics.GregEventLog.FormatRow(row));
+                        eventLabel.style.color = GetEventColor(row.Kind);
+                        eventLabel.style.fontSize = 12;
+                        eventLabel.style.whiteSpace = WhiteSpace.Normal;
+                        eventLabel.style.marginBottom = 2;
+                        _logContainer.Add(eventLabel);
+                        shown++;
+                    }
+                    if (shown == 0)
+                    {
+                        var hint = new Label("Noch keine Events — Menüs, Hooks, Saves und Jobs erscheinen hier.");
+                        hint.style.color = new Color(0.55f, 0.55f, 0.6f);
+                        hint.style.fontSize = 12;
+                        _logContainer.Add(hint);
+                    }
+                }
+                catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
+                return;
+            }
 
             int start = Math.Max(0, _logs.Count - 50);
             for (int i = start; i < _logs.Count; i++)
@@ -353,6 +394,22 @@ namespace gregCore.Infrastructure.UI
             if (log.Contains("[WARN]")) return new Color(1f, 0.8f, 0.3f);
             if (log.Contains("[COMMAND]")) return GregUITheme.PrimaryAccent;
             return new Color(0.85f, 0.85f, 0.87f);
+        }
+
+        private Color GetEventColor(string kind)
+        {
+            try
+            {
+                switch (kind)
+                {
+                    case "hook": return new Color(0.65f, 0.78f, 1f);
+                    case "menu": return new Color(0.55f, 0.9f, 0.55f);
+                    case "save": return new Color(1f, 0.8f, 0.3f);
+                    case "job": return new Color(1f, 0.7f, 0.45f);
+                    default: return new Color(0.85f, 0.85f, 0.87f);
+                }
+            }
+            catch { return new Color(0.85f, 0.85f, 0.87f); }
         }
 
         private void SubmitCommand()

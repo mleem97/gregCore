@@ -14,6 +14,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/). Version: see [
   helpers (IL2CPP-safe, no reflection), main-thread marshaling with 5 s timeout,
   `GregDevConsole.Tail(n)`, xunit protocol tests, `docs/ipc-bridge.md`.
 
+- Aggregated event log (`GregEventLog`): every menu/hook/save/job activity is
+  recorded verbose in `UserData/gregCore/logs/events-YYYY-MM-DD.log` (7-day
+  rotation) and deduplicated with counters + rates in the DevConsole
+  (Logs/Events toggle, color-coded). Sources: HookBus dispatch, menu open/close,
+  save/load + sidecars, technician jobs. `docs/event-log.md`, xunit tests.
+
 - Game hooks (+7, sourced from workshop-mod usage): `Router.ApplyRoute`
   (both overloads), `RouterConfiguration.CreateSubnetRowUI`,
   `NetworkMap.GetAllRackedServers`, `NetworkMap.FindAllShortestPathsBetween`,

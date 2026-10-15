@@ -6,6 +6,7 @@ Start: [README.md](../README.md) · Quickstart: [QUICKSTART.md](../QUICKSTART.md
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Structure, components, data flows |
 | [ipc-bridge.md](ipc-bridge.md) | Universal localhost bridge (MCP/tools/agents talk to the game) |
+| [event-log.md](event-log.md) | Aggregated event log: everything verbose in file, clean in console |
 | [README.md](../README.md) | Overview, installation, layout |
 | [QUICKSTART.md](../QUICKSTART.md) | Clone → build → test in 5 minutes |
 | [CHANGELOG.md](../CHANGELOG.md) | Changelog history |

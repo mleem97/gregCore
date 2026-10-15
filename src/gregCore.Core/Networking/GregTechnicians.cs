@@ -97,6 +97,28 @@ public static class GregTechnicians
 
     // ── Actions (Technician) ─────────────────────────────────────────────────
 
+    private static string TechId(global::Il2Cpp.Technician tech)
+    {
+        try { return tech != null ? tech.technicianID.ToString() : "?"; }
+        catch { return "?"; }
+    }
+
+    private static string TechLabel(global::Il2Cpp.Technician tech)
+    {
+        try
+        {
+            if (tech == null) return "?";
+            string name = "";
+            try { name = tech.technicianName ?? ""; } catch { }
+            string state = "";
+            try { state = tech.currentState.ToString(); } catch { }
+            string label = (string.IsNullOrEmpty(name) ? ("#" + TechId(tech)) : name);
+            if (!string.IsNullOrEmpty(state)) label += " [" + state + "]";
+            return label;
+        }
+        catch { return "#?"; }
+    }
+
     public static bool RepairDevice(global::Il2Cpp.Technician tech)
     {
         if (tech == null) return false;
@@ -104,6 +126,8 @@ public static class GregTechnicians
         {
             _ = tech.gameObject; // liveness
             tech.RepairDevice();
+            try { Diagnostics.GregEventLog.Emit("tech:" + TechId(tech) + ":repair", "Mitarbeiter " + TechLabel(tech) + " repariert Gerät", "job"); }
+            catch { /* event log must never break jobs */ }
             return true;
         }
         catch (Exception ex)
@@ -124,6 +148,8 @@ public static class GregTechnicians
             try { job.networkSwitch = networkSwitch; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             try { job.server = server; } catch { /* ignored: defensive best-effort (CONVENTIONS.md) */ }
             tech.AssignJob(job);
+            try { Diagnostics.GregEventLog.Emit("tech:" + TechId(tech) + ":assign", "Mitarbeiter " + TechLabel(tech) + " beauftragt (Reparaturauftrag)", "job"); }
+            catch { /* event log must never break jobs */ }
             return true;
         }
         catch (Exception ex)
@@ -140,7 +166,13 @@ public static class GregTechnicians
         {
             _ = tech.gameObject; // liveness
             var routine = tech.RequestJobDelayed();
-            return GregRackAndSfp.StartIl2CppRoutine(routine);
+            bool ok = GregRackAndSfp.StartIl2CppRoutine(routine);
+            if (ok)
+            {
+                try { Diagnostics.GregEventLog.Emit("tech:" + TechId(tech) + ":request", "Mitarbeiter " + TechLabel(tech) + " fordert Auftrag an", "job"); }
+                catch { /* event log must never break jobs */ }
+            }
+            return ok;
         }
         catch (Exception ex)
         {
@@ -165,6 +197,8 @@ public static class GregTechnicians
         {
             _ = mgr.gameObject; // liveness
             mgr.SendTechnician(networkSwitch, server);
+            try { Diagnostics.GregEventLog.Emit("tech:dispatch", "Techniker entsandt (Switch → Server)", "job"); }
+            catch { /* event log must never break jobs */ }
             return true;
         }
         catch (Exception ex)

@@ -42,6 +42,8 @@
 - Lua, JS and Python scripting bridges
 - Universal IPC bridge (localhost TCP/JSON): external tools, MCP servers and
   agents talk to the running game (`docs/ipc-bridge.md`, opt-in via `GREG_IPC_PORT`)
+- Aggregated event log (`docs/event-log.md`): every menu/hook/save/job event
+  verbose in file, deduplicated with counters in the DevConsole (Logs/Events toggle)
 - Native Data Center co-op compatibility without a replacement networking stack
 - Tasten-HUD (`GregHud`) und zentrales Mod-Hub (F1)
 - Own hardware ID system (`gregID:` schema): stable device identity

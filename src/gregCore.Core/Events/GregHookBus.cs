@@ -116,7 +116,11 @@ public sealed class GregHookBus
         }
 
         if (anySuccess)
+        {
             _totalHooksFired++;
+            try { Diagnostics.GregEventLog.Emit("hook:" + hookName, "Hook " + hookName, "hook"); }
+            catch { /* event log must never break dispatch */ }
+        }
     }
 
     /// <summary>

@@ -29,6 +29,12 @@ public static class IncompatibleModGuard
     private static readonly HashSet<string> _handled =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Returns the set of mod/assembly names already handled (unpatched)
+    /// this session. Used by the problems diagnostic collector.
+    /// </summary>
+    public static IReadOnlyList<string> Handled() => _handled.ToList();
+
     public static bool DisableIncompatibleIdMods()
     {
         bool anyDisabled = false;

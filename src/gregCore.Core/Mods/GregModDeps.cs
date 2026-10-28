@@ -25,6 +25,15 @@ public static class GregModDeps
         public bool Required { get; set; } = true;
     }
 
+    /// <summary>
+    /// Returns all owner mod IDs that have declared dependencies.
+    /// Used by the problems diagnostic collector.
+    /// </summary>
+    public static List<string> DeclaredOwners()
+    {
+        lock (_lock) { return new List<string>(_declared.Keys); }
+    }
+
     public sealed class Problem
     {
         public string OwnerModId { get; set; } = "";

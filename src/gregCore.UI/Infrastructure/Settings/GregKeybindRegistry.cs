@@ -8,6 +8,11 @@ namespace gregCore.Infrastructure.Settings;
 
 public class GregKeybindRegistry
 {
+    /// <summary>
+    /// Singleton instance used by diagnostics and other framework consumers.
+    /// </summary>
+    public static GregKeybindRegistry Current { get; private set; } = null!;
+
     // ModId.ActionId -> KeybindEntry
     private readonly Dictionary<string, KeybindEntry> _keybinds = new();
     private readonly IGregLogger _logger;
@@ -41,6 +46,7 @@ public class GregKeybindRegistry
     public GregKeybindRegistry(IGregLogger logger)
     {
         _logger = logger.ForContext("KeybindRegistry");
+        Current = this;
     }
 
     public void Register(KeybindEntry entry)
